@@ -1,4 +1,7 @@
 #include "DxLib.h"
+#include "SceneManager.h"
+#include "Input.h"
+#include "Game.h"
 
 // プログラムは WinMain から始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -6,12 +9,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// 一部の関数はDxLib_Init()の前に実行する必要がある
 	ChangeWindowMode(true);
 
+	SetGraphMode(Game::kWindowWidth,Game::kWindowHeight,16);
+
+	SetWindowText("メテオファイターズ");
+
 	if (DxLib_Init() == -1)		// ＤＸライブラリ初期化処理
 	{
 		return -1;			// エラーが起きたら直ちに終了
 	}
 
+
 	SetDrawScreen(DX_SCREEN_BACK);
+
+	SceneManager sceneManager;
+	MyEngine::Input input;
+
+	sceneManager.Init();
 
 	// ゲームループ
 	while (ProcessMessage() != -1)
@@ -23,7 +36,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		ClearDrawScreen();
 
 		// ゲームの処理
+		input.Update();
+		sceneManager.Update(input);
 
+		sceneManager.Draw();
 
 		// 画面が切り替わるのを待つ
 		ScreenFlip();

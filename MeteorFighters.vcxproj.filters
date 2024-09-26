@@ -13,10 +13,108 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ソース ファイル\MyEngine">
+      <UniqueIdentifier>{9bb88e2a-6a5b-4fff-bba2-e28f94db2a6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\MyEngine\Physics">
+      <UniqueIdentifier>{6e416122-7c81-431a-aa15-5de52322ebe4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\MyEngine\Utility">
+      <UniqueIdentifier>{94d9998f-08c6-4c1b-a65e-29effb60ffe7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Scene">
+      <UniqueIdentifier>{bf1c5de7-6815-4eae-bbe5-299d951e0f95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\MyEngine">
+      <UniqueIdentifier>{de1114f5-d2dc-4a73-803d-8b7e559bb28d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="MyEngine\Physics\CapsuleColliderData.cpp">
+      <Filter>ソース ファイル\MyEngine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="MyEngine\Physics\Collidable.cpp">
+      <Filter>ソース ファイル\MyEngine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="MyEngine\Physics\Physics.cpp">
+      <Filter>ソース ファイル\MyEngine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="MyEngine\Physics\Rigidbody.cpp">
+      <Filter>ソース ファイル\MyEngine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="MyEngine\Physics\SphereColliderData.cpp">
+      <Filter>ソース ファイル\MyEngine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="MyEngine\Utility\Input.cpp">
+      <Filter>ソース ファイル\MyEngine\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="MyEngine\Utility\LoadCsv.cpp">
+      <Filter>ソース ファイル\MyEngine\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="MyEngine\Utility\Vector2.cpp">
+      <Filter>ソース ファイル\MyEngine\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="MyEngine\Utility\Vector3.cpp">
+      <Filter>ソース ファイル\MyEngine\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneBase.cpp">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneTitle.cpp">
+      <Filter>ソース ファイル\Scene</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SceneBase.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="MyEngine\Physics\ColliderData.h">
+      <Filter>ソース ファイル\MyEngine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="MyEngine\Physics\CapsuleColliderData.h">
+      <Filter>ソース ファイル\MyEngine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="MyEngine\Physics\Collidable.h">
+      <Filter>ソース ファイル\MyEngine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="MyEngine\Physics\ObjectTag.h">
+      <Filter>ソース ファイル\MyEngine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="MyEngine\Physics\Physics.h">
+      <Filter>ソース ファイル\MyEngine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="MyEngine\Physics\Rigidbody.h">
+      <Filter>ソース ファイル\MyEngine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="MyEngine\Physics\SphereColliderData.h">
+      <Filter>ソース ファイル\MyEngine\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneTitle.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="MyEngine\Utility\Input.h">
+      <Filter>ヘッダー ファイル\MyEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="MyEngine\Utility\LoadCsv.h">
+      <Filter>ヘッダー ファイル\MyEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="MyEngine\Utility\Vector2.h">
+      <Filter>ヘッダー ファイル\MyEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="MyEngine\Utility\Vector3.h">
+      <Filter>ヘッダー ファイル\MyEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
