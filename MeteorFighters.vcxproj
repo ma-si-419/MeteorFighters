@@ -150,7 +150,10 @@
     <ClCompile Include="MyEngine\Utility\Vector2.cpp" />
     <ClCompile Include="MyEngine\Utility\Vector3.cpp" />
     <ClCompile Include="SceneBase.cpp" />
+    <ClCompile Include="SceneGame.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="SceneMenu.cpp" />
+    <ClCompile Include="SceneSelect.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -167,7 +170,10 @@
     <ClInclude Include="MyEngine\Utility\Vector2.h" />
     <ClInclude Include="MyEngine\Utility\Vector3.h" />
     <ClInclude Include="SceneBase.h" />
+    <ClInclude Include="SceneGame.h" />
     <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="SceneMenu.h" />
+    <ClInclude Include="SceneSelect.h" />
     <ClInclude Include="SceneTitle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

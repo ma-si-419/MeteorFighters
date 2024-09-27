@@ -6,7 +6,7 @@
 
 namespace
 {
-	constexpr int kFadeSpeed = 3;
+	constexpr int kFadeSpeed = 15;
 }
 
 SceneManager::SceneManager() :
