@@ -1,15 +1,24 @@
 #include "DxLib.h"
 #include "SceneManager.h"
+#include "GraphManager.h"
 #include "Input.h"
 #include "Game.h"
 
-// プログラムは WinMain から始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	// 一部の関数はDxLib_Init()の前に実行する必要がある
-	ChangeWindowMode(true);
+	bool isWindow = false;
+
+#ifdef _DEBUG
+		
+	isWindow = true;
+
+#endif // _DEBUG
+
+	ChangeWindowMode(isWindow);
 
 	SetGraphMode(Game::kWindowWidth,Game::kWindowHeight,16);
+
+	SetChangeScreenModeGraphicsSystemResetFlag(false);
 
 	SetWindowText("メテオファイターズ");
 
@@ -21,6 +30,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	SetDrawScreen(DX_SCREEN_BACK);
 
+	GraphManager::GetInstance().Init();
 	SceneManager sceneManager;
 	MyEngine::Input input;
 
@@ -40,6 +50,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		sceneManager.Update(input);
 
 		sceneManager.Draw();
+#ifdef _DEBUG
+
+		if (input.IsTrigger("Select"))
+		{
+			isWindow = !isWindow;
+
+			ChangeWindowMode(isWindow);
+
+		}
+
+#endif // _DEBUG
 
 		// 画面が切り替わるのを待つ
 		ScreenFlip();
