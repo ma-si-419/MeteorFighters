@@ -1,7 +1,19 @@
 #include "Vector3.h"
+#include "Matrix.h"
 #include <cmath>
 #include <cassert>
 using namespace MyEngine;
+
+VECTOR MyEngine::Vector3::CastVECTOR()
+{
+	VECTOR ans;
+
+	ans.x = x;
+	ans.y = y;
+	ans.z = z;
+
+	return ans;
+}
 
 float Vector3::Length() const
 {
@@ -77,6 +89,39 @@ Vector3 Vector3::MatTransform(MATRIX& right)
 	ans.x = x * right.m[0][0] + y * right.m[1][0] + z * right.m[2][0] + right.m[3][0];
 	ans.y = x * right.m[0][1] + y * right.m[1][1] + z * right.m[2][1] + right.m[3][1];
 	ans.z = x * right.m[0][2] + y * right.m[1][2] + z * right.m[2][2] + right.m[3][2];
+	return ans;
+}
+
+MATRIX MyEngine::Vector3::GetRotationMat()
+{
+
+	Matrix rotX;
+	rotX.m[0][0] = 1; rotX.m[0][1] = 0;                    rotX.m[0][2] = 0;				   rotX.m[0][3] = 0;
+	rotX.m[1][0] = 0; rotX.m[1][1] = std::cosf(x);		   rotX.m[1][2] = std::sinf(x);		   rotX.m[1][3] = 0;
+	rotX.m[2][0] = 0; rotX.m[2][1] = -std::sinf(x);		   rotX.m[2][2] = std::cosf(x);		   rotX.m[2][3] = 0;
+	rotX.m[3][0] = 0; rotX.m[3][1] = 0;                    rotX.m[3][2] = 0;                   rotX.m[3][3] = 1;
+
+	Matrix rotY;
+	rotY.m[0][0] = std::cosf(y); rotY.m[0][1] = 0; rotY.m[0][2] = -std::sinf(y); rotY.m[0][3] = 0;
+	rotY.m[1][0] = 0;			 rotY.m[1][1] = 1; rotY.m[1][2] = 0;  		     rotY.m[1][3] = 0;
+	rotY.m[2][0] = std::sinf(y); rotY.m[2][1] = 0; rotY.m[2][2] = std::cosf(y);  rotY.m[2][3] = 0;
+	rotY.m[3][0] = 0;	  		 rotY.m[3][1] = 0; rotY.m[3][2] = 0;             rotY.m[3][3] = 1;
+
+	Matrix rotZ;
+	rotZ.m[0][0] = std::cosf(z);  rotZ.m[0][1] = std::sinf(z); rotZ.m[0][2] = 0; rotZ.m[0][3] = 0;
+	rotZ.m[1][0] = -std::sinf(z); rotZ.m[1][1] = std::cosf(z); rotZ.m[1][2] = 0; rotZ.m[1][3] = 0;
+	rotZ.m[2][0] = 0;             rotZ.m[2][1] = 0;			   rotZ.m[2][2] = 1; rotZ.m[2][3] = 0;
+	rotZ.m[3][0] = 0; 			  rotZ.m[3][1] = 0;		  	   rotZ.m[3][2] = 0; rotZ.m[3][3] = 1;
+
+	//âÒì]ÇçáÇÌÇπÇΩçsóÒ
+	Matrix rotMat;
+	//XÇÃçsóÒÇ∆YÇÃçsóÒÇèÊéZÇ∑ÇÈ
+	rotMat = rotX.Mul(rotY);
+	//èÊéZÇµÇΩÇ‡ÇÃÇ∆ZÇÃçsóÒÇèÊéZÇ∑ÇÈ
+	rotMat = rotMat.Mul(rotZ);
+	
+	MATRIX ans = rotMat.CastMATRIX();
+
 	return ans;
 }
 

@@ -1,6 +1,7 @@
 #include "SceneMenu.h"
 #include "SceneSelect.h"
 #include "DxLib.h"
+#include "Input.h"
 
 namespace
 {
@@ -20,9 +21,9 @@ void SceneMenu::Init()
 {
 }
 
-void SceneMenu::Update(MyEngine::Input input)
+void SceneMenu::Update()
 {
-	if (input.IsTrigger("A"))
+	if (MyEngine::Input::GetInstance().IsTrigger("A"))
 	{
 		m_sceneManager.ChangeScene(std::make_shared<SceneSelect>(m_sceneManager));
 	}
@@ -30,7 +31,12 @@ void SceneMenu::Update(MyEngine::Input input)
 
 void SceneMenu::Draw()
 {
+#ifdef _DEBUG
+	
 	DrawString(0,0,"SceneMenu",kWhiteColor);
+
+#endif // _DEBUG
+
 }
 
 void SceneMenu::End()

@@ -36,16 +36,8 @@ namespace MyEngine
 		/// DxLibのVECTORにキャスト
 		/// </summary>
 		/// <returns>VECTOR型のデータ</returns>
-		VECTOR CastVECTOR()
-		{
-			VECTOR retVec;
+		VECTOR CastVECTOR();
 
-			retVec.x = x;
-			retVec.y = y;
-			retVec.z = z;
-
-			return retVec;
-		}
 		/// <summary>
 		/// ベクトルの長さを取得
 		/// </summary>
@@ -80,7 +72,12 @@ namespace MyEngine
 		/// <param name="right">回転行列</param>
 		/// <returns>回転行列の向いている方向を正面とした移動ベクトル</returns>
 		Vector3 MatTransform(MATRIX& right);
-
+		
+		/// <summary>
+		/// 回転行列を返す
+		/// </summary>
+		/// <returns>このベクトルの回転行列</returns>
+		MATRIX GetRotationMat();
 
 		/*演算子オーバーロード*/
 		Vector3 operator+(Vector3 right)const;

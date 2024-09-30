@@ -1,23 +1,28 @@
 #include "DxLib.h"
 #include "Input.h"
 using namespace MyEngine;
-Input::Input()
+
+MyEngine::Input::~Input()
+{
+}
+
+void Input::Init()
 {
 	//ƒ{ƒ^ƒ“‚ÌÝ’è
-	m_inputActionMap["Ok"] = {{InputType::kKeyboard,KEY_INPUT_RETURN},{InputType::kPad,PAD_INPUT_A}};
-	m_inputActionMap["Pause"] = {{InputType::kKeyboard,KEY_INPUT_P}, {InputType::kPad,PAD_INPUT_START}};
-	m_inputActionMap["Select"] = {{InputType::kKeyboard,KEY_INPUT_TAB}, {InputType::kPad,PAD_INPUT_7}};
-	m_inputActionMap["Cancel"] = {{InputType::kKeyboard,KEY_INPUT_ESCAPE}, {InputType::kPad,PAD_INPUT_B}};
-	m_inputActionMap["Up"] = {{InputType::kKeyboard,KEY_INPUT_W}, {InputType::kPad,PAD_INPUT_UP}};
-	m_inputActionMap["Down"] = {{InputType::kKeyboard,KEY_INPUT_S}, {InputType::kPad,PAD_INPUT_DOWN}};
-	m_inputActionMap["Left"] = {{InputType::kKeyboard,KEY_INPUT_A}, {InputType::kPad,PAD_INPUT_LEFT}};
-	m_inputActionMap["Right"] = {{InputType::kKeyboard,KEY_INPUT_D}, {InputType::kPad,PAD_INPUT_RIGHT}};
-	m_inputActionMap["Lb"] = {{InputType::kKeyboard,KEY_INPUT_J}, {InputType::kPad,PAD_INPUT_5}};
-	m_inputActionMap["Rb"] = {{InputType::kKeyboard,KEY_INPUT_L}, {InputType::kPad,PAD_INPUT_6}};
-	m_inputActionMap["A"] = {{InputType::kKeyboard,KEY_INPUT_U}, {InputType::kPad,PAD_INPUT_1}};
-	m_inputActionMap["B"] = {{InputType::kKeyboard,KEY_INPUT_H}, {InputType::kPad,PAD_INPUT_2}};
-	m_inputActionMap["X"] = {{InputType::kKeyboard,KEY_INPUT_G}, {InputType::kPad,PAD_INPUT_3}};
-	m_inputActionMap["Y"] = {{InputType::kKeyboard,KEY_INPUT_Y}, {InputType::kPad,PAD_INPUT_4}};
+	m_inputActionMap["Ok"] = { {InputType::kKeyboard,KEY_INPUT_RETURN},{InputType::kPad,PAD_INPUT_A} };
+	m_inputActionMap["Pause"] = { {InputType::kKeyboard,KEY_INPUT_P}, {InputType::kPad,PAD_INPUT_START} };
+	m_inputActionMap["Select"] = { {InputType::kKeyboard,KEY_INPUT_TAB}, {InputType::kPad,PAD_INPUT_7} };
+	m_inputActionMap["Cancel"] = { {InputType::kKeyboard,KEY_INPUT_ESCAPE}, {InputType::kPad,PAD_INPUT_B} };
+	m_inputActionMap["Up"] = { {InputType::kKeyboard,KEY_INPUT_W}, {InputType::kPad,PAD_INPUT_UP} };
+	m_inputActionMap["Down"] = { {InputType::kKeyboard,KEY_INPUT_S}, {InputType::kPad,PAD_INPUT_DOWN} };
+	m_inputActionMap["Left"] = { {InputType::kKeyboard,KEY_INPUT_A}, {InputType::kPad,PAD_INPUT_LEFT} };
+	m_inputActionMap["Right"] = { {InputType::kKeyboard,KEY_INPUT_D}, {InputType::kPad,PAD_INPUT_RIGHT} };
+	m_inputActionMap["Lb"] = { {InputType::kKeyboard,KEY_INPUT_J}, {InputType::kPad,PAD_INPUT_5} };
+	m_inputActionMap["Rb"] = { {InputType::kKeyboard,KEY_INPUT_L}, {InputType::kPad,PAD_INPUT_6} };
+	m_inputActionMap["A"] = { {InputType::kKeyboard,KEY_INPUT_U}, {InputType::kPad,PAD_INPUT_1} };
+	m_inputActionMap["B"] = { {InputType::kKeyboard,KEY_INPUT_H}, {InputType::kPad,PAD_INPUT_2} };
+	m_inputActionMap["X"] = { {InputType::kKeyboard,KEY_INPUT_G}, {InputType::kPad,PAD_INPUT_3} };
+	m_inputActionMap["Y"] = { {InputType::kKeyboard,KEY_INPUT_Y}, {InputType::kPad,PAD_INPUT_4} };
 }
 void Input::Update()
 {
@@ -78,6 +83,27 @@ void Input::Update()
 	GetJoypadXInputState(DX_INPUT_PAD1, xInputState);
 	m_triggerInfo.left = xInputState->LeftTrigger;
 	m_triggerInfo.right = xInputState->RightTrigger;
+}
+
+void MyEngine::Input::StopUpdate()
+{
+	for (auto& item : m_currentInput)
+	{
+		item.second = false;
+	}
+
+	for (auto& item : m_lastInput)
+	{
+		item.second = false;
+	}
+
+	m_stickInfo.leftStickX = 0;
+	m_stickInfo.leftStickY = 0;
+	m_stickInfo.rightStickX = 0;
+	m_stickInfo.rightStickY = 0;
+
+	m_triggerInfo.left = 0;
+	m_triggerInfo.right = 0;
 }
 
 bool Input::IsPress(const std::string& action) const

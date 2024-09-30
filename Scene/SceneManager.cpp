@@ -7,6 +7,7 @@
 namespace
 {
 	constexpr int kFadeSpeed = 15;
+	const int kBlack = GetColor(0,0,0);
 }
 
 SceneManager::SceneManager() :
@@ -27,7 +28,7 @@ void SceneManager::Init()
 	m_pScene->Init();
 }
 
-void SceneManager::Update(MyEngine::Input input)
+void SceneManager::Update()
 {
 
 	//シーン切り替えフラグがたっていたら
@@ -56,13 +57,13 @@ void SceneManager::Update(MyEngine::Input input)
 			}
 		}
 		//シーン切り替えが始まったら入力をさせないようにする
-		MyEngine::Input none;
-		m_pScene->Update(none);
+		MyEngine::Input::GetInstance().StopUpdate();
+		m_pScene->Update();
 	}
 	//シーン切り替えしていないときの処理
 	else
 	{
-		m_pScene->Update(input);
+		m_pScene->Update();
 	}
 
 }
@@ -72,7 +73,7 @@ void SceneManager::Draw()
 	m_pScene->Draw();
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_fadeAlpha);
-	DrawBox(0, 0, Game::kWindowWidth, Game::kWindowHeight, GetColor(0, 0, 0), true);
+	DrawBox(0, 0, Game::kWindowWidth, Game::kWindowHeight, kBlack, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 void SceneManager::ChangeScene(std::shared_ptr<SceneBase> next)

@@ -9,7 +9,7 @@ public:
 	//‰Šú‰»ˆ—
 	virtual void Init() abstract;
 	//XVˆ—
-	virtual void Update(MyEngine::Input input) abstract;
+	virtual void Update() abstract;
 	//•`‰æˆ—
 	virtual void Draw() abstract;
 	//I—¹ˆ—

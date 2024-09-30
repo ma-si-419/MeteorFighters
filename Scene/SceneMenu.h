@@ -1,17 +1,18 @@
 #pragma once
 #include "SceneBase.h"
-class SceneSelect : public SceneBase
+class SceneMenu : public SceneBase
 {
 public:
-	SceneSelect(SceneManager& sceneManager);
-	virtual ~SceneSelect();
+	SceneMenu(SceneManager& sceneManager);
+	virtual ~SceneMenu();
 	//‰Šú‰»ˆ—
 	virtual void Init();
 	//XVˆ—
-	virtual void Update(MyEngine::Input input);
+	virtual void Update();
 	//•`‰æˆ—
 	virtual void Draw();
 	//I—¹ˆ—
 	virtual void End();
+
 };
 

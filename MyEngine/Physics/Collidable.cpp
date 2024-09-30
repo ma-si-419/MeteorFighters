@@ -15,16 +15,16 @@ Collidable::~Collidable()
 {
 }
 
-void Collidable::Init(std::shared_ptr<Physics> physics)
+void Collidable::Init()
 {
 	//•¨—î•ñ“o˜^
-	physics->Entry(shared_from_this());
+	Physics::GetInstance().Entry(shared_from_this());
 }
 
-void Collidable::Final(std::shared_ptr<Physics> physics)
+void Collidable::Final()
 {
 	//•¨—î•ñ‰ðœ
-	physics->Exit(shared_from_this());
+	Physics::GetInstance().Exit(shared_from_this());
 }
 
 void Collidable::OnCollide(std::shared_ptr<Collidable> collider)

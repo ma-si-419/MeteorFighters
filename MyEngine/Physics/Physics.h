@@ -6,7 +6,20 @@
 
 class Physics final
 {
+private:
+	Physics() = default;
+	~Physics();
+	Physics(const Physics&) = delete;
+	Physics& operator = (const Physics&) = delete;
+	Physics(Physics&&) = delete;
+	Physics& operator = (Physics&&) = delete;
 public:
+
+	static Physics& GetInstance()
+	{
+		static Physics instance;
+		return instance;
+	}
 	//”»’è‚ğ‚·‚éÕ“Ë•¨‚ğ“o˜^Eíœ‚·‚é
 	void Entry(std::shared_ptr<Collidable> col);
 	void Exit(std::shared_ptr<Collidable> col);

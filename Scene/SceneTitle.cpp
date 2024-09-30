@@ -3,6 +3,8 @@
 #include "DxLib.h"
 #include "Game.h"
 #include "GraphManager.h"
+#include "Input.h"
+
 namespace
 {
 	//文字を表示する座標
@@ -29,9 +31,12 @@ void SceneTitle::Init()
 	GraphManager::GetInstance().LoadSceneGraph("Title");
 }
 
-void SceneTitle::Update(MyEngine::Input input)
+void SceneTitle::Update()
 {
-
+	if (MyEngine::Input::GetInstance().IsTrigger("A"))
+	{
+		m_sceneManager.ChangeScene(std::make_shared<SceneMenu>(m_sceneManager));
+	}
 }
 
 
@@ -39,9 +44,13 @@ void SceneTitle::Draw()
 {
 	auto& graphManager = GraphManager::GetInstance();
 
+#ifdef _DEBUG
+
 	DrawGraph(0, 0, graphManager.GetHandle("タイトルロゴ"), true);
 
 	DrawString(0, 0, "SceneTitle", kWhiteColor);
+
+#endif // _DEBUG
 }
 
 void SceneTitle::End()

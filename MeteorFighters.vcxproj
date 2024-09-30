@@ -76,13 +76,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(DXLIB_DIR);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(DXLIB_DIR);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -93,7 +93,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(DXLIB_DIR);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -101,7 +101,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(DXLIB_DIR);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -110,13 +110,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(DXLIB_DIR);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(DXLIB_DIR);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -127,7 +127,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(DXLIB_DIR);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -135,12 +135,17 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(DXLIB_DIR);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Actor.cpp" />
+    <ClCompile Include="CharacterBase.cpp" />
+    <ClCompile Include="GameCamera.cpp" />
     <ClCompile Include="GraphManager.cpp" />
+    <ClCompile Include="MyEngine\Utility\LocalPos.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MyEngine\Utility\Matrix.cpp" />
     <ClCompile Include="MyEngine\Physics\CapsuleColliderData.cpp" />
     <ClCompile Include="MyEngine\Physics\Collidable.cpp" />
     <ClCompile Include="MyEngine\Physics\Physics.cpp" />
@@ -150,16 +155,22 @@
     <ClCompile Include="MyEngine\Utility\LoadCsv.cpp" />
     <ClCompile Include="MyEngine\Utility\Vector2.cpp" />
     <ClCompile Include="MyEngine\Utility\Vector3.cpp" />
-    <ClCompile Include="SceneBase.cpp" />
-    <ClCompile Include="SceneGame.cpp" />
-    <ClCompile Include="SceneManager.cpp" />
-    <ClCompile Include="SceneMenu.cpp" />
-    <ClCompile Include="SceneSelect.cpp" />
-    <ClCompile Include="SceneTitle.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Scene\SceneBase.cpp" />
+    <ClCompile Include="Scene\SceneGame.cpp" />
+    <ClCompile Include="Scene\SceneManager.cpp" />
+    <ClCompile Include="Scene\SceneMenu.cpp" />
+    <ClCompile Include="Scene\SceneSelect.cpp" />
+    <ClCompile Include="Scene\SceneTitle.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Actor.h" />
+    <ClInclude Include="CharacterBase.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameCamera.h" />
     <ClInclude Include="GraphManager.h" />
+    <ClInclude Include="MyEngine\Utility\LocalPos.h" />
+    <ClInclude Include="MyEngine\Utility\Matrix.h" />
     <ClInclude Include="MyEngine\Physics\CapsuleColliderData.h" />
     <ClInclude Include="MyEngine\Physics\Collidable.h" />
     <ClInclude Include="MyEngine\Physics\ColliderData.h" />
@@ -171,12 +182,13 @@
     <ClInclude Include="MyEngine\Utility\LoadCsv.h" />
     <ClInclude Include="MyEngine\Utility\Vector2.h" />
     <ClInclude Include="MyEngine\Utility\Vector3.h" />
-    <ClInclude Include="SceneBase.h" />
-    <ClInclude Include="SceneGame.h" />
-    <ClInclude Include="SceneManager.h" />
-    <ClInclude Include="SceneMenu.h" />
-    <ClInclude Include="SceneSelect.h" />
-    <ClInclude Include="SceneTitle.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="Scene\SceneBase.h" />
+    <ClInclude Include="Scene\SceneGame.h" />
+    <ClInclude Include="Scene\SceneManager.h" />
+    <ClInclude Include="Scene\SceneMenu.h" />
+    <ClInclude Include="Scene\SceneSelect.h" />
+    <ClInclude Include="Scene\SceneTitle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

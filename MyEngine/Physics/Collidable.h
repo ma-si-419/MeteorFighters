@@ -3,14 +3,15 @@
 #include "ColliderData.h"
 #include "Rigidbody.h"
 #include <memory>
+
 class Physics;
 class Collidable abstract : public std::enable_shared_from_this<Collidable>
 {
 public:
 	Collidable(ObjectTag tag, ColliderData::Kind colKind);
 	virtual ~Collidable();
-	virtual void Init(std::shared_ptr<Physics> physics);
-	virtual void Final(std::shared_ptr<Physics> physics);
+	virtual void Init();
+	virtual void Final();
 
 	ObjectTag GetTag() const { return m_tag; }
 

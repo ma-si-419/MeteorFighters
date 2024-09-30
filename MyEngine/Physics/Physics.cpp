@@ -4,6 +4,9 @@
 #include "Collidable.h"
 #include "CapsuleColliderData.h"
 #include "SphereColliderData.h"
+Physics::~Physics()
+{
+}
 void Physics::Entry(std::shared_ptr<Collidable> col)
 {
 	// “o˜^

@@ -1,13 +1,14 @@
 #include "SceneSelect.h"
 #include "SceneGame.h"
 #include "DxLib.h"
+#include "Input.h"
 
 namespace
 {
 	const int kWhiteColor = GetColor(255, 255, 255);
 }
 
-SceneSelect::SceneSelect(SceneManager& sceneManager):
+SceneSelect::SceneSelect(SceneManager& sceneManager) :
 	SceneBase(sceneManager)
 {
 }
@@ -20,9 +21,9 @@ void SceneSelect::Init()
 {
 }
 
-void SceneSelect::Update(MyEngine::Input input)
+void SceneSelect::Update()
 {
-	if (input.IsTrigger("A"))
+	if (MyEngine::Input::GetInstance().IsTrigger("A"))
 	{
 		m_sceneManager.ChangeScene(std::make_shared<SceneGame>(m_sceneManager));
 	}
@@ -30,7 +31,11 @@ void SceneSelect::Update(MyEngine::Input input)
 
 void SceneSelect::Draw()
 {
-	DrawString(0, 0, "SceneMenu", kWhiteColor);
+#ifdef _DEBUG
+
+	DrawString(0, 0, "SceneSelect", kWhiteColor);
+
+#endif // _DEBUG
 }
 
 void SceneSelect::End()

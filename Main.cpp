@@ -1,6 +1,7 @@
 #include "DxLib.h"
 #include "SceneManager.h"
 #include "GraphManager.h"
+#include "Physics.h"
 #include "Input.h"
 #include "Game.h"
 
@@ -31,8 +32,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetDrawScreen(DX_SCREEN_BACK);
 
 	GraphManager::GetInstance().Init();
+	MyEngine::Input::GetInstance().Init();
 	SceneManager sceneManager;
-	MyEngine::Input input;
 
 	sceneManager.Init();
 
@@ -46,13 +47,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		ClearDrawScreen();
 
 		// ÉQÅ[ÉÄÇÃèàóù
-		input.Update();
-		sceneManager.Update(input);
+		MyEngine::Input::GetInstance().Update();
+		sceneManager.Update();
+
+		Physics::GetInstance().Update();
 
 		sceneManager.Draw();
 #ifdef _DEBUG
 
-		if (input.IsTrigger("Select"))
+		if (MyEngine::Input::GetInstance().IsTrigger("Select"))
 		{
 			isWindow = !isWindow;
 

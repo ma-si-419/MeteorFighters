@@ -6,12 +6,32 @@ namespace MyEngine
 {
 	class Input
 	{
+	private:
+		Input() = default;
+		~Input();
+		Input(const Input&) = delete;
+		Input& operator = (const Input&) = delete;
+		Input(Input&&) = delete;
+		Input& operator = (Input&&) = delete;
 	public:
+
+		static Input& GetInstance()
+		{
+			static Input instance;
+			return instance;
+		}
 		/// <summary>
 		/// スティックの傾きを保存する構造体
 		/// </summary>
 		struct StickInfo
 		{
+			StickInfo()
+			{
+				leftStickX = 0;
+				leftStickY = 0;
+				rightStickX = 0;
+				rightStickY = 0;
+			}
 			int leftStickX;
 			int leftStickY;
 			int rightStickX;
@@ -20,16 +40,29 @@ namespace MyEngine
 
 		struct TriggerInfo
 		{
+			TriggerInfo()
+			{
+				left = 0;
+				right = 0;
+			}
 			int left;
 			int right;
 		};
-		
-		Input();
+
+		/// <summary>
+		/// キー情報を設定する
+		/// </summary>
+		void Init();
 
 		/// <summary>
 		/// 入力情報を更新する
 		/// </summary>
 		void Update();
+
+		/// <summary>
+		/// 入力情報を受け付けないようにする
+		/// </summary>
+		void StopUpdate();
 
 		/// <summary>
 		/// キー押したかどうか
@@ -78,8 +111,8 @@ namespace MyEngine
 		std::map<std::string, bool> m_currentInput;
 		std::map<std::string, bool> m_lastInput;
 
-		StickInfo m_stickInfo;
+		StickInfo m_stickInfo = StickInfo();
 
-		TriggerInfo m_triggerInfo;
+		TriggerInfo m_triggerInfo = TriggerInfo();
 	};
 }
