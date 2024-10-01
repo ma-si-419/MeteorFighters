@@ -1,6 +1,7 @@
 #pragma once
 #include "SceneBase.h"
 #include <vector>
+class GameManager;
 class Actor;
 class SceneGame : public SceneBase
 {
@@ -17,5 +18,6 @@ public:
 	virtual void End();
 private:
 	std::vector<std::shared_ptr<Actor>> m_pActors;
+	std::shared_ptr<GameManager> m_pGameManager;
 };
 

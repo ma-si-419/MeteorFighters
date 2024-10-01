@@ -1,6 +1,8 @@
 #include "SceneGame.h"
 #include "DxLib.h"
 #include "Player.h"
+#include "Enemy.h"
+#include "GameManager.h"
 
 namespace
 {
@@ -10,7 +12,19 @@ namespace
 SceneGame::SceneGame(SceneManager& sceneManager) :
 	SceneBase(sceneManager)
 {
-	m_pActors.push_back(std::make_shared<Player>());
+	m_pGameManager = std::make_shared<GameManager>();
+
+	std::shared_ptr<Player> player = std::make_shared<Player>();
+	std::shared_ptr<Enemy> enemy = std::make_shared<Enemy>();
+
+	player->SetGameManager(m_pGameManager);
+	enemy->SetGameManager(m_pGameManager);
+
+	m_pGameManager->SetPlayer(player);
+	m_pGameManager->SetEnemy(enemy);
+	
+	m_pActors.push_back(player);
+	m_pActors.push_back(enemy);
 }
 
 SceneGame::~SceneGame()

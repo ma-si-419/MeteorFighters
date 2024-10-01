@@ -10,3 +10,13 @@ CharacterBase::CharacterBase(ObjectTag tag):
 CharacterBase::~CharacterBase()
 {
 }
+
+void CharacterBase::SetGameManager(std::shared_ptr<GameManager> manager)
+{
+	m_pGameManager = manager;
+}
+
+MyEngine::Vector3 CharacterBase::GetPos()
+{
+	return m_rigidbody.GetPos();
+}

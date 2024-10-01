@@ -141,7 +141,9 @@
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="CharacterBase.cpp" />
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="GameCamera.cpp" />
+    <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="GraphManager.cpp" />
     <ClCompile Include="MyEngine\Utility\LocalPos.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -166,8 +168,10 @@
   <ItemGroup>
     <ClInclude Include="Actor.h" />
     <ClInclude Include="CharacterBase.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameCamera.h" />
+    <ClInclude Include="GameManager.h" />
     <ClInclude Include="GraphManager.h" />
     <ClInclude Include="MyEngine\Utility\LocalPos.h" />
     <ClInclude Include="MyEngine\Utility\Matrix.h" />

@@ -1,9 +1,8 @@
 #include "LocalPos.h"
 #include <cmath>
 
-LocalPos::LocalPos(MyEngine::Vector3 center)
+LocalPos::LocalPos()
 {
-	m_centerPos = center;
 }
 
 MyEngine::Vector3 LocalPos::GetWorldPos()
@@ -24,6 +23,11 @@ MyEngine::Vector3 LocalPos::GetWorldPos()
 void LocalPos::SetCenterPos(MyEngine::Vector3 pos)
 {
 	m_centerPos = pos;
+}
+
+void LocalPos::SetLocalPos(MyEngine::Vector3 pos)
+{
+	m_localPos = pos;
 }
 
 void LocalPos::SetFrontPos(MyEngine::Vector3 frontPos)

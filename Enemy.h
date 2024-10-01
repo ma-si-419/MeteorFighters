@@ -1,26 +1,17 @@
 #pragma once
 #include "CharacterBase.h"
-class GameCamera;
-class Player : public CharacterBase
+class GameManager;
+class Enemy : public CharacterBase
 {
 public:
 
-	Player();
-	virtual ~Player();
+	Enemy();
+	virtual ~Enemy();
 
 	void Init() override;
 	void Update() override;
 	void Draw() override;
 
 	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
-
-private:
-#ifdef _DEBUG
-
-	bool isGround;
-
-#endif // _DEBUG
-
-	std::shared_ptr<GameCamera> m_camera;
 };
 
