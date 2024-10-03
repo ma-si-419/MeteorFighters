@@ -1,4 +1,5 @@
 #include "Enemy.h"
+#include "EnemyStateIdle.h"
 
 namespace
 {
@@ -14,6 +15,8 @@ Enemy::Enemy() :
 	CharacterBase(ObjectTag::kEnemy)
 {
 	m_modelHandle = MV1LoadModel("data/model/protoFighter.mv1");
+	m_pState = std::make_shared<EnemyStateIdle>();
+	m_pState->Enter();
 }
 
 Enemy::~Enemy()
@@ -28,6 +31,14 @@ void Enemy::Init()
 
 void Enemy::Update()
 {
+	//State‚É•Ï‰»‚ª‚ ‚ê‚Î•Ï‰»‚³‚¹‚é
+	if (m_pState->GetKind() != m_pState->m_pNextState->GetKind())
+	{
+		m_pState = m_pState->m_pNextState;
+	}
+
+	//State‚ÌXVˆ—
+	m_pState->Update();
 }
 
 void Enemy::Draw()

@@ -2,6 +2,7 @@
 #include "Actor.h"
 class SceneGame;
 class GameManager;
+class CharacterStateBase;
 class CharacterBase : public Actor
 {
 public: 
@@ -19,4 +20,6 @@ protected:
 	std::shared_ptr<SceneGame> m_pScene;
 	//マネージャーのポインタ
 	std::shared_ptr<GameManager> m_pGameManager;
+	//State
+	std::shared_ptr<CharacterStateBase> m_pState;
 };

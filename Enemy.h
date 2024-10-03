@@ -13,5 +13,7 @@ public:
 	void Draw() override;
 
 	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
+private:
+
 };
 

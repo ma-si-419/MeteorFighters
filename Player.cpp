@@ -3,6 +3,7 @@
 #include "GameCamera.h"
 #include "GameManager.h"
 #include <cmath>
+#include "PlayerStateIdle.h"
 
 namespace
 {
@@ -25,6 +26,11 @@ Player::Player() :
 
 	m_camera = std::make_shared<GameCamera>();
 
+	m_pState = std::make_shared<PlayerStateIdle>();
+	m_pState->Enter();
+
+	
+
 #ifdef _DEBUG
 
 	isGround = true;
@@ -45,6 +51,15 @@ void Player::Init()
 
 void Player::Update()
 {
+	//Stateに変化があれば変化させる
+	if (m_pState->GetKind() != m_pState->m_pNextState->GetKind())
+	{
+		m_pState = m_pState->m_pNextState;
+	}
+	
+	//Stateの更新処理
+	m_pState->Update();
+
 
 	//ポジションの設定
 	MV1SetPosition(m_modelHandle, m_rigidbody.GetPos().CastVECTOR());
