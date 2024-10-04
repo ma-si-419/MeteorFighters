@@ -6,6 +6,16 @@ class CharacterStateBase;
 class CharacterBase : public Actor
 {
 public: 
+
+	enum class AnimKind
+	{
+		kIdle,
+		kGuard,
+		kStep,
+		kMove
+	};
+
+
 	CharacterBase(ObjectTag tag);
 	~CharacterBase();
 
@@ -13,6 +23,11 @@ public:
 
 	MyEngine::Vector3 GetPos();
 
+	void ChangeAnim(int animNumber,bool loop);
+
+	void PlayAnim();
+
+	bool GetAnimEnd();
 protected:
 	//モデルハンドル
 	int m_modelHandle;
@@ -22,4 +37,11 @@ protected:
 	std::shared_ptr<GameManager> m_pGameManager;
 	//State
 	std::shared_ptr<CharacterStateBase> m_pState;
+	//アニメーションの情報
+	int m_attachAnim;
+	int m_totalAnimTime;
+	int m_playAnimTime;
+	float m_animPlaySpeed;
+	bool m_isLoop;
+
 };

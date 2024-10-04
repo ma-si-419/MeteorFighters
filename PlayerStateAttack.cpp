@@ -1,7 +1,10 @@
 #include "PlayerStateAttack.h"
 #include "DxLib.h"
 #include "Input.h"
-
+PlayerStateAttack::PlayerStateAttack(std::shared_ptr<Player> player):
+	PlayerStateBase(player)
+{
+}
 void PlayerStateAttack::Enter()
 {
 	m_pNextState = shared_from_this();

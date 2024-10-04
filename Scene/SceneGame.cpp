@@ -12,6 +12,15 @@ namespace
 SceneGame::SceneGame(SceneManager& sceneManager) :
 	SceneBase(sceneManager)
 {
+
+}
+
+SceneGame::~SceneGame()
+{
+}
+
+void SceneGame::Init()
+{
 	m_pGameManager = std::make_shared<GameManager>();
 
 	std::shared_ptr<Player> player = std::make_shared<Player>();
@@ -22,17 +31,10 @@ SceneGame::SceneGame(SceneManager& sceneManager) :
 
 	m_pGameManager->SetPlayer(player);
 	m_pGameManager->SetEnemy(enemy);
-	
+
 	m_pActors.push_back(player);
 	m_pActors.push_back(enemy);
-}
 
-SceneGame::~SceneGame()
-{
-}
-
-void SceneGame::Init()
-{
 	for (auto& actor : m_pActors)
 	{
 		actor->Init();

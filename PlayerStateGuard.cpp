@@ -3,6 +3,11 @@
 #include "Input.h"
 
 
+PlayerStateGuard::PlayerStateGuard(std::shared_ptr<Player> player):
+	PlayerStateBase(player)
+{
+}
+
 void PlayerStateGuard::Enter()
 {
 	m_pNextState = shared_from_this();

@@ -2,6 +2,11 @@
 #include "DxLib.h"
 #include "Input.h"
 
+PlayerStateButtonBashing::PlayerStateButtonBashing(std::shared_ptr<Player> player):
+	PlayerStateBase(player)
+{
+}
+
 void PlayerStateButtonBashing::Enter()
 {
 	m_pNextState = shared_from_this();

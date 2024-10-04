@@ -5,7 +5,7 @@ namespace
 {
 #ifdef _DEBUG
 
-	const MyEngine::Vector3 kDebugPos(500,0,500);
+	const MyEngine::Vector3 kDebugPos(50,0,50);
 
 #endif // _DEBUG
 
@@ -14,9 +14,11 @@ namespace
 Enemy::Enemy() :
 	CharacterBase(ObjectTag::kEnemy)
 {
-	m_modelHandle = MV1LoadModel("data/model/protoFighter.mv1");
-	m_pState = std::make_shared<EnemyStateIdle>();
-	m_pState->Enter();
+	m_modelHandle = MV1LoadModel("data/model/Fighter.mv1");
+
+	MV1SetScale(m_modelHandle, VGet(0.1f, 0.1f, 0.1f));
+
+	
 }
 
 Enemy::~Enemy()
@@ -27,6 +29,9 @@ void Enemy::Init()
 {
 	m_rigidbody.SetPos(kDebugPos);
 	MV1SetPosition(m_modelHandle,m_rigidbody.GetPos().CastVECTOR());
+
+	m_pState = std::make_shared<EnemyStateIdle>();
+	m_pState->Enter();
 }
 
 void Enemy::Update()

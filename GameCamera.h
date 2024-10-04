@@ -20,5 +20,7 @@ private:
 	LocalPos m_localPos;
 
 	MyEngine::Vector3 m_targetPos;
+
+	int m_cameraHandle;
 };
 

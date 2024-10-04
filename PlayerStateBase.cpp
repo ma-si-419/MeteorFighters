@@ -6,6 +6,23 @@
 #include "PlayerStateRush.h"
 #include "PlayerStateHitAttack.h"
 #include "PlayerStateButtonBashing.h"
+#include "Player.h"
+#include "GameManager.h"
+
+PlayerStateBase::PlayerStateBase(std::shared_ptr<Player> player)
+{
+	m_pPlayer = player;
+}
+
+MyEngine::Vector3 PlayerStateBase::GetEnemyPos()
+{
+	return m_pPlayer->m_pGameManager->GetEnemyPos();
+}
+
+void PlayerStateBase::SetPlayerVelo(MyEngine::Vector3 velo)
+{
+	m_pPlayer->m_rigidbody.SetVelo(velo);
+}
 
 void PlayerStateBase::ChangeState(CharacterStateKind nextState)
 {
@@ -16,7 +33,7 @@ void PlayerStateBase::ChangeState(CharacterStateKind nextState)
 	if (nextState == CharacterStateKind::kIdle)
 	{
 		//ポインタの作成
-		m_pNextState = std::make_shared<PlayerStateIdle>();
+		m_pNextState = std::make_shared<PlayerStateIdle>(m_pPlayer);
 		//次のStateの開始処理
 		m_pNextState->Enter();
 		return;
@@ -25,7 +42,7 @@ void PlayerStateBase::ChangeState(CharacterStateKind nextState)
 	else if (nextState == CharacterStateKind::kMove)
 	{
 		//ポインタの作成
-		m_pNextState = std::make_shared<PlayerStateMove>();
+		m_pNextState = std::make_shared<PlayerStateMove>(m_pPlayer);
 		//次のStateの開始処理
 		m_pNextState->Enter();
 		return;
@@ -34,7 +51,7 @@ void PlayerStateBase::ChangeState(CharacterStateKind nextState)
 	else if (nextState == CharacterStateKind::kGuard)
 	{
 		//ポインタの作成
-		m_pNextState = std::make_shared<PlayerStateGuard>();
+		m_pNextState = std::make_shared<PlayerStateGuard>(m_pPlayer);
 		//次のStateの開始処理
 		m_pNextState->Enter();
 		return;
@@ -43,7 +60,7 @@ void PlayerStateBase::ChangeState(CharacterStateKind nextState)
 	else if (nextState == CharacterStateKind::kAttack)
 	{
 		//ポインタの作成
-		m_pNextState = std::make_shared<PlayerStateAttack>();
+		m_pNextState = std::make_shared<PlayerStateAttack>(m_pPlayer);
 		//次のStateの開始処理
 		m_pNextState->Enter();
 		return;
@@ -52,7 +69,7 @@ void PlayerStateBase::ChangeState(CharacterStateKind nextState)
 	else if (nextState == CharacterStateKind::kRush)
 	{
 		//ポインタの作成
-		m_pNextState = std::make_shared<PlayerStateRush>();
+		m_pNextState = std::make_shared<PlayerStateRush>(m_pPlayer);
 		//次のStateの開始処理
 		m_pNextState->Enter();
 		return;
@@ -61,7 +78,7 @@ void PlayerStateBase::ChangeState(CharacterStateKind nextState)
 	else if (nextState == CharacterStateKind::kHitAttack)
 	{
 		//ポインタの作成
-		m_pNextState = std::make_shared<PlayerStateHitAttack>();
+		m_pNextState = std::make_shared<PlayerStateHitAttack>(m_pPlayer);
 		//次のStateの開始処理
 		m_pNextState->Enter();
 		return;
@@ -70,7 +87,7 @@ void PlayerStateBase::ChangeState(CharacterStateKind nextState)
 	else if (nextState == CharacterStateKind::kButtonBashing)
 	{
 		//ポインタの作成
-		m_pNextState = std::make_shared<PlayerStateButtonBashing>();
+		m_pNextState = std::make_shared<PlayerStateButtonBashing>(m_pPlayer);
 		//次のStateの開始処理
 		m_pNextState->Enter();
 		return;

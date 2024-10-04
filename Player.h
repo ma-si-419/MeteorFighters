@@ -1,5 +1,6 @@
 #pragma once
 #include "CharacterBase.h"
+class PlayerStateBase;
 class GameCamera;
 class Player : public CharacterBase
 {
@@ -15,12 +16,9 @@ public:
 	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
 
 private:
-#ifdef _DEBUG
-
-	bool isGround;
-
-#endif // _DEBUG
 
 	std::shared_ptr<GameCamera> m_camera;
+
+	friend PlayerStateBase;
 };
 
