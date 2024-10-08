@@ -71,10 +71,6 @@ void Player::Update()
 	
 	//“G‚Ì•ûŒü‚ðŒü‚­‚æ‚¤‚É‚·‚é
 	MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - m_pGameManager->GetEnemyPos()).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
-
-
-
-
 }
 void Player::Draw()
 {
@@ -83,4 +79,9 @@ void Player::Draw()
 
 void Player::OnCollide(std::shared_ptr<Collidable> collider)
 {
+#ifdef _DEBUG
+
+	DrawString(0, 64, "Player‚ª‚È‚É‚©‚Æ‚Ô‚Â‚©‚Á‚½", GetColor(255, 255, 255));
+
+#endif // _DEBUG
 }

@@ -16,14 +16,20 @@ void PlayerStateGuard::Enter()
 
 void PlayerStateGuard::Update()
 {
+	//ガードボタンが押されている間このStateにいる
+	if (!MyEngine::Input::GetInstance().IsPress("B"))
+	{
+		
+		//ガードボタンが離されたら
+		ChangeState(CharacterStateKind::kIdle);
+
+	}
+
+
 #ifdef _DEBUG
 
 	DrawString(0, 16, "PlayerState:Guard", GetColor(255, 255, 255));
 
-	if (MyEngine::Input::GetInstance().IsTrigger("A"))
-	{
-		ChangeState(CharacterStateKind::kIdle);
-	}
 #endif // _DEBUG
 
 }

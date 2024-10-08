@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "GameManager.h"
+#include "Physics.h"
 
 namespace
 {
@@ -54,6 +55,8 @@ void SceneGame::Draw()
 #ifdef _DEBUG
 
 	DrawString(0, 0, "SceneGame", kWhiteColor);
+
+	Physics::GetInstance().DebugDraw();
 
 #endif // _DEBUG
 

@@ -72,26 +72,10 @@ void Physics::Update()
 				if (!hasFirstColData)
 				{
 					pushData.push_back({ first,second });
-					//if (first->GetTag() == ObjectTag::kPlayer)
-					//{
-					//	printfDx("プレイヤーとぶつかった");
-					//}
-					//if (first->GetTag() == ObjectTag::kEnemy)
-					//{
-					//	printfDx("エネミーとぶつかった");
-					//}
 				}
 				if (!hasSecondColData)
 				{
 					pushData.push_back({ second,first });
-					//if (first->GetTag() == ObjectTag::kPlayer)
-					//{
-					//	printfDx("プレイヤーとぶつかった");
-					//}
-					//if (first->GetTag() == ObjectTag::kEnemy)
-					//{
-					//	printfDx("エネミーとぶつかった");
-					//}
 				}
 			}
 		}
@@ -134,20 +118,24 @@ void Physics::FixPosition()
 		MyEngine::Vector3 velocity = item->m_nextPos - item->m_rigidbody.GetPos(); 
 		MyEngine::Vector3 nextPos = item->m_rigidbody.GetPos() + velocity;
 
-		// 位置確定
-		item->m_rigidbody.SetPos(nextPos);
-
 		//当たり判定がカプセルだったら
 		if (item->m_pColData->GetKind() == ColliderData::Kind::kCapsule)
 		{
 			auto capsuleCol = std::dynamic_pointer_cast<CapsuleColliderData>(item->m_pColData);
-			//伸びるカプセルかどうか取得する
-			if (!capsuleCol->m_isMoveStartPos)
+			//初期位置を一緒に動かすカプセルであれば
+			if (capsuleCol->m_isMoveStartPos)
 			{
-				//伸びないカプセルだったら初期位置を一緒に動かす
-				capsuleCol->m_startPos = item->m_nextPos;
+				//初期位置を一緒に動かす
+				MyEngine::Vector3 pos = item->m_nextPos;
+				pos.y += capsuleCol->m_length;
+				capsuleCol->m_startPos = pos;
+
 			}
 		}
+
+		// 位置確定
+		item->m_rigidbody.SetPos(nextPos);
+
 	}
 }
 

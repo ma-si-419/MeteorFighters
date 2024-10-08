@@ -60,6 +60,7 @@ void PlayerStateIdle::Update()
 		return;
 	}
 
+
 	SetPlayerVelo(MyEngine::Vector3(0, 0, 0));
 
 }

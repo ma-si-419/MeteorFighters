@@ -5,7 +5,7 @@ namespace
 {
 #ifdef _DEBUG
 
-	const MyEngine::Vector3 kDebugPos(50,0,50);
+	const MyEngine::Vector3 kDebugPos(50, 0, 50);
 
 #endif // _DEBUG
 
@@ -18,7 +18,7 @@ Enemy::Enemy() :
 
 	MV1SetScale(m_modelHandle, VGet(0.1f, 0.1f, 0.1f));
 
-	
+
 }
 
 Enemy::~Enemy()
@@ -27,8 +27,9 @@ Enemy::~Enemy()
 
 void Enemy::Init()
 {
+	Collidable::Init();
 	m_rigidbody.SetPos(kDebugPos);
-	MV1SetPosition(m_modelHandle,m_rigidbody.GetPos().CastVECTOR());
+	MV1SetPosition(m_modelHandle, m_rigidbody.GetPos().CastVECTOR());
 
 	m_pState = std::make_shared<EnemyStateIdle>();
 	m_pState->Enter();
@@ -53,4 +54,11 @@ void Enemy::Draw()
 
 void Enemy::OnCollide(std::shared_ptr<Collidable> collider)
 {
+#ifdef _DEBUG
+
+	DrawString(0, 48, "Enemy‚ª‚È‚É‚©‚Æ‚Ô‚Â‚©‚Á‚½", GetColor(255, 255, 255));
+
+#endif // _DEBUG
+
+
 }

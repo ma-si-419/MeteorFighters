@@ -1,4 +1,11 @@
 #include "CharacterBase.h"
+#include "CapsuleColliderData.h"
+
+namespace
+{
+	constexpr float kCharacterHeight = 4.5f;
+	constexpr float kCharacterRadius = 3.0f;
+}
 
 CharacterBase::CharacterBase(ObjectTag tag) :
 	Actor(tag, ColliderData::Kind::kCapsule),
@@ -9,6 +16,14 @@ CharacterBase::CharacterBase(ObjectTag tag) :
 	m_animPlaySpeed(0),
 	m_isLoop(false)
 {
+	auto capsuleData = std::dynamic_pointer_cast<CapsuleColliderData>(m_pColData);
+
+	capsuleData->m_radius = kCharacterRadius;
+
+	capsuleData->m_length = kCharacterHeight;
+
+	capsuleData->m_isMoveStartPos = true;
+
 }
 
 CharacterBase::~CharacterBase()

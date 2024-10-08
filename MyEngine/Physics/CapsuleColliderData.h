@@ -7,6 +7,7 @@ public:
 	CapsuleColliderData();
 	MyEngine::Vector3 m_startPos;
 	float m_radius;
+	float m_length;
 	bool m_isMoveStartPos;
 };
 
