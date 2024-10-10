@@ -140,6 +140,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
+    <ClCompile Include="Attack.cpp" />
+    <ClCompile Include="AttackManager.cpp" />
     <ClCompile Include="CharacterBase.cpp" />
     <ClCompile Include="CharacterStateBase.cpp" />
     <ClCompile Include="Enemy.cpp" />
@@ -185,6 +187,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h" />
+    <ClInclude Include="Attack.h" />
+    <ClInclude Include="AttackManager.h" />
     <ClInclude Include="CharacterBase.h" />
     <ClInclude Include="CharacterStateBase.h" />
     <ClInclude Include="Enemy.h" />

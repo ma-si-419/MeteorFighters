@@ -18,14 +18,9 @@ namespace
 
 }
 
-Player::Player() :
-	CharacterBase(ObjectTag::kPlayer)
+Player::Player(CharacterKind kind) :
+	CharacterBase(ObjectTag::kPlayer,kind)
 {
-	m_modelHandle = MV1LoadModel("data/model/Fighter.mv1");
-
-	MV1SetScale(m_modelHandle, VGet(0.1f, 0.1f, 0.1f));
-
-	m_camera = std::make_shared<GameCamera>();
 }
 
 Player::~Player()
@@ -35,6 +30,12 @@ Player::~Player()
 
 void Player::Init()
 {
+	m_modelHandle = MV1LoadModel("data/model/Fighter.mv1");
+
+	MV1SetScale(m_modelHandle, VGet(0.1f, 0.1f, 0.1f));
+
+	m_camera = std::make_shared<GameCamera>();
+
 	Collidable::Init();
 	m_camera->Init(m_rigidbody.GetPos());
 
@@ -62,6 +63,8 @@ void Player::Update()
 	
 	//プレイヤーからエネミーへのベクトル
 	MyEngine::Vector3 playerToTarget = m_pGameManager->GetEnemyPos() - m_rigidbody.GetPos();
+
+
 
 	m_camera->SetFrontPos(m_rigidbody.GetPos() + playerToTarget);
 

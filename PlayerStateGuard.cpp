@@ -19,10 +19,8 @@ void PlayerStateGuard::Update()
 	//ガードボタンが押されている間このStateにいる
 	if (!MyEngine::Input::GetInstance().IsPress("B"))
 	{
-		
 		//ガードボタンが離されたら
 		ChangeState(CharacterStateKind::kIdle);
-
 	}
 
 

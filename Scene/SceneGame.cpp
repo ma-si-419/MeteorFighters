@@ -4,6 +4,7 @@
 #include "Enemy.h"
 #include "GameManager.h"
 #include "Physics.h"
+#include "LoadCsv.h"
 
 namespace
 {
@@ -22,19 +23,8 @@ SceneGame::~SceneGame()
 
 void SceneGame::Init()
 {
-	m_pGameManager = std::make_shared<GameManager>();
-
-	std::shared_ptr<Player> player = std::make_shared<Player>();
-	std::shared_ptr<Enemy> enemy = std::make_shared<Enemy>();
-
-	player->SetGameManager(m_pGameManager);
-	enemy->SetGameManager(m_pGameManager);
-
-	m_pGameManager->SetPlayer(player);
-	m_pGameManager->SetEnemy(enemy);
-
-	m_pActors.push_back(player);
-	m_pActors.push_back(enemy);
+	m_pActors.push_back(m_pGameManager->GetPlayerPointer());
+	m_pActors.push_back(m_pGameManager->GetEnemyPointer());
 
 	for (auto& actor : m_pActors)
 	{
@@ -69,4 +59,17 @@ void SceneGame::Draw()
 
 void SceneGame::End()
 {
+}
+
+void SceneGame::SetCharacter(int player, int enemy)
+{
+	m_pGameManager = std::make_shared<GameManager>();
+
+	LoadCsv load;
+
+	std::vector<std::vector<std::string>> data = load.LoadFile("data/csv/characterStatus.csv");
+
+	m_pGameManager->SetPlayerStatus(player,data[player]);
+
+	m_pGameManager->SetEnemyStatus(enemy,data[enemy]);
 }

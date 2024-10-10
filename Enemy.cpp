@@ -11,8 +11,8 @@ namespace
 
 }
 
-Enemy::Enemy() :
-	CharacterBase(ObjectTag::kEnemy)
+Enemy::Enemy(CharacterKind kind) :
+	CharacterBase(ObjectTag::kEnemy,kind)
 {
 	m_modelHandle = MV1LoadModel("data/model/Fighter.mv1");
 

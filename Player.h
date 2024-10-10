@@ -6,7 +6,7 @@ class Player : public CharacterBase
 {
 public:
 
-	Player();
+	Player(CharacterKind kind);
 	virtual ~Player();
 
 	void Init() override;

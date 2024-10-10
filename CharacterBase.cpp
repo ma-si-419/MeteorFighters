@@ -1,5 +1,6 @@
 #include "CharacterBase.h"
 #include "CapsuleColliderData.h"
+#include "LoadCsv.h"
 
 namespace
 {
@@ -7,14 +8,15 @@ namespace
 	constexpr float kCharacterRadius = 3.0f;
 }
 
-CharacterBase::CharacterBase(ObjectTag tag) :
+CharacterBase::CharacterBase(ObjectTag tag,CharacterKind kind) :
 	Actor(tag, ColliderData::Kind::kCapsule),
 	m_modelHandle(-1),
 	m_attachAnim(-1),
 	m_totalAnimTime(-1),
 	m_playAnimTime(-1),
 	m_animPlaySpeed(0),
-	m_isLoop(false)
+	m_isLoop(false),
+	m_characterKind(kind)
 {
 	auto capsuleData = std::dynamic_pointer_cast<CapsuleColliderData>(m_pColData);
 
@@ -23,6 +25,8 @@ CharacterBase::CharacterBase(ObjectTag tag) :
 	capsuleData->m_length = kCharacterHeight;
 
 	capsuleData->m_isMoveStartPos = true;
+
+
 
 }
 
@@ -39,6 +43,7 @@ MyEngine::Vector3 CharacterBase::GetPos()
 {
 	return m_rigidbody.GetPos();
 }
+
 
 void CharacterBase::ChangeAnim(int animNumber, bool loop)
 {

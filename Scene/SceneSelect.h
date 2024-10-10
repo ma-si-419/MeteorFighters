@@ -13,5 +13,11 @@ public:
 	virtual void Draw();
 	//I—¹ˆ—
 	virtual void End();
+
+private:
+
+	int m_playerNumber;
+	int m_enemyNumber;
+
 };
 

@@ -5,7 +5,7 @@ class Enemy : public CharacterBase
 {
 public:
 
-	Enemy();
+	Enemy(CharacterKind kind);
 	virtual ~Enemy();
 
 	void Init() override;

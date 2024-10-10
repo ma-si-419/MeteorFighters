@@ -1,23 +1,49 @@
 #include "GameManager.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "AttackManager.h"
+#include "LoadCsv.h"
 
 GameManager::GameManager()
 {
+	
 }
 
 GameManager::~GameManager()
 {
 }
 
-void GameManager::SetPlayer(std::shared_ptr<Player> player)
+void GameManager::Update()
 {
-	m_pPlayer = player;
+	m_pAttackManager->Update();
 }
 
-void GameManager::SetEnemy(std::shared_ptr<Enemy> enemy)
+void GameManager::SetPlayerStatus(int number,std::vector<std::string> statusData)
 {
-	m_pEnemy = enemy;
+	//プレイヤー作成
+	m_pPlayer = std::make_shared<Player>(static_cast<CharacterBase::CharacterKind>(number));
+	//プレイヤーに自分のポインターを渡しておく
+	m_pPlayer->SetGameManager(shared_from_this());
+
+	CharacterBase::CharacterStatus status;
+
+	status.hp = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kHp)]);
+	status.atk = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kAtk)]);
+	status.def = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kDef)]);
+	status.spd = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSpd)]);
+	status.energyChargeSpeed = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kChargeSpd)]);
+
+	//プレイヤーのステータスを設定する
+	m_pPlayer->SetStatus(status);
+}
+
+//上の感じでエネミーも作る
+void GameManager::SetEnemyStatus(int number,std::vector<std::string> statusData)
+{
+	//エネミー作成
+	m_pEnemy = std::make_shared<Enemy>(static_cast<CharacterBase::CharacterKind>(number));
+	//エネミーに自分のポインターを渡しておく
+	m_pEnemy->SetGameManager(shared_from_this());
 }
 
 MyEngine::Vector3 GameManager::GetPlayerPos()
@@ -30,3 +56,13 @@ MyEngine::Vector3 GameManager::GetEnemyPos()
 	return m_pEnemy->GetPos();
 }
 
+void GameManager::AddAttack(int attackNumber, bool isSpecial, bool isPlayer)
+{
+	float power = 0;
+	if (isPlayer)
+	{
+		power = m_pPlayer->GetPower();
+	}
+
+	m_pAttackManager->AddAttack(attackNumber,isSpecial,isPlayer);
+}

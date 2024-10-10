@@ -9,7 +9,9 @@ namespace
 }
 
 SceneSelect::SceneSelect(SceneManager& sceneManager) :
-	SceneBase(sceneManager)
+	SceneBase(sceneManager),
+	m_playerNumber(0),
+	m_enemyNumber(0)
 {
 }
 
@@ -25,7 +27,12 @@ void SceneSelect::Update()
 {
 	if (MyEngine::Input::GetInstance().IsTrigger("A"))
 	{
-		m_sceneManager.ChangeScene(std::make_shared<SceneGame>(m_sceneManager));
+		//ゲームシーンのポインタ作成
+		std::shared_ptr<SceneGame> scene = std::make_shared<SceneGame>(m_sceneManager);
+		//ゲームシーンに選択しているキャラクター情報を与える
+		scene->SetCharacter(m_playerNumber,m_enemyNumber);
+		//ゲームシーンに移行する
+		m_sceneManager.ChangeScene(scene);
 	}
 }
 
