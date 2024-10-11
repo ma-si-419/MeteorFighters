@@ -54,5 +54,5 @@ void AttackManager::Draw()
 
 void AttackManager::AddAttack(int attackNumber, bool isSpecial, bool isPlayer,float power)
 {
-
+	
 }

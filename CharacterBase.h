@@ -37,7 +37,7 @@ public:
 		float atk = 0;
 		float def = 0;
 		float spd = 0;
-		float energyChargeSpeed = 0;
+		float chargeSpd = 0;
 	};
 
 	CharacterBase(ObjectTag tag,CharacterKind kind);
@@ -60,6 +60,12 @@ public:
 	/// </summary>
 	/// <param name="status">キャラクターのステータス</param>
 	void SetStatus(CharacterStatus status) { m_status = status; }
+
+	/// <summary>
+	/// キャラクターの攻撃力を取得する
+	/// </summary>
+	/// <returns>キャラクターの攻撃力</returns>
+	float GetPower() { return m_status.atk; }
 
 	/// <summary>
 	/// 再生するアニメーションを変える
