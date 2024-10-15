@@ -4,15 +4,19 @@ class Attack : public Collidable
 {
 public:
 
+	/// <summary>
+	/// 攻撃のステータス
+	/// </summary>
 	struct AttackStatus
 	{
-		int damage
+		int damage = 0;
+		float speed = 0;
 	};
 
 	/// <summary>
 	/// 攻撃のステータスの設定
 	/// </summary>
-	void Init();
+	void Init(AttackStatus status);
 
 	/// <summary>
 	/// 攻撃の更新(座標の更新など)
@@ -25,7 +29,6 @@ public:
 	void Draw();
 private:
 
-
-
+	AttackStatus m_status;
 };
 

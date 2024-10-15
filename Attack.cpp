@@ -1,7 +1,8 @@
 #include "Attack.h"
 
-void Attack::Init()
+void Attack::Init(AttackStatus status)
 {
+	m_status = status;
 }
 
 void Attack::Update()
