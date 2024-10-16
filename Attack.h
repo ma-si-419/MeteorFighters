@@ -1,5 +1,6 @@
 #pragma once
 #include "Collidable.h"
+#include "CharacterBase.h"
 class Attack : public Collidable
 {
 public:
@@ -11,7 +12,15 @@ public:
 	{
 		int damage = 0;
 		float speed = 0;
+		int lifeTime = 0;
+		CharacterBase::BurstPower burstPower = CharacterBase::BurstPower::kNone;
+		CharacterBase::HitDirection hitDirection = CharacterBase::HitDirection::kFar;
+		CharacterBase::HitReaction hitReaction = CharacterBase::HitReaction::kRow;
 	};
+
+	Attack(ObjectTag tag,MyEngine::Vector3 pos);
+
+	virtual ~Attack();
 
 	/// <summary>
 	/// 攻撃のステータスの設定
@@ -27,8 +36,24 @@ public:
 	/// 描画するものがあれば描画する
 	/// </summary>
 	void Draw();
+
+	bool IsGetExist() { return m_isExist; }
+
+	/// <summary>
+	/// 自身以外のCollidableとぶつかった時の処理を書く
+	/// </summary>
+	/// <param name="collider">ぶつかった相手側のコライダー</param>
+	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
 private:
 
+	//攻撃のステータス
 	AttackStatus m_status;
+
+	//シーンに出てから何フレームたったか
+	int m_lifeTime;
+
+	//存在しているかどうか
+	bool m_isExist;
+
 };
 

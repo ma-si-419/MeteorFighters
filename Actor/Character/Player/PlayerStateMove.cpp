@@ -1,4 +1,5 @@
 #include "PlayerStateMove.h"
+#include "PlayerStateIdle.h"
 #include "DxLib.h"
 #include "Input.h"
 #include "Player.h"
@@ -64,7 +65,9 @@ void PlayerStateMove::Update()
 	if (moveVec.sqLength() == 0)
 	{
 		//アイドル状態に戻る
-		ChangeState(CharacterStateKind::kIdle);
+		std::shared_ptr<PlayerStateIdle> next = std::make_shared<PlayerStateIdle>(m_pPlayer);
+
+		ChangeState(next);
 	}
 	//移動ベクトルを設定する
 	SetPlayerVelo(moveVec);
@@ -76,7 +79,9 @@ void PlayerStateMove::Update()
 
 	if (MyEngine::Input::GetInstance().IsTrigger("A"))
 	{
-		ChangeState(CharacterStateKind::kIdle);
+		std::shared_ptr<PlayerStateIdle> next = std::make_shared<PlayerStateIdle>(m_pPlayer);
+
+		ChangeState(next);
 	}
 #endif // _DEBUG
 

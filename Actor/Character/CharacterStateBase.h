@@ -21,10 +21,13 @@ public:
 
 protected:
 	
-	virtual void ChangeState(CharacterStateKind nextState) abstract;
+	virtual void ChangeState(std::shared_ptr<CharacterStateBase> nextState) abstract;
 
 	//Œ»İ‚Ìó‘Ô
 	CharacterStateKind m_kind;
+
+	//State‚É“ü‚Á‚Ä‰½ƒtƒŒ[ƒ€—§‚Á‚½‚©
+	int m_time = 0;
 
 };
 

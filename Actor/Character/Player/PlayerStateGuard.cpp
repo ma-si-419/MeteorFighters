@@ -1,4 +1,5 @@
 #include "PlayerStateGuard.h"
+#include "PlayerStateIdle.h"
 #include "DxLib.h"
 #include "Input.h"
 
@@ -20,7 +21,9 @@ void PlayerStateGuard::Update()
 	if (!MyEngine::Input::GetInstance().IsPress("B"))
 	{
 		//ガードボタンが離されたら
-		ChangeState(CharacterStateKind::kIdle);
+		std::shared_ptr<PlayerStateIdle> next = std::make_shared<PlayerStateIdle>(m_pPlayer);
+
+		ChangeState(next);
 	}
 
 

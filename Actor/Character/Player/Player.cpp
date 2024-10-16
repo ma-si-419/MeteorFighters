@@ -65,10 +65,10 @@ void Player::Update()
 	MyEngine::Vector3 playerToTarget = m_pGameManager->GetEnemyPos() - m_rigidbody.GetPos();
 
 
+	//カメラの正面方向を設定
+	m_camera->SetPlayerFrontPos(m_rigidbody.GetPos() + playerToTarget);
 
-	m_camera->SetFrontPos(m_rigidbody.GetPos() + playerToTarget);
-
-
+	//カメラの更新
 	m_camera->Update();
 
 	

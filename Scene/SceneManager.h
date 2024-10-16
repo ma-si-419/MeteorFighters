@@ -20,7 +20,7 @@ public:
 	//終了処理を呼ぶときに使う
 	void GameEnd() { m_isEnd = true; }
 	//終了処理が呼ばれたかどうか取得する
-	bool GetEnd() { return m_isEnd; }
+	bool IsGetEnd() { return m_isEnd; }
 private:
 	std::shared_ptr<SceneBase> m_pScene;//現在のシーン
 

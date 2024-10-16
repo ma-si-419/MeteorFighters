@@ -6,7 +6,7 @@
 
 class Player;
 class Enemy;
-class AttackManager;
+class Attack;
 class GameManager : public std::enable_shared_from_this<GameManager>
 {
 public:
@@ -57,18 +57,17 @@ public:
 	MyEngine::Vector3 GetEnemyPos();
 
 	/// <summary>
-	/// 攻撃を作成し、追加する
+	/// 管理する攻撃を追加する
 	/// </summary>
-	/// <param name="attackNumber">攻撃の番号</param>
-	/// <param name="isSpecial">必殺技かどうか</param>
-	/// <param name="isPlayer">プレイヤーかどうか</param>
-	void AddAttack(int attackNumber, bool isSpecial, bool isPlayer);
+	/// <param name="attack">追加する攻撃クラスのポインタ</param>
+	void AddAttack(std::shared_ptr<Attack> attack);
 
 private:
+
 	//プレイヤーのポインタ
 	std::shared_ptr<Player> m_pPlayer;
 	//エネミーのポインタ
 	std::shared_ptr<Enemy> m_pEnemy;
 	//攻撃の情報を持っているマネージャー
-	std::shared_ptr<AttackManager> m_pAttackManager;
+	std::vector<std::shared_ptr<Attack>> m_pAttacks;
 };

@@ -1,4 +1,5 @@
 #include "EnemyStateHitAttack.h"
+#include "EnemyStateIdle.h"
 #include "DxLib.h"
 
 
@@ -18,7 +19,9 @@ void EnemyStateHitAttack::Update()
 
 	if (m_time > 60)
 	{
-		ChangeState(CharacterStateKind::kIdle);
+		std::shared_ptr<EnemyStateIdle> next = std::make_shared<EnemyStateIdle>();
+
+		ChangeState(next);
 	}
 #endif // _DEBUG
 }

@@ -5,7 +5,7 @@ class EnemyStateBase : public CharacterStateBase
 {
 protected:
 	//State‚ÌØ‘Ö
-	void ChangeState(CharacterStateKind nextState) override;
+	void ChangeState(std::shared_ptr<CharacterStateBase> nextState) override;
 #ifdef _DEBUG
 
 	//‚»‚ÌState‚É“ü‚Á‚Ä‰½ƒtƒŒ[ƒ€—§‚Á‚½‚©

@@ -1,4 +1,5 @@
 #include "PlayerStateButtonBashing.h"
+#include "PlayerStateIdle.h"
 #include "DxLib.h"
 #include "Input.h"
 
@@ -21,7 +22,9 @@ void PlayerStateButtonBashing::Update()
 	
 	if (MyEngine::Input::GetInstance().IsTrigger("A"))
 	{
-		ChangeState(CharacterStateKind::kIdle);
+		std::shared_ptr<PlayerStateIdle> next = std::make_shared<PlayerStateIdle>(m_pPlayer);
+
+		ChangeState(next);
 	}
 #endif // _DEBUG
 

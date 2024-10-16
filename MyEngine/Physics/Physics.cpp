@@ -51,7 +51,7 @@ void Physics::Update()
 		for (auto& second : m_collidables)
 		{
 			//当たり判定チェック
-			if (CheckCollide(first, second))
+			if (IsCheckCollide(first, second))
 			{
 				//一度入れたものを二度入れないようにチェック
 				bool hasFirstColData = false;
@@ -139,7 +139,7 @@ void Physics::FixPosition()
 	}
 }
 
-bool Physics::CheckCollide(std::shared_ptr<Collidable> first, std::shared_ptr<Collidable> second)
+bool Physics::IsCheckCollide(std::shared_ptr<Collidable> first, std::shared_ptr<Collidable> second)
 {
 	//第一の当たり判定と第二の当たり判定がおなじものでなければ
 	if (first != second)

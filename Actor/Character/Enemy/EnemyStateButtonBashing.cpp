@@ -1,4 +1,5 @@
 #include "EnemyStateButtonBashing.h"
+#include "EnemyStateIdle.h"
 #include "DxLib.h"
 
 void EnemyStateButtonBashing::Enter()
@@ -17,7 +18,9 @@ void EnemyStateButtonBashing::Update()
 
 	if (m_time > 60)
 	{
-		ChangeState(CharacterStateKind::kIdle);
+		std::shared_ptr<EnemyStateIdle> next = std::make_shared<EnemyStateIdle>();
+
+		ChangeState(next);
 	}
 
 #endif // _DEBUG

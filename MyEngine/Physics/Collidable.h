@@ -13,8 +13,16 @@ public:
 	virtual void Init();
 	virtual void Final();
 
+	/// <summary>
+	/// 自身のタグを返す
+	/// </summary>
+	/// <returns>自身のObjectTag</returns>
 	ObjectTag GetTag() const { return m_tag; }
 
+	/// <summary>
+	/// Collidableどうしがぶつかった時の処理を書く
+	/// </summary>
+	/// <param name="collider">ぶつかった相手側のCollidable</param>
 	virtual void OnCollide(std::shared_ptr<Collidable> collider) abstract;
 
 protected:

@@ -39,7 +39,7 @@ void GameCamera::SetPlayerPosAndTarget(MyEngine::Vector3 player, MyEngine::Vecto
 	m_targetPos = target;
 }
 
-void GameCamera::SetFrontPos(MyEngine::Vector3 pos)
+void GameCamera::SetPlayerFrontPos(MyEngine::Vector3 pos)
 {
 	m_localPos.SetFrontPos(pos);
 }

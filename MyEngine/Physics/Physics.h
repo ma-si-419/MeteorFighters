@@ -31,7 +31,7 @@ private:
 	std::list<std::shared_ptr<Collidable>> m_collidables; //登録されたcollidableのリスト
 	void FixPosition();
 
-	bool CheckCollide(std::shared_ptr<Collidable> first, std::shared_ptr<Collidable> second);
+	bool IsCheckCollide(std::shared_ptr<Collidable> first, std::shared_ptr<Collidable> second);
 
 	// OnCollideの衝突通知のためのデータ
 	struct OnCollideInfo

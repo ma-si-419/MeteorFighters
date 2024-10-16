@@ -21,7 +21,7 @@ public:
 	/// プレイヤーの向いている方向を設定する
 	/// </summary>
 	/// <param name="pos">プレイヤーの前方向とする座標</param>
-	void SetFrontPos(MyEngine::Vector3 pos);
+	void SetPlayerFrontPos(MyEngine::Vector3 pos);
 
 
 private:
