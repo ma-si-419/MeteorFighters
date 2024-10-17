@@ -14,7 +14,7 @@ void PlayerStateIdle::Enter()
 {
 	m_pNextState = shared_from_this();
 	m_kind = CharacterStateKind::kIdle;
-	m_pPlayer->ChangeAnim(0, true);
+	m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kIdle, true);
 }
 
 void PlayerStateIdle::Update()
@@ -50,8 +50,6 @@ void PlayerStateIdle::Update()
 	//}
 #endif // _DEBUG
 
-	m_pPlayer->PlayAnim();
-
 	auto& input = MyEngine::Input::GetInstance();
 
 	//攻撃入力がされたら
@@ -60,7 +58,7 @@ void PlayerStateIdle::Update()
 		//次のStateのポインタ作成
 		std::shared_ptr<PlayerStateNormalAttack> next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
 		//何の攻撃を行うかをAttackStateに渡す
-		//next->
+		next->SetAttack("Low1");
 		//StateをAttackに変更する
 		ChangeState(next);
 		return;

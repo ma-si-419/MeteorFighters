@@ -46,9 +46,20 @@ public:
 	enum class AnimKind
 	{
 		kIdle,
+		kAssault,
 		kGuard,
-		kStep,
-		kMove
+		kDodge,
+		kStartCharge,
+		kInCharge,
+		kEndCharge,
+		kLowAttack1,
+		kLowAttack2,
+		kLowAttack3,
+		kLowAttack4,
+		kLowAttack5,
+		kLowAttack6,
+		kLowAttack7,
+		kLowAttack8
 	};
 
 	enum class CharacterKind
@@ -100,6 +111,7 @@ public:
 		float damageRate = -1;
 		int totalFrame = -1;
 		int attackFrame = -1;
+		int cancelFrame = -1;
 		HitReaction hitReaction = HitReaction::kLow;
 		HitDirection hitDirection = HitDirection::kFar;
 		BurstPower burstPower = BurstPower::kNone;
@@ -142,11 +154,11 @@ public:
 	/// </summary>
 	struct AttackData
 	{
-		MyEngine::Vector3 pos;
 		int damage = 0;
 		float speed = 0;
 		int lifeTime = 0;
 		bool isPlayer = true;
+		float radius = 0;
 		HitReaction hitReaction = HitReaction::kLow;
 		HitDirection hitDirection = HitDirection::kFar;
 		BurstPower burstPower = BurstPower::kNone;
@@ -182,9 +194,9 @@ public:
 	/// <summary>
 	/// 再生するアニメーションを変える
 	/// </summary>
-	/// <param name="animNumber">アニメーション番号</param>
+	/// <param name="animKind">アニメーションを指定</param>
 	/// <param name="loop">繰り返すかどうか</param>
-	void ChangeAnim(int animNumber, bool loop);
+	void ChangeAnim(AnimKind animKind, bool loop);
 
 	/// <summary>
 	/// アニメーションを再生する
@@ -211,12 +223,16 @@ public:
 	void SetNormalAttackData(std::vector<std::vector<std::string>> normalAttackData);
 
 	/// <summary>
-	/// 攻撃を作成する
+	/// 攻撃を作成してシーン上に出す
 	/// </summary>
-	/// <returns>攻撃クラスのポインタ</returns>
 	/// <param name="attackData">攻撃の情報</param>
-	std::shared_ptr<Attack> CreateAttack(AttackData attackData);
+	void CreateAttack(AttackData attackData);
 
+	/// <summary>
+	/// 通常攻撃の情報を取得する
+	/// </summary>
+	/// <param name="attackName">取得したい通常攻撃の名前</param>
+	/// <returns>通常攻撃を生成する際の情報</returns>
 	NormalAttackData GetNormalAttackData(std::string attackName);
 
 protected:
@@ -230,6 +246,7 @@ protected:
 		kDamageRate,//ダメージ倍率
 		kTotalFrame,//総フレーム
 		kAttackFrame,//攻撃発生フレーム
+		kCancelFrame,//次の攻撃に移行できるようになるフレーム
 		kHitReaction,//攻撃を受けた際の反応
 		kHitDirection,//攻撃を受けた時の吹き飛ぶ方向
 		kBurstPower,//吹き飛ぶ強さ
@@ -260,5 +277,7 @@ protected:
 	float m_playAnimTime;
 	float m_animPlaySpeed;
 	bool m_isLoop;
+	float m_animBlendRate;
+	int m_lastAnim;
 
 };

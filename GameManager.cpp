@@ -15,6 +15,19 @@ GameManager::~GameManager()
 
 void GameManager::Update()
 {
+#ifdef _DEBUG
+
+	MyEngine::Vector3 pos = m_pPlayer->GetPos();
+
+	DrawFormatString(0,80,GetColor(255,255,255),"プレイヤーの座標(%0.1f,%0.1f,%0.1f)",pos.x,pos.y,pos.z);
+	
+	pos = m_pEnemy->GetPos();
+
+	DrawFormatString(0,96,GetColor(255,255,255),"エネミーの座標(%0.1f,%0.1f,%0.1f)",pos.x,pos.y,pos.z);
+
+#endif // _DEBUG
+
+
 	for (auto& item : m_pAttacks)
 	{
 		//攻撃の更新
@@ -24,7 +37,13 @@ void GameManager::Update()
 	auto iterator = std::remove_if(m_pAttacks.begin(), m_pAttacks.end(),
 		[](const auto& item)
 		{
-			return !item->IsGetExist();
+			if (!item->IsGetExist())
+			{
+				item->Final();
+
+				return true;
+			}
+			return false;
 		});
 	m_pAttacks.erase(iterator, m_pAttacks.end());
 }

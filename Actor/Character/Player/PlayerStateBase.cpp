@@ -22,6 +22,9 @@ void PlayerStateBase::ChangeState(std::shared_ptr<CharacterStateBase> nextState)
 	//終了処理
 	Exit();
 
+	//次のStateを変更する
+	m_pNextState = nextState;
+
 	//次のStateの開始処理
 	m_pNextState->Enter();
 }

@@ -1,11 +1,13 @@
 #include "Attack.h"
 #include "Physics.h"
+#include "CapsuleColliderData.h"
 
 Attack::Attack(ObjectTag tag, MyEngine::Vector3 pos):
 	Collidable(tag, ColliderData::Kind::kCapsule),
 	m_lifeTime(0),
 	m_isExist(true)
 {
+	m_rigidbody.SetPos(pos);
 }
 
 Attack::~Attack()
@@ -16,6 +18,8 @@ void Attack::Init(AttackStatus status)
 {
 	m_status = status;
 	Collidable::Init();
+	auto col = std::dynamic_pointer_cast<CapsuleColliderData>(m_pColData);
+	col->m_radius = status.radius;
 }
 
 void Attack::Update()
@@ -24,7 +28,6 @@ void Attack::Update()
 	if (m_lifeTime > m_status.lifeTime)
 	{
 		m_isExist = false;
-		Collidable::Final();
 	}
 
 	//シーンに出てからのフレーム数を数える
@@ -33,6 +36,11 @@ void Attack::Update()
 
 void Attack::Draw()
 {
+}
+
+void Attack::Final()
+{
+	Collidable::Final();
 }
 
 void Attack::OnCollide(std::shared_ptr<Collidable> collider)

@@ -56,6 +56,8 @@ void Player::Update()
 	//Stateの更新処理
 	m_pState->Update();
 
+	//アニメーションの更新
+	PlayAnim();
 
 	//ポジションの設定
 	MV1SetPosition(m_modelHandle, m_rigidbody.GetPos().CastVECTOR());

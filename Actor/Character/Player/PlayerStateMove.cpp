@@ -1,5 +1,6 @@
 #include "PlayerStateMove.h"
 #include "PlayerStateIdle.h"
+#include "PlayerStateNormalAttack.h"
 #include "DxLib.h"
 #include "Input.h"
 #include "Player.h"
@@ -61,6 +62,18 @@ void PlayerStateMove::Update()
 		moveVec = moveDir * kSpeed;
 	}
 	
+	//攻撃入力がされたら
+	if (input.IsTrigger("X"))
+	{
+		//次のStateのポインタ作成
+		std::shared_ptr<PlayerStateNormalAttack> next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
+		//何の攻撃を行うかをAttackStateに渡す
+		next->SetAttack("Low1");
+		//StateをAttackに変更する
+		ChangeState(next);
+		return;
+	}
+
 	//移動していなかったら
 	if (moveVec.sqLength() == 0)
 	{

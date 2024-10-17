@@ -13,9 +13,10 @@ public:
 		int damage = 0;
 		float speed = 0;
 		int lifeTime = 0;
+		float radius = 0;
 		CharacterBase::BurstPower burstPower = CharacterBase::BurstPower::kNone;
 		CharacterBase::HitDirection hitDirection = CharacterBase::HitDirection::kFar;
-		CharacterBase::HitReaction hitReaction = CharacterBase::HitReaction::kRow;
+		CharacterBase::HitReaction hitReaction = CharacterBase::HitReaction::kLow;
 	};
 
 	Attack(ObjectTag tag,MyEngine::Vector3 pos);
@@ -36,6 +37,11 @@ public:
 	/// •`‰æ‚·‚é‚à‚Ì‚ª‚ ‚ê‚Î•`‰æ‚·‚é
 	/// </summary>
 	void Draw();
+
+	/// <summary>
+	/// ‚±‚ÌƒNƒ‰ƒX‚ğ‚¯‚·‚ÉŒÄ‚Ño‚·
+	/// </summary>
+	void Final();
 
 	bool IsGetExist() { return m_isExist; }
 

@@ -3,6 +3,9 @@
 namespace
 {
 	const MyEngine::Vector3 kPlayerToCameraInitVec(-17,15,-15);
+
+	constexpr float kCameraNear = 1.0f;
+	constexpr float kCameraFar = 100.0f;
 }
 
 GameCamera::GameCamera():
@@ -19,7 +22,7 @@ void GameCamera::Init(MyEngine::Vector3 centerPos)
 {
 	m_localPos.SetCenterPos(centerPos);
 	m_localPos.SetLocalPos(kPlayerToCameraInitVec);
-	SetCameraNearFar(1.0f, 100.0f);
+	SetCameraNearFar(kCameraNear, kCameraFar);
 
 	m_cameraHandle = CreateDirLightHandle(VGet(0,0,0));
 

@@ -12,5 +12,8 @@ void EnemyStateBase::ChangeState(std::shared_ptr<CharacterStateBase> nextState)
 	//I—¹ˆ—
 	Exit();
 
-	nextState->Enter();
+	m_pNextState = nextState;
+
+	//ŽŸ‚ÌState‚ÌŠJŽnˆ—
+	m_pNextState->Enter();
 }

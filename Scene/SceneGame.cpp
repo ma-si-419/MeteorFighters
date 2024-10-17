@@ -38,6 +38,7 @@ void SceneGame::Update()
 	{
 		actor->Update();
 	}
+	m_pGameManager->Update();
 }
 
 void SceneGame::Draw()
