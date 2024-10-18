@@ -1,5 +1,6 @@
 #pragma once
 #include "StateBase.h"
+class Collidable;
 class CharacterStateBase : public StateBase
 {
 public:
@@ -13,6 +14,8 @@ public:
 		kHitAttack,//UŒ‚‚ğó‚¯‚½
 		kButtonBashing//“G‚Æ‚Ì‰Ÿ‚µ‡‚¢
 	};
+
+	virtual void OnCollide(std::shared_ptr<Collidable> collider) abstract;
 
 	CharacterStateKind GetKind() { return m_kind; }
 

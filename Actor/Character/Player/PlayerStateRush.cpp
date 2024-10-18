@@ -32,3 +32,7 @@ void PlayerStateRush::Update()
 void PlayerStateRush::Exit()
 {
 }
+
+void PlayerStateRush::OnCollide(std::shared_ptr<Collidable> collider)
+{
+}

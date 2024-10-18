@@ -59,7 +59,8 @@ public:
 		kLowAttack5,
 		kLowAttack6,
 		kLowAttack7,
-		kLowAttack8
+		kLowAttack8,
+		kSkyIdle
 	};
 
 	enum class CharacterKind

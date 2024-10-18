@@ -14,6 +14,7 @@ protected:
 	void SetPlayerVelo(MyEngine::Vector3 velo);
 
 	void ChangeState(std::shared_ptr<CharacterStateBase> nextState) override;
+	
 	//プレイヤーのポインタ
 	std::shared_ptr<Player> m_pPlayer;
 

@@ -16,6 +16,8 @@ public:
 
 	virtual void Exit() override;
 
+	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
+
 	int GetAnimKind(std::string animName);
 private:
 

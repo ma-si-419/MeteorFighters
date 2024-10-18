@@ -17,6 +17,7 @@ namespace
 PlayerStateMove::PlayerStateMove(std::shared_ptr<Player> player) :
 	PlayerStateBase(player)
 {
+	m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kSkyIdle,true);
 }
 
 void PlayerStateMove::Enter()
@@ -100,5 +101,9 @@ void PlayerStateMove::Update()
 
 }
 void PlayerStateMove::Exit()
+{
+}
+
+void PlayerStateMove::OnCollide(std::shared_ptr<Collidable> collider)
 {
 }

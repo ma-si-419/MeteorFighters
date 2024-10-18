@@ -33,3 +33,7 @@ void PlayerStateHitAttack::Update()
 void PlayerStateHitAttack::Exit()
 {
 }
+
+void PlayerStateHitAttack::OnCollide(std::shared_ptr<Collidable> collider)
+{
+}

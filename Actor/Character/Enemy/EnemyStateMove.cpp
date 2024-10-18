@@ -6,6 +6,7 @@ void EnemyStateMove::Enter()
 {
 	m_kind = CharacterStateKind::kMove;
 	m_pNextState = shared_from_this();
+	
 }
 
 void EnemyStateMove::Update()
@@ -26,5 +27,9 @@ void EnemyStateMove::Update()
 }
 
 void EnemyStateMove::Exit()
+{
+}
+
+void EnemyStateMove::OnCollide(std::shared_ptr<Collidable> collider)
 {
 }

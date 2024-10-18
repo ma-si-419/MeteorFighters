@@ -36,6 +36,10 @@ private:
 	ObjectTag m_tag;
 
 	MyEngine::Vector3 m_nextPos;
+
+	//Õ“Ë‚µ‚½‚É•¨—‹““®‚ğ‚µ‚È‚¢‚Étrue‚É‚·‚é
+	bool m_isTrigger;
+
 	//Physics‚ªCollidable‚ğ©—R‚ÉŠÇ—‚Å‚«‚é‚æ‚¤‚É
 	friend Physics;
 };

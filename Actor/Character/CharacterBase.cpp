@@ -11,9 +11,11 @@ namespace
 	constexpr float kCharacterHeight = 4.5f;
 	constexpr float kCharacterRadius = 3.0f;
 
-	const MyEngine::Vector3 kAttackPos(0.0f, kCharacterHeight, kCharacterRadius * 2.0f);
+	constexpr float kAttackPopPos = kCharacterRadius * 3.0f;
 
-	constexpr float kAnimBlendSpeed = 0.07f;
+	const MyEngine::Vector3 kAttackPos(0.0f, kCharacterHeight, kAttackPopPos);
+
+	constexpr float kAnimBlendSpeed = 0.08f;
 }
 
 CharacterBase::CharacterBase(ObjectTag tag, CharacterKind kind) :
@@ -88,10 +90,6 @@ void CharacterBase::PlayAnim()
 		if (m_isLoop)
 		{
 			m_playAnimTime = 0;
-		}
-		else
-		{
-
 		}
 	}
 

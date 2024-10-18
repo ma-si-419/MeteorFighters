@@ -37,3 +37,7 @@ void PlayerStateGuard::Update()
 void PlayerStateGuard::Exit()
 {
 }
+
+void PlayerStateGuard::OnCollide(std::shared_ptr<Collidable> collider)
+{
+}

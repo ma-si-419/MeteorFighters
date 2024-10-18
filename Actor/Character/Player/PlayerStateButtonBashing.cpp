@@ -32,3 +32,7 @@ void PlayerStateButtonBashing::Update()
 void PlayerStateButtonBashing::Exit()
 {
 }
+
+void PlayerStateButtonBashing::OnCollide(std::shared_ptr<Collidable> collider)
+{
+}

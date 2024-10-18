@@ -82,3 +82,7 @@ void PlayerStateIdle::Exit()
 {
 
 }
+
+void PlayerStateIdle::OnCollide(std::shared_ptr<Collidable> collider)
+{
+}

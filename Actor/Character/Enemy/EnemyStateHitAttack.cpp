@@ -29,3 +29,7 @@ void EnemyStateHitAttack::Update()
 void EnemyStateHitAttack::Exit()
 {
 }
+
+void EnemyStateHitAttack::OnCollide(std::shared_ptr<Collidable> collider)
+{
+}

@@ -120,6 +120,10 @@ void PlayerStateNormalAttack::Exit()
 {
 }
 
+void PlayerStateNormalAttack::OnCollide(std::shared_ptr<Collidable> collider)
+{
+}
+
 int PlayerStateNormalAttack::GetAnimKind(std::string animName)
 {
 	int ans = 0;

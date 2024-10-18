@@ -29,3 +29,7 @@ void EnemyStateButtonBashing::Update()
 void EnemyStateButtonBashing::Exit()
 {
 }
+
+void EnemyStateButtonBashing::OnCollide(std::shared_ptr<Collidable> collider)
+{
+}

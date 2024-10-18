@@ -53,3 +53,7 @@ void EnemyStateIdle::Update()
 void EnemyStateIdle::Exit()
 {
 }
+
+void EnemyStateIdle::OnCollide(std::shared_ptr<Collidable> collider)
+{
+}
