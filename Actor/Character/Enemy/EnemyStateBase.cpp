@@ -1,11 +1,6 @@
 #include "EnemyStateBase.h"
-#include "EnemyStateIdle.h"
-#include "EnemyStateMove.h"
-#include "EnemyStateGuard.h"
-#include "EnemyStateAttack.h"
-#include "EnemyStateRush.h"
-#include "EnemyStateHitAttack.h"
-#include "EnemyStateButtonBashing.h"
+#include "Enemy.h"
+#include "GameManager.h"
 
 void EnemyStateBase::ChangeState(std::shared_ptr<CharacterStateBase> nextState)
 {
@@ -16,4 +11,9 @@ void EnemyStateBase::ChangeState(std::shared_ptr<CharacterStateBase> nextState)
 
 	//ŽŸ‚ÌState‚ÌŠJŽnˆ—
 	m_pNextState->Enter();
+}
+
+MyEngine::Vector3 EnemyStateBase::GetPlayerPos()
+{
+	return m_pEnemy->m_pGameManager->GetPlayerPos();
 }

@@ -10,6 +10,7 @@ class Attack;
 class CharacterBase : public Actor
 {
 public:
+	
 	/// <summary>
 	/// 攻撃を受けた時の反応
 	/// </summary>
@@ -19,7 +20,9 @@ public:
 		kMid,//中
 		kHigh,//強
 		kBurst,//吹っ飛び
-		kStun//怯み
+		kBottomStan,//下段スタン
+		kMiddleStan,//中段スタン
+		kTopStan//上段スタン
 	};
 
 	/// <summary>
