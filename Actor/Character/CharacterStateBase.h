@@ -12,8 +12,11 @@ public:
 		kAttack,//UŒ‚ó‘Ô
 		kRush,//“ËŒ‚ó‘Ô
 		kHitAttack,//UŒ‚‚ğó‚¯‚½
-		kButtonBashing//“G‚Æ‚Ì‰Ÿ‚µ‡‚¢
+		kButtonBashing,//“G‚Æ‚Ì‰Ÿ‚µ‡‚¢
+		kStateKindNum
 	};
+
+public:
 
 	virtual void OnCollide(std::shared_ptr<Collidable> collider) abstract;
 
@@ -27,10 +30,9 @@ protected:
 	virtual void ChangeState(std::shared_ptr<CharacterStateBase> nextState) abstract;
 
 	//Œ»İ‚Ìó‘Ô
-	CharacterStateKind m_kind;
+	CharacterStateKind m_kind = CharacterStateKind::kIdle;
 
 	//State‚É“ü‚Á‚Ä‰½ƒtƒŒ[ƒ€—§‚Á‚½‚©
 	int m_time = 0;
-
 };
 

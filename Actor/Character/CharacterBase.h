@@ -10,40 +10,20 @@ class Attack;
 class CharacterBase : public Actor
 {
 public:
-	
+
 	/// <summary>
-	/// 攻撃を受けた時の反応
+	/// 攻撃の種類
 	/// </summary>
-	enum class HitReaction
+	enum class AttackHitKind
 	{
 		kLow,//弱
-		kMid,//中
-		kHigh,//強
-		kBurst,//吹っ飛び
+		kMiddle,//中
+		kUpBurst,//上吹っ飛び
+		kDownBurst,//下吹っ飛び
+		kFarBurst,//奥吹っ飛び
 		kBottomStan,//下段スタン
 		kMiddleStan,//中段スタン
-		kTopStan//上段スタン
-	};
-
-	/// <summary>
-	/// 吹き飛ばす力
-	/// </summary>
-	enum class BurstPower
-	{
-		kNone,
-		kLow,
-		kMid,
-		kHigh
-	};
-
-	/// <summary>
-	/// 攻撃を受けた際にどちらの方向に動かすのか
-	/// </summary>
-	enum class HitDirection
-	{
-		kUp,
-		kDown,
-		kFar
+		kKindNum
 	};
 
 	enum class AnimKind
@@ -96,13 +76,14 @@ public:
 	};
 
 	/// <summary>
-	/// 必殺技の種類
+	/// 攻撃の種類
 	/// </summary>
-	enum class SpecialAttackKind
+	enum class AttackKind
 	{
+		kEnergy,//気弾攻撃
+		kPhysical,//格闘攻撃
 		kBeam,//レーザー上の攻撃
 		kRush,//ぶつかると演出に切り替わる攻撃
-		kEnergy,//気弾攻撃
 		kThrow,//ガードできなくぶつかると演出に切り替わる攻撃
 		kAssault//ぶつかると演出せずにそのままダメージを受ける攻撃
 	};
@@ -116,9 +97,8 @@ public:
 		int totalFrame = -1;
 		int attackFrame = -1;
 		int cancelFrame = -1;
-		HitReaction hitReaction = HitReaction::kLow;
-		HitDirection hitDirection = HitDirection::kFar;
-		BurstPower burstPower = BurstPower::kNone;
+		AttackHitKind attackHitKind = AttackHitKind::kLow;
+		AttackKind attackKind = AttackKind::kPhysical;
 		std::string nextLowComboName = "empty";
 		std::string nextHighComboName = "empty";
 		std::string animationName = "empty";
@@ -129,8 +109,8 @@ public:
 	/// </summary>
 	struct SpecialAttackData
 	{
-		std::string name;
-		SpecialAttackKind kind;//必殺技の種類によって吹き飛ばし方などを判別する
+		std::string name = "empty";
+		AttackKind kind = AttackKind::kBeam;//必殺技の種類によって吹き飛ばし方などを判別する
 		int cost = -1;
 		float damageRate = -1;
 		int startFrame = -1;//発生フレーム
@@ -163,10 +143,11 @@ public:
 		int lifeTime = 0;
 		bool isPlayer = true;
 		float radius = 0;
-		HitReaction hitReaction = HitReaction::kLow;
-		HitDirection hitDirection = HitDirection::kFar;
-		BurstPower burstPower = BurstPower::kNone;
+		AttackKind attackKind = AttackKind::kPhysical;
+		AttackHitKind attackHitKind = AttackHitKind::kLow;
 	};
+
+public:
 
 	CharacterBase(ObjectTag tag, CharacterKind kind);
 	~CharacterBase();
@@ -188,6 +169,12 @@ public:
 	/// </summary>
 	/// <param name="status">キャラクターのステータス</param>
 	void SetStatus(CharacterStatus status) { m_status = status; }
+
+	/// <summary>
+	/// 体力を減らす
+	/// </summary>
+	/// <param name="subHp">減少量</param>
+	void SubHp(int subHp);
 
 	/// <summary>
 	/// キャラクターの攻撃力を取得する
@@ -218,7 +205,7 @@ public:
 	/// </summary>
 	/// <param name="kind">必殺技の種類を表すstringのデータ</param>
 	/// <returns>SpecialAttackKind型の必殺技の種類</returns>
-	SpecialAttackKind GetSpecialAttackKind(std::string kind);
+	AttackKind GetSpecialAttackKind(std::string kind);
 
 	/// <summary>
 	/// 各キャラ共通で使用する通常攻撃を設定する
@@ -251,9 +238,8 @@ protected:
 		kTotalFrame,//総フレーム
 		kAttackFrame,//攻撃発生フレーム
 		kCancelFrame,//次の攻撃に移行できるようになるフレーム
-		kHitReaction,//攻撃を受けた際の反応
-		kHitDirection,//攻撃を受けた時の吹き飛ぶ方向
-		kBurstPower,//吹き飛ぶ強さ
+		kAttackHitKind,//この攻撃を受けた時のやられ状態
+		kAttackKind,//攻撃の種類
 		kLowComboName,//Xボタンを押したときに次に出る攻撃の名前
 		kHighComboName,//Yボタンを押したときに次に出る攻撃の名前
 		kAnimationName//アニメーションの名前
@@ -272,8 +258,12 @@ protected:
 	CharacterKind m_characterKind;
 	//自身のステータス
 	CharacterStatus m_status;
+	//現在の体力
+	int m_nowHp;
+	//現在の気力
+	int m_nowMp;
 	//すべてのキャラで共通で使う通常攻撃の情報
-	std::map<std::string,NormalAttackData> m_normalAttackData;
+	std::map<std::string, NormalAttackData> m_normalAttackData;
 
 	//アニメーションの情報
 	int m_attachAnim;

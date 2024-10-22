@@ -1,5 +1,14 @@
 #include "EnemyStateIdle.h"
+#include "EnemyStateHitAttack.h"
 #include "DxLib.h"
+#include "Collidable.h"
+#include "Attack.h"
+
+
+EnemyStateIdle::EnemyStateIdle(std::shared_ptr<Enemy> enemy):
+	EnemyStateBase(enemy)
+{
+}
 
 void EnemyStateIdle::Enter()
 {
@@ -19,7 +28,7 @@ void EnemyStateIdle::Update()
 	{
 		int rand = GetRand(6) + 1;
 
-		std::shared_ptr<EnemyStateIdle> next = std::make_shared<EnemyStateIdle>();
+		std::shared_ptr<EnemyStateIdle> next = std::make_shared<EnemyStateIdle>(m_pEnemy);
 
 		ChangeState(next);
 		//if (rand == 1)
@@ -48,6 +57,9 @@ void EnemyStateIdle::Update()
 		//}
 	}
 #endif // _DEBUG
+
+	SetEnemyVelo(MyEngine::Vector3(0,0,0));
+
 }
 
 void EnemyStateIdle::Exit()
@@ -56,4 +68,12 @@ void EnemyStateIdle::Exit()
 
 void EnemyStateIdle::OnCollide(std::shared_ptr<Collidable> collider)
 {
+	if (collider->GetTag() == ObjectTag::kPlayerAttack)
+	{
+		auto attack = std::static_pointer_cast<Attack>(collider);
+
+		auto status = attack->GetStatus();
+
+		HitAttack(attack, GetKind());
+	}
 }

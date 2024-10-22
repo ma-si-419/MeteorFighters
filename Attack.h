@@ -14,11 +14,11 @@ public:
 		float speed = 0;
 		int lifeTime = 0;
 		float radius = 0;
-		CharacterBase::BurstPower burstPower = CharacterBase::BurstPower::kNone;
-		CharacterBase::HitDirection hitDirection = CharacterBase::HitDirection::kFar;
-		CharacterBase::HitReaction hitReaction = CharacterBase::HitReaction::kLow;
+		CharacterBase::AttackKind attackKind = CharacterBase::AttackKind::kPhysical;
+		CharacterBase::AttackHitKind attackHitKind = CharacterBase::AttackHitKind::kLow;
 	};
 
+public:
 	Attack(ObjectTag tag,MyEngine::Vector3 pos);
 
 	virtual ~Attack();
@@ -43,7 +43,17 @@ public:
 	/// </summary>
 	void Final();
 
+	/// <summary>
+	/// 存在しているかを返す
+	/// </summary>
+	/// <returns>攻撃が存在しているかどうか</returns>
 	bool IsGetExist() { return m_isExist; }
+
+	/// <summary>
+	/// 攻撃のステータスを返す
+	/// </summary>
+	/// <returns>攻撃のステータス</returns>
+	AttackStatus GetStatus() { return m_status; }
 
 	/// <summary>
 	/// 自身以外のCollidableとぶつかった時の処理を書く

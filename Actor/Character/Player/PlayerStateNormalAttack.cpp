@@ -77,10 +77,8 @@ void PlayerStateNormalAttack::Update()
 	{
 		CharacterBase::AttackData attack;
 
-		attack.damage = attackData.damageRate * m_pPlayer->GetPower();
-		attack.burstPower = attackData.burstPower;
-		attack.hitDirection = attackData.hitDirection;
-		attack.hitReaction = attackData.hitReaction;
+		attack.damage = static_cast<int>(attackData.damageRate * m_pPlayer->GetPower());
+		attack.attackHitKind = attackData.attackHitKind;
 		attack.isPlayer = true;
 		attack.lifeTime = kNormalAttackLifeTime;
 		attack.speed = 0;

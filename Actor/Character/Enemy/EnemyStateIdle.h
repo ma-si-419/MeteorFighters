@@ -3,6 +3,9 @@
 class EnemyStateIdle : public EnemyStateBase, public std::enable_shared_from_this<EnemyStateIdle>
 {
 public:
+
+	EnemyStateIdle(std::shared_ptr<Enemy> enemy);
+
 	virtual void Enter() override;
 
 	virtual void Update() override;

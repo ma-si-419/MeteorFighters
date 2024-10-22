@@ -3,6 +3,9 @@
 class EnemyStateMove : public EnemyStateBase, public std::enable_shared_from_this<EnemyStateMove>
 {
 public:
+
+	EnemyStateMove(std::shared_ptr<Enemy> enemy);
+
 	virtual void Enter() override;
 
 	virtual void Update() override;

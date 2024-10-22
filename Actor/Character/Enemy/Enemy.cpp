@@ -31,7 +31,9 @@ void Enemy::Init()
 	m_rigidbody.SetPos(kDebugPos);
 	MV1SetPosition(m_modelHandle, m_rigidbody.GetPos().CastVECTOR());
 
-	m_pState = std::make_shared<EnemyStateIdle>();
+	auto enemy = std::static_pointer_cast<Enemy>(shared_from_this());
+
+	m_pState = std::make_shared<EnemyStateIdle>(enemy);
 	m_pState->Enter();
 }
 
@@ -45,6 +47,8 @@ void Enemy::Update()
 
 	//State‚ÌXVˆ—
 	m_pState->Update();
+
+	MV1SetPosition(m_modelHandle,m_rigidbody.GetPos().CastVECTOR());
 }
 
 void Enemy::Draw()
@@ -54,6 +58,9 @@ void Enemy::Draw()
 
 void Enemy::OnCollide(std::shared_ptr<Collidable> collider)
 {
+
+	m_pState->OnCollide(collider);
+
 #ifdef _DEBUG
 
 	DrawString(0, 48, "Enemy‚ª‚È‚É‚©‚Æ‚Ô‚Â‚©‚Á‚½", GetColor(255, 255, 255));

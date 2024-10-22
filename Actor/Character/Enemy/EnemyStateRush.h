@@ -3,6 +3,9 @@
 class EnemyStateRush : public EnemyStateBase, public std::enable_shared_from_this<EnemyStateRush>
 {
 public:
+	
+	EnemyStateRush(std::shared_ptr<Enemy> enemy);
+
 	virtual void Enter() override;
 
 	virtual void Update() override;

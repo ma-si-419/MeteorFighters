@@ -6,102 +6,38 @@
 
 namespace
 {
-	constexpr int kDownTimes[static_cast<int>(EnemyStateHitAttack::HitReaction::kReactionNum)] =
+	constexpr int kDownTimes[static_cast<int>(EnemyStateHitAttack::HitKind::kKindNum)] =
 	{
+		15,
+		20,
 		40,
 		40,
-		50,
+		40,
 		60,
-		180,
-		180,
-		180
+		60
 	};
+
+	constexpr float kMoveSpeed[static_cast<int>(EnemyStateHitAttack::HitKind::kKindNum)] =
+	{
+		0.3f,
+		1.5f,
+		3.0f,
+		3.0f,
+		3.0f,
+		0.01f,
+		0.01f
+	};
+
+	//移動する時間の割合
+	constexpr float kMoveTimeRate = 0.7f;
 }
 
-void EnemyStateHitAttack::HitAttack(HitReaction reaction, BurstPower power, HitDirection direction)
+EnemyStateHitAttack::EnemyStateHitAttack(std::shared_ptr<Enemy> enemy):
+	EnemyStateBase(enemy),
+	m_downTime(0),
+	m_moveTime(0),
+	m_hitReaction(HitKind::kLow)
 {
-
-	int reactions[static_cast<int>(HitReaction::kReactionNum)] = {};
-
-	for (auto item : m_hitReactions)
-	{
-		reactions[static_cast<int>(item)]++;
-	}
-
-
-	//ダウンタイムを設定する
-	m_downTime = kDownTimes[static_cast<int>(reaction)];
-	//現在のやられ状態を設定する
-	m_hitReaction = reaction;
-	//動く方向を設定する
-	MyEngine::Vector3 moveDir;
-	//攻撃した相手の座標を中心としたローカル座標を作成する
-	LocalPos local;
-	local.SetCenterPos(GetPlayerPos());
-	MyEngine::Vector3 centerFrontPos = m_pEnemy->GetPos() - GetPlayerPos() + GetPlayerPos();
-	local.SetFrontPos(centerFrontPos);
-
-	if (direction == HitDirection::kUp)
-	{
-		
-
-	}
-	else if (direction == HitDirection::kDown)
-	{
-
-	}
-	else if (direction == HitDirection::kFar)
-	{
-
-	}
-
-	//コンボとやられ状態の確認
-	if (reaction == HitReaction::kLow)
-	{
-
-	}
-	else if (reaction == HitReaction::kMid)
-	{
-
-	}
-	else if (reaction == HitReaction::kHigh)
-	{
-
-	}
-	else if (reaction == HitReaction::kBurst)
-	{
-
-	}
-	else if (reaction == HitReaction::kBottomStan)
-	{
-		//同じスタン攻撃を二度受けていたら
-		if (reactions[static_cast<int>(reaction)] > 0)
-		{
-			//やられ状態を変化させる
-			
-		}
-	}
-	else if (reaction == HitReaction::kMiddleStan)
-	{
-		//同じスタン攻撃を二度受けていたら
-		if (reactions[static_cast<int>(reaction)] > 0)
-		{
-			//やられ状態を変化させる
-
-		}
-	}
-	else if (reaction == HitReaction::kTopStan)
-	{
-		//同じスタン攻撃を二度受けていたら
-		if (reactions[static_cast<int>(reaction)] > 0)
-		{
-			//やられ状態を変化させる
-
-		}
-	}
-
-	//今まで受けた攻撃を保存しておく
-	m_hitReactions.push_back(reaction);
 }
 
 void EnemyStateHitAttack::Enter()
@@ -115,14 +51,16 @@ void EnemyStateHitAttack::Update()
 
 	m_time++;
 	//設定した時間たったら
-	if (m_downTime = m_time)
+	if (m_downTime == m_time)
 	{
 
-		std::shared_ptr<EnemyStateIdle> next = std::make_shared<EnemyStateIdle>();
+		std::shared_ptr<EnemyStateIdle> next = std::make_shared<EnemyStateIdle>(m_pEnemy);
 
 		//アイドル状態に戻る
 		ChangeState(next);
 	}
+
+	SetEnemyVelo(m_moveVec);
 
 
 #ifdef _DEBUG
@@ -136,6 +74,94 @@ void EnemyStateHitAttack::Exit()
 {
 }
 
+void EnemyStateHitAttack::HitAttack(HitKind kind)
+{
+
+	//コンボ中に何の攻撃を受けたかを保存しておく
+	int hitAttackKinds[static_cast<int>(HitKind::kKindNum)] = {};
+
+	for (auto item : m_hitReactions)
+	{
+		hitAttackKinds[static_cast<int>(item)]++;
+	}
+
+
+	//動けない時間を設定する
+	m_downTime = kDownTimes[static_cast<int>(kind)];
+	//現在のやられ状態を設定する
+	m_hitReaction = kind;
+	//動く方向を設定する
+	MyEngine::Vector3 moveDir;
+	//攻撃されたキャラクターの座標を中心としたローカル座標を作成する
+	LocalPos local;
+	local.SetCenterPos(m_pEnemy->GetPos());
+	//ローカル座標の前方向を攻撃したものから攻撃されたものに向ける
+	MyEngine::Vector3 centerFrontPos = (m_pEnemy->GetPos() - GetPlayerPos()).Normalize() + m_pEnemy->GetPos();
+	local.SetFrontPos(centerFrontPos);
+
+
+	//上方向に吹っ飛ばすもの
+	if (kind == HitKind::kUpBurst)
+	{
+		//斜め上に吹き飛ばす
+		local.SetLocalPos(MyEngine::Vector3(0, 1, 1));
+	}
+	//下方向に吹っ飛ばすもの
+	else if (kind == HitKind::kDownBurst)
+	{
+		//斜め下に吹き飛ばす
+		local.SetLocalPos(MyEngine::Vector3(0, -1, 1));
+	}
+	//それ以外のもの
+	else
+	{
+		//基本的に奥方向に動かす
+		local.SetLocalPos(MyEngine::Vector3(0, 0, 1));
+	}
+
+	moveDir = (local.GetWorldPos() - m_pEnemy->GetPos());
+
+	//やられ状態によって移動速度を変更する
+	m_moveVec = moveDir * kMoveSpeed[static_cast<int>(kind)];
+
+	//コンボとやられ状態の確認
+
+	//軽い吹き飛ばし攻撃
+	if (kind == HitKind::kMiddle)
+	{
+		//二度受けていたら
+		if (hitAttackKinds[static_cast<int>(kind)] > 0)
+		{
+			//やられ状態を変化させる
+		}
+
+	}
+	//下段スタン攻撃
+	else if (kind == HitKind::kBottomStan)
+	{
+		//二度受けていたら
+		if (hitAttackKinds[static_cast<int>(kind)] > 0)
+		{
+			//やられ状態を変化させる
+
+		}
+	}
+	//中段スタン攻撃
+	else if (kind == HitKind::kMiddleStan)
+	{
+		//二度受けていたら
+		if (hitAttackKinds[static_cast<int>(kind)] > 0)
+		{
+			//やられ状態を変化させる
+
+		}
+	}
+
+	//今まで受けた攻撃を保存しておく
+	m_hitReactions.push_back(kind);
+}
+
 void EnemyStateHitAttack::OnCollide(std::shared_ptr<Collidable> collider)
 {
+
 }

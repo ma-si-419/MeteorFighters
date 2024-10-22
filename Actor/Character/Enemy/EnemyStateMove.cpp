@@ -2,6 +2,11 @@
 #include "EnemyStateIdle.h"
 #include "DxLib.h"
 
+EnemyStateMove::EnemyStateMove(std::shared_ptr<Enemy> enemy):
+	EnemyStateBase(enemy)
+{
+}
+
 void EnemyStateMove::Enter()
 {
 	m_kind = CharacterStateKind::kMove;
@@ -19,7 +24,7 @@ void EnemyStateMove::Update()
 
 	if (m_time > 60)
 	{
-		std::shared_ptr<EnemyStateIdle> next = std::make_shared<EnemyStateIdle>();
+		std::shared_ptr<EnemyStateIdle> next = std::make_shared<EnemyStateIdle>(m_pEnemy);
 
 		ChangeState(next);
 	}

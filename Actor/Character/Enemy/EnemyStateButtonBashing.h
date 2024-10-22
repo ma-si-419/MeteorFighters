@@ -3,6 +3,8 @@
 class EnemyStateButtonBashing : public EnemyStateBase, public std::enable_shared_from_this<EnemyStateButtonBashing>
 {
 public:
+	EnemyStateButtonBashing(std::shared_ptr<Enemy> enemy);
+
 	virtual void Enter() override;
 
 	virtual void Update() override;

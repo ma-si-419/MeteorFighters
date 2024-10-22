@@ -16,6 +16,27 @@ namespace
 	const MyEngine::Vector3 kAttackPos(0.0f, kCharacterHeight, kAttackPopPos);
 
 	constexpr float kAnimBlendSpeed = 0.08f;
+
+	const std::map<std::string, CharacterBase::AttackHitKind> kAttackHitKindMap =
+	{
+		{"弱",CharacterBase::AttackHitKind::kLow},
+		{"中",CharacterBase::AttackHitKind::kMiddle},
+		{"奥吹っ飛び",CharacterBase::AttackHitKind::kFarBurst},
+		{"上吹っ飛び",CharacterBase::AttackHitKind::kUpBurst},
+		{"下吹っ飛び",CharacterBase::AttackHitKind::kDownBurst},
+		{"中スタン",CharacterBase::AttackHitKind::kMiddleStan},
+		{"下スタン",CharacterBase::AttackHitKind::kBottomStan}
+	};
+
+	const std::map<std::string, CharacterBase::AttackKind> kSpecialAttackKindMap =
+	{
+		{"ビーム",CharacterBase::AttackKind::kBeam},
+		{"格闘",CharacterBase::AttackKind::kRush},
+		{"気弾",CharacterBase::AttackKind::kEnergy},
+		{"投げ",CharacterBase::AttackKind::kThrow},
+		{"体当たり",CharacterBase::AttackKind::kAssault}
+	};
+
 }
 
 CharacterBase::CharacterBase(ObjectTag tag, CharacterKind kind) :
@@ -58,6 +79,11 @@ void CharacterBase::SetGameManager(std::shared_ptr<GameManager> manager)
 MyEngine::Vector3 CharacterBase::GetPos()
 {
 	return m_rigidbody.GetPos();
+}
+
+void CharacterBase::SubHp(int subHp)
+{
+
 }
 
 
@@ -111,39 +137,14 @@ bool CharacterBase::IsGetAnimEnd()
 	return false;
 }
 
-CharacterBase::SpecialAttackKind CharacterBase::GetSpecialAttackKind(std::string kind)
+CharacterBase::AttackKind CharacterBase::GetSpecialAttackKind(std::string kind)
 {
-	if (kind == "ビーム")
-	{
-		return SpecialAttackKind::kBeam;
-	}
-	else if (kind == "格闘")
-	{
-		return SpecialAttackKind::kRush;
-	}
-	else if (kind == "気弾")
-	{
-		return SpecialAttackKind::kEnergy;
-	}
-	else if (kind == "投げ")
-	{
-		return SpecialAttackKind::kThrow;
-	}
-	else if (kind == "体当たり")
-	{
-		return SpecialAttackKind::kAssault;
-	}
-	else
-	{
-		assert(false);
-
-		return SpecialAttackKind::kBeam;
-	}
+	return kSpecialAttackKindMap.at(kind);
 }
 
 void CharacterBase::SetNormalAttackData(std::vector<std::vector<std::string>> normalAttackData)
 {
-	for (auto item : normalAttackData)
+	for (auto& item : normalAttackData)
 	{
 		NormalAttackData pushData;
 
@@ -152,80 +153,10 @@ void CharacterBase::SetNormalAttackData(std::vector<std::vector<std::string>> no
 		pushData.attackFrame = stoi(item[static_cast<int>(NormalAttackDataSort::kAttackFrame)]);
 		pushData.cancelFrame = stoi(item[static_cast<int>(NormalAttackDataSort::kCancelFrame)]);
 		pushData.animationName = item[static_cast<int>(NormalAttackDataSort::kAnimationName)];
+		pushData.attackKind = static_cast<AttackKind>(stoi(item[static_cast<int>(NormalAttackDataSort::kAttackKind)]));
 		pushData.nextLowComboName = item[static_cast<int>(NormalAttackDataSort::kLowComboName)];
 		pushData.nextHighComboName = item[static_cast<int>(NormalAttackDataSort::kHighComboName)];
-
-
-		//一旦情報を保存する変数
-		std::string temp;
-
-		//受けた時のやられ状態
-		temp = item[static_cast<int>(NormalAttackDataSort::kHitReaction)];
-
-		HitReaction hitReaction = HitReaction::kLow;
-		if (temp == "弱")
-		{
-			hitReaction = HitReaction::kLow;
-		}
-		else if (temp == "中")
-		{
-			hitReaction = HitReaction::kMid;
-		}
-		else if (temp == "強")
-		{
-			hitReaction = HitReaction::kHigh;
-		}
-		else if (temp == "吹っ飛び")
-		{
-			hitReaction = HitReaction::kBurst;
-		}
-
-		pushData.hitReaction = hitReaction;
-
-		//攻撃を受けた時の吹き飛ぶ方向
-		temp = item[static_cast<int>(NormalAttackDataSort::kHitDirection)];
-
-		HitDirection hitDirection = HitDirection::kFar;
-
-		if (temp == "奥")
-		{
-			hitDirection = HitDirection::kFar;
-		}
-		else if (temp == "上")
-		{
-			hitDirection = HitDirection::kUp;
-		}
-		else if (temp == "下")
-		{
-			hitDirection = HitDirection::kDown;
-		}
-
-		pushData.hitDirection = hitDirection;
-
-		//吹き飛ぶ強さ
-		temp = item[static_cast<int>(NormalAttackDataSort::kBurstPower)];
-
-		BurstPower burstPower = BurstPower::kNone;
-
-		if (temp == "無")
-		{
-			burstPower = BurstPower::kNone;
-		}
-		else if (temp == "弱")
-		{
-			burstPower = BurstPower::kLow;
-		}
-		else if (temp == "中")
-		{
-			burstPower = BurstPower::kMid;
-		}
-		else if (temp == "強")
-		{
-			burstPower = BurstPower::kHigh;
-		}
-
-		pushData.burstPower = burstPower;
-
+		pushData.attackHitKind = kAttackHitKindMap.at(item[static_cast<int>(NormalAttackDataSort::kAttackHitKind)]);
 
 		m_normalAttackData[item[static_cast<int>(NormalAttackDataSort::kAttackName)]] = pushData;
 	}
@@ -285,9 +216,8 @@ void CharacterBase::CreateAttack(AttackData attackData)
 	status.speed = attackData.speed;
 	status.lifeTime = attackData.lifeTime;
 	status.radius = attackData.radius;
-	status.hitDirection = attackData.hitDirection;
-	status.hitReaction = attackData.hitReaction;
-	status.burstPower = attackData.burstPower;
+	status.attackHitKind = attackData.attackHitKind;
+	status.attackKind = attackData.attackKind;
 
 	ans->Init(status);
 
