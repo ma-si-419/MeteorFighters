@@ -1,5 +1,6 @@
 #include "Physics.h"
 #include <cassert>
+#include <cmath>
 #include "Vector3.h"
 #include "Collidable.h"
 #include "CapsuleColliderData.h"
@@ -43,9 +44,25 @@ void Physics::Update()
 	for (auto& item : m_collidables)
 	{
 		item->m_nextPos = (item->m_rigidbody.GetPos() + item->m_rigidbody.GetVelo());
+
+		//当たり判定がカプセルだったら
+		if (item->m_pColData->GetKind() == ColliderData::Kind::kCapsule)
+		{
+			auto capsuleCol = std::dynamic_pointer_cast<CapsuleColliderData>(item->m_pColData);
+
+			//初期位置を一緒に動かすカプセルであれば
+			if (capsuleCol->m_isMoveStartPos)
+			{
+				//初期位置を一緒に動かす
+				MyEngine::Vector3 pos = item->m_nextPos;
+				pos.y += capsuleCol->m_length;
+				capsuleCol->m_nextStartPos = pos;
+
+			}
+		}
 	}
 	//当たっているものを入れる配列
-	std::vector<OnCollideInfo> pushData;
+	std::vector<OnCollideInfo> hitData;
 	for (auto& first : m_collidables)
 	{
 		for (auto& second : m_collidables)
@@ -56,7 +73,7 @@ void Physics::Update()
 				//一度入れたものを二度入れないようにチェック
 				bool hasFirstColData = false;
 				bool hasSecondColData = false;
-				for (auto& item : pushData)
+				for (auto& item : hitData)
 				{
 					//すでに入れていたら弾く
 					if (item.owner == first)
@@ -71,22 +88,29 @@ void Physics::Update()
 				//弾かれなかった場合当たったものリストに入れる
 				if (!hasFirstColData)
 				{
-					pushData.push_back({ first,second });
+					hitData.push_back({ first,second });
 				}
 				if (!hasSecondColData)
 				{
-					pushData.push_back({ second,first });
+					hitData.push_back({ second,first });
 				}
 			}
 		}
 	}
 	//当たった当たり判定の当たった時の処理を呼ぶ
-	for (auto& hitCol : pushData)
+	for (auto& hitCol : hitData)
 	{
 		hitCol.OnCollide();
+		//物理挙動をするものだけ動かす
+		if (!hitCol.owner->m_pColData->GetIsTrigger() &&
+			!hitCol.colider->m_pColData->GetIsTrigger())
+		{
+			//座標修正
+			FixNextPosition(hitCol);
+		}
 	}
-	//位置修正
-	FixPosition();
+	//座標確定
+	ConfirmPosition();
 }
 
 void Physics::DebugDraw()
@@ -108,28 +132,37 @@ void Physics::DebugDraw()
 			DrawSphere3D(item->m_rigidbody.GetPos().CastVECTOR(), sphereData->m_radius, 3, GetColor(255, 255, 0), GetColor(255, 255, 255), false);
 		}
 	}
+
+	//地面の線の描画
+	for (int x = 0; x < 20; x++)
+	{
+		for (int z = 0; z < 20; z++)
+		{
+			DrawLine3D(VGet(x * 10.0f - 50.0f,0.0f,-1000.0f),VGet(x * 10.0f - 50.0f,0.0f,1000.0f),GetColor(255,0,0));
+			DrawLine3D(VGet(-1000.0f,0.0f, z * 10.0f - 50.0f),VGet(1000.0f,0.0f, z * 10 - 50.0f),GetColor(255,255,0));
+		}
+	}
+
 }
 
-void Physics::FixPosition()
+void Physics::ConfirmPosition()
 {
 	for (auto& item : m_collidables)
 	{
 		// Posを更新するので、velocityもそこに移動するvelocityに修正
-		MyEngine::Vector3 velocity = item->m_nextPos - item->m_rigidbody.GetPos(); 
+		MyEngine::Vector3 velocity = item->m_nextPos - item->m_rigidbody.GetPos();
 		MyEngine::Vector3 nextPos = item->m_rigidbody.GetPos() + velocity;
 
 		//当たり判定がカプセルだったら
 		if (item->m_pColData->GetKind() == ColliderData::Kind::kCapsule)
 		{
 			auto capsuleCol = std::dynamic_pointer_cast<CapsuleColliderData>(item->m_pColData);
+
 			//初期位置を一緒に動かすカプセルであれば
 			if (capsuleCol->m_isMoveStartPos)
 			{
 				//初期位置を一緒に動かす
-				MyEngine::Vector3 pos = item->m_nextPos;
-				pos.y += capsuleCol->m_length;
-				capsuleCol->m_startPos = pos;
-
+				capsuleCol->m_startPos = capsuleCol->m_nextStartPos;
 			}
 		}
 
@@ -137,6 +170,150 @@ void Physics::FixPosition()
 		item->m_rigidbody.SetPos(nextPos);
 
 	}
+}
+
+void Physics::FixNextPosition(OnCollideInfo hitCol)
+{
+	//今回動かす当たり判定
+	auto moveCol = hitCol.owner;
+	//今回動かない当たり判定
+	auto staticCol = hitCol.colider;
+
+	//動かす当たり判定が球で
+	if (moveCol->m_pColData->GetKind() == ColliderData::Kind::kSphere)
+	{
+		//動かない当たり判定が球の場合
+		if (staticCol->m_pColData->GetKind() == ColliderData::Kind::kSphere)
+		{
+			//球のデータにダウンキャスト
+			auto staticSphereData = std::dynamic_pointer_cast<SphereColliderData>(staticCol->m_pColData);
+
+			//調整する方向
+			MyEngine::Vector3 fixDir = (moveCol->m_nextPos - staticCol->m_nextPos).Normalize();
+
+			//球の半径+ちょっと(半径だけ足すとぶつかっている場所に補正するから)離す
+			float fixScale = staticSphereData->m_radius + 0.001f;
+
+			//位置の補正
+			moveCol->m_nextPos = (fixDir * fixScale) + staticCol->m_nextPos;
+		}
+		//動かない当たり判定がカプセルの場合
+		else if (staticCol->m_pColData->GetKind() == ColliderData::Kind::kCapsule)
+		{
+			//動かない当たり判定をカプセルのデータにダウンキャスト
+			auto staticCapsuleData = std::dynamic_pointer_cast<CapsuleColliderData>(staticCol->m_pColData);
+
+			//球とカプセルの当たり判定を取得する
+			float distance = Segment_Point_MinLength(staticCol->m_nextPos.CastVECTOR(), staticCapsuleData->m_nextStartPos.CastVECTOR(), moveCol->m_nextPos.CastVECTOR());
+
+			//最近接点を求める
+
+			//カプセルの線
+			MyEngine::Vector3 startToEnd = staticCol->m_nextPos - staticCapsuleData->m_nextStartPos;
+
+			//カプセルの線の端から球の座標までのベクトル
+			MyEngine::Vector3 startToPoint = moveCol->m_nextPos - staticCapsuleData->m_nextStartPos;
+
+			//線上のどの辺かを求める
+			float t = startToEnd.Dot(startToPoint) / startToEnd.SqLength();
+			//排他処理
+			t = std::fmax(std::fmin(t, 1.0f), 0.0f);
+			//最近接点
+			MyEngine::Vector3 nearPoint = staticCapsuleData->m_nextStartPos + startToEnd * t;
+			//最近接点から動く判定の中心までの単位ベクトル
+			MyEngine::Vector3 fixDir = (moveCol->m_nextPos - nearPoint).Normalize();
+			//補正の大きさ(カプセルの半径よりも少しだけ大きくする)
+			float fixScale = staticCapsuleData->m_radius + 0.001f;
+			//位置の補正
+			moveCol->m_nextPos = (fixDir * fixScale) + nearPoint;
+		}
+	}
+	//動かす当たり判定がカプセルで
+	else if (moveCol->m_pColData->GetKind() == ColliderData::Kind::kCapsule)
+	{
+		//動かない当たり判定が球の場合
+		if (staticCol->m_pColData->GetKind() == ColliderData::Kind::kSphere)
+		{
+			//動く当たり判定をカプセルのデータにダウンキャスト
+			auto moveCapsuleData = std::dynamic_pointer_cast<CapsuleColliderData>(moveCol->m_pColData);
+
+			//動かない当たり判定を球のデータにダウンキャスト
+			auto staticSphereData = std::dynamic_pointer_cast<SphereColliderData>(staticCol->m_pColData);
+
+			//球とカプセルの当たり判定を取得する
+			float distance = Segment_Point_MinLength(moveCol->m_nextPos.CastVECTOR(), moveCapsuleData->m_nextStartPos.CastVECTOR(), staticCol->m_nextPos.CastVECTOR());
+
+			//最近接点を求める
+
+			//カプセルの線
+			MyEngine::Vector3 startToEnd = moveCol->m_nextPos - moveCapsuleData->m_nextStartPos;
+
+			//カプセルの線の端から球の座標までのベクトル
+			MyEngine::Vector3 startToPoint = staticCol->m_nextPos - moveCapsuleData->m_nextStartPos;
+
+			//線上のどの辺かを求める
+			float t = startToEnd.Dot(startToPoint) / startToEnd.SqLength();
+			//排他処理
+			t = std::fmax(std::fmin(t, 1.0f), 0.0f);
+			//最近接点
+			MyEngine::Vector3 nearPoint = moveCapsuleData->m_nextStartPos + startToEnd * t;
+			//動かない判定の中心から最近接点の単位ベクトル
+			MyEngine::Vector3 fixDir = (nearPoint - staticCol->m_nextPos).Normalize();
+			//補正の大きさ
+			float fixScale = distance - (moveCapsuleData->m_radius + staticSphereData->m_radius) + 0.001f;
+			//位置の補正
+			moveCol->m_nextPos = moveCol->m_nextPos + (fixDir * fixScale);
+			moveCapsuleData->m_nextStartPos = moveCapsuleData->m_nextStartPos + (fixDir * fixScale);
+		}
+		//動かない当たり判定がカプセルの場合
+		else if (staticCol->m_pColData->GetKind() == ColliderData::Kind::kCapsule)
+		{
+			//動く当たり判定をカプセルのデータにダウンキャスト
+			auto moveCapsuleData = std::dynamic_pointer_cast<CapsuleColliderData>(moveCol->m_pColData);
+
+			//動かない当たり判定をカプセルのデータにダウンキャスト
+			auto staticCapsuleData = std::dynamic_pointer_cast<CapsuleColliderData>(staticCol->m_pColData);
+
+			//カプセルの中心点を取得する
+			MyEngine::Vector3 moveCapsuleCenter = moveCol->m_nextPos + (moveCol->m_nextPos - moveCapsuleData->m_nextStartPos) * 0.5f;
+
+			MyEngine::Vector3 staticCapsuleCenter = staticCol->m_nextPos + (staticCol->m_nextPos - staticCapsuleData->m_nextStartPos) * 0.5f;
+
+			// 相対ベクトル
+			MyEngine::Vector3 relativeVec = staticCapsuleCenter - moveCapsuleCenter;
+
+			//カプセルの開始位置から中点までのベクトル
+			MyEngine::Vector3 mDir = moveCapsuleCenter - moveCapsuleData->m_nextStartPos;
+			MyEngine::Vector3 sDir = staticCapsuleCenter - staticCapsuleData->m_nextStartPos;
+
+			//線分のどのくらいの位置が最近接点なのかの割合
+			float mRate = relativeVec.Dot(mDir) / mDir.SqLength();
+			float sRate = -relativeVec.Dot(sDir) / sDir.SqLength();
+
+			// 範囲の制限
+			mRate = std::min<float>(std::max<float>(mRate, -1.0f), 1.0f);
+			sRate = std::min<float>(std::max<float>(sRate, -1.0f), 1.0f);
+
+			//最近接点
+			MyEngine::Vector3 moveNearPoint = mDir * mRate + moveCapsuleCenter;
+			MyEngine::Vector3 staticNearPoint = sDir * sRate + staticCapsuleCenter;
+
+			//補正する方向ベクトル
+			MyEngine::Vector3 fixDir = (moveNearPoint - staticNearPoint).Normalize();
+
+			//最近接点の距離を取得
+			float distance = (moveNearPoint - staticNearPoint).Length();
+
+			//補正する大きさ
+			float fixScale = moveCapsuleData->m_radius + staticCapsuleData->m_radius + 0.001f - distance;
+
+			moveCol->m_nextPos = moveCol->m_nextPos + (fixDir * fixScale);
+			moveCapsuleData->m_nextStartPos = moveCapsuleData->m_nextStartPos + (fixDir * fixScale);
+
+		}
+	}
+
+
 }
 
 bool Physics::IsCheckCollide(std::shared_ptr<Collidable> first, std::shared_ptr<Collidable> second)
@@ -176,8 +353,8 @@ bool Physics::IsCheckCollide(std::shared_ptr<Collidable> first, std::shared_ptr<
 			auto secondCol = std::dynamic_pointer_cast<CapsuleColliderData>(second->m_pColData);
 
 			//カプセル同士の最短距離
-			float distance = Segment_Segment_MinLength(first->m_nextPos.CastVECTOR(), firstCol->m_startPos.CastVECTOR(),
-				second->m_nextPos.CastVECTOR(), secondCol->m_startPos.CastVECTOR());
+			float distance = Segment_Segment_MinLength(first->m_nextPos.CastVECTOR(), firstCol->m_nextStartPos.CastVECTOR(),
+				second->m_nextPos.CastVECTOR(), secondCol->m_nextStartPos.CastVECTOR());
 
 			if (distance < firstCol->m_radius + secondCol->m_radius)
 			{
@@ -206,7 +383,7 @@ bool Physics::IsCheckCollide(std::shared_ptr<Collidable> first, std::shared_ptr<
 				auto capsuleData = std::dynamic_pointer_cast<CapsuleColliderData>(capsuleDataBase);
 				//線分と点の最近距離を求める
 				distance = Segment_Point_MinLength(second->m_nextPos.CastVECTOR(),
-					capsuleData->m_startPos.CastVECTOR(), first->m_nextPos.CastVECTOR());
+					capsuleData->m_nextStartPos.CastVECTOR(), first->m_nextPos.CastVECTOR());
 			}
 			else
 			{
@@ -216,7 +393,7 @@ bool Physics::IsCheckCollide(std::shared_ptr<Collidable> first, std::shared_ptr<
 				auto capsuleData = std::dynamic_pointer_cast<CapsuleColliderData>(capsuleDataBase);
 				//線分と点の最近距離を求める
 				distance = Segment_Point_MinLength(first->m_nextPos.CastVECTOR(),
-					capsuleData->m_startPos.CastVECTOR(), second->m_nextPos.CastVECTOR());
+					capsuleData->m_nextStartPos.CastVECTOR(), second->m_nextPos.CastVECTOR());
 			}
 			//ダウンキャスト
 			auto sphereData = std::dynamic_pointer_cast<SphereColliderData>(sphereDataBase);

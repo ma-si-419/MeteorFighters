@@ -1,5 +1,6 @@
 #pragma once
 #include "Actor.h"
+#include "LocalPos.h"
 #include <vector>
 #include <string>
 #include <map>
@@ -43,7 +44,17 @@ public:
 		kLowAttack6,
 		kLowAttack7,
 		kLowAttack8,
-		kSkyIdle
+		kSkyIdle,
+		kFrontBurst,
+		kBackBurst,
+		kLowHit1,
+		kLowHit2,
+		kLowHit3,
+		kBackLowHit1,
+		kBackLowHit2,
+		kBackLowHit3,
+		kMiddleHit,
+		kBackMiddleHit
 	};
 
 	enum class CharacterKind
@@ -57,6 +68,7 @@ public:
 	{
 		kName,
 		kHp,
+		kStartMp,
 		kAtk,
 		kDef,
 		kSpd,
@@ -125,6 +137,7 @@ public:
 	{
 		std::string name = "empty";
 		float hp = 0;
+		float startMp = 0;
 		float atk = 0;
 		float def = 0;
 		float spd = 0;
@@ -174,7 +187,7 @@ public:
 	/// 体力を減らす
 	/// </summary>
 	/// <param name="subHp">減少量</param>
-	void SubHp(int subHp);
+	void SubHp(int subHp) { m_nowHp -= subHp; }
 
 	/// <summary>
 	/// キャラクターの攻撃力を取得する
@@ -183,11 +196,19 @@ public:
 	float GetPower() { return m_status.atk; }
 
 	/// <summary>
-	/// 再生するアニメーションを変える
+	/// 再生するアニメーションを変える(ブレンドスピード固定)
 	/// </summary>
 	/// <param name="animKind">アニメーションを指定</param>
 	/// <param name="loop">繰り返すかどうか</param>
 	void ChangeAnim(AnimKind animKind, bool loop);
+
+	/// <summary>
+	/// 再生するアニメーションを変える(ブレンドスピード可変)
+	/// </summary>
+	/// <param name="animKind">アニメーションを指定</param>
+	/// <param name="loop">繰り返すかどうか</param>
+	/// <param name="blendSpeed">繰り返すかどうか</param>
+	void ChangeAnim(AnimKind animKind, bool loop ,float blendSpeed);
 
 	/// <summary>
 	/// アニメーションを再生する
@@ -198,7 +219,7 @@ public:
 	/// アニメーションが終了したかを取得する
 	/// </summary>
 	/// <returns>true:アニメーション終了時　false:アニメーション再生時</returns>
-	bool IsGetAnimEnd();
+	bool IsAnimEnd();
 
 	/// <summary>
 	/// csvから持ってきたstringデータの必殺技の種類をSpecialAttackKindに変換する
@@ -225,6 +246,31 @@ public:
 	/// <param name="attackName">取得したい通常攻撃の名前</param>
 	/// <returns>通常攻撃を生成する際の情報</returns>
 	NormalAttackData GetNormalAttackData(std::string attackName);
+
+	/// <summary>
+	/// アニメーションブレンドが終了したかどうかを取得する
+	/// </summary>
+	/// <returns>終了していたらtrue</returns>
+	bool IsEndAnimationBlend() { return m_isEndAnimationBlend; }
+	
+	/// <summary>
+	/// 現在再生しているアニメーションを返す
+	/// </summary>
+	/// <returns>アニメーションの種類</returns>
+	AnimKind GetPlayAnimKind() { return m_playAnimKind; }
+
+	/// <summary>
+	/// 自身がどちらを向いているかを設定する
+	/// </summary>
+	/// <param name="frontPos">前方の座標</param>
+	void SetFrontPos(MyEngine::Vector3 frontPos);
+
+	/// <summary>
+	/// 前方にターゲットがいるかどうかを返す
+	/// </summary>
+	/// <param name="isPlayer">プレイヤーならtrueを入れる</param>
+	/// <returns>前方にいるならtrue</returns>
+	bool IsFrontTarget(bool isPlayer);
 
 protected:
 
@@ -259,19 +305,32 @@ protected:
 	//自身のステータス
 	CharacterStatus m_status;
 	//現在の体力
-	int m_nowHp;
+	float m_nowHp;
 	//現在の気力
-	int m_nowMp;
+	float m_nowMp;
 	//すべてのキャラで共通で使う通常攻撃の情報
 	std::map<std::string, NormalAttackData> m_normalAttackData;
-
-	//アニメーションの情報
+	//自身の向いている方向などを保存するためにローカル座標を持っておく
+	LocalPos m_targetLocalPos;
+	//今再生しているアニメ
 	int m_attachAnim;
+	//今再生しているアニメの種類
+	AnimKind m_playAnimKind;
+	//アニメーションの合計時間
 	float m_totalAnimTime;
+	//アニメーションの現在の再生時間
 	float m_playAnimTime;
+	//アニメーションの再生速度
 	float m_animPlaySpeed;
+	//アニメーションをループするかどうか
 	bool m_isLoop;
+	//アニメーションのブレンド率
 	float m_animBlendRate;
+	//アニメーションのブレンド速度
+	float m_animBlendSpeed;
+	//1つ前のアニメーション
 	int m_lastAnim;
+	//アニメーションブレンドが終わったかどうか
+	bool m_isEndAnimationBlend;
 
 };

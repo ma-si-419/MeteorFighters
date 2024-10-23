@@ -2,7 +2,15 @@
 #include "PlayerStateIdle.h"
 #include "DxLib.h"
 #include "Input.h"
+#include "Player.h"
 
+namespace
+{
+	//攻撃を回避できる時間
+	constexpr float kDodgeTime = 15;
+	//アニメーションブレンドの速さ
+	constexpr float kBlendSpeed = 1.0f / kDodgeTime;
+}
 
 PlayerStateGuard::PlayerStateGuard(std::shared_ptr<Player> player):
 	PlayerStateBase(player)
@@ -13,6 +21,7 @@ void PlayerStateGuard::Enter()
 {
 	m_pNextState = shared_from_this();
 	m_kind = CharacterStateKind::kGuard;
+	m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kGuard,true,kBlendSpeed);
 }
 
 void PlayerStateGuard::Update()

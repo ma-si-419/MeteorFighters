@@ -29,7 +29,7 @@ float Vector3::Length() const
 	return ans;
 }
 
-float Vector3::sqLength() const
+float Vector3::SqLength() const
 {
 	float ans;
 
@@ -57,7 +57,7 @@ Vector3 Vector3::Normalize()
 	//0èúéZÇµÇÊÇ§Ç∆ÇµÇΩÇÁé~ÇﬂÇÈ
 	else
 	{
-		assert(false);
+		//assert(false);
 	}
 
 	return ans;
@@ -123,6 +123,11 @@ MATRIX MyEngine::Vector3::GetRotationMat()
 	MATRIX ans = rotMat.CastMATRIX();
 
 	return ans;
+}
+
+Vector3 MyEngine::Vector3::operator-() const
+{
+	return Vector3(-x,-y,-z);
 }
 
 Vector3 Vector3::operator+(Vector3 right)const

@@ -18,7 +18,7 @@ void Rigidbody::SetVelo(MyEngine::Vector3 velo)
 {
 	m_velo = velo;
 	//ˆÚ“®—Ê‚ª‚ ‚Á‚½‚ç
-	if (m_velo.sqLength() > 0)
+	if (m_velo.SqLength() > 0)
 	{
 		//•ûŒüƒxƒNƒgƒ‹‚ğİ’è‚·‚é
 		m_dir = m_velo.Normalize();

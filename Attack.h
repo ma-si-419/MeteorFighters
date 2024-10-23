@@ -47,7 +47,7 @@ public:
 	/// 存在しているかを返す
 	/// </summary>
 	/// <returns>攻撃が存在しているかどうか</returns>
-	bool IsGetExist() { return m_isExist; }
+	bool IsExist() { return m_isExist; }
 
 	/// <summary>
 	/// 攻撃のステータスを返す

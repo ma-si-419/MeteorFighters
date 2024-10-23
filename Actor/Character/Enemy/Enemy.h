@@ -1,5 +1,7 @@
 #pragma once
 #include "CharacterBase.h"
+#include "LocalPos.h"
+
 class EnemyStateBase;
 class GameManager;
 class Enemy : public CharacterBase

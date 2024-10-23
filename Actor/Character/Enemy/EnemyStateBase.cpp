@@ -7,6 +7,17 @@
 namespace
 {
 	constexpr float kDamageCutRate = 0.2f;
+
+	const std::map<CharacterBase::AttackHitKind, EnemyStateHitAttack::HitKind> kEnemyStateHitKindMap =
+	{
+		{CharacterBase::AttackHitKind::kLow,EnemyStateHitAttack::HitKind::kLow},
+		{CharacterBase::AttackHitKind::kMiddle,EnemyStateHitAttack::HitKind::kMiddle},
+		{CharacterBase::AttackHitKind::kUpBurst,EnemyStateHitAttack::HitKind::kUpBurst},
+		{CharacterBase::AttackHitKind::kDownBurst,EnemyStateHitAttack::HitKind::kDownBurst},
+		{CharacterBase::AttackHitKind::kFarBurst,EnemyStateHitAttack::HitKind::kFarBurst},
+		{CharacterBase::AttackHitKind::kBottomStan,EnemyStateHitAttack::HitKind::kBottomStan},
+		{CharacterBase::AttackHitKind::kMiddleStan,EnemyStateHitAttack::HitKind::kMiddleStan}
+	};
 }
 
 EnemyStateBase::EnemyStateBase(std::shared_ptr<Enemy> enemy) :
@@ -37,7 +48,10 @@ void EnemyStateBase::HitAttack(std::shared_ptr<Attack> attack, CharacterStateBas
 	//攻撃のステータス
 	auto status = attack->GetStatus();
 
-	EnemyStateHitAttack::HitKind kind = static_cast<EnemyStateHitAttack::HitKind>(status.attackHitKind);
+	//攻撃を受けたタイミングで敵が前方にいるか後方にいるか判断する
+	bool isFront = m_pEnemy->IsFrontTarget(false);
+	
+	EnemyStateHitAttack::HitKind kind = kEnemyStateHitKindMap.at(status.attackHitKind);
 
 	int damage = status.damage;
 	//ガード時であれば
@@ -75,6 +89,7 @@ void EnemyStateBase::HitAttack(std::shared_ptr<Attack> attack, CharacterStateBas
 	}
 	nextState->HitAttack(kind);
 
+	//体力を減らす
 	m_pEnemy->SubHp(damage);
 
 	ChangeState(nextState);

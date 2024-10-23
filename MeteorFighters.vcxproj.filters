@@ -196,7 +196,7 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="PlayerStateSpecialAttack.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Actor\Character\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

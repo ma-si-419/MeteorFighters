@@ -41,6 +41,13 @@ public:
 	
 	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
 
+	/// <summary>
+	/// 今再生しているアニメーションと受けた攻撃から次に再生するアニメーションを考えて返す
+	/// </summary>
+	/// <param name="kind">受けた攻撃の種類</param>
+	/// <returns>次に再生するアニメーション</returns>
+	int GetNextAnimKind(HitKind kind);
+
 private:
 
 	//動けない時間
@@ -57,5 +64,8 @@ private:
 
 	//現在のやられ状態
 	HitKind m_hitReaction;
+	
+	//後ろから殴られたかどうか
+	bool m_isBackHit;
 };
 

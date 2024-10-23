@@ -42,7 +42,7 @@ void PlayerStateMove::Update()
 	//左スティックの傾き取得
 	MyEngine::Vector3 leftStickDir(stick.leftStickX, 0, -stick.leftStickY);
 	//移動ベクトルが0じゃなければ
-	if (leftStickDir.sqLength() > 0.001)
+	if (leftStickDir.SqLength() > 0.001)
 	{
 		//移動方向
 		MyEngine::Vector3 moveDir = leftStickDir.Normalize();
@@ -76,7 +76,7 @@ void PlayerStateMove::Update()
 	}
 
 	//移動していなかったら
-	if (moveVec.sqLength() == 0)
+	if (moveVec.SqLength() == 0)
 	{
 		//アイドル状態に戻る
 		std::shared_ptr<PlayerStateIdle> next = std::make_shared<PlayerStateIdle>(m_pPlayer);

@@ -6,6 +6,7 @@ class CapsuleColliderData : public ColliderData
 public:
 	CapsuleColliderData();
 	MyEngine::Vector3 m_startPos;
+	MyEngine::Vector3 m_nextStartPos;
 	float m_radius;
 	float m_length;
 	bool m_isMoveStartPos;

@@ -32,11 +32,12 @@ namespace
 	constexpr float kMoveTimeRate = 0.7f;
 }
 
-EnemyStateHitAttack::EnemyStateHitAttack(std::shared_ptr<Enemy> enemy):
+EnemyStateHitAttack::EnemyStateHitAttack(std::shared_ptr<Enemy> enemy) :
 	EnemyStateBase(enemy),
 	m_downTime(0),
 	m_moveTime(0),
-	m_hitReaction(HitKind::kLow)
+	m_hitReaction(HitKind::kLow),
+	m_isBackHit(false)
 {
 }
 
@@ -84,7 +85,6 @@ void EnemyStateHitAttack::HitAttack(HitKind kind)
 	{
 		hitAttackKinds[static_cast<int>(item)]++;
 	}
-
 
 	//“®‚¯‚È‚¢ŠÔ‚ğİ’è‚·‚é
 	m_downTime = kDownTimes[static_cast<int>(kind)];
@@ -157,6 +157,9 @@ void EnemyStateHitAttack::HitAttack(HitKind kind)
 		}
 	}
 
+	//ƒAƒjƒ[ƒVƒ‡ƒ“‚Ì•ÏX
+	m_pEnemy->ChangeAnim(static_cast<CharacterBase::AnimKind>(GetNextAnimKind(kind)), false);
+
 	//¡‚Ü‚Åó‚¯‚½UŒ‚‚ğ•Û‘¶‚µ‚Ä‚¨‚­
 	m_hitReactions.push_back(kind);
 }
@@ -164,4 +167,89 @@ void EnemyStateHitAttack::HitAttack(HitKind kind)
 void EnemyStateHitAttack::OnCollide(std::shared_ptr<Collidable> collider)
 {
 
+}
+
+int EnemyStateHitAttack::GetNextAnimKind(HitKind kind)
+{
+
+	int ans = 0;
+
+	CharacterBase::AnimKind animKind = m_pEnemy->GetPlayAnimKind();
+
+	//ãUŒ‚‚ğó‚¯‚½‚ç‡”Ô‚ÉƒAƒjƒ[ƒVƒ‡ƒ“‚ğÄ¶‚·‚é
+	if (kind == HitKind::kLow)
+	{
+		//‘O•û‚©‚çUŒ‚‚ğó‚¯‚½ê‡
+		if (!m_isBackHit)
+		{
+			if (animKind == CharacterBase::AnimKind::kLowHit1)
+			{
+				ans = static_cast<int>(CharacterBase::AnimKind::kLowHit2);
+			}
+			else if (animKind == CharacterBase::AnimKind::kLowHit2)
+			{
+				ans = static_cast<int>(CharacterBase::AnimKind::kLowHit3);
+			}
+			else if (animKind == CharacterBase::AnimKind::kLowHit3)
+			{
+				ans = static_cast<int>(CharacterBase::AnimKind::kLowHit1);
+			}
+			else
+			{
+				ans = static_cast<int>(CharacterBase::AnimKind::kLowHit1);
+			}
+		}
+		//Œã‚ë‚©‚çUŒ‚‚ğó‚¯‚½ê‡
+		else
+		{
+			if (animKind == CharacterBase::AnimKind::kBackLowHit1)
+			{
+				ans = static_cast<int>(CharacterBase::AnimKind::kBackLowHit2);
+			}
+			else if (animKind == CharacterBase::AnimKind::kBackLowHit2)
+			{
+				ans = static_cast<int>(CharacterBase::AnimKind::kBackLowHit3);
+			}
+			else if (animKind == CharacterBase::AnimKind::kBackLowHit3)
+			{
+				ans = static_cast<int>(CharacterBase::AnimKind::kBackLowHit1);
+			}
+			else
+			{
+				ans = static_cast<int>(CharacterBase::AnimKind::kBackLowHit1);
+			}
+		}
+	}
+	//’†UŒ‚‚ğó‚¯‚½ê‡
+	else if (kind == HitKind::kMiddle)
+	{
+		//‘O•û‚©‚çUŒ‚‚ğó‚¯‚½ê‡
+		if (!m_isBackHit)
+		{
+			ans = static_cast<int>(CharacterBase::AnimKind::kMiddleHit);
+		}
+		//Œã•û‚©‚çUŒ‚‚ğó‚¯‚½ê‡
+		else
+		{
+			ans = static_cast<int>(CharacterBase::AnimKind::kBackMiddleHit);
+		}
+	}
+	//‚«”ò‚Î‚µUŒ‚‚ğó‚¯‚½ê‡
+	else if (kind == HitKind::kUpBurst ||
+		kind == HitKind::kDownBurst ||
+		kind == HitKind::kFarBurst)
+	{
+		//‘O•û‚©‚çUŒ‚‚ğó‚¯‚½ê‡
+		if (!m_isBackHit)
+		{
+			ans = static_cast<int>(CharacterBase::AnimKind::kFrontBurst);
+		}
+		//Œã•û‚©‚çUŒ‚‚ğó‚¯‚½ê‡
+		else
+		{
+			ans = static_cast<int>(CharacterBase::AnimKind::kBackBurst);
+		}
+	}
+
+	return ans;
 }

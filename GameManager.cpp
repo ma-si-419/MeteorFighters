@@ -37,7 +37,7 @@ void GameManager::Update()
 	auto iterator = std::remove_if(m_pAttacks.begin(), m_pAttacks.end(),
 		[](const auto& item)
 		{
-			if (!item->IsGetExist())
+			if (!item->IsExist())
 			{
 				item->Final();
 
@@ -59,6 +59,7 @@ void GameManager::SetPlayerStatus(int number,std::vector<std::string> statusData
 
 	status.name = statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kName)];
 	status.hp = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kHp)]);
+	status.startMp = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kStartMp)]);
 	status.atk = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kAtk)]);
 	status.def = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kDef)]);
 	status.spd = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSpd)]);
@@ -92,7 +93,9 @@ void GameManager::SetEnemyStatus(int number,std::vector<std::string> statusData)
 	m_pEnemy->SetGameManager(shared_from_this());
 	CharacterBase::CharacterStatus status;
 
+	status.name = statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kName)];
 	status.hp = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kHp)]);
+	status.startMp = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kStartMp)]);
 	status.atk = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kAtk)]);
 	status.def = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kDef)]);
 	status.spd = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSpd)]);

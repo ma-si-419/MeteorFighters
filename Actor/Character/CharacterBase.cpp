@@ -49,7 +49,9 @@ CharacterBase::CharacterBase(ObjectTag tag, CharacterKind kind) :
 	m_isLoop(false),
 	m_characterKind(kind),
 	m_lastAnim(-1),
-	m_animBlendRate(1.0f)
+	m_animBlendRate(1.0f),
+	m_animBlendSpeed(kAnimBlendSpeed),
+	m_isEndAnimationBlend(true)
 {
 	auto capsuleData = std::dynamic_pointer_cast<CapsuleColliderData>(m_pColData);
 
@@ -64,7 +66,6 @@ CharacterBase::CharacterBase(ObjectTag tag, CharacterKind kind) :
 	std::vector<std::vector<std::string>> data = load.LoadFile("data/csv/normalAttackData.csv");
 
 	SetNormalAttackData(data);
-
 }
 
 CharacterBase::~CharacterBase()
@@ -81,13 +82,12 @@ MyEngine::Vector3 CharacterBase::GetPos()
 	return m_rigidbody.GetPos();
 }
 
-void CharacterBase::SubHp(int subHp)
+void CharacterBase::ChangeAnim(AnimKind animKind, bool loop)
 {
-
+	ChangeAnim(animKind, loop, kAnimBlendSpeed);
 }
 
-
-void CharacterBase::ChangeAnim(AnimKind animKind, bool loop)
+void CharacterBase::ChangeAnim(AnimKind animKind, bool loop, float blendSpeed)
 {
 	//アニメーションを再生していたらけしておく
 	if (m_attachAnim != -1)
@@ -97,13 +97,15 @@ void CharacterBase::ChangeAnim(AnimKind animKind, bool loop)
 
 	int animNumber = static_cast<int>(animKind);
 
-	printfDx("%d\n", animNumber);
 	m_attachAnim = MV1AttachAnim(m_modelHandle, animNumber);
+	m_playAnimKind = animKind;
 	m_totalAnimTime = MV1GetAnimTotalTime(m_modelHandle, animNumber);
 	m_playAnimTime = 0;
 	m_animPlaySpeed = 1.0f;
 	m_isLoop = loop;
 	m_animBlendRate = 0.0f;
+	m_animBlendSpeed = blendSpeed;
+	m_isEndAnimationBlend = false;
 }
 
 void CharacterBase::PlayAnim()
@@ -120,11 +122,12 @@ void CharacterBase::PlayAnim()
 	}
 
 	//ブレンド率の調整
-	m_animBlendRate += kAnimBlendSpeed;
+	m_animBlendRate += m_animBlendSpeed;
 
 	if (m_animBlendRate > 1.0f)
 	{
 		m_animBlendRate = 1.0f;
+		m_isEndAnimationBlend = true;
 	}
 
 	//アニメーションのブレンド
@@ -132,7 +135,7 @@ void CharacterBase::PlayAnim()
 	MV1SetAttachAnimBlendRate(m_modelHandle, m_attachAnim, m_animBlendRate);
 }
 
-bool CharacterBase::IsGetAnimEnd()
+bool CharacterBase::IsAnimEnd()
 {
 	return false;
 }
@@ -227,4 +230,45 @@ void CharacterBase::CreateAttack(AttackData attackData)
 CharacterBase::NormalAttackData CharacterBase::GetNormalAttackData(std::string attackName)
 {
 	return m_normalAttackData[attackName];
+}
+
+void CharacterBase::SetFrontPos(MyEngine::Vector3 frontPos)
+{
+	//ローカル座標の前方向を修正
+	m_targetLocalPos.SetFrontPos(frontPos);
+
+	//モデルの前方向を修正する
+	MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - frontPos).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
+}
+
+bool CharacterBase::IsFrontTarget(bool isPlayer)
+{
+
+	MyEngine::Vector3 toTargetDir;
+
+	//プレイヤーなら
+	if (isPlayer)
+	{
+		toTargetDir = m_targetLocalPos.ChangeWorldToLocal(m_pGameManager->GetEnemyPos());
+	}
+	//2P側なら(基本CPU)
+	else
+	{
+		toTargetDir = m_targetLocalPos.ChangeWorldToLocal(m_pGameManager->GetPlayerPos());
+	}
+
+	toTargetDir = toTargetDir.Normalize();
+
+	if (toTargetDir.z > 0)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	
+	//警告けしのため
+	return true;
+
 }

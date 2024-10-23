@@ -48,7 +48,7 @@ namespace MyEngine
 		/// ベクトルの長さの2乗を取得
 		/// </summary>
 		/// <returns>ベクトルの長さの2乗</returns>
-		float sqLength() const;
+		float SqLength() const;
 		/// <summary>
 		/// 正規化したベクトルを返す
 		/// </summary>
@@ -80,6 +80,7 @@ namespace MyEngine
 		MATRIX GetRotationMat();
 
 		/*演算子オーバーロード*/
+		Vector3 operator-()const;
 		Vector3 operator+(Vector3 right)const;
 		Vector3 operator+=(Vector3 right);
 		Vector3 operator-(Vector3 right)const;

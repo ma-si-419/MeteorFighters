@@ -13,8 +13,9 @@ namespace
 	constexpr float kGravityPower = 0.2f;
 
 	const int kWhite = GetColor(255, 255, 255);
-
 #endif // _DEBUG
+
+	constexpr float kModelScale = 0.1f;
 
 }
 
@@ -32,12 +33,15 @@ void Player::Init()
 {
 	m_modelHandle = MV1LoadModel("data/model/Fighter.mv1");
 
-	MV1SetScale(m_modelHandle, VGet(0.1f, 0.1f, 0.1f));
+	MV1SetScale(m_modelHandle, VGet(kModelScale, kModelScale, kModelScale));
 
 	m_camera = std::make_shared<GameCamera>();
 
 	Collidable::Init();
 	m_camera->Init(m_rigidbody.GetPos());
+
+	m_nowHp = m_status.hp;
+	m_nowMp = m_status.startMp;
 
 	auto player = std::static_pointer_cast<Player>(shared_from_this());
 
@@ -64,7 +68,24 @@ void Player::Update()
 	m_camera->SetPlayerPosAndTarget(m_rigidbody.GetPos(), m_pGameManager->GetEnemyPos());
 	
 	//プレイヤーからエネミーへのベクトル
-	MyEngine::Vector3 playerToTarget = m_pGameManager->GetEnemyPos() - m_rigidbody.GetPos();
+	MyEngine::Vector3 playerToTarget = (m_pGameManager->GetEnemyPos() - m_rigidbody.GetPos()).Normalize();
+
+#ifdef _DEBUG
+
+	LocalPos enemy;
+
+	enemy.SetCenterPos(m_rigidbody.GetPos());
+
+	enemy.SetFrontPos(m_rigidbody.GetPos() + playerToTarget);
+
+	enemy.SetLocalPos(enemy.ChangeWorldToLocal(m_pGameManager->GetEnemyPos()));
+
+	MyEngine::Vector3 pos = enemy.GetLocalPos();
+
+	DrawFormatString(0,112,GetColor(255,255,255),"プレイヤーから見たエネミー座標(X:%0.1f,Y:%0.1f,Z:%0.1f)",pos.x, pos.y, pos.z);
+
+#endif // _DEBUG
+
 
 
 	//カメラの正面方向を設定

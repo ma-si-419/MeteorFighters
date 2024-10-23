@@ -42,3 +42,16 @@ void LocalPos::SetFrontPos(MyEngine::Vector3 frontPos)
 
 	m_centerRotation = rotation;
 }
+
+MyEngine::Vector3 LocalPos::ChangeWorldToLocal(MyEngine::Vector3 worldPos)
+{
+	MyEngine::Vector3 ans;
+
+	MyEngine::Vector3 toWorldPos = worldPos - m_centerPos;
+
+	MATRIX mat = (-m_centerRotation).GetRotationMat();
+
+	ans = toWorldPos.MatTransform(mat);
+
+	return ans;
+}

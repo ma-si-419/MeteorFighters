@@ -8,6 +8,7 @@ Attack::Attack(ObjectTag tag, MyEngine::Vector3 pos):
 	m_isExist(true)
 {
 	m_rigidbody.SetPos(pos);
+	m_pColData->SetIsTrigger(true);
 }
 
 Attack::~Attack()

@@ -1,6 +1,7 @@
 #include "PlayerStateIdle.h"
 #include "PlayerStateNormalAttack.h"
 #include "PlayerStateMove.h"
+#include "PlayerStateGuard.h"
 #include "DxLib.h"
 #include "Input.h"
 #include "Player.h"
@@ -75,6 +76,16 @@ void PlayerStateIdle::Update()
 		return;
 	}
 
+	//ガード入力がされていたら
+	if (input.IsPress("B"))
+	{
+		//次のStateのポインタ作成
+		std::shared_ptr<PlayerStateGuard> next = std::make_shared<PlayerStateGuard>(m_pPlayer);
+		//StateをMoveに変更する
+		ChangeState(next);
+		return;
+	}
+		
 	SetPlayerVelo(MyEngine::Vector3(0, 0, 0));
 
 }
