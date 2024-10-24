@@ -2,6 +2,12 @@
 #include "Input.h"
 using namespace MyEngine;
 
+namespace
+{
+	//トリガーを押していると判定する強さ
+	constexpr float kTriggerPower = 128;
+}
+
 MyEngine::Input::~Input()
 {
 }
@@ -17,8 +23,8 @@ void Input::Init()
 	m_inputActionMap["Down"] = { {InputType::kKeyboard,KEY_INPUT_S}, {InputType::kPad,PAD_INPUT_DOWN} };
 	m_inputActionMap["Left"] = { {InputType::kKeyboard,KEY_INPUT_A}, {InputType::kPad,PAD_INPUT_LEFT} };
 	m_inputActionMap["Right"] = { {InputType::kKeyboard,KEY_INPUT_D}, {InputType::kPad,PAD_INPUT_RIGHT} };
-	m_inputActionMap["Lb"] = { {InputType::kKeyboard,KEY_INPUT_J}, {InputType::kPad,PAD_INPUT_5} };
-	m_inputActionMap["Rb"] = { {InputType::kKeyboard,KEY_INPUT_L}, {InputType::kPad,PAD_INPUT_6} };
+	m_inputActionMap["LB"] = { {InputType::kKeyboard,KEY_INPUT_J}, {InputType::kPad,PAD_INPUT_5} };
+	m_inputActionMap["RB"] = { {InputType::kKeyboard,KEY_INPUT_L}, {InputType::kPad,PAD_INPUT_6} };
 	m_inputActionMap["A"] = { {InputType::kKeyboard,KEY_INPUT_U}, {InputType::kPad,PAD_INPUT_1} };
 	m_inputActionMap["B"] = { {InputType::kKeyboard,KEY_INPUT_H}, {InputType::kPad,PAD_INPUT_2} };
 	m_inputActionMap["X"] = { {InputType::kKeyboard,KEY_INPUT_G}, {InputType::kPad,PAD_INPUT_3} };
@@ -144,4 +150,35 @@ bool Input::IsTrigger(const std::string& action) const
 	{
 		return false;
 	}
+}
+
+bool MyEngine::Input::IsPushTrigger(bool right, int power)
+{
+	//トリガーの状態取得
+	auto trigger = GetTriggerInfo();
+
+	//右側を判定する場合
+	if (right)
+	{
+		//引数よりも強く押し込まれたら
+		if (trigger.right >= power)
+		{
+			return true;
+		}
+	}
+	//左側を判定する場合
+	else
+	{
+		//引数よりも強く押し込まれたら
+		if (trigger.left >= power)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool MyEngine::Input::IsPushTrigger(bool right)
+{
+	return IsPushTrigger(right, kTriggerPower);
 }

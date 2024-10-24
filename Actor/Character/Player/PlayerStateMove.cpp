@@ -35,6 +35,8 @@ void PlayerStateMove::Update()
 	MyEngine::Input& input = MyEngine::Input::GetInstance();
 	//移動ベクトル
 	MyEngine::Vector3 moveVec;
+	//移動方向ベクトル
+	MyEngine::Vector3 moveDir;
 
 	//スティックの情報取得
 	MyEngine::Input::StickInfo stick = input.GetStickInfo();
@@ -45,7 +47,7 @@ void PlayerStateMove::Update()
 	if (leftStickDir.SqLength() > 0.001)
 	{
 		//移動方向
-		MyEngine::Vector3 moveDir = leftStickDir.Normalize();
+		moveDir = leftStickDir.Normalize();
 
 		//エネミーの方向に移動方向を回転させる
 		float vX = GetEnemyPos().x - m_pPlayer->GetPos().x;
@@ -61,6 +63,16 @@ void PlayerStateMove::Update()
 
 		//移動方向にスピードをかける
 		moveVec = moveDir * kSpeed;
+	}
+	//ジャンプボタンが押されたら
+	if (input.IsPress("RB"))
+	{
+		moveVec.y = kSpeed;
+	}
+	//下降ボタンが押されたら
+	else if (input.IsPushTrigger(true))
+	{
+		moveVec.y = -kSpeed;
 	}
 	
 	//攻撃入力がされたら

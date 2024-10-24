@@ -47,9 +47,6 @@ void EnemyStateBase::HitAttack(std::shared_ptr<Attack> attack, CharacterStateBas
 
 	//攻撃のステータス
 	auto status = attack->GetStatus();
-
-	//攻撃を受けたタイミングで敵が前方にいるか後方にいるか判断する
-	bool isFront = m_pEnemy->IsFrontTarget(false);
 	
 	EnemyStateHitAttack::HitKind kind = kEnemyStateHitKindMap.at(status.attackHitKind);
 

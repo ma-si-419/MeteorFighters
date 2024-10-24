@@ -5,7 +5,7 @@ namespace
 	const MyEngine::Vector3 kPlayerToCameraInitVec(-17,15,-15);
 
 	constexpr float kCameraNear = 1.0f;
-	constexpr float kCameraFar = 100.0f;
+	constexpr float kCameraFar = 500.0f;
 }
 
 GameCamera::GameCamera():

@@ -63,9 +63,15 @@ void Player::Update()
 	//アニメーションの更新
 	PlayAnim();
 
+
 	//ポジションの設定
 	MV1SetPosition(m_modelHandle, m_rigidbody.GetPos().CastVECTOR());
-	m_camera->SetPlayerPosAndTarget(m_rigidbody.GetPos(), m_pGameManager->GetEnemyPos());
+	
+	MyEngine::Vector3 cameraTargetPos = m_pGameManager->GetEnemyPos();
+
+	cameraTargetPos.y = m_rigidbody.GetPos().y;
+
+	m_camera->SetPlayerPosAndTarget(m_rigidbody.GetPos(),cameraTargetPos);
 	
 	//プレイヤーからエネミーへのベクトル
 	MyEngine::Vector3 playerToTarget = (m_pGameManager->GetEnemyPos() - m_rigidbody.GetPos()).Normalize();

@@ -37,7 +37,7 @@ EnemyStateHitAttack::EnemyStateHitAttack(std::shared_ptr<Enemy> enemy) :
 	m_downTime(0),
 	m_moveTime(0),
 	m_hitReaction(HitKind::kLow),
-	m_isBackHit(false)
+	m_isFrontHit(false)
 {
 }
 
@@ -52,7 +52,7 @@ void EnemyStateHitAttack::Update()
 
 	m_time++;
 	//設定した時間たったら
-	if (m_downTime == m_time)
+	if (m_downTime <= m_time)
 	{
 
 		std::shared_ptr<EnemyStateIdle> next = std::make_shared<EnemyStateIdle>(m_pEnemy);
@@ -157,6 +157,9 @@ void EnemyStateHitAttack::HitAttack(HitKind kind)
 		}
 	}
 
+	//前方から殴られたかどうかを取得する
+	m_isFrontHit = m_pEnemy->IsFrontTarget(false);
+
 	//アニメーションの変更
 	m_pEnemy->ChangeAnim(static_cast<CharacterBase::AnimKind>(GetNextAnimKind(kind)), false);
 
@@ -180,7 +183,7 @@ int EnemyStateHitAttack::GetNextAnimKind(HitKind kind)
 	if (kind == HitKind::kLow)
 	{
 		//前方から攻撃を受けた場合
-		if (!m_isBackHit)
+		if (m_isFrontHit)
 		{
 			if (animKind == CharacterBase::AnimKind::kLowHit1)
 			{
@@ -224,7 +227,7 @@ int EnemyStateHitAttack::GetNextAnimKind(HitKind kind)
 	else if (kind == HitKind::kMiddle)
 	{
 		//前方から攻撃を受けた場合
-		if (!m_isBackHit)
+		if (m_isFrontHit)
 		{
 			ans = static_cast<int>(CharacterBase::AnimKind::kMiddleHit);
 		}
@@ -240,7 +243,7 @@ int EnemyStateHitAttack::GetNextAnimKind(HitKind kind)
 		kind == HitKind::kFarBurst)
 	{
 		//前方から攻撃を受けた場合
-		if (!m_isBackHit)
+		if (m_isFrontHit)
 		{
 			ans = static_cast<int>(CharacterBase::AnimKind::kFrontBurst);
 		}

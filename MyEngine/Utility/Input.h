@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <list>
 namespace MyEngine
 {
 	class Input
@@ -89,6 +90,22 @@ namespace MyEngine
 		/// </summary>
 		/// <returns>トリガーがどのくらい押し込まれているか</returns>
 		TriggerInfo GetTriggerInfo() { return m_triggerInfo; }
+
+		/// <summary>
+		/// トリガーボタンを押しているかどうかを返す(押し込みの強さ可変)
+		/// </summary>
+		/// <param name="right">右側のボタンが取得したいならtrue</param>
+		/// <param name="power">どのくらい押し込まれていたらtrueとするか(最大255,最小0)</param>
+		/// <returns></returns>
+		bool IsPushTrigger(bool right, int power);
+
+		/// <summary>
+		/// トリガーボタンを押しているかどうかを返す(押し込みの強さ固定)
+		/// </summary>
+		/// <param name="right">右側のボタンを取得したい場合</param>
+		/// <returns></returns>
+		bool IsPushTrigger(bool right);
+
 	private:
 		/// <summary>
 		/// 入力種類
@@ -108,7 +125,9 @@ namespace MyEngine
 
 		std::map<std::string, std::vector<InputMapInfo>> m_inputActionMap;
 
+		//現在のフレームの入力
 		std::map<std::string, bool> m_currentInput;
+		//１フレーム前の入力
 		std::map<std::string, bool> m_lastInput;
 
 		StickInfo m_stickInfo = StickInfo();

@@ -65,7 +65,6 @@ private:
 	//Œ»İ‚Ì‚â‚ç‚êó‘Ô
 	HitKind m_hitReaction;
 	
-	//Œã‚ë‚©‚ç‰£‚ç‚ê‚½‚©‚Ç‚¤‚©
-	bool m_isBackHit;
+	//‘O•û‚©‚ç‰£‚ç‚ê‚½‚©‚Ç‚¤‚©
+	bool m_isFrontHit;
 };
-

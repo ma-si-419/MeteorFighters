@@ -26,5 +26,7 @@ private:
 	std::string m_nextAttackName;
 
 	bool m_isNextAttack;
+
+	MyEngine::Vector3 m_moveDir;
 };
 

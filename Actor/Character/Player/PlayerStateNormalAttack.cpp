@@ -9,7 +9,7 @@ namespace
 	//格闘攻撃の攻撃持続フレーム
 	constexpr int kNormalAttackLifeTime = 2;
 	//格闘攻撃の判定の大きさ
-	constexpr float kNormalAttackRadius = 4.0f;
+	constexpr float kNormalAttackRadius = 5.0f;
 }
 
 PlayerStateNormalAttack::PlayerStateNormalAttack(std::shared_ptr<Player> player) :
@@ -32,13 +32,26 @@ void PlayerStateNormalAttack::Enter()
 
 	CharacterBase::AnimKind anim = static_cast<CharacterBase::AnimKind>(GetAnimKind(animName));
 
-	m_pPlayer->ChangeAnim(anim,false);
+	m_pPlayer->ChangeAnim(anim, false);
+
+	MyEngine::Vector3 shiftVec = (GetEnemyPos() - m_pPlayer->GetPos()).Normalize();
+
+	shiftVec *= kNormalAttackRadius;
+
+	shiftVec.y = 0;
+
+	m_moveDir = ((GetEnemyPos() + shiftVec) - m_pPlayer->GetPos()).Normalize();
 
 }
 
 void PlayerStateNormalAttack::Update()
 {
+	//Stateにいるフレーム数を数えておく
+	m_time++;
+
 	auto attackData = m_pPlayer->GetNormalAttackData(m_nowAttackName);
+
+	MyEngine::Vector3 velo;
 
 	//次の攻撃に移行できるフレームであれば
 	if (m_time > attackData.cancelFrame)
@@ -51,16 +64,25 @@ void PlayerStateNormalAttack::Update()
 			//次に行う攻撃の設定
 			m_nowAttackName = m_nextAttackName;
 			m_nextAttackName = "empty";
+			//攻撃を行う方向を設定する
+			MyEngine::Vector3 shiftVec = (GetEnemyPos() - m_pPlayer->GetPos()).Normalize();
+
+			shiftVec *= kNormalAttackRadius;
+
+			shiftVec.y = 0;
+
+			m_moveDir = ((GetEnemyPos() + shiftVec) - m_pPlayer->GetPos()).Normalize();
 			//攻撃情報の更新
 			attackData = m_pPlayer->GetNormalAttackData(m_nowAttackName);
-			
+
 			CharacterBase::AnimKind anim = static_cast<CharacterBase::AnimKind>(GetAnimKind(attackData.animationName));
 
-			m_pPlayer->ChangeAnim(anim,false);
+			m_pPlayer->ChangeAnim(anim, false);
 
 			m_isNextAttack = false;
 		}
 	}
+
 
 	//攻撃の合計フレームを超えたら
 	if (m_time > attackData.totalFrame)
@@ -70,6 +92,12 @@ void PlayerStateNormalAttack::Update()
 
 		ChangeState(next);
 		return;
+	}
+
+	//攻撃を出すフレームまでは移動する
+	if (m_time < attackData.attackFrame)
+	{
+		velo = m_moveDir * attackData.moveSpeed;
 	}
 
 	//攻撃を出すフレームになったら
@@ -86,6 +114,7 @@ void PlayerStateNormalAttack::Update()
 
 		m_pPlayer->CreateAttack(attack);
 	}
+
 	//次の攻撃を行うか判定する
 	if (!m_isNextAttack)
 	{
@@ -101,17 +130,13 @@ void PlayerStateNormalAttack::Update()
 		}
 	}
 
-	SetPlayerVelo(MyEngine::Vector3(0,0,0));
-
+	SetPlayerVelo(velo);
 
 #ifdef _DEBUG
 
 	DrawString(0, 16, "PlayerState:Attack", GetColor(255, 255, 255));
 
 #endif // _DEBUG
-
-	//Stateにいるフレーム数を数えておく
-	m_time++;
 }
 
 void PlayerStateNormalAttack::Exit()

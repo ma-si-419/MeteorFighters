@@ -109,6 +109,7 @@ public:
 		int totalFrame = -1;
 		int attackFrame = -1;
 		int cancelFrame = -1;
+		float moveSpeed = -1;
 		AttackHitKind attackHitKind = AttackHitKind::kLow;
 		AttackKind attackKind = AttackKind::kPhysical;
 		std::string nextLowComboName = "empty";
@@ -284,6 +285,7 @@ protected:
 		kTotalFrame,//総フレーム
 		kAttackFrame,//攻撃発生フレーム
 		kCancelFrame,//次の攻撃に移行できるようになるフレーム
+		kMoveSpeed,//移動速度
 		kAttackHitKind,//この攻撃を受けた時のやられ状態
 		kAttackKind,//攻撃の種類
 		kLowComboName,//Xボタンを押したときに次に出る攻撃の名前
