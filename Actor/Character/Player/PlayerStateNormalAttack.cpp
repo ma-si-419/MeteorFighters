@@ -54,7 +54,7 @@ void PlayerStateNormalAttack::Update()
 	MyEngine::Vector3 velo;
 
 	//Ÿ‚ÌUŒ‚‚ÉˆÚs‚Å‚«‚éƒtƒŒ[ƒ€‚Å‚ ‚ê‚Î
-	if (m_time > attackData.cancelFrame)
+	if (m_time >= attackData.cancelFrame)
 	{
 		//Ÿ‚ÉUŒ‚‚ğs‚¤‚ÆŒˆ’è‚µ‚Ä‚¢‚ê‚Î
 		if (m_isNextAttack)
@@ -64,6 +64,24 @@ void PlayerStateNormalAttack::Update()
 			//Ÿ‚És‚¤UŒ‚‚Ìİ’è
 			m_nowAttackName = m_nextAttackName;
 			m_nextAttackName = "empty";
+
+			//UŒ‚î•ñ‚ÌXV
+			attackData = m_pPlayer->GetNormalAttackData(m_nowAttackName);
+
+			//uŠÔˆÚ“®‚·‚éUŒ‚‚Å‚ ‚ê‚ÎuŠÔˆÚ“®‚·‚é
+			if (attackData.isTeleportation)
+			{
+				//Ÿ‚ÌUŒ‚”­¶ƒtƒŒ[ƒ€‚É“G‚ª‚¢‚éêŠ‚ğŒvZ‚·‚é
+				MyEngine::Vector3 teleportationPos = GetEnemyPos() + (GetEnemyVelo() * (attackData.attackFrame - 1));
+				//uŠÔˆÚ“®æ‚ÉUŒ‚‚ÌUŒ‚”ÍˆÍ•ª‚¾‚¯‚¸‚ê‚ğ‘«‚·
+				MyEngine::Vector3 attackShiftVec = GetEnemyVelo();
+				attackShiftVec.y = 0;
+				
+				teleportationPos += attackShiftVec.Normalize() * (kNormalAttackRadius);
+
+				SetPlayerPos(teleportationPos);
+			}
+
 			//UŒ‚‚ğs‚¤•ûŒü‚ğİ’è‚·‚é
 			MyEngine::Vector3 shiftVec = (GetEnemyPos() - m_pPlayer->GetPos()).Normalize();
 
@@ -72,9 +90,6 @@ void PlayerStateNormalAttack::Update()
 			shiftVec.y = 0;
 
 			m_moveDir = ((GetEnemyPos() + shiftVec) - m_pPlayer->GetPos()).Normalize();
-			//UŒ‚î•ñ‚ÌXV
-			attackData = m_pPlayer->GetNormalAttackData(m_nowAttackName);
-
 			CharacterBase::AnimKind anim = static_cast<CharacterBase::AnimKind>(GetAnimKind(attackData.animationName));
 
 			m_pPlayer->ChangeAnim(anim, false);
@@ -85,7 +100,7 @@ void PlayerStateNormalAttack::Update()
 
 
 	//UŒ‚‚Ì‡ŒvƒtƒŒ[ƒ€‚ğ’´‚¦‚½‚ç
-	if (m_time > attackData.totalFrame)
+	if (m_time >= attackData.totalFrame)
 	{
 		//ƒAƒCƒhƒ‹ó‘Ô‚É–ß‚é
 		std::shared_ptr<PlayerStateIdle> next = std::make_shared<PlayerStateIdle>(m_pPlayer);
@@ -95,7 +110,7 @@ void PlayerStateNormalAttack::Update()
 	}
 
 	//UŒ‚‚ğo‚·ƒtƒŒ[ƒ€‚Ü‚Å‚ÍˆÚ“®‚·‚é
-	if (m_time < attackData.attackFrame)
+	if (m_time <= attackData.attackFrame)
 	{
 		velo = m_moveDir * attackData.moveSpeed;
 	}

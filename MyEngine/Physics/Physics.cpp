@@ -101,8 +101,8 @@ void Physics::Update()
 	for (auto& hitCol : hitData)
 	{
 		hitCol.OnCollide();
-		//物理挙動をするものだけ動かす
-		if (!hitCol.owner->m_pColData->GetIsTrigger() &&
+		//物理挙動をするものだけ座標修正を行う
+		if (!hitCol.owner->m_pColData->GetIsTrigger() ||
 			!hitCol.colider->m_pColData->GetIsTrigger())
 		{
 			//座標修正
@@ -276,44 +276,51 @@ void Physics::FixNextPosition(OnCollideInfo hitCol)
 
 			//カプセルの中心点を取得する
 			MyEngine::Vector3 moveCapsuleCenter = moveCol->m_nextPos + (moveCol->m_nextPos - moveCapsuleData->m_nextStartPos) * 0.5f;
-
 			MyEngine::Vector3 staticCapsuleCenter = staticCol->m_nextPos + (staticCol->m_nextPos - staticCapsuleData->m_nextStartPos) * 0.5f;
+			
+			//動くカプセルの線とと動かないカプセルの中点の最近接点を求める
+			MyEngine::Vector3 moveCapsuleStartToEnd = moveCol->m_nextPos - moveCapsuleData->m_nextStartPos;
+			MyEngine::Vector3 moveCapsuleStartToPoint = staticCapsuleCenter - moveCapsuleData->m_nextStartPos;
+			
+			//線上のどの辺に最近接点があるか
+			float moveCapsuleRate = moveCapsuleStartToEnd.Dot(moveCapsuleStartToPoint) / moveCapsuleStartToEnd.SqLength();
+			//排他処理
+			moveCapsuleRate = std::fmax(std::fmin(moveCapsuleRate,1.0f),0.0f);
 
-			// 相対ベクトル
-			MyEngine::Vector3 relativeVec = staticCapsuleCenter - moveCapsuleCenter;
+			//線と中点の最近接点
+			MyEngine::Vector3 moveNearestPoint = moveCapsuleData->m_nextStartPos + moveCapsuleStartToEnd * moveCapsuleRate;
 
-			//カプセルの開始位置から中点までのベクトル
-			MyEngine::Vector3 mDir = moveCapsuleCenter - moveCapsuleData->m_nextStartPos;
-			MyEngine::Vector3 sDir = staticCapsuleCenter - staticCapsuleData->m_nextStartPos;
+			//線と中点の最近接点と動かないカプセルの線の最近接点を求める
+			MyEngine::Vector3 staticCapsuleStartToEnd = staticCol->m_nextPos - staticCapsuleData->m_nextStartPos;
+			MyEngine::Vector3 staticCapsuleStartToPoint = moveNearestPoint - staticCapsuleData->m_nextStartPos;
 
-			//線分のどのくらいの位置が最近接点なのかの割合
-			float mRate = relativeVec.Dot(mDir) / mDir.SqLength();
-			float sRate = -relativeVec.Dot(sDir) / sDir.SqLength();
+			//線上のどの辺に最近接点があるか
+			float staticCapsuleRate = staticCapsuleStartToEnd.Dot(staticCapsuleStartToPoint) / staticCapsuleStartToEnd.SqLength();
 
-			// 範囲の制限
-			mRate = std::min<float>(std::max<float>(mRate, -1.0f), 1.0f);
-			sRate = std::min<float>(std::max<float>(sRate, -1.0f), 1.0f);
+			//排他処理
+			staticCapsuleRate = std::fmax(std::fmin(staticCapsuleRate, 1.0f), 0.0f);
 
 			//最近接点
-			MyEngine::Vector3 moveNearPoint = mDir * mRate + moveCapsuleCenter;
-			MyEngine::Vector3 staticNearPoint = sDir * sRate + staticCapsuleCenter;
+			MyEngine::Vector3 staticNearestPoint = staticCapsuleData->m_nextStartPos + staticCapsuleStartToEnd * staticCapsuleRate;
+			
+			
+
+			DrawSphere3D(staticNearestPoint.CastVECTOR(),2,3,GetColor(255,0,0),GetColor(255,0,0),true);
 
 			//補正する方向ベクトル
-			MyEngine::Vector3 fixDir = (moveNearPoint - staticNearPoint).Normalize();
+			MyEngine::Vector3 fixDir = (moveNearestPoint - staticNearestPoint).Normalize();
 
 			//最近接点の距離を取得
-			float distance = (moveNearPoint - staticNearPoint).Length();
+			float distance = (moveNearestPoint - staticNearestPoint).Length();
 
 			//補正する大きさ
-			float fixScale = moveCapsuleData->m_radius + staticCapsuleData->m_radius + 0.001f - distance;
+			float fixScale = moveCapsuleData->m_radius + staticCapsuleData->m_radius + 0.01f - distance;
 
 			moveCol->m_nextPos = moveCol->m_nextPos + (fixDir * fixScale);
 			moveCapsuleData->m_nextStartPos = moveCapsuleData->m_nextStartPos + (fixDir * fixScale);
 
 		}
 	}
-
-
 }
 
 bool Physics::IsCheckCollide(std::shared_ptr<Collidable> first, std::shared_ptr<Collidable> second)

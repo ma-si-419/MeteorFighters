@@ -57,6 +57,18 @@ public:
 	MyEngine::Vector3 GetEnemyPos();
 
 	/// <summary>
+	/// プレイヤーの移動ベクトルを取得する
+	/// </summary>
+	/// <returns>プレイヤーの座標</returns>
+	MyEngine::Vector3 GetPlayerVelo();
+
+	/// <summary>
+	/// エネミーの移動ベクトルを取得する
+	/// </summary>
+	/// <returns>エネミーの移動ベクトル</returns>
+	MyEngine::Vector3 GetEnemyVelo();
+
+	/// <summary>
 	/// 管理する攻撃を追加する
 	/// </summary>
 	/// <param name="attack">追加する攻撃クラスのポインタ</param>

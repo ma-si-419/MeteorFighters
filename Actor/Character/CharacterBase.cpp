@@ -82,6 +82,11 @@ MyEngine::Vector3 CharacterBase::GetPos()
 	return m_rigidbody.GetPos();
 }
 
+MyEngine::Vector3 CharacterBase::GetVelo()
+{
+	return m_rigidbody.GetVelo();
+}
+
 void CharacterBase::ChangeAnim(AnimKind animKind, bool loop)
 {
 	ChangeAnim(animKind, loop, kAnimBlendSpeed);
@@ -156,6 +161,7 @@ void CharacterBase::SetNormalAttackData(std::vector<std::vector<std::string>> no
 		pushData.attackFrame = stoi(item[static_cast<int>(NormalAttackDataSort::kAttackFrame)]);
 		pushData.cancelFrame = stoi(item[static_cast<int>(NormalAttackDataSort::kCancelFrame)]);
 		pushData.moveSpeed = stof(item[static_cast<int>(NormalAttackDataSort::kMoveSpeed)]);
+		pushData.isTeleportation = static_cast<bool>(stoi(item[static_cast<int>(NormalAttackDataSort::kIsTeleportation)]));
 		pushData.animationName = item[static_cast<int>(NormalAttackDataSort::kAnimationName)];
 		pushData.attackKind = static_cast<AttackKind>(stoi(item[static_cast<int>(NormalAttackDataSort::kAttackKind)]));
 		pushData.nextLowComboName = item[static_cast<int>(NormalAttackDataSort::kLowComboName)];

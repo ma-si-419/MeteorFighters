@@ -130,6 +130,16 @@ MyEngine::Vector3 GameManager::GetEnemyPos()
 	return m_pEnemy->GetPos();
 }
 
+MyEngine::Vector3 GameManager::GetPlayerVelo()
+{
+	return m_pPlayer->GetVelo();
+}
+
+MyEngine::Vector3 GameManager::GetEnemyVelo()
+{
+	return m_pEnemy->GetVelo();
+}
+
 void GameManager::AddAttack(std::shared_ptr<Attack> attack)
 {
 	m_pAttacks.push_back(attack);

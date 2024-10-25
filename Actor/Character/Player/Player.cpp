@@ -31,7 +31,7 @@ Player::~Player()
 
 void Player::Init()
 {
-	m_modelHandle = MV1LoadModel("data/model/Fighter.mv1");
+	//m_modelHandle = MV1LoadModel("data/model/Fighter.mv1");
 
 	MV1SetScale(m_modelHandle, VGet(kModelScale, kModelScale, kModelScale));
 

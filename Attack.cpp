@@ -21,6 +21,7 @@ void Attack::Init(AttackStatus status)
 	Collidable::Init();
 	auto col = std::dynamic_pointer_cast<CapsuleColliderData>(m_pColData);
 	col->m_radius = status.radius;
+	col->m_length = 0.1f;
 }
 
 void Attack::Update()

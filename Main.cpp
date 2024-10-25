@@ -10,14 +10,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	bool isWindow = false;
 
 #ifdef _DEBUG
-		
+
 	isWindow = true;
 
 #endif // _DEBUG
 
 	ChangeWindowMode(isWindow);
 
-	SetGraphMode(Game::kWindowWidth,Game::kWindowHeight,16);
+	SetGraphMode(Game::kWindowWidth, Game::kWindowHeight, 16);
 
 	SetChangeScreenModeGraphicsSystemResetFlag(false);
 
@@ -37,6 +37,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	sceneManager.Init();
 
+#ifdef _DEBUG
+
+	bool isStop = false;
+	bool isMove = false;
+
+#endif // _DEBUG
+
+
 	// ゲームループ
 	while (ProcessMessage() != -1)
 	{
@@ -48,12 +56,32 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		// ゲームの処理
 		MyEngine::Input::GetInstance().Update();
-		sceneManager.Update();
-
-		Physics::GetInstance().Update();
-
-		sceneManager.Draw();
 #ifdef _DEBUG
+
+
+		if (MyEngine::Input::GetInstance().IsTrigger("A"))
+		{
+			isMove = true;
+		}
+
+
+		if (!isStop || isMove)
+		{
+#endif // _DEBUG
+			sceneManager.Update();
+
+			Physics::GetInstance().Update();
+		
+#ifdef _DEBUG
+
+		}
+
+		if (MyEngine::Input::GetInstance().IsTrigger("Pause"))
+		{
+			isStop = !isStop;
+		}
+
+		isMove = false;
 
 		if (MyEngine::Input::GetInstance().IsTrigger("Select"))
 		{
@@ -64,6 +92,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 
 #endif // _DEBUG
+		sceneManager.Draw();
 
 		// 画面が切り替わるのを待つ
 		ScreenFlip();

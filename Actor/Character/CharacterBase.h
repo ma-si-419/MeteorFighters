@@ -110,6 +110,7 @@ public:
 		int attackFrame = -1;
 		int cancelFrame = -1;
 		float moveSpeed = -1;
+		bool isTeleportation = false;
 		AttackHitKind attackHitKind = AttackHitKind::kLow;
 		AttackKind attackKind = AttackKind::kPhysical;
 		std::string nextLowComboName = "empty";
@@ -177,6 +178,12 @@ public:
 	/// </summary>
 	/// <returns>自身のワールド座標</returns>
 	MyEngine::Vector3 GetPos();
+
+	/// <summary>
+	/// 現在の移動ベクトルを返す
+	/// </summary>
+	/// <returns>自身の移動ベクトル</returns>
+	MyEngine::Vector3 GetVelo();
 
 	/// <summary>
 	/// ステータスのセットする
@@ -286,6 +293,7 @@ protected:
 		kAttackFrame,//攻撃発生フレーム
 		kCancelFrame,//次の攻撃に移行できるようになるフレーム
 		kMoveSpeed,//移動速度
+		kIsTeleportation,
 		kAttackHitKind,//この攻撃を受けた時のやられ状態
 		kAttackKind,//攻撃の種類
 		kLowComboName,//Xボタンを押したときに次に出る攻撃の名前

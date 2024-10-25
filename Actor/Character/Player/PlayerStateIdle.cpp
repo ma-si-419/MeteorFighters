@@ -67,7 +67,9 @@ void PlayerStateIdle::Update()
 
 	//ˆÚ“®“ü—Í‚ª‚³‚ê‚Ä‚¢‚½‚ç
 	if (input.GetStickInfo().leftStickX != 0 ||
-		input.GetStickInfo().leftStickY != 0)
+		input.GetStickInfo().leftStickY != 0 ||
+		input.IsPress("RB")||
+		input.IsPushTrigger(true))
 	{
 		//Ÿ‚ÌState‚Ìƒ|ƒCƒ“ƒ^ì¬
 		std::shared_ptr<PlayerStateMove> next = std::make_shared<PlayerStateMove>(m_pPlayer);

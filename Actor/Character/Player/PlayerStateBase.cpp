@@ -12,9 +12,19 @@ MyEngine::Vector3 PlayerStateBase::GetEnemyPos()
 	return m_pPlayer->m_pGameManager->GetEnemyPos();
 }
 
+MyEngine::Vector3 PlayerStateBase::GetEnemyVelo()
+{
+	return m_pPlayer->m_pGameManager->GetEnemyVelo();
+}
+
 void PlayerStateBase::SetPlayerVelo(MyEngine::Vector3 velo)
 {
 	m_pPlayer->m_rigidbody.SetVelo(velo);
+}
+
+void PlayerStateBase::SetPlayerPos(MyEngine::Vector3 pos)
+{
+	m_pPlayer->m_rigidbody.SetPos(pos);
 }
 
 void PlayerStateBase::ChangeState(std::shared_ptr<CharacterStateBase> nextState)
