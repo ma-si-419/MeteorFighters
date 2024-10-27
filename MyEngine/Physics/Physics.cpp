@@ -106,7 +106,7 @@ void Physics::Update()
 			!hitCol.colider->m_pColData->GetIsTrigger())
 		{
 			//座標修正
-			FixNextPosition(hitCol);
+			//FixNextPosition(hitCol);
 		}
 	}
 	//座標確定
@@ -186,13 +186,14 @@ void Physics::FixNextPosition(OnCollideInfo hitCol)
 		if (staticCol->m_pColData->GetKind() == ColliderData::Kind::kSphere)
 		{
 			//球のデータにダウンキャスト
+			auto moveSphereData = std::dynamic_pointer_cast<SphereColliderData>(moveCol->m_pColData);
 			auto staticSphereData = std::dynamic_pointer_cast<SphereColliderData>(staticCol->m_pColData);
 
 			//調整する方向
 			MyEngine::Vector3 fixDir = (moveCol->m_nextPos - staticCol->m_nextPos).Normalize();
 
 			//球の半径+ちょっと(半径だけ足すとぶつかっている場所に補正するから)離す
-			float fixScale = staticSphereData->m_radius + 0.001f;
+			float fixScale = staticSphereData->m_radius + moveSphereData->m_radius + 0.001f;
 
 			//位置の補正
 			moveCol->m_nextPos = (fixDir * fixScale) + staticCol->m_nextPos;

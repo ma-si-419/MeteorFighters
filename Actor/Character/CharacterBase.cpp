@@ -1,5 +1,5 @@
 #include "CharacterBase.h"
-#include "CapsuleColliderData.h"
+#include "SphereColliderData.h"
 #include "LoadCsv.h"
 #include "Attack.h"
 #include <cassert>
@@ -40,7 +40,7 @@ namespace
 }
 
 CharacterBase::CharacterBase(ObjectTag tag, CharacterKind kind) :
-	Actor(tag, ColliderData::Kind::kCapsule),
+	Actor(tag, ColliderData::Kind::kSphere),
 	m_modelHandle(-1),
 	m_attachAnim(-1),
 	m_totalAnimTime(-1),
@@ -53,13 +53,9 @@ CharacterBase::CharacterBase(ObjectTag tag, CharacterKind kind) :
 	m_animBlendSpeed(kAnimBlendSpeed),
 	m_isEndAnimationBlend(true)
 {
-	auto capsuleData = std::dynamic_pointer_cast<CapsuleColliderData>(m_pColData);
+	auto sphereData = std::dynamic_pointer_cast<SphereColliderData>(m_pColData);
 
-	capsuleData->m_radius = kCharacterRadius;
-
-	capsuleData->m_length = kCharacterHeight;
-
-	capsuleData->m_isMoveStartPos = true;
+	sphereData->m_radius = kCharacterRadius;
 
 	LoadCsv load;
 
@@ -278,4 +274,11 @@ bool CharacterBase::IsFrontTarget(bool isPlayer)
 	//åxçêÇØÇµÇÃÇΩÇﬂ
 	return true;
 
+}
+
+void CharacterBase::SetDrawPos(MyEngine::Vector3 pos)
+{
+	pos.y -= kCharacterHeight;
+
+	MV1SetPosition(m_modelHandle,pos.CastVECTOR());
 }

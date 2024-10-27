@@ -47,7 +47,7 @@ std::shared_ptr<ColliderData> Collidable::CreateColliderData(ColliderData::Kind 
 	else if (kind == ColliderData::Kind::kSphere)
 	{
 		//スフィアコライダーの情報を入れる
-		return std::make_shared<CapsuleColliderData>();
+		return std::make_shared<SphereColliderData>();
 	}
 	else
 	{

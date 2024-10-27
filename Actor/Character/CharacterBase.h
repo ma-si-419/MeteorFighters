@@ -280,6 +280,12 @@ public:
 	/// <returns>‘O•û‚É‚¢‚é‚È‚çtrue</returns>
 	bool IsFrontTarget(bool isPlayer);
 
+	/// <summary>
+	/// •`‰æ‚·‚éÀ•W‚ğİ’è‚·‚é(MV1SetPosition‚Ì‘ã‚í‚è)
+	/// </summary>
+	/// <param name="pos">•`‰æ‚µ‚½‚¢À•W</param>
+	void SetDrawPos(MyEngine::Vector3 pos);
+
 protected:
 
 	/// <summary>

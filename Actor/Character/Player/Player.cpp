@@ -31,7 +31,7 @@ Player::~Player()
 
 void Player::Init()
 {
-	//m_modelHandle = MV1LoadModel("data/model/Fighter.mv1");
+	m_modelHandle = MV1LoadModel("data/model/Fighter.mv1");
 
 	MV1SetScale(m_modelHandle, VGet(kModelScale, kModelScale, kModelScale));
 
@@ -64,9 +64,9 @@ void Player::Update()
 	PlayAnim();
 
 
-	//ポジションの設定
-	MV1SetPosition(m_modelHandle, m_rigidbody.GetPos().CastVECTOR());
-	
+	//描画座標の設定
+	SetDrawPos(m_rigidbody.GetPos());
+
 	MyEngine::Vector3 cameraTargetPos = m_pGameManager->GetEnemyPos();
 
 	cameraTargetPos.y = m_rigidbody.GetPos().y;

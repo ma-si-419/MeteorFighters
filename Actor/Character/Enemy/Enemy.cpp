@@ -76,7 +76,7 @@ void Enemy::Update()
 	//State‚ÌXVˆ—
 	m_pState->Update();
 
-	MV1SetPosition(m_modelHandle, m_rigidbody.GetPos().CastVECTOR());
+	SetDrawPos(m_rigidbody.GetPos());
 }
 
 void Enemy::Draw()
