@@ -54,7 +54,9 @@ public:
 		kBackLowHit2,
 		kBackLowHit3,
 		kMiddleHit,
-		kBackMiddleHit
+		kBackMiddleHit,
+		kEnergyAttackLeft,
+		kEnergyAttackRight
 	};
 
 	enum class CharacterKind
@@ -110,6 +112,7 @@ public:
 		int attackFrame = -1;
 		int cancelFrame = -1;
 		float moveSpeed = -1;
+		float attackMoveSpeed = -1;
 		bool isTeleportation = false;
 		AttackHitKind attackHitKind = AttackHitKind::kLow;
 		AttackKind attackKind = AttackKind::kPhysical;
@@ -204,6 +207,12 @@ public:
 	float GetPower() { return m_status.atk; }
 
 	/// <summary>
+	/// キャラクターの移動速度を取得する
+	/// </summary>
+	/// <returns>キャラクターの移動速度</returns>
+	float GetSpeed() { return m_status.spd; }
+
+	/// <summary>
 	/// 再生するアニメーションを変える(ブレンドスピード固定)
 	/// </summary>
 	/// <param name="animKind">アニメーションを指定</param>
@@ -286,6 +295,13 @@ public:
 	/// <param name="pos">描画したい座標</param>
 	void SetDrawPos(MyEngine::Vector3 pos);
 
+	/// <summary>
+	/// 攻撃のアニメーションを返す
+	/// </summary>
+	/// <param name="animName">アニメーションの名前</param>
+	/// <returns>アニメーション番号</returns>
+	AnimKind GetAttackAnimKind(std::string animName);
+
 protected:
 
 	/// <summary>
@@ -299,6 +315,7 @@ protected:
 		kAttackFrame,//攻撃発生フレーム
 		kCancelFrame,//次の攻撃に移行できるようになるフレーム
 		kMoveSpeed,//移動速度
+		kAttackMoveSpeed,//攻撃の移動速度
 		kIsTeleportation,
 		kAttackHitKind,//この攻撃を受けた時のやられ状態
 		kAttackKind,//攻撃の種類

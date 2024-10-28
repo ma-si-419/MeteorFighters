@@ -34,6 +34,7 @@ void GameManager::Update()
 		item->Update();
 	}
 
+	//UŒ‚‚Ìíœ
 	auto iterator = std::remove_if(m_pAttacks.begin(), m_pAttacks.end(),
 		[](const auto& item)
 		{

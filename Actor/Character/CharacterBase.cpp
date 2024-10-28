@@ -11,9 +11,9 @@ namespace
 	constexpr float kCharacterHeight = 4.5f;
 	constexpr float kCharacterRadius = 3.0f;
 
-	constexpr float kAttackPopPos = kCharacterRadius * 3.0f;
+	constexpr float kAttackPopPos = kCharacterRadius * 2.0f;
 
-	const MyEngine::Vector3 kAttackPos(0.0f, kCharacterHeight, kAttackPopPos);
+	const MyEngine::Vector3 kAttackPos(0.0f, 0.0f, kAttackPopPos);
 
 	constexpr float kAnimBlendSpeed = 0.08f;
 
@@ -157,6 +157,7 @@ void CharacterBase::SetNormalAttackData(std::vector<std::vector<std::string>> no
 		pushData.attackFrame = stoi(item[static_cast<int>(NormalAttackDataSort::kAttackFrame)]);
 		pushData.cancelFrame = stoi(item[static_cast<int>(NormalAttackDataSort::kCancelFrame)]);
 		pushData.moveSpeed = stof(item[static_cast<int>(NormalAttackDataSort::kMoveSpeed)]);
+		pushData.attackMoveSpeed = stof(item[static_cast<int>(NormalAttackDataSort::kAttackMoveSpeed)]);
 		pushData.isTeleportation = static_cast<bool>(stoi(item[static_cast<int>(NormalAttackDataSort::kIsTeleportation)]));
 		pushData.animationName = item[static_cast<int>(NormalAttackDataSort::kAnimationName)];
 		pushData.attackKind = static_cast<AttackKind>(stoi(item[static_cast<int>(NormalAttackDataSort::kAttackKind)]));
@@ -196,13 +197,16 @@ void CharacterBase::CreateAttack(AttackData attackData)
 
 	//³–Ê•ûŒü‚ðÝ’è
 	MyEngine::Vector3 toTarget;
+	MyEngine::Vector3 targetPos;
 	if (attackData.isPlayer)
 	{
-		toTarget = (m_pGameManager->GetEnemyPos() - m_pGameManager->GetPlayerPos()).Normalize();
+		targetPos = m_pGameManager->GetEnemyPos();
+		toTarget = (targetPos - m_pGameManager->GetPlayerPos()).Normalize();
 	}
 	else
 	{
-		toTarget = (m_pGameManager->GetPlayerPos() - m_pGameManager->GetEnemyPos()).Normalize();
+		targetPos = m_pGameManager->GetPlayerPos();
+		toTarget = (targetPos - m_pGameManager->GetEnemyPos()).Normalize();
 	}
 
 	localPos.SetFrontPos(m_rigidbody.GetPos() + toTarget);
@@ -218,6 +222,7 @@ void CharacterBase::CreateAttack(AttackData attackData)
 
 	Attack::AttackStatus status;
 
+	status.targetPos = targetPos;
 	status.damage = attackData.damage;
 	status.speed = attackData.speed;
 	status.lifeTime = attackData.lifeTime;
@@ -281,4 +286,54 @@ void CharacterBase::SetDrawPos(MyEngine::Vector3 pos)
 	pos.y -= kCharacterHeight;
 
 	MV1SetPosition(m_modelHandle,pos.CastVECTOR());
+}
+
+CharacterBase::AnimKind CharacterBase::GetAttackAnimKind(std::string animName)
+{
+	CharacterBase::AnimKind ans = AnimKind::kLowAttack1;
+
+	if (animName == "LowAttack1")
+	{
+		ans = CharacterBase::AnimKind::kLowAttack1;
+	}
+	else if (animName == "LowAttack2")
+	{
+		ans = CharacterBase::AnimKind::kLowAttack2;
+	}
+	else if (animName == "LowAttack3")
+	{
+		ans = CharacterBase::AnimKind::kLowAttack3;
+	}
+	else if (animName == "LowAttack4")
+	{
+		ans = CharacterBase::AnimKind::kLowAttack4;
+	}
+	else if (animName == "LowAttack5")
+	{
+		ans = CharacterBase::AnimKind::kLowAttack5;
+	}
+	else if (animName == "LowAttack6")
+	{
+		ans = CharacterBase::AnimKind::kLowAttack6;
+	}
+	else if (animName == "LowAttack7")
+	{
+		ans = CharacterBase::AnimKind::kLowAttack7;
+	}
+	else if (animName == "LowAttack8")
+	{
+		ans = CharacterBase::AnimKind::kLowAttack8;
+	}
+	else if (animName == "EnergyAttackRight")
+	{
+		ans = CharacterBase::AnimKind::kEnergyAttackRight;
+	}
+	else if (animName == "EnergyAttackLeft")
+	{
+		ans = CharacterBase::AnimKind::kEnergyAttackLeft;
+	}
+
+	return ans;
+
+	return AnimKind();
 }

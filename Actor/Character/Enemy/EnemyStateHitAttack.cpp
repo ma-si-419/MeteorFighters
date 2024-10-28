@@ -3,6 +3,7 @@
 #include "LocalPos.h"
 #include "DxLib.h"
 #include "Enemy.h"
+#include "Attack.h"
 
 namespace
 {
@@ -124,6 +125,8 @@ void EnemyStateHitAttack::HitAttack(HitKind kind)
 	//やられ状態によって移動速度を変更する
 	m_moveVec = moveDir * kMoveSpeed[static_cast<int>(kind)];
 
+	SetEnemyVelo(m_moveVec);
+
 	//コンボとやられ状態の確認
 
 	//軽い吹き飛ばし攻撃
@@ -169,7 +172,14 @@ void EnemyStateHitAttack::HitAttack(HitKind kind)
 
 void EnemyStateHitAttack::OnCollide(std::shared_ptr<Collidable> collider)
 {
+	if (collider->GetTag() == ObjectTag::kPlayerAttack)
+	{
+		auto attack = std::static_pointer_cast<Attack>(collider);
 
+		auto status = attack->GetStatus();
+
+		EnemyStateBase::HitAttack(attack,GetKind());
+	}
 }
 
 int EnemyStateHitAttack::GetNextAnimKind(HitKind kind)

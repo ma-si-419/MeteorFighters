@@ -6,14 +6,6 @@
 #include "Player.h"
 #include <cmath>
 
-namespace
-{
-#ifdef _DEBUG
-	constexpr float kSpeed = 0.7f;
-
-#endif // _DEBUG
-}
-
 PlayerStateMove::PlayerStateMove(std::shared_ptr<Player> player) :
 	PlayerStateBase(player)
 {
@@ -34,9 +26,9 @@ void PlayerStateMove::Update()
 	//インプットを管理しているクラスの参照
 	MyEngine::Input& input = MyEngine::Input::GetInstance();
 	//移動ベクトル
-	MyEngine::Vector3 moveVec;
+	MyEngine::Vector3 velo;
 	//移動方向ベクトル
-	MyEngine::Vector3 moveDir;
+	MyEngine::Vector3 dir;
 
 	//スティックの情報取得
 	MyEngine::Input::StickInfo stick = input.GetStickInfo();
@@ -47,7 +39,7 @@ void PlayerStateMove::Update()
 	if (leftStickDir.SqLength() > 0.001)
 	{
 		//移動方向
-		moveDir = leftStickDir.Normalize();
+		dir = leftStickDir.Normalize();
 
 		//エネミーの方向に移動方向を回転させる
 		float vX = GetEnemyPos().x - m_pPlayer->GetPos().x;
@@ -59,20 +51,20 @@ void PlayerStateMove::Update()
 
 		MATRIX mat = rotation.GetRotationMat();
 
-		moveDir = moveDir.MatTransform(mat);
+		dir = dir.MatTransform(mat);
 
 		//移動方向にスピードをかける
-		moveVec = moveDir * kSpeed;
+		velo = dir * GetSpeed();
 	}
 	//ジャンプボタンが押されたら
 	if (input.IsPress("RB"))
 	{
-		moveVec.y = kSpeed;
+		velo.y = GetSpeed();
 	}
 	//下降ボタンが押されたら
 	else if (input.IsPushTrigger(true))
 	{
-		moveVec.y = -kSpeed;
+		velo.y = -GetSpeed();
 	}
 	
 	//攻撃入力がされたら
@@ -86,9 +78,19 @@ void PlayerStateMove::Update()
 		ChangeState(next);
 		return;
 	}
+	else if (input.IsTrigger("Y"))
+	{
+		//次のStateのポインタ作成
+		std::shared_ptr<PlayerStateNormalAttack> next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
+		//何の攻撃を行うかをAttackStateに渡す
+		next->SetAttack("Energy1");
+		//StateをAttackに変更する
+		ChangeState(next);
+		return;
+	}
 
 	//移動していなかったら
-	if (moveVec.SqLength() == 0)
+	if (velo.SqLength() == 0)
 	{
 		//アイドル状態に戻る
 		std::shared_ptr<PlayerStateIdle> next = std::make_shared<PlayerStateIdle>(m_pPlayer);
@@ -96,19 +98,13 @@ void PlayerStateMove::Update()
 		ChangeState(next);
 	}
 	//移動ベクトルを設定する
-	SetPlayerVelo(moveVec);
+	SetPlayerVelo(velo);
 
 
 #ifdef _DEBUG
 
 	DrawString(0, 16, "PlayerState:Move", GetColor(255, 255, 255));
 
-	if (MyEngine::Input::GetInstance().IsTrigger("A"))
-	{
-		std::shared_ptr<PlayerStateIdle> next = std::make_shared<PlayerStateIdle>(m_pPlayer);
-
-		ChangeState(next);
-	}
 #endif // _DEBUG
 
 }

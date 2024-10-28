@@ -76,11 +76,11 @@ void Physics::Update()
 				for (auto& item : hitData)
 				{
 					//すでに入れていたら弾く
-					if (item.owner == first)
+					if (item.owner == first && item.colider == second)
 					{
 						hasFirstColData = true;
 					}
-					if (item.owner == second)
+					if (item.owner == second && item.colider == first)
 					{
 						hasSecondColData = true;
 					}
@@ -102,11 +102,11 @@ void Physics::Update()
 	{
 		hitCol.OnCollide();
 		//物理挙動をするものだけ座標修正を行う
-		if (!hitCol.owner->m_pColData->GetIsTrigger() ||
+		if (!hitCol.owner->m_pColData->GetIsTrigger() &&
 			!hitCol.colider->m_pColData->GetIsTrigger())
 		{
 			//座標修正
-			//FixNextPosition(hitCol);
+			FixNextPosition(hitCol);
 		}
 	}
 	//座標確定

@@ -38,3 +38,13 @@ void PlayerStateBase::ChangeState(std::shared_ptr<CharacterStateBase> nextState)
 	//ŽŸ‚ÌState‚ÌŠJŽnˆ—
 	m_pNextState->Enter();
 }
+
+int PlayerStateBase::GetAttackAnimKind(std::string animName)
+{
+	return static_cast<int>(m_pPlayer->GetAttackAnimKind(animName));
+}
+
+float PlayerStateBase::GetSpeed()
+{
+	return m_pPlayer->GetSpeed();
+}

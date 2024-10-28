@@ -342,7 +342,7 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="PlayerStateSpecialAttack.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Actor\Character\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

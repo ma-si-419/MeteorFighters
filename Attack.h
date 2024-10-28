@@ -10,6 +10,7 @@ public:
 	/// </summary>
 	struct AttackStatus
 	{
+		MyEngine::Vector3 targetPos;
 		int damage = 0;
 		float speed = 0;
 		int lifeTime = 0;
@@ -64,6 +65,9 @@ private:
 
 	//攻撃のステータス
 	AttackStatus m_status;
+
+	//攻撃の移動方向ベクトル
+	MyEngine::Vector3 m_dir;
 
 	//シーンに出てから何フレームたったか
 	int m_lifeTime;

@@ -17,16 +17,18 @@ public:
 	virtual void Exit() override;
 
 	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
-
-	int GetAnimKind(std::string animName);
 private:
 
+	//Œ»İs‚Á‚Ä‚¢‚éUŒ‚‚Ì–¼‘O
 	std::string m_nowAttackName;
 
+	//Ÿ‚És‚¤UŒ‚‚Ì–¼‘O
 	std::string m_nextAttackName;
 
+	//Ÿ‚ÉUŒ‚‚ğs‚¤‚©‚Ç‚¤‚©
 	bool m_isNextAttack;
 
-	MyEngine::Vector3 m_moveDir;
+	//Ši“¬UŒ‚‚ÅˆÚ“®‚·‚éÀ•W
+	MyEngine::Vector3 m_moveTargetPos;
 };
 

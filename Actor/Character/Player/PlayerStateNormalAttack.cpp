@@ -3,13 +3,19 @@
 #include "DxLib.h"
 #include "Input.h"
 #include "Player.h"
+#include <cmath>
 
 namespace
 {
 	//格闘攻撃の攻撃持続フレーム
-	constexpr int kNormalAttackLifeTime = 2;
+	constexpr int kPhysicalAttackLifeTime = 2;
 	//格闘攻撃の判定の大きさ
-	constexpr float kNormalAttackRadius = 5.0f;
+	constexpr float kPhysicalAttackRadius = 5.0f;
+	//気弾攻撃の攻撃判定が残る時間
+	constexpr int kEnergyAttackLifeTime = 120;
+	//気弾攻撃の判定の大きさ
+	constexpr float kEnergyAttackRadius = 3.0f;
+
 }
 
 PlayerStateNormalAttack::PlayerStateNormalAttack(std::shared_ptr<Player> player) :
@@ -30,17 +36,17 @@ void PlayerStateNormalAttack::Enter()
 
 	std::string animName = m_pPlayer->GetNormalAttackData(m_nowAttackName).animationName;
 
-	CharacterBase::AnimKind anim = static_cast<CharacterBase::AnimKind>(GetAnimKind(animName));
+	CharacterBase::AnimKind anim = static_cast<CharacterBase::AnimKind>(GetAttackAnimKind(animName));
 
 	m_pPlayer->ChangeAnim(anim, false);
 
 	MyEngine::Vector3 shiftVec = (GetEnemyPos() - m_pPlayer->GetPos()).Normalize();
 
-	shiftVec *= kNormalAttackRadius;
+	shiftVec *= kPhysicalAttackRadius;
 
 	shiftVec.y = 0;
 
-	m_moveDir = ((GetEnemyPos() + shiftVec) - m_pPlayer->GetPos()).Normalize();
+	m_moveTargetPos = GetEnemyPos() + shiftVec;
 
 }
 
@@ -72,25 +78,33 @@ void PlayerStateNormalAttack::Update()
 			if (attackData.isTeleportation)
 			{
 				//次の攻撃発生フレーム時に敵がいる場所を計算する
-				MyEngine::Vector3 teleportationPos = GetEnemyPos() + (GetEnemyVelo() * (attackData.attackFrame - 1));
+				MyEngine::Vector3 teleportationPos = GetEnemyPos() + (GetEnemyVelo() * (attackData.attackFrame));
 				//瞬間移動先に攻撃の攻撃範囲分だけずれを足す
 				MyEngine::Vector3 attackShiftVec = GetEnemyVelo();
-				attackShiftVec.y = 0;
-				
-				teleportationPos += attackShiftVec.Normalize() * (kNormalAttackRadius);
+				//attackShiftVec.y = 0;
+
+				teleportationPos += attackShiftVec.Normalize() * (kPhysicalAttackRadius);
 
 				SetPlayerPos(teleportationPos);
 			}
 
 			//攻撃を行う方向を設定する
-			MyEngine::Vector3 shiftVec = (GetEnemyPos() - m_pPlayer->GetPos()).Normalize();
+			LocalPos attackPos;
 
-			shiftVec *= kNormalAttackRadius;
+			attackPos.SetCenterPos(GetEnemyPos());
+
+			attackPos.SetFrontPos(GetEnemyPos() + (m_pPlayer->GetPos() - GetEnemyPos()).Normalize());
+
+			attackPos.SetLocalPos(MyEngine::Vector3(0.0f, 0.0f, kPhysicalAttackRadius));
+
+			MyEngine::Vector3 shiftVec = (attackPos.GetWorldPos() - m_pPlayer->GetPos()).Normalize();
+
+			shiftVec *= kPhysicalAttackRadius;
 
 			shiftVec.y = 0;
 
-			m_moveDir = ((GetEnemyPos() + shiftVec) - m_pPlayer->GetPos()).Normalize();
-			CharacterBase::AnimKind anim = static_cast<CharacterBase::AnimKind>(GetAnimKind(attackData.animationName));
+			m_moveTargetPos = GetEnemyPos() + shiftVec;
+			CharacterBase::AnimKind anim = static_cast<CharacterBase::AnimKind>(GetAttackAnimKind(attackData.animationName));
 
 			m_pPlayer->ChangeAnim(anim, false);
 
@@ -109,10 +123,73 @@ void PlayerStateNormalAttack::Update()
 		return;
 	}
 
-	//攻撃を出すフレームまでは移動する
-	if (m_time <= attackData.attackFrame)
+	//格闘攻撃ならば
+	if (attackData.attackKind == CharacterBase::AttackKind::kPhysical)
 	{
-		velo = m_moveDir * attackData.moveSpeed;
+		//攻撃を出すフレームまでは移動する
+		if (m_time <= attackData.attackFrame)
+		{
+
+			MyEngine::Vector3 dir;
+
+			dir = (m_moveTargetPos - m_pPlayer->GetPos()).Normalize();
+
+			float speed = attackData.moveSpeed;
+
+			//移動距離が行きたい座標までの距離よりも長ければ
+			if ((m_moveTargetPos - m_pPlayer->GetPos()).Length() < speed * attackData.attackFrame)
+			{
+				//移動距離を補正する
+				speed = (m_moveTargetPos - m_pPlayer->GetPos()).Length() / attackData.attackFrame;
+			}
+
+			velo = dir * speed;
+		}
+	}
+	//気弾攻撃ならば
+	else if (attackData.attackKind == CharacterBase::AttackKind::kEnergy)
+	{
+		//自由に移動できるようにする
+		MyEngine::Input& input = MyEngine::Input::GetInstance();
+		//移動方向ベクトル
+		MyEngine::Vector3 dir;
+
+		//スティックの情報取得
+		MyEngine::Input::StickInfo stick = input.GetStickInfo();
+
+		//左スティックの傾き取得
+		MyEngine::Vector3 leftStickDir(stick.leftStickX, 0, -stick.leftStickY);
+		//移動ベクトルが0じゃなければ
+		if (leftStickDir.SqLength() > 0.001)
+		{
+			//移動方向
+			dir = leftStickDir.Normalize();
+
+			//エネミーの方向に移動方向を回転させる
+			float vX = GetEnemyPos().x - m_pPlayer->GetPos().x;
+			float vZ = GetEnemyPos().z - m_pPlayer->GetPos().z;
+
+			float angle = std::atan2f(vX, vZ);
+
+			MyEngine::Vector3 rotation(0.0f, angle, 0.0f);
+
+			MATRIX mat = rotation.GetRotationMat();
+
+			dir = dir.MatTransform(mat);
+
+			//移動方向にスピードをかける
+			velo = dir * GetSpeed();
+		}
+		//ジャンプボタンが押されたら
+		if (input.IsPress("RB"))
+		{
+			velo.y = GetSpeed();
+		}
+		//下降ボタンが押されたら
+		else if (input.IsPushTrigger(true))
+		{
+			velo.y = -GetSpeed();
+		}
 	}
 
 	//攻撃を出すフレームになったら
@@ -123,9 +200,20 @@ void PlayerStateNormalAttack::Update()
 		attack.damage = static_cast<int>(attackData.damageRate * m_pPlayer->GetPower());
 		attack.attackHitKind = attackData.attackHitKind;
 		attack.isPlayer = true;
-		attack.lifeTime = kNormalAttackLifeTime;
-		attack.speed = 0;
-		attack.radius = kNormalAttackRadius;
+		attack.speed = attackData.attackMoveSpeed;
+
+		//格闘攻撃なら
+		if (attackData.attackKind == CharacterBase::AttackKind::kPhysical)
+		{
+			attack.lifeTime = kPhysicalAttackLifeTime;
+			attack.radius = kPhysicalAttackRadius;
+		}
+		//気弾攻撃なら
+		else if (attackData.attackKind == CharacterBase::AttackKind::kEnergy)
+		{
+			attack.lifeTime = kEnergyAttackLifeTime;
+			attack.radius = kEnergyAttackRadius;
+		}
 
 		m_pPlayer->CreateAttack(attack);
 	}
@@ -160,45 +248,4 @@ void PlayerStateNormalAttack::Exit()
 
 void PlayerStateNormalAttack::OnCollide(std::shared_ptr<Collidable> collider)
 {
-}
-
-int PlayerStateNormalAttack::GetAnimKind(std::string animName)
-{
-	int ans = 0;
-
-	if (animName == "LowAttack1")
-	{
-		ans = static_cast<int>(CharacterBase::AnimKind::kLowAttack1);
-	}
-	else if (animName == "LowAttack2")
-	{
-		ans = static_cast<int>(CharacterBase::AnimKind::kLowAttack2);
-	}
-	else if (animName == "LowAttack3")
-	{
-		ans = static_cast<int>(CharacterBase::AnimKind::kLowAttack3);
-	}
-	else if (animName == "LowAttack4")
-	{
-		ans = static_cast<int>(CharacterBase::AnimKind::kLowAttack4);
-	}
-	else if (animName == "LowAttack5")
-	{
-		ans = static_cast<int>(CharacterBase::AnimKind::kLowAttack5);
-	}
-	else if (animName == "LowAttack6")
-	{
-		ans = static_cast<int>(CharacterBase::AnimKind::kLowAttack6);
-	}
-	else if (animName == "LowAttack7")
-	{
-		ans = static_cast<int>(CharacterBase::AnimKind::kLowAttack7);
-	}
-	else if (animName == "LowAttack8")
-	{
-		ans = static_cast<int>(CharacterBase::AnimKind::kLowAttack8);
-	}
-
-
-	return ans;
 }

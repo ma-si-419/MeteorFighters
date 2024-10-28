@@ -64,6 +64,16 @@ void PlayerStateIdle::Update()
 		ChangeState(next);
 		return;
 	}
+	else if (input.IsTrigger("Y"))
+	{
+		//次のStateのポインタ作成
+		std::shared_ptr<PlayerStateNormalAttack> next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
+		//何の攻撃を行うかをAttackStateに渡す
+		next->SetAttack("Energy1");
+		//StateをAttackに変更する
+		ChangeState(next);
+		return;
+	}
 
 	//移動入力がされていたら
 	if (input.GetStickInfo().leftStickX != 0 ||

@@ -1,5 +1,6 @@
 #pragma once
 #include "StateBase.h"
+#include <string>
 class Collidable;
 class CharacterStateBase : public StateBase
 {
@@ -13,7 +14,8 @@ public:
 		kRush,//“ËŒ‚ó‘Ô
 		kHitAttack,//UŒ‚‚ğó‚¯‚½
 		kButtonBashing,//“G‚Æ‚Ì‰Ÿ‚µ‡‚¢
-		kStateKindNum
+		kEnergyAttack,//‹C’eUŒ‚
+		kStateKindNum//State‚Ì”
 	};
 
 public:
@@ -26,7 +28,7 @@ public:
 	std::shared_ptr<CharacterStateBase> m_pNextState;
 
 protected:
-	
+
 	virtual void ChangeState(std::shared_ptr<CharacterStateBase> nextState) abstract;
 
 	//Œ»İ‚Ìó‘Ô
