@@ -51,7 +51,7 @@ void Enemy::Init()
 void Enemy::Update()
 {
 	//State‚É•Ï‰»‚ª‚ ‚ê‚Î•Ï‰»‚³‚¹‚é
-	if (m_pState->GetKind() != m_pState->m_pNextState->GetKind())
+	if (m_pState != m_pState->m_pNextState)
 	{
 		m_pState = m_pState->m_pNextState;
 	}

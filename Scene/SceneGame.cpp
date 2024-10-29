@@ -56,6 +56,8 @@ void SceneGame::Draw()
 	{
 		actor->Draw();
 	}
+
+	m_pGameManager->Draw();
 }
 
 void SceneGame::End()

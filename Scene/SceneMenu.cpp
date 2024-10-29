@@ -11,7 +11,7 @@ namespace
 	constexpr int kShowUiPosY[static_cast<int>(SceneMenu::ItemKind::kItemKindNum)] = { 100,200,300,400,500 };
 
 	//Uiを選択した時に動かす範囲
-	constexpr int kShowUiMoveLange = 100;
+	constexpr int kShowUiMoveRange = 100;
 
 	//Uiを動かす速さ
 	constexpr int kShowUiMoveSpeed = 8;
@@ -51,14 +51,14 @@ void SceneMenu::Init()
 void SceneMenu::Update()
 {
 	//選択している選択肢を右に動かす
-	if (m_showUi[m_selectKind].showPosX < kShowUiPosX + kShowUiMoveLange)
+	if (m_showUi[m_selectKind].showPosX < kShowUiPosX + kShowUiMoveRange)
 	{
 		//右に動かす
 		m_showUi[m_selectKind].showPosX += kShowUiMoveSpeed;
 		//行きすぎたら戻す
-		if (m_showUi[m_selectKind].showPosX > kShowUiPosX + kShowUiMoveLange)
+		if (m_showUi[m_selectKind].showPosX > kShowUiPosX + kShowUiMoveRange)
 		{
-			m_showUi[m_selectKind].showPosX = kShowUiPosX + kShowUiMoveLange;
+			m_showUi[m_selectKind].showPosX = kShowUiPosX + kShowUiMoveRange;
 		}
 	}
 	//選択されてない選択肢を左に動かす

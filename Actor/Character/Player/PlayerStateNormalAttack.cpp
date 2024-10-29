@@ -12,7 +12,7 @@ namespace
 	//Ši“¬UŒ‚‚Ì”»’è‚Ì‘å‚«‚³
 	constexpr float kPhysicalAttackRadius = 5.0f;
 	//‹C’eUŒ‚‚ÌUŒ‚”»’è‚ªc‚éŠÔ
-	constexpr int kEnergyAttackLifeTime = 120;
+	constexpr int kEnergyAttackLifeTime = 240;
 	//‹C’eUŒ‚‚Ì”»’è‚Ì‘å‚«‚³
 	constexpr float kEnergyAttackRadius = 3.0f;
 

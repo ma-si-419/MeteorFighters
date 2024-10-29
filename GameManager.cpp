@@ -49,6 +49,15 @@ void GameManager::Update()
 	m_pAttacks.erase(iterator, m_pAttacks.end());
 }
 
+void GameManager::Draw()
+{
+	for (auto& item : m_pAttacks)
+	{
+		//UŒ‚‚Ì•`‰æ
+		item->Draw();
+	}
+}
+
 void GameManager::SetPlayerStatus(int number,std::vector<std::string> statusData)
 {
 	//ƒvƒŒƒCƒ„[ì¬

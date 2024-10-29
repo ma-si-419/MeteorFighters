@@ -21,6 +21,11 @@ public:
 	void Update();
 
 	/// <summary>
+	/// 攻撃の描画などを行う
+	/// </summary>
+	void Draw();
+
+	/// <summary>
 	/// プレイヤーが操作するキャラクターを設定する
 	/// </summary>
 	/// <param name="number">プレイヤーが使うキャラクターの番号</param>

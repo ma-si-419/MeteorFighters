@@ -6,9 +6,9 @@ Low4,3,35,10,20,1,0,0,é„,1,Low5,Low5,LowAttack4
 Low5,5,45,10,30,1,0,0,íÜ,1,Low6,Low5,LowAttack5
 Low6,3,45,10,20,0.5,0,1,é„,1,Low7,Low5,LowAttack6
 Low7,5,35,10,20,1,0,0,è„êÅÇ¡îÚÇ—,1,Low8,Low5,LowAttack7
-Low8,7,35,10,20,0.5,0,1,â∫êÅÇ¡îÚÇ—,1,None,None,LowAttack8
-Energy1,1,40,10,20,0,2.5,0,é„,0,None,Energy2,EnergyAttackRight
-Energy2,1,40,10,20,0,2.5,0,é„,0,None,Energy3,EnergyAttackLeft
-Energy3,1,40,10,20,0,2.5,0,é„,0,None,Energy4,EnergyAttackRight
-Energy4,1,40,10,20,0,2.5,0,é„,0,None,Energy5,EnergyAttackLeft
-Energy5,3,50,10,30,0,3,0,íÜ,0,None,None,EnergyAttackRight
+Low8,7,60,30,40,0.5,0,1,â∫êÅÇ¡îÚÇ—,1,None,None,LowAttack8
+Energy1,1,40,10,20,0,3,0,é„,0,None,Energy2,EnergyAttackRight
+Energy2,1,40,10,20,0,3,0,é„,0,None,Energy3,EnergyAttackLeft
+Energy3,1,40,10,20,0,3,0,é„,0,None,Energy4,EnergyAttackRight
+Energy4,1,40,10,20,0,3,0,é„,0,None,Energy5,EnergyAttackLeft
+Energy5,3,50,10,30,0,4,0,íÜ,0,None,None,EnergyAttackRight

@@ -9,11 +9,11 @@ namespace
 {
 	constexpr int kDownTimes[static_cast<int>(EnemyStateHitAttack::HitKind::kKindNum)] =
 	{
-		15,
-		20,
 		40,
-		40,
-		40,
+		50,
+		90,
+		90,
+		90,
 		60,
 		60
 	};
@@ -125,8 +125,6 @@ void EnemyStateHitAttack::HitAttack(HitKind kind)
 	//やられ状態によって移動速度を変更する
 	m_moveVec = moveDir * kMoveSpeed[static_cast<int>(kind)];
 
-	SetEnemyVelo(m_moveVec);
-
 	//コンボとやられ状態の確認
 
 	//軽い吹き飛ばし攻撃
@@ -178,7 +176,8 @@ void EnemyStateHitAttack::OnCollide(std::shared_ptr<Collidable> collider)
 
 		auto status = attack->GetStatus();
 
-		EnemyStateBase::HitAttack(attack,GetKind());
+		EnemyStateBase::HitAttack(attack, GetKind());
+		printfDx("Hit\n");
 	}
 }
 

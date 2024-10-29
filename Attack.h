@@ -75,5 +75,8 @@ private:
 	//‘¶İ‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©
 	bool m_isExist;
 
+	//’Ç”ö‚·‚é‚©‚Ç‚¤‚©
+	bool m_isTrack;
+
 };
 
