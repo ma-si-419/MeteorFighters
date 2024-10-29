@@ -3,7 +3,7 @@
 #include "DxLib.h"
 #include "Collidable.h"
 #include "Attack.h"
-
+#include "Enemy.h"
 
 EnemyStateIdle::EnemyStateIdle(std::shared_ptr<Enemy> enemy):
 	EnemyStateBase(enemy)
@@ -14,6 +14,8 @@ void EnemyStateIdle::Enter()
 {
 	m_kind = CharacterStateKind::kIdle;
 	m_pNextState = shared_from_this();
+	m_pEnemy->ChangeAnim(CharacterBase::AnimKind::kIdle,true);
+	printfDx("アイドルだよー\n");
 }
 
 void EnemyStateIdle::Update()
@@ -26,11 +28,11 @@ void EnemyStateIdle::Update()
 
 	if (m_time > 60)
 	{
-		int rand = GetRand(6) + 1;
+		//int rand = GetRand(6) + 1;
 
-		std::shared_ptr<EnemyStateIdle> next = std::make_shared<EnemyStateIdle>(m_pEnemy);
+		//std::shared_ptr<EnemyStateIdle> next = std::make_shared<EnemyStateIdle>(m_pEnemy);
 
-		ChangeState(next);
+		//ChangeState(next);
 		//if (rand == 1)
 		//{
 		//	ChangeState(CharacterStateKind::kMove);

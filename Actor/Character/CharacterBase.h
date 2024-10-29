@@ -56,7 +56,10 @@ public:
 		kMiddleHit,
 		kBackMiddleHit,
 		kEnergyAttackLeft,
-		kEnergyAttackRight
+		kEnergyAttackRight,
+		kUpperAttack,
+		kStanAttack,
+		kLegSweepAttack
 	};
 
 	enum class CharacterKind
@@ -116,8 +119,7 @@ public:
 		bool isTeleportation = false;
 		AttackHitKind attackHitKind = AttackHitKind::kLow;
 		AttackKind attackKind = AttackKind::kPhysical;
-		std::string nextLowComboName = "empty";
-		std::string nextHighComboName = "empty";
+		std::string nextComboName = "empty";
 		std::string animationName = "empty";
 	};
 
@@ -319,8 +321,7 @@ protected:
 		kIsTeleportation,
 		kAttackHitKind,//この攻撃を受けた時のやられ状態
 		kAttackKind,//攻撃の種類
-		kLowComboName,//Xボタンを押したときに次に出る攻撃の名前
-		kHighComboName,//Yボタンを押したときに次に出る攻撃の名前
+		kNextComboName,//次に出る攻撃の名前
 		kAnimationName//アニメーションの名前
 	};
 
@@ -352,7 +353,9 @@ protected:
 	//アニメーションの合計時間
 	float m_totalAnimTime;
 	//アニメーションの現在の再生時間
-	float m_playAnimTime;
+	float m_nowPlayAnimTime;
+	//前のアニメーション
+	float m_lastPlayAnimTime;
 	//アニメーションの再生速度
 	float m_animPlaySpeed;
 	//アニメーションをループするかどうか

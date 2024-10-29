@@ -4,7 +4,7 @@
 
 namespace
 {
-	constexpr float kEnergyAttackTrackRange = 2.0f;
+	constexpr float kEnergyAttackTrackRange = 1.5f;
 }
 
 Attack::Attack(ObjectTag tag, MyEngine::Vector3 pos) :

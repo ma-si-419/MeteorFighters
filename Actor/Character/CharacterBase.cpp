@@ -44,7 +44,7 @@ CharacterBase::CharacterBase(ObjectTag tag, CharacterKind kind) :
 	m_modelHandle(-1),
 	m_attachAnim(-1),
 	m_totalAnimTime(-1),
-	m_playAnimTime(-1),
+	m_nowPlayAnimTime(-1),
 	m_animPlaySpeed(0),
 	m_isLoop(false),
 	m_characterKind(kind),
@@ -90,18 +90,20 @@ void CharacterBase::ChangeAnim(AnimKind animKind, bool loop)
 
 void CharacterBase::ChangeAnim(AnimKind animKind, bool loop, float blendSpeed)
 {
-	//アニメーションを再生していたらけしておく
-	if (m_attachAnim != -1)
+
+	//アニメーションをけしておく
+	if (m_lastAnim != -1)
 	{
-		MV1DetachAnim(m_modelHandle, m_attachAnim);
+		MV1DetachAnim(m_modelHandle, m_lastAnim);
 	}
 
 	int animNumber = static_cast<int>(animKind);
-
+	m_lastAnim = m_attachAnim;
 	m_attachAnim = MV1AttachAnim(m_modelHandle, animNumber);
 	m_playAnimKind = animKind;
 	m_totalAnimTime = MV1GetAnimTotalTime(m_modelHandle, animNumber);
-	m_playAnimTime = 0;
+	m_lastPlayAnimTime = m_nowPlayAnimTime;
+	m_nowPlayAnimTime = 0;
 	m_animPlaySpeed = 1.0f;
 	m_isLoop = loop;
 	m_animBlendRate = 0.0f;
@@ -111,14 +113,14 @@ void CharacterBase::ChangeAnim(AnimKind animKind, bool loop, float blendSpeed)
 
 void CharacterBase::PlayAnim()
 {
-	MV1SetAttachAnimTime(m_modelHandle, m_lastAnim, m_playAnimTime);
-	MV1SetAttachAnimTime(m_modelHandle, m_attachAnim, m_playAnimTime);
-	m_playAnimTime += m_animPlaySpeed;
-	if (m_playAnimTime > m_totalAnimTime)
+	MV1SetAttachAnimTime(m_modelHandle, m_lastAnim, m_lastPlayAnimTime);
+	MV1SetAttachAnimTime(m_modelHandle, m_attachAnim, m_nowPlayAnimTime);
+	m_nowPlayAnimTime += m_animPlaySpeed;
+	if (m_nowPlayAnimTime > m_totalAnimTime)
 	{
 		if (m_isLoop)
 		{
-			m_playAnimTime = 0;
+			m_nowPlayAnimTime = 0;
 		}
 	}
 
@@ -129,6 +131,8 @@ void CharacterBase::PlayAnim()
 	{
 		m_animBlendRate = 1.0f;
 		m_isEndAnimationBlend = true;
+		m_lastPlayAnimTime = 0;
+		MV1DetachAnim(m_modelHandle,m_lastAnim);
 	}
 
 	//アニメーションのブレンド
@@ -161,8 +165,7 @@ void CharacterBase::SetNormalAttackData(std::vector<std::vector<std::string>> no
 		pushData.isTeleportation = static_cast<bool>(stoi(item[static_cast<int>(NormalAttackDataSort::kIsTeleportation)]));
 		pushData.animationName = item[static_cast<int>(NormalAttackDataSort::kAnimationName)];
 		pushData.attackKind = static_cast<AttackKind>(stoi(item[static_cast<int>(NormalAttackDataSort::kAttackKind)]));
-		pushData.nextLowComboName = item[static_cast<int>(NormalAttackDataSort::kLowComboName)];
-		pushData.nextHighComboName = item[static_cast<int>(NormalAttackDataSort::kHighComboName)];
+		pushData.nextComboName = item[static_cast<int>(NormalAttackDataSort::kNextComboName)];
 		pushData.attackHitKind = kAttackHitKindMap.at(item[static_cast<int>(NormalAttackDataSort::kAttackHitKind)]);
 
 		m_normalAttackData[item[static_cast<int>(NormalAttackDataSort::kAttackName)]] = pushData;
@@ -332,8 +335,17 @@ CharacterBase::AnimKind CharacterBase::GetAttackAnimKind(std::string animName)
 	{
 		ans = CharacterBase::AnimKind::kEnergyAttackLeft;
 	}
-
+	else if (animName == "UpperAttack")
+	{
+		ans = CharacterBase::AnimKind::kUpperAttack;
+	}
+	else if (animName == "StanAttack")
+	{
+		ans = CharacterBase::AnimKind::kStanAttack;
+	}
+	else if (animName == "LegSweepAttack")
+	{
+		ans = CharacterBase::AnimKind::kLegSweepAttack;
+	}
 	return ans;
-
-	return AnimKind();
 }

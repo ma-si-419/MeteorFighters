@@ -15,7 +15,14 @@ namespace
 	constexpr int kEnergyAttackLifeTime = 240;
 	//‹C’eUŒ‚‚Ì”»’è‚Ì‘å‚«‚³
 	constexpr float kEnergyAttackRadius = 3.0f;
-
+	//”h¶UŒ‚‚ÌƒXƒeƒBƒbƒN‚ÌŒX‚«
+	constexpr int kPhysicalAttackStickPower = 500;
+	//ã“ü—Í‚Ì‹­UŒ‚
+	const std::string kUpperAttackName = "Upper";
+	//’†“ü—Í‚Ì‹­UŒ‚
+	const std::string kStanAttackName = "Stan";
+	//‰º“ü—Í‚Ì‹­UŒ‚
+	const std::string kLegSweepAttackName = "LegSweep";
 }
 
 PlayerStateNormalAttack::PlayerStateNormalAttack(std::shared_ptr<Player> player) :
@@ -221,15 +228,44 @@ void PlayerStateNormalAttack::Update()
 	//Ÿ‚ÌUŒ‚‚ğs‚¤‚©”»’è‚·‚é
 	if (!m_isNextAttack)
 	{
-		if (MyEngine::Input::GetInstance().IsTrigger("X"))
+		//Ši“¬UŒ‚‚È‚ç
+		if (attackData.attackKind == CharacterBase::AttackKind::kPhysical)
 		{
-			m_nextAttackName = attackData.nextLowComboName;
-			m_isNextAttack = true;
+			//Xƒ{ƒ^ƒ“‚ÅŸ‚Ì’ÊíUŒ‚‚ÉˆÚs‚·‚é
+			if (MyEngine::Input::GetInstance().IsTrigger("X"))
+			{
+				m_nextAttackName = attackData.nextComboName;
+				m_isNextAttack = true;
+			}
+			//Yƒ{ƒ^ƒ“‚Å”h¶UŒ‚‚ğo‚·
+			else if (MyEngine::Input::GetInstance().IsTrigger("Y"))
+			{
+				//ã“ü—Í‚µ‚È‚ª‚ç‚Ì”h¶UŒ‚
+				if (MyEngine::Input::GetInstance().GetStickInfo().leftStickY < -kPhysicalAttackStickPower)
+				{
+					m_nextAttackName = kUpperAttackName;
+				}
+				else if (MyEngine::Input::GetInstance().GetStickInfo().leftStickY > kPhysicalAttackStickPower)
+				{
+					m_nextAttackName = kLegSweepAttackName;
+				}
+				else
+				{
+					m_nextAttackName = kStanAttackName;
+				}
+
+				m_isNextAttack = true;
+			}
 		}
-		if (MyEngine::Input::GetInstance().IsTrigger("Y"))
+		//‹C’eUŒ‚‚È‚ç
+		if (attackData.attackKind == CharacterBase::AttackKind::kEnergy)
 		{
-			m_nextAttackName = attackData.nextHighComboName;
-			m_isNextAttack = true;
+			//Yƒ{ƒ^ƒ“‚ÅŸ‚ÌUŒ‚‚ÉˆÚs‚·‚é
+			if (MyEngine::Input::GetInstance().IsTrigger("Y"))
+			{
+				m_nextAttackName = attackData.nextComboName;
+				m_isNextAttack = true;
+			}
 		}
 	}
 
