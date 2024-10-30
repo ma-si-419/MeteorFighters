@@ -34,12 +34,6 @@ protected:
 	void SetPlayerPos(MyEngine::Vector3 pos);
 
 	/// <summary>
-	/// Stateを変更する
-	/// </summary>
-	/// <param name="nextState">次のState</param>
-	void ChangeState(std::shared_ptr<CharacterStateBase> nextState) override;
-	
-	/// <summary>
 	/// アニメーション番号を取得する
 	/// </summary>
 	/// <param name="animName">アニメーションの名前</param>

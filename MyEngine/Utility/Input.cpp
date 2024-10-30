@@ -138,7 +138,7 @@ bool Input::IsTrigger(const std::string& action) const
 		//未定義のボタン名が来たらfalseを返す
 		if (last == m_lastInput.end())
 		{
-			return true;
+			return false;
 		}
 		//前のフレームでも押されていたら
 		else
@@ -150,6 +150,34 @@ bool Input::IsTrigger(const std::string& action) const
 	{
 		return false;
 	}
+}
+
+bool MyEngine::Input::IsRelease(const std::string& action) const
+{
+	//まず押されているか判定
+	if (IsPress(action))
+	{
+		//押されていたらfalseを返す
+		return false;
+	}
+	//押されていなければ
+	else
+	{
+		//前のフレームを参照
+		auto last = m_lastInput.find(action);
+		//未定義のボタン名が来たらfalseを返す
+		if (last == m_lastInput.end())
+		{
+			return false;
+		}
+		else
+		{
+			return last->second;
+		}
+	}
+
+
+	return false;
 }
 
 bool MyEngine::Input::IsPushTrigger(bool right, int power)

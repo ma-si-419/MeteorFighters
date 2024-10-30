@@ -11,11 +11,13 @@ namespace
 	constexpr float kCharacterHeight = 4.5f;
 	constexpr float kCharacterRadius = 3.0f;
 
-	constexpr float kAttackPopPos = kCharacterRadius * 2.0f;
+	constexpr float kAttackPopPos = kCharacterRadius * 3.0f;
 
 	const MyEngine::Vector3 kAttackPos(0.0f, 0.0f, kAttackPopPos);
 
 	constexpr float kAnimBlendSpeed = 0.08f;
+
+	constexpr float kAnimPlaySpeed = 1.0f;
 
 	const std::map<std::string, CharacterBase::AttackHitKind> kAttackHitKindMap =
 	{
@@ -35,6 +37,27 @@ namespace
 		{"気弾",CharacterBase::AttackKind::kEnergy},
 		{"投げ",CharacterBase::AttackKind::kThrow},
 		{"体当たり",CharacterBase::AttackKind::kAssault}
+	};
+
+	const std::map<std::string, CharacterBase::AnimKind> kAttackAnimKindMap =
+	{
+		{"LowAttack1",CharacterBase::AnimKind::kLowAttack1},
+		{"LowAttack2",CharacterBase::AnimKind::kLowAttack2},
+		{"LowAttack3",CharacterBase::AnimKind::kLowAttack3},
+		{"LowAttack4",CharacterBase::AnimKind::kLowAttack4},
+		{"LowAttack5",CharacterBase::AnimKind::kLowAttack5},
+		{"LowAttack6",CharacterBase::AnimKind::kLowAttack6},
+		{"LowAttack7",CharacterBase::AnimKind::kLowAttack7},
+		{"LowAttack8",CharacterBase::AnimKind::kLowAttack8},
+		{"EnergyAttackRight",CharacterBase::AnimKind::kEnergyAttackRight},
+		{"EnergyAttackLeft",CharacterBase::AnimKind::kEnergyAttackLeft},
+		{"UpperAttack",CharacterBase::AnimKind::kUpperAttack},
+		{"StanAttack",CharacterBase::AnimKind::kStanAttack},
+		{"LegSweepAttack",CharacterBase::AnimKind::kLegSweepAttack},
+		{"UpChargeAttack",CharacterBase::AnimKind::kUpChargeAttack},
+		{"MiddleChargeAttack",CharacterBase::AnimKind::kMiddleChargeAttack},
+		{"DownChargeAttack",CharacterBase::AnimKind::kDownChargeAttack},
+		{"EnergyChargeAttack",CharacterBase::AnimKind::kEnergyChargeAttack}
 	};
 
 }
@@ -138,6 +161,16 @@ void CharacterBase::PlayAnim()
 	//アニメーションのブレンド
 	MV1SetAttachAnimBlendRate(m_modelHandle, m_lastAnim, 1.0f - m_animBlendRate);
 	MV1SetAttachAnimBlendRate(m_modelHandle, m_attachAnim, m_animBlendRate);
+}
+
+void CharacterBase::SetAnimPlaySpeed(float speed)
+{
+	m_animPlaySpeed = speed;
+}
+
+void CharacterBase::SetAnimPlaySpeed()
+{
+	m_animPlaySpeed = kAnimPlaySpeed;
 }
 
 bool CharacterBase::IsAnimEnd()
@@ -292,60 +325,6 @@ void CharacterBase::SetDrawPos(MyEngine::Vector3 pos)
 }
 
 CharacterBase::AnimKind CharacterBase::GetAttackAnimKind(std::string animName)
-{
-	CharacterBase::AnimKind ans = AnimKind::kLowAttack1;
-
-	if (animName == "LowAttack1")
-	{
-		ans = CharacterBase::AnimKind::kLowAttack1;
-	}
-	else if (animName == "LowAttack2")
-	{
-		ans = CharacterBase::AnimKind::kLowAttack2;
-	}
-	else if (animName == "LowAttack3")
-	{
-		ans = CharacterBase::AnimKind::kLowAttack3;
-	}
-	else if (animName == "LowAttack4")
-	{
-		ans = CharacterBase::AnimKind::kLowAttack4;
-	}
-	else if (animName == "LowAttack5")
-	{
-		ans = CharacterBase::AnimKind::kLowAttack5;
-	}
-	else if (animName == "LowAttack6")
-	{
-		ans = CharacterBase::AnimKind::kLowAttack6;
-	}
-	else if (animName == "LowAttack7")
-	{
-		ans = CharacterBase::AnimKind::kLowAttack7;
-	}
-	else if (animName == "LowAttack8")
-	{
-		ans = CharacterBase::AnimKind::kLowAttack8;
-	}
-	else if (animName == "EnergyAttackRight")
-	{
-		ans = CharacterBase::AnimKind::kEnergyAttackRight;
-	}
-	else if (animName == "EnergyAttackLeft")
-	{
-		ans = CharacterBase::AnimKind::kEnergyAttackLeft;
-	}
-	else if (animName == "UpperAttack")
-	{
-		ans = CharacterBase::AnimKind::kUpperAttack;
-	}
-	else if (animName == "StanAttack")
-	{
-		ans = CharacterBase::AnimKind::kStanAttack;
-	}
-	else if (animName == "LegSweepAttack")
-	{
-		ans = CharacterBase::AnimKind::kLegSweepAttack;
-	}
-	return ans;
+{	
+	return kAttackAnimKindMap.at(animName);
 }

@@ -6,8 +6,15 @@
 #include "Player.h"
 #include <cmath>
 
+namespace
+{
+	constexpr int kChargeAttackTime = 15;
+}
+
 PlayerStateMove::PlayerStateMove(std::shared_ptr<Player> player) :
-	PlayerStateBase(player)
+	PlayerStateBase(player),
+	m_attackButtonPushTime(0.0f),
+	m_attackKey("empty")
 {
 	m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kSkyIdle,true);
 }
@@ -67,26 +74,39 @@ void PlayerStateMove::Update()
 		velo.y = -GetSpeed();
 	}
 	
-	//攻撃入力がされたら
-	if (input.IsTrigger("X"))
+	//攻撃ボタンが押されていないときに
+	if (m_attackKey == "empty")
 	{
-		//次のStateのポインタ作成
-		std::shared_ptr<PlayerStateNormalAttack> next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
-		//何の攻撃を行うかをAttackStateに渡す
-		next->SetAttack("Low1");
-		//StateをAttackに変更する
-		ChangeState(next);
-		return;
+		//格闘ボタンが押された時
+		if (input.IsPress("X"))
+		{
+			m_attackKey = "X";
+		}
+		else if (input.IsPress("Y"))
+		{
+			m_attackKey = "Y";
+		}
 	}
-	else if (input.IsTrigger("Y"))
+	//攻撃ボタンが押されていたら
+	else
 	{
-		//次のStateのポインタ作成
-		std::shared_ptr<PlayerStateNormalAttack> next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
-		//何の攻撃を行うかをAttackStateに渡す
-		next->SetAttack("Energy1");
-		//StateをAttackに変更する
-		ChangeState(next);
-		return;
+		//押しているフレーム数を数える
+		m_attackButtonPushTime++;
+
+		//押していたボタンが離されたら
+		if (input.IsRelease(m_attackKey) ||
+			m_attackButtonPushTime > kChargeAttackTime)
+		{
+			//チャージされていたかどうか判定
+			bool isCharge = m_attackButtonPushTime > kChargeAttackTime;
+			//次のStateのポインタ作成
+			std::shared_ptr<PlayerStateNormalAttack> next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
+			//何の攻撃を行うかをAttackStateに渡す
+			next->SetAttack(m_attackKey, isCharge);
+			//StateをAttackに変更する
+			ChangeState(next);
+			return;
+		}
 	}
 
 	//移動していなかったら

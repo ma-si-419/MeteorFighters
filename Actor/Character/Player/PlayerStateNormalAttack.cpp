@@ -7,49 +7,119 @@
 
 namespace
 {
+	//次の攻撃の入力判定をはじめるフレーム
+	constexpr float kNextAttackInputTime = 5.0f;
 	//格闘攻撃の攻撃持続フレーム
 	constexpr int kPhysicalAttackLifeTime = 2;
 	//格闘攻撃の判定の大きさ
 	constexpr float kPhysicalAttackRadius = 5.0f;
+	//格闘攻撃で最低限離れる距離
+	constexpr float kPhysicalAttackNearLange = 8.0f;
 	//気弾攻撃の攻撃判定が残る時間
 	constexpr int kEnergyAttackLifeTime = 240;
 	//気弾攻撃の判定の大きさ
 	constexpr float kEnergyAttackRadius = 3.0f;
 	//派生攻撃のスティックの傾き
 	constexpr int kPhysicalAttackStickPower = 500;
+	//ため攻撃を行っているときの経過時間の経過速度
+	constexpr float kOnChargeStateTimeCountSpeed = 0.1f;
+	//ため攻撃を行っているときのアニメ再生速度
+	constexpr float kOnChargeAnimPlaySpeed = 0.1f;
+	//ため攻撃の貯められるマックスのフレーム数
+	constexpr float kChargeMaxTime = kOnChargeStateTimeCountSpeed * 40;
 	//上入力の強攻撃
 	const std::string kUpperAttackName = "Upper";
 	//中入力の強攻撃
 	const std::string kStanAttackName = "Stan";
 	//下入力の強攻撃
 	const std::string kLegSweepAttackName = "LegSweep";
+	//上入力のため攻撃
+	const std::string kUpChargeAttack = "UpCharge";
+	//中入力のため攻撃
+	const std::string kMiddleChargeAttack = "MiddleCharge";
+	//下入力のため攻撃
+	const std::string kDownChargeAttack = "DownCharge";
+	//気弾のため攻撃
+	const std::string kEnergyChargeAttack = "EnergyCharge";
 }
 
 PlayerStateNormalAttack::PlayerStateNormalAttack(std::shared_ptr<Player> player) :
 	PlayerStateBase(player),
 	m_nowAttackName("empty"),
 	m_nextAttackName("empty"),
-	m_isNextAttack(false)
+	m_isNextAttack(false),
+	m_isCharge(false),
+	m_attackKey("empty"),
+	m_chargeTime(0.0f),
+	m_isAttacked(false)
 {
 }
-void PlayerStateNormalAttack::SetAttack(std::string attackName)
+void PlayerStateNormalAttack::SetAttack(std::string key, bool isCharge)
 {
-	m_nowAttackName = attackName;
+	//押されたキーを保存しておく
+	m_attackKey = key;
+
+	//チャージされていた場合
+	if (isCharge)
+	{
+		//格闘攻撃ならば派生する
+		if (key == "X")
+		{
+			//上入力の場合
+			if (MyEngine::Input::GetInstance().GetStickInfo().leftStickY < -kPhysicalAttackStickPower)
+			{
+				m_nowAttackName = kUpChargeAttack;
+			}
+			//下入力の場合
+			else if (MyEngine::Input::GetInstance().GetStickInfo().leftStickY > kPhysicalAttackStickPower)
+			{
+				m_nowAttackName = kDownChargeAttack;
+			}
+			//入力なしの場合
+			else
+			{
+				m_nowAttackName = kMiddleChargeAttack;
+			}
+
+		}
+		//気弾攻撃なら派生しない
+		else if (key == "Y")
+		{
+			m_nowAttackName = kEnergyChargeAttack;
+		}
+		m_isCharge = true;
+	}
+	else
+	{
+		if (key == "X")
+		{
+			m_nowAttackName = "Low1";
+		}
+		else if (key == "Y")
+		{
+			m_nowAttackName = "Energy1";
+		}
+		m_isCharge = false;
+	}
+
 }
 void PlayerStateNormalAttack::Enter()
 {
 	m_pNextState = shared_from_this();
 	m_kind = CharacterStateKind::kAttack;
 
+	//設定された攻撃のアニメーション取得
 	std::string animName = m_pPlayer->GetNormalAttackData(m_nowAttackName).animationName;
 
 	CharacterBase::AnimKind anim = static_cast<CharacterBase::AnimKind>(GetAttackAnimKind(animName));
 
+	//アニメーションの変更
 	m_pPlayer->ChangeAnim(anim, false);
 
+	//向かう方向の設定
 	MyEngine::Vector3 shiftVec = (GetEnemyPos() - m_pPlayer->GetPos()).Normalize();
 
-	shiftVec *= kPhysicalAttackRadius;
+	shiftVec *= kPhysicalAttackNearLange;
 
 	shiftVec.y = 0;
 
@@ -59,12 +129,54 @@ void PlayerStateNormalAttack::Enter()
 
 void PlayerStateNormalAttack::Update()
 {
-	//Stateにいるフレーム数を数えておく
-	m_time++;
+	//チャージ中はフレームを数える速度を変える
+	if (m_isCharge)
+	{
+		m_time += kOnChargeStateTimeCountSpeed;
+		//どのくらいチャージしたかを数える
+		m_chargeTime += kOnChargeStateTimeCountSpeed;
+		//マックスまで貯めたらチャージをやめる
+		if (m_time > kChargeMaxTime)
+		{
+			m_isCharge = false;
+		}
+		//アニメーションの再生速度も変える
+		m_pPlayer->SetAnimPlaySpeed(kOnChargeAnimPlaySpeed);
+	}
+	//チャージしていない状態
+	else
+	{
+		//Stateにいるフレーム数を数えておく
+		m_time++;
+		//アニメーションの再生速度を通常にする
+		m_pPlayer->SetAnimPlaySpeed();
+	}
+
+	//ボタンを押している間はチャージを続ける
+	if (m_isCharge)
+	{
+		//ボタンが離されたらチャージをやめる
+		if (!MyEngine::Input::GetInstance().IsPress(m_attackKey))
+		{
+			m_isCharge = false;
+		}
+	}
 
 	auto attackData = m_pPlayer->GetNormalAttackData(m_nowAttackName);
 
 	MyEngine::Vector3 velo;
+
+
+
+	//攻撃の合計フレームを超えたら
+	if (m_time >= attackData.totalFrame)
+	{
+		//アイドル状態に戻る
+		std::shared_ptr<PlayerStateIdle> next = std::make_shared<PlayerStateIdle>(m_pPlayer);
+
+		ChangeState(next);
+		return;
+	}
 
 	//次の攻撃に移行できるフレームであれば
 	if (m_time >= attackData.cancelFrame)
@@ -72,11 +184,18 @@ void PlayerStateNormalAttack::Update()
 		//次に攻撃を行うと決定していれば
 		if (m_isNextAttack)
 		{
+			//次の攻撃がない攻撃だったら
+			if (m_nextAttackName == "None") return;
 			//時間のリセット
 			m_time = 0;
+			//攻撃を行っていない状態に変化
+			m_isAttacked = false;
 			//次に行う攻撃の設定
 			m_nowAttackName = m_nextAttackName;
 			m_nextAttackName = "empty";
+
+			//次の攻撃がチャージできるかどうかを判断する
+			m_isCharge = (m_attackKey == "Y");
 
 			//攻撃情報の更新
 			attackData = m_pPlayer->GetNormalAttackData(m_nowAttackName);
@@ -88,7 +207,6 @@ void PlayerStateNormalAttack::Update()
 				MyEngine::Vector3 teleportationPos = GetEnemyPos() + (GetEnemyVelo() * (attackData.attackFrame));
 				//瞬間移動先に攻撃の攻撃範囲分だけずれを足す
 				MyEngine::Vector3 attackShiftVec = GetEnemyVelo();
-				//attackShiftVec.y = 0;
 
 				teleportationPos += attackShiftVec.Normalize() * (kPhysicalAttackRadius);
 
@@ -98,15 +216,16 @@ void PlayerStateNormalAttack::Update()
 			//攻撃を行う方向を設定する
 			LocalPos attackPos;
 
+			//ローカル座標の中心を設定
 			attackPos.SetCenterPos(GetEnemyPos());
-
+			//ローカル座標の正面座標を設定
 			attackPos.SetFrontPos(GetEnemyPos() + (m_pPlayer->GetPos() - GetEnemyPos()).Normalize());
-
+			//ローカル座標を設定
 			attackPos.SetLocalPos(MyEngine::Vector3(0.0f, 0.0f, kPhysicalAttackRadius));
 
 			MyEngine::Vector3 shiftVec = (attackPos.GetWorldPos() - m_pPlayer->GetPos()).Normalize();
 
-			shiftVec *= kPhysicalAttackRadius;
+			shiftVec *= kPhysicalAttackNearLange;
 
 			shiftVec.y = 0;
 
@@ -117,17 +236,6 @@ void PlayerStateNormalAttack::Update()
 
 			m_isNextAttack = false;
 		}
-	}
-
-
-	//攻撃の合計フレームを超えたら
-	if (m_time >= attackData.totalFrame)
-	{
-		//アイドル状態に戻る
-		std::shared_ptr<PlayerStateIdle> next = std::make_shared<PlayerStateIdle>(m_pPlayer);
-
-		ChangeState(next);
-		return;
 	}
 
 	//格闘攻撃ならば
@@ -141,7 +249,15 @@ void PlayerStateNormalAttack::Update()
 
 			dir = (m_moveTargetPos - m_pPlayer->GetPos()).Normalize();
 
+			//プレイヤーの移動速度
 			float speed = attackData.moveSpeed;
+
+			//チャージ中であれば
+			if (m_isCharge)
+			{
+				//移動速度をアニメーションの再生速度と同じ倍率にする
+				speed *= kOnChargeAnimPlaySpeed;
+			}
 
 			//移動距離が行きたい座標までの距離よりも長ければ
 			if ((m_moveTargetPos - m_pPlayer->GetPos()).Length() < speed * attackData.attackFrame)
@@ -200,11 +316,25 @@ void PlayerStateNormalAttack::Update()
 	}
 
 	//攻撃を出すフレームになったら
-	if (m_time == attackData.attackFrame)
+	if (m_time > attackData.attackFrame &&
+		!m_isAttacked)
 	{
+		m_isAttacked = true;
 		CharacterBase::AttackData attack;
 
-		attack.damage = static_cast<int>(attackData.damageRate * m_pPlayer->GetPower());
+
+		//チャージした時のダメージ
+		if (m_chargeTime > 0.0f)
+		{
+			//チャージした時間によってダメージを上昇させる
+			attack.damage = static_cast<int>((attackData.damageRate + m_chargeTime) * m_pPlayer->GetPower());
+		}
+		//チャージされていないときのダメージ
+		else
+		{
+			attack.damage = static_cast<int>(attackData.damageRate * m_pPlayer->GetPower());
+		}
+
 		attack.attackHitKind = attackData.attackHitKind;
 		attack.isPlayer = true;
 		attack.speed = attackData.attackMoveSpeed;
@@ -222,11 +352,13 @@ void PlayerStateNormalAttack::Update()
 			attack.radius = kEnergyAttackRadius;
 		}
 
+		//攻撃を作成
 		m_pPlayer->CreateAttack(attack);
 	}
 
 	//次の攻撃を行うか判定する
-	if (!m_isNextAttack)
+	if (!m_isNextAttack &&
+		m_time > kNextAttackInputTime)
 	{
 		//格闘攻撃なら
 		if (attackData.attackKind == CharacterBase::AttackKind::kPhysical)
@@ -236,6 +368,7 @@ void PlayerStateNormalAttack::Update()
 			{
 				m_nextAttackName = attackData.nextComboName;
 				m_isNextAttack = true;
+				m_attackKey = "X";
 			}
 			//Yボタンで派生攻撃を出す
 			else if (MyEngine::Input::GetInstance().IsTrigger("Y"))
@@ -254,6 +387,7 @@ void PlayerStateNormalAttack::Update()
 					m_nextAttackName = kStanAttackName;
 				}
 
+				m_attackKey = "Y";
 				m_isNextAttack = true;
 			}
 		}
@@ -261,7 +395,7 @@ void PlayerStateNormalAttack::Update()
 		if (attackData.attackKind == CharacterBase::AttackKind::kEnergy)
 		{
 			//Yボタンで次の攻撃に移行する
-			if (MyEngine::Input::GetInstance().IsTrigger("Y"))
+			if (MyEngine::Input::GetInstance().IsRelease("Y"))
 			{
 				m_nextAttackName = attackData.nextComboName;
 				m_isNextAttack = true;

@@ -10,7 +10,7 @@ namespace
 	constexpr int kDownTimes[static_cast<int>(EnemyStateHitAttack::HitKind::kKindNum)] =
 	{
 		40,
-		50,
+		40,
 		90,
 		90,
 		90,
@@ -21,7 +21,7 @@ namespace
 	constexpr float kMoveSpeed[static_cast<int>(EnemyStateHitAttack::HitKind::kKindNum)] =
 	{
 		0.3f,
-		1.5f,
+		1.0f,
 		3.0f,
 		3.0f,
 		3.0f,
@@ -29,8 +29,37 @@ namespace
 		0.01f
 	};
 
+	//前から攻撃を受けた時の反応
+	const std::map<EnemyStateHitAttack::HitKind, CharacterBase::AnimKind> kFrontHitReactionMap =
+	{
+		{EnemyStateHitAttack::HitKind::kLow,CharacterBase::AnimKind::kLowHit1},
+		{EnemyStateHitAttack::HitKind::kMiddle,CharacterBase::AnimKind::kMiddleHit},
+		{EnemyStateHitAttack::HitKind::kUpBurst,CharacterBase::AnimKind::kFrontBurst},
+		{EnemyStateHitAttack::HitKind::kDownBurst,CharacterBase::AnimKind::kFrontBurst},
+		{EnemyStateHitAttack::HitKind::kFarBurst,CharacterBase::AnimKind::kFrontBurst},
+		{EnemyStateHitAttack::HitKind::kBottomStan,CharacterBase::AnimKind::kBottomStan},
+		{EnemyStateHitAttack::HitKind::kMiddleStan,CharacterBase::AnimKind::kFrontMiddleStan}
+	};
+
+	//後ろから攻撃を受けた時の反応
+	const std::map<EnemyStateHitAttack::HitKind, CharacterBase::AnimKind> kBackHitReactionMap =
+	{
+		{EnemyStateHitAttack::HitKind::kLow,CharacterBase::AnimKind::kBackLowHit1},
+		{EnemyStateHitAttack::HitKind::kMiddle,CharacterBase::AnimKind::kBackMiddleHit},
+		{EnemyStateHitAttack::HitKind::kUpBurst,CharacterBase::AnimKind::kBackBurst},
+		{EnemyStateHitAttack::HitKind::kDownBurst,CharacterBase::AnimKind::kBackBurst},
+		{EnemyStateHitAttack::HitKind::kFarBurst,CharacterBase::AnimKind::kBackBurst},
+		{EnemyStateHitAttack::HitKind::kBottomStan,CharacterBase::AnimKind::kBottomStan},
+		{EnemyStateHitAttack::HitKind::kMiddleStan,CharacterBase::AnimKind::kBackMiddleStan}
+	};
+
 	//移動する時間の割合
-	constexpr float kMoveTimeRate = 0.7f;
+	constexpr float kMoveTimeRate = 0.4f;
+
+	//スタン時のアニメーションをゆっくり再生する時間の割合
+	constexpr float kSlowAnimTimeRate = 0.4f;
+	//スタン時のアニメーションをゆっくり再生するときの再生速度
+	constexpr float kSlowAnimPlaySpeed = 0.3f;
 }
 
 EnemyStateHitAttack::EnemyStateHitAttack(std::shared_ptr<Enemy> enemy) :
@@ -52,6 +81,25 @@ void EnemyStateHitAttack::Update()
 {
 
 	m_time++;
+
+	//今受けている攻撃がスタン攻撃だったら
+	if (m_hitReaction == HitKind::kBottomStan ||
+		m_hitReaction == HitKind::kMiddleStan)
+	{
+		int slowAnimTime = static_cast<int>(m_downTime * kSlowAnimTimeRate);
+
+		if (m_time < slowAnimTime)
+		{
+			//再生速度をゆっくりにする
+			m_pEnemy->SetAnimPlaySpeed(kSlowAnimPlaySpeed);
+		}
+		else
+		{
+			//再生速度を初期値に戻す
+			m_pEnemy->SetAnimPlaySpeed();
+		}
+	}
+
 	//設定した時間たったら
 	if (m_downTime <= m_time)
 	{
@@ -161,6 +209,21 @@ void EnemyStateHitAttack::HitAttack(HitKind kind)
 	//前方から殴られたかどうかを取得する
 	m_isFrontHit = m_pEnemy->IsFrontTarget(false);
 
+	//前方から殴られていたらプレイヤーの方向を向く
+	if (m_isFrontHit)
+	{
+		m_pEnemy->SetFrontPos(GetPlayerPos());
+	}
+	//後方から殴られていたらプレイヤーとは逆の方向を向く
+	else
+	{
+		MyEngine::Vector3 frontPos;
+
+		frontPos = (m_pEnemy->GetPos() - GetPlayerPos()).Normalize() + m_pEnemy->GetPos();
+
+		m_pEnemy->SetFrontPos(frontPos);
+	}
+
 	//アニメーションの変更
 	m_pEnemy->ChangeAnim(static_cast<CharacterBase::AnimKind>(GetNextAnimKind(kind)), false);
 
@@ -184,84 +247,48 @@ void EnemyStateHitAttack::OnCollide(std::shared_ptr<Collidable> collider)
 int EnemyStateHitAttack::GetNextAnimKind(HitKind kind)
 {
 
-	int ans = 0;
+	CharacterBase::AnimKind ans = CharacterBase::AnimKind::kLowHit1;
 
 	CharacterBase::AnimKind animKind = m_pEnemy->GetPlayAnimKind();
 
-	//弱攻撃を受けたら順番にアニメーションを再生する
-	if (kind == HitKind::kLow)
+	//正面から攻撃を受けている場合
+	if (m_isFrontHit)
 	{
-		//前方から攻撃を受けた場合
-		if (m_isFrontHit)
+		ans = kFrontHitReactionMap.at(kind);
+	}
+	//後ろから攻撃を受けている場合
+	else
+	{
+		ans = kBackHitReactionMap.at(kind);
+	}
+
+	//弱攻撃を受けた場合、順番にアニメーションをさせる
+	if (ans == CharacterBase::AnimKind::kLowHit1)
+	{
+		//弱攻撃1を受けている状態だったら
+		if (animKind == CharacterBase::AnimKind::kLowHit1)
 		{
-			if (animKind == CharacterBase::AnimKind::kLowHit1)
-			{
-				ans = static_cast<int>(CharacterBase::AnimKind::kLowHit2);
-			}
-			else if (animKind == CharacterBase::AnimKind::kLowHit2)
-			{
-				ans = static_cast<int>(CharacterBase::AnimKind::kLowHit3);
-			}
-			else if (animKind == CharacterBase::AnimKind::kLowHit3)
-			{
-				ans = static_cast<int>(CharacterBase::AnimKind::kLowHit1);
-			}
-			else
-			{
-				ans = static_cast<int>(CharacterBase::AnimKind::kLowHit1);
-			}
+			ans = CharacterBase::AnimKind::kLowHit2;
 		}
-		//後ろから攻撃を受けた場合
-		else
+		//弱攻撃2を受けている状態だったら
+		else if (animKind == CharacterBase::AnimKind::kLowHit2)
 		{
-			if (animKind == CharacterBase::AnimKind::kBackLowHit1)
-			{
-				ans = static_cast<int>(CharacterBase::AnimKind::kBackLowHit2);
-			}
-			else if (animKind == CharacterBase::AnimKind::kBackLowHit2)
-			{
-				ans = static_cast<int>(CharacterBase::AnimKind::kBackLowHit3);
-			}
-			else if (animKind == CharacterBase::AnimKind::kBackLowHit3)
-			{
-				ans = static_cast<int>(CharacterBase::AnimKind::kBackLowHit1);
-			}
-			else
-			{
-				ans = static_cast<int>(CharacterBase::AnimKind::kBackLowHit1);
-			}
+			ans = CharacterBase::AnimKind::kLowHit3;
 		}
 	}
-	//中攻撃を受けた場合
-	else if (kind == HitKind::kMiddle)
+	else if (ans == CharacterBase::AnimKind::kBackLowHit1)
 	{
-		//前方から攻撃を受けた場合
-		if (m_isFrontHit)
+		//弱攻撃1を受けている状態だったら
+		if (animKind == CharacterBase::AnimKind::kLowHit1)
 		{
-			ans = static_cast<int>(CharacterBase::AnimKind::kMiddleHit);
+			ans = CharacterBase::AnimKind::kLowHit2;
 		}
-		//後方から攻撃を受けた場合
-		else
+		//弱攻撃2を受けている状態だったら
+		else if (animKind == CharacterBase::AnimKind::kLowHit2)
 		{
-			ans = static_cast<int>(CharacterBase::AnimKind::kBackMiddleHit);
-		}
-	}
-	//吹き飛ばし攻撃を受けた場合
-	else if (kind == HitKind::kUpBurst ||
-		kind == HitKind::kDownBurst ||
-		kind == HitKind::kFarBurst)
-	{
-		//前方から攻撃を受けた場合
-		if (m_isFrontHit)
-		{
-			ans = static_cast<int>(CharacterBase::AnimKind::kFrontBurst);
-		}
-		//後方から攻撃を受けた場合
-		else
-		{
-			ans = static_cast<int>(CharacterBase::AnimKind::kBackBurst);
+			ans = CharacterBase::AnimKind::kLowHit3;
 		}
 	}
 
-	return ans;
+	return static_cast<int>(ans);
 }

@@ -59,7 +59,14 @@ public:
 		kEnergyAttackRight,
 		kUpperAttack,
 		kStanAttack,
-		kLegSweepAttack
+		kLegSweepAttack,
+		kBottomStan,
+		kFrontMiddleStan,
+		kBackMiddleStan,
+		kDownChargeAttack,
+		kMiddleChargeAttack,
+		kUpChargeAttack,
+		kEnergyChargeAttack
 	};
 
 	enum class CharacterKind
@@ -233,6 +240,17 @@ public:
 	/// アニメーションを再生する
 	/// </summary>
 	void PlayAnim();
+
+	/// <summary>
+	/// アニメーションの再生速度を設定する
+	/// </summary>
+	/// <param name="speed">再生速度</param>
+	void SetAnimPlaySpeed(float speed);
+
+	/// <summary>
+	/// アニメーションの再生速度を初期値に戻す
+	/// </summary>
+	void SetAnimPlaySpeed();
 
 	/// <summary>
 	/// アニメーションが終了したかを取得する

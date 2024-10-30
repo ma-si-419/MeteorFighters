@@ -29,12 +29,12 @@ public:
 
 protected:
 
-	virtual void ChangeState(std::shared_ptr<CharacterStateBase> nextState) abstract;
+	virtual void ChangeState(std::shared_ptr<CharacterStateBase> nextState);
 
 	//Œ»İ‚Ìó‘Ô
 	CharacterStateKind m_kind = CharacterStateKind::kIdle;
 
 	//State‚É“ü‚Á‚Ä‰½ƒtƒŒ[ƒ€—§‚Á‚½‚©
-	int m_time = 0;
+	float m_time = 0.0f;
 };
 

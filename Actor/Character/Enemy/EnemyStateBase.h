@@ -12,12 +12,6 @@ public:
 protected:
 
 	/// <summary>
-	/// Stateの切替
-	/// </summary>
-	/// <param name="nextState">次のStateのポインタ</param>
-	void ChangeState(std::shared_ptr<CharacterStateBase> nextState) override;
-
-	/// <summary>
 	/// エネミーの移動ベクトルを変更する
 	/// </summary>
 	/// <param name="moveVec">移動ベクトル</param>

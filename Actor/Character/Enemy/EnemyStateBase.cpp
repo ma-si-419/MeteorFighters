@@ -25,17 +25,6 @@ EnemyStateBase::EnemyStateBase(std::shared_ptr<Enemy> enemy) :
 {
 }
 
-void EnemyStateBase::ChangeState(std::shared_ptr<CharacterStateBase> nextState)
-{
-	//I—¹ˆ—
-	Exit();
-
-	m_pNextState = nextState;
-
-	//ŽŸ‚ÌState‚ÌŠJŽnˆ—
-	m_pNextState->Enter();
-}
-
 void EnemyStateBase::SetEnemyVelo(MyEngine::Vector3 moveVec)
 {
 	m_pEnemy->m_rigidbody.SetVelo(moveVec);

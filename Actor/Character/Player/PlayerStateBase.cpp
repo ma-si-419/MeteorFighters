@@ -27,18 +27,6 @@ void PlayerStateBase::SetPlayerPos(MyEngine::Vector3 pos)
 	m_pPlayer->m_rigidbody.SetPos(pos);
 }
 
-void PlayerStateBase::ChangeState(std::shared_ptr<CharacterStateBase> nextState)
-{
-	//終了処理
-	Exit();
-
-	//次のStateを変更する
-	m_pNextState = nextState;
-
-	//次のStateの開始処理
-	m_pNextState->Enter();
-}
-
 int PlayerStateBase::GetAttackAnimKind(std::string animName)
 {
 	return static_cast<int>(m_pPlayer->GetAttackAnimKind(animName));

@@ -7,8 +7,12 @@ public:
 
 	PlayerStateNormalAttack(std::shared_ptr<Player> player);
 
-	void SetAttack(std::string attackName);
-
+	/// <summary>
+	/// このStateに入るときに最初に呼ぶ関数
+	/// </summary>
+	/// <param name="key">何のボタンを押したのか</param>
+	/// <param name="isCharge">チャージしたのか</param>
+	void SetAttack(std::string key,bool isCharge);
 
 	virtual void Enter() override;
 
@@ -24,6 +28,18 @@ private:
 
 	//次に行う攻撃の名前
 	std::string m_nextAttackName;
+
+	//チャージ攻撃を行っているかどうか
+	bool m_isCharge;
+
+	//何フレームチャージを行ったか
+	float m_chargeTime;
+
+	//攻撃を行ったかどうか
+	bool m_isAttacked;
+
+	//何キーを押して攻撃を行っているか
+	std::string m_attackKey;
 
 	//次に攻撃を行うかどうか
 	bool m_isNextAttack;

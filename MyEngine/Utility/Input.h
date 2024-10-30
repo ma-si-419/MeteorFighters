@@ -80,6 +80,13 @@ namespace MyEngine
 		bool IsTrigger(const std::string& action)const;
 
 		/// <summary>
+		/// キーが離された瞬間を取得する
+		/// </summary>
+		/// <param name="action">判定したいキー</param>
+		/// <returns>離された瞬間のみTrueを返す</returns>
+		bool IsRelease(const std::string& action)const;
+
+		/// <summary>
 		/// スティックの傾きを取得する
 		/// </summary>
 		/// <returns>スティックがどれだけ倒れているか</returns>

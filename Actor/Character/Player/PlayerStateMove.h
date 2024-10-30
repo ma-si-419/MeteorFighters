@@ -12,5 +12,10 @@ public:
 	virtual void Exit() override;
 
 	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
+private:
+
+	std::string m_attackKey;
+
+	int m_attackButtonPushTime;
 };
 
