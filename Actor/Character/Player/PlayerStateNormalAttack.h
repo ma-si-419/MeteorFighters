@@ -29,6 +29,9 @@ private:
 	//次に行う攻撃の名前
 	std::string m_nextAttackName;
 
+	//次の攻撃にチャージができるかどうか
+	bool m_isNextCharge;
+
 	//チャージ攻撃を行っているかどうか
 	bool m_isCharge;
 

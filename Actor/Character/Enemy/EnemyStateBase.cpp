@@ -1,5 +1,6 @@
 #include "EnemyStateBase.h"
 #include "EnemyStateHitAttack.h"
+#include "CharacterBase.h"
 #include "Enemy.h"
 #include "GameManager.h"
 #include "Attack.h"
@@ -8,15 +9,15 @@ namespace
 {
 	constexpr float kDamageCutRate = 0.2f;
 
-	const std::map<CharacterBase::AttackHitKind, EnemyStateHitAttack::HitKind> kEnemyStateHitKindMap =
+	const std::map<CharacterBase::AttackHitKind, CharacterBase::HitReactionKind> kEnemyStateHitKindMap =
 	{
-		{CharacterBase::AttackHitKind::kLow,EnemyStateHitAttack::HitKind::kLow},
-		{CharacterBase::AttackHitKind::kMiddle,EnemyStateHitAttack::HitKind::kMiddle},
-		{CharacterBase::AttackHitKind::kUpBurst,EnemyStateHitAttack::HitKind::kUpBurst},
-		{CharacterBase::AttackHitKind::kDownBurst,EnemyStateHitAttack::HitKind::kDownBurst},
-		{CharacterBase::AttackHitKind::kFarBurst,EnemyStateHitAttack::HitKind::kFarBurst},
-		{CharacterBase::AttackHitKind::kBottomStan,EnemyStateHitAttack::HitKind::kBottomStan},
-		{CharacterBase::AttackHitKind::kMiddleStan,EnemyStateHitAttack::HitKind::kMiddleStan}
+		{CharacterBase::AttackHitKind::kLow,CharacterBase::HitReactionKind::kLow},
+		{CharacterBase::AttackHitKind::kMiddle,CharacterBase::HitReactionKind::kMiddle},
+		{CharacterBase::AttackHitKind::kUpBurst,CharacterBase::HitReactionKind::kUpBurst},
+		{CharacterBase::AttackHitKind::kDownBurst,CharacterBase::HitReactionKind::kDownBurst},
+		{CharacterBase::AttackHitKind::kFarBurst,CharacterBase::HitReactionKind::kFarBurst},
+		{CharacterBase::AttackHitKind::kBottomStan,CharacterBase::HitReactionKind::kBottomStan},
+		{CharacterBase::AttackHitKind::kMiddleStan,CharacterBase::HitReactionKind::kMiddleStan}
 	};
 }
 
@@ -37,14 +38,14 @@ void EnemyStateBase::HitAttack(std::shared_ptr<Attack> attack, CharacterStateBas
 	//攻撃のステータス
 	auto status = attack->GetStatus();
 	
-	EnemyStateHitAttack::HitKind kind = kEnemyStateHitKindMap.at(status.attackHitKind);
+	CharacterBase::HitReactionKind kind = kEnemyStateHitKindMap.at(status.attackHitKind);
 
 	int damage = status.damage;
 	//ガード時であれば
 	if (stateKind == CharacterStateKind::kGuard)
 	{
 		//基本的にガード状態にする
-		kind = EnemyStateHitAttack::HitKind::kGuard;
+		kind = CharacterBase::HitReactionKind::kGuard;
 
 		//打撃系は0ダメージ
 		if (status.attackKind == CharacterBase::AttackKind::kPhysical)
@@ -64,13 +65,13 @@ void EnemyStateBase::HitAttack(std::shared_ptr<Attack> attack, CharacterStateBas
 			//ダメージはない
 			damage = 0;
 			//ガードブレイク状態にする
-			kind = EnemyStateHitAttack::HitKind::kGuardBreak;
+			kind = CharacterBase::HitReactionKind::kGuardBreak;
 		}
 		//投げ攻撃にぶつかった場合
 		else if (status.attackKind == CharacterBase::AttackKind::kThrow)
 		{
 			//ガード関係なく状態遷移する
-			kind = static_cast<EnemyStateHitAttack::HitKind>(status.attackHitKind);
+			kind = static_cast<CharacterBase::HitReactionKind>(status.attackHitKind);
 		}
 	}
 	nextState->HitAttack(kind);

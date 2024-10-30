@@ -1,28 +1,10 @@
 #pragma once
 #include "EnemyStateBase.h"
 #include "Vector3.h"
+#include "CharacterBase.h"
 #include <list>
 class EnemyStateHitAttack : public EnemyStateBase, public std::enable_shared_from_this<EnemyStateHitAttack>
 {
-public:
-
-	/// <summary>
-	/// 攻撃を受けた時の反応
-	/// </summary>
-	enum class HitKind
-	{
-		kLow,//弱
-		kMiddle,//中
-		kUpBurst,//上吹っ飛び
-		kDownBurst,//下吹っ飛び
-		kFarBurst,//奥吹っ飛び
-		kBottomStan,//下段スタン
-		kMiddleStan,//中段スタン
-		kGuard,//ガード状態
-		kGuardBreak,//ガードブレイク状態
-		kKindNum
-	};
-
 public:
 
 	EnemyStateHitAttack(std::shared_ptr<Enemy> enemy);
@@ -37,7 +19,7 @@ public:
 	/// 攻撃を受けた時に呼ぶ関数
 	/// </summary>
 	/// <param name="reaction">攻撃を受けた時の反応</param>
-	void HitAttack(HitKind reaction);
+	void HitAttack(CharacterBase::HitReactionKind reaction);
 	
 	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
 
@@ -46,7 +28,7 @@ public:
 	/// </summary>
 	/// <param name="kind">受けた攻撃の種類</param>
 	/// <returns>次に再生するアニメーション</returns>
-	int GetNextAnimKind(HitKind kind);
+	int GetNextAnimKind(CharacterBase::HitReactionKind kind);
 
 private:
 
@@ -60,10 +42,7 @@ private:
 	MyEngine::Vector3 m_moveVec;
 
 	//今まで受けた攻撃
-	std::list<HitKind> m_hitReactions;
-
-	//現在のやられ状態
-	HitKind m_hitReaction;
+	std::list<CharacterBase::HitReactionKind> m_hitReactions;
 	
 	//前方から殴られたかどうか
 	bool m_isFrontHit;

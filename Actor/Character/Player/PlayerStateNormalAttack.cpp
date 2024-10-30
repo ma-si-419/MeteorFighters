@@ -41,6 +41,8 @@ namespace
 	const std::string kDownChargeAttack = "DownCharge";
 	//‹C’e‚Ì‚½‚ßUŒ‚
 	const std::string kEnergyChargeAttack = "EnergyCharge";
+	//uŠÔˆÚ“®‚·‚éUŒ‚
+	const std::string kTeleportationAttack = "Teleportation";
 }
 
 PlayerStateNormalAttack::PlayerStateNormalAttack(std::shared_ptr<Player> player) :
@@ -51,7 +53,8 @@ PlayerStateNormalAttack::PlayerStateNormalAttack(std::shared_ptr<Player> player)
 	m_isCharge(false),
 	m_attackKey("empty"),
 	m_chargeTime(0.0f),
-	m_isAttacked(false)
+	m_isAttacked(false),
+	m_isNextCharge(false)
 {
 }
 void PlayerStateNormalAttack::SetAttack(std::string key, bool isCharge)
@@ -194,8 +197,9 @@ void PlayerStateNormalAttack::Update()
 			m_nowAttackName = m_nextAttackName;
 			m_nextAttackName = "empty";
 
-			//Ÿ‚ÌUŒ‚‚ªƒ`ƒƒ[ƒW‚Å‚«‚é‚©‚Ç‚¤‚©‚ğ”»’f‚·‚é
-			m_isCharge = (m_attackKey == "Y");
+			//Ÿ‚ÌUŒ‚‚ªƒ`ƒƒ[ƒW‚Å‚«‚é‚©‚Ç‚¤‚©
+			m_isCharge = m_isNextCharge;
+			m_isNextCharge = false;
 
 			//UŒ‚î•ñ‚ÌXV
 			attackData = m_pPlayer->GetNormalAttackData(m_nowAttackName);
@@ -373,6 +377,8 @@ void PlayerStateNormalAttack::Update()
 			//Yƒ{ƒ^ƒ“‚Å”h¶UŒ‚‚ğo‚·
 			else if (MyEngine::Input::GetInstance().IsTrigger("Y"))
 			{
+				//Yƒ{ƒ^ƒ“‚Ì”h¶‹Z‚ÍŠî–{ƒ`ƒƒ[ƒW‚ª‚Å‚«‚é
+				m_isNextCharge = true;
 				//ã“ü—Í‚µ‚È‚ª‚ç‚Ì”h¶UŒ‚
 				if (MyEngine::Input::GetInstance().GetStickInfo().leftStickY < -kPhysicalAttackStickPower)
 				{
@@ -386,9 +392,18 @@ void PlayerStateNormalAttack::Update()
 				{
 					m_nextAttackName = kStanAttackName;
 				}
-
-				m_attackKey = "Y";
+				//“G‚ª‚Á”ò‚Ñó‘Ô‚Ì‚É”h¶UŒ‚‚ğ‚µ‚Ä‚¢‚½‚ç
+				CharacterBase::HitReactionKind kind = static_cast<CharacterBase::HitReactionKind>(GetEnemyHitReaction());
+				if (kind == CharacterBase::HitReactionKind::kUpBurst ||
+					kind == CharacterBase::HitReactionKind::kFarBurst ||
+					kind == CharacterBase::HitReactionKind::kDownBurst)
+				{
+					m_nextAttackName = kTeleportationAttack;
+					//uŠÔˆÚ“®UŒ‚‚¾‚¯ƒ`ƒƒ[ƒW‚ª‚Å‚«‚È‚¢
+					m_isNextCharge = false;
+				}
 				m_isNextAttack = true;
+				m_attackKey = "Y";
 			}
 		}
 		//‹C’eUŒ‚‚È‚ç

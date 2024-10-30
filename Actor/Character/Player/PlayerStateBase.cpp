@@ -17,6 +17,11 @@ MyEngine::Vector3 PlayerStateBase::GetEnemyVelo()
 	return m_pPlayer->m_pGameManager->GetEnemyVelo();
 }
 
+int PlayerStateBase::GetEnemyHitReaction()
+{
+	return m_pPlayer->m_pGameManager->GetEnemyReactionKind();
+}
+
 void PlayerStateBase::SetPlayerVelo(MyEngine::Vector3 velo)
 {
 	m_pPlayer->m_rigidbody.SetVelo(velo);

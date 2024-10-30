@@ -150,6 +150,16 @@ MyEngine::Vector3 GameManager::GetEnemyVelo()
 	return m_pEnemy->GetVelo();
 }
 
+int GameManager::GetPlayerReactionKind()
+{
+	return static_cast<int>(m_pPlayer->GetHitReaction());
+}
+
+int GameManager::GetEnemyReactionKind()
+{
+	return static_cast<int>(m_pEnemy->GetHitReaction());
+}
+
 void GameManager::AddAttack(std::shared_ptr<Attack> attack)
 {
 	m_pAttacks.push_back(attack);

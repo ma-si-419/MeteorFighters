@@ -7,6 +7,7 @@ Low5,5,50,12,34,1,0,0,中,1,Low6,LowAttack5
 Low6,3,50,12,24,0.5,0,1,弱,1,Low7,LowAttack6
 Low7,5,40,12,24,1,0,0,上吹っ飛び,1,Low8,LowAttack7
 Low8,7,60,30,40,0.5,0,1,下吹っ飛び,1,None,LowAttack8
+Teleportation,5,60,30,40,0.5,0,1,奥吹っ飛び,1,None,MiddleChargeAttack
 Energy1,1,30,10,15,0,3,0,弱,0,Energy2,EnergyAttackRight
 Energy2,1,30,10,15,0,3,0,弱,0,Energy3,EnergyAttackLeft
 Energy3,1,30,10,15,0,3,0,弱,0,Energy4,EnergyAttackRight
@@ -17,6 +18,6 @@ Upper,5,40,10,30,1,0,0,上吹っ飛び,1,Low1,UpperAttack
 Stan,5,40,10,30,1,0,0,中スタン,1,Low1,StanAttack
 LegSweep,5,40,10,30,1,0,0,下スタン,1,Low1,LegSweepAttack
 UpCharge,5,40,15,30,4,0,0,上吹っ飛び,1,None,UpChargeAttack
-MiddleCharge,5,40,15,30,4,0,0,中スタン,1,None,MiddleChargeAttack
+MiddleCharge,5,40,15,30,4,0,0,奥吹っ飛び,1,None,MiddleChargeAttack
 DownCharge,5,40,15,30,4,0,0,下吹っ飛び,1,None,DownChargeAttack
 EnergyCharge,3,40,25,30,0,5,0,中,0,None,EnergyChargeAttack

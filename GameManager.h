@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include "Vector3.h"
+#include "CharacterBase.h"
 
 class Player;
 class Enemy;
@@ -72,6 +73,18 @@ public:
 	/// </summary>
 	/// <returns>エネミーの移動ベクトル</returns>
 	MyEngine::Vector3 GetEnemyVelo();
+
+	/// <summary>
+	/// プレイヤーの今のやられ状態を取得する
+	/// </summary>
+	/// <returns>プレイヤーのやられ状態</returns>
+	int GetPlayerReactionKind();
+
+	/// <summary>
+	/// エネミーの今のやられ状態を取得する
+	/// </summary>
+	/// <returns>エネミーのやられ状態</returns>
+	int GetEnemyReactionKind();
 
 	/// <summary>
 	/// 管理する攻撃を追加する

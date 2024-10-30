@@ -22,6 +22,12 @@ protected:
 	MyEngine::Vector3 GetEnemyVelo();
 
 	/// <summary>
+	/// エネミーのやられ状態を取得する
+	/// </summary>
+	/// <returns>エネミーのやられ状態</returns>
+	int GetEnemyHitReaction();
+
+	/// <summary>
 	/// プレイヤーの移動ベクトルを設定する
 	/// </summary>
 	/// <param name="velo">移動ベクトル</param>

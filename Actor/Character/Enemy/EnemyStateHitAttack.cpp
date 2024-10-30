@@ -7,54 +7,54 @@
 
 namespace
 {
-	constexpr int kDownTimes[static_cast<int>(EnemyStateHitAttack::HitKind::kKindNum)] =
+	const std::map<CharacterBase::HitReactionKind,int> kDownTimeMap =
 	{
-		40,
-		40,
-		90,
-		90,
-		90,
-		60,
-		60
+		{CharacterBase::HitReactionKind::kLow,40},
+		{CharacterBase::HitReactionKind::kMiddle,40},
+		{CharacterBase::HitReactionKind::kUpBurst,120},
+		{CharacterBase::HitReactionKind::kFarBurst,120},
+		{CharacterBase::HitReactionKind::kDownBurst,120},
+		{CharacterBase::HitReactionKind::kMiddleStan,60},
+		{CharacterBase::HitReactionKind::kBottomStan,60}
 	};
 
-	constexpr float kMoveSpeed[static_cast<int>(EnemyStateHitAttack::HitKind::kKindNum)] =
+	const std::map<CharacterBase::HitReactionKind, float> kMoveSpeedMap =
 	{
-		0.3f,
-		1.0f,
-		3.0f,
-		3.0f,
-		3.0f,
-		0.01f,
-		0.01f
+		{CharacterBase::HitReactionKind::kLow,0.4f},
+		{CharacterBase::HitReactionKind::kMiddle,0.8f},
+		{CharacterBase::HitReactionKind::kUpBurst,2.0f},
+		{CharacterBase::HitReactionKind::kFarBurst,2.0f},
+		{CharacterBase::HitReactionKind::kDownBurst,2.0f},
+		{CharacterBase::HitReactionKind::kMiddleStan,0.1f},
+		{CharacterBase::HitReactionKind::kBottomStan,0.1f}
 	};
 
 	//前から攻撃を受けた時の反応
-	const std::map<EnemyStateHitAttack::HitKind, CharacterBase::AnimKind> kFrontHitReactionMap =
+	const std::map<CharacterBase::HitReactionKind, CharacterBase::AnimKind> kFrontHitReactionMap =
 	{
-		{EnemyStateHitAttack::HitKind::kLow,CharacterBase::AnimKind::kLowHit1},
-		{EnemyStateHitAttack::HitKind::kMiddle,CharacterBase::AnimKind::kMiddleHit},
-		{EnemyStateHitAttack::HitKind::kUpBurst,CharacterBase::AnimKind::kFrontBurst},
-		{EnemyStateHitAttack::HitKind::kDownBurst,CharacterBase::AnimKind::kFrontBurst},
-		{EnemyStateHitAttack::HitKind::kFarBurst,CharacterBase::AnimKind::kFrontBurst},
-		{EnemyStateHitAttack::HitKind::kBottomStan,CharacterBase::AnimKind::kBottomStan},
-		{EnemyStateHitAttack::HitKind::kMiddleStan,CharacterBase::AnimKind::kFrontMiddleStan}
+		{CharacterBase::HitReactionKind::kLow,CharacterBase::AnimKind::kLowHit1},
+		{CharacterBase::HitReactionKind::kMiddle,CharacterBase::AnimKind::kMiddleHit},
+		{CharacterBase::HitReactionKind::kUpBurst,CharacterBase::AnimKind::kFrontBurst},
+		{CharacterBase::HitReactionKind::kDownBurst,CharacterBase::AnimKind::kFrontBurst},
+		{CharacterBase::HitReactionKind::kFarBurst,CharacterBase::AnimKind::kFrontBurst},
+		{CharacterBase::HitReactionKind::kBottomStan,CharacterBase::AnimKind::kBottomStan},
+		{CharacterBase::HitReactionKind::kMiddleStan,CharacterBase::AnimKind::kFrontMiddleStan}
 	};
 
 	//後ろから攻撃を受けた時の反応
-	const std::map<EnemyStateHitAttack::HitKind, CharacterBase::AnimKind> kBackHitReactionMap =
+	const std::map<CharacterBase::HitReactionKind, CharacterBase::AnimKind> kBackHitReactionMap =
 	{
-		{EnemyStateHitAttack::HitKind::kLow,CharacterBase::AnimKind::kBackLowHit1},
-		{EnemyStateHitAttack::HitKind::kMiddle,CharacterBase::AnimKind::kBackMiddleHit},
-		{EnemyStateHitAttack::HitKind::kUpBurst,CharacterBase::AnimKind::kBackBurst},
-		{EnemyStateHitAttack::HitKind::kDownBurst,CharacterBase::AnimKind::kBackBurst},
-		{EnemyStateHitAttack::HitKind::kFarBurst,CharacterBase::AnimKind::kBackBurst},
-		{EnemyStateHitAttack::HitKind::kBottomStan,CharacterBase::AnimKind::kBottomStan},
-		{EnemyStateHitAttack::HitKind::kMiddleStan,CharacterBase::AnimKind::kBackMiddleStan}
+		{CharacterBase::HitReactionKind::kLow,CharacterBase::AnimKind::kBackLowHit1},
+		{CharacterBase::HitReactionKind::kMiddle,CharacterBase::AnimKind::kBackMiddleHit},
+		{CharacterBase::HitReactionKind::kUpBurst,CharacterBase::AnimKind::kBackBurst},
+		{CharacterBase::HitReactionKind::kDownBurst,CharacterBase::AnimKind::kBackBurst},
+		{CharacterBase::HitReactionKind::kFarBurst,CharacterBase::AnimKind::kBackBurst},
+		{CharacterBase::HitReactionKind::kBottomStan,CharacterBase::AnimKind::kBottomStan},
+		{CharacterBase::HitReactionKind::kMiddleStan,CharacterBase::AnimKind::kBackMiddleStan}
 	};
 
 	//移動する時間の割合
-	constexpr float kMoveTimeRate = 0.4f;
+	constexpr float kMoveTimeRate = 0.7f;
 
 	//スタン時のアニメーションをゆっくり再生する時間の割合
 	constexpr float kSlowAnimTimeRate = 0.4f;
@@ -66,7 +66,6 @@ EnemyStateHitAttack::EnemyStateHitAttack(std::shared_ptr<Enemy> enemy) :
 	EnemyStateBase(enemy),
 	m_downTime(0),
 	m_moveTime(0),
-	m_hitReaction(HitKind::kLow),
 	m_isFrontHit(false)
 {
 }
@@ -83,8 +82,8 @@ void EnemyStateHitAttack::Update()
 	m_time++;
 
 	//今受けている攻撃がスタン攻撃だったら
-	if (m_hitReaction == HitKind::kBottomStan ||
-		m_hitReaction == HitKind::kMiddleStan)
+	if (m_pEnemy->GetHitReaction() == CharacterBase::HitReactionKind::kBottomStan ||
+		m_pEnemy->GetHitReaction() == CharacterBase::HitReactionKind::kMiddleStan)
 	{
 		int slowAnimTime = static_cast<int>(m_downTime * kSlowAnimTimeRate);
 
@@ -110,6 +109,13 @@ void EnemyStateHitAttack::Update()
 		ChangeState(next);
 	}
 
+	//移動する時間が終わったら
+	if (m_time > static_cast<int>(m_downTime * kMoveTimeRate))
+	{
+		m_moveVec = MyEngine::Vector3(0, 0, 0);
+		//TODO : 吹っ飛び状態であれば吹っ飛び状態から通常状態に戻るアニメーションを再生する
+	}
+
 	SetEnemyVelo(m_moveVec);
 
 
@@ -124,11 +130,11 @@ void EnemyStateHitAttack::Exit()
 {
 }
 
-void EnemyStateHitAttack::HitAttack(HitKind kind)
+void EnemyStateHitAttack::HitAttack(CharacterBase::HitReactionKind kind)
 {
 
 	//コンボ中に何の攻撃を受けたかを保存しておく
-	int hitAttackKinds[static_cast<int>(HitKind::kKindNum)] = {};
+	int hitAttackKinds[static_cast<int>(CharacterBase::HitReactionKind::kKindNum)] = {};
 
 	for (auto item : m_hitReactions)
 	{
@@ -136,9 +142,9 @@ void EnemyStateHitAttack::HitAttack(HitKind kind)
 	}
 
 	//動けない時間を設定する
-	m_downTime = kDownTimes[static_cast<int>(kind)];
+	m_downTime = kDownTimeMap.at(kind);
 	//現在のやられ状態を設定する
-	m_hitReaction = kind;
+	m_pEnemy->SetHitReaction(kind);
 	//動く方向を設定する
 	MyEngine::Vector3 moveDir;
 	//攻撃されたキャラクターの座標を中心としたローカル座標を作成する
@@ -150,13 +156,13 @@ void EnemyStateHitAttack::HitAttack(HitKind kind)
 
 
 	//上方向に吹っ飛ばすもの
-	if (kind == HitKind::kUpBurst)
+	if (kind == CharacterBase::HitReactionKind::kUpBurst)
 	{
 		//斜め上に吹き飛ばす
 		local.SetLocalPos(MyEngine::Vector3(0, 1, 1));
 	}
 	//下方向に吹っ飛ばすもの
-	else if (kind == HitKind::kDownBurst)
+	else if (kind == CharacterBase::HitReactionKind::kDownBurst)
 	{
 		//斜め下に吹き飛ばす
 		local.SetLocalPos(MyEngine::Vector3(0, -1, 1));
@@ -171,12 +177,12 @@ void EnemyStateHitAttack::HitAttack(HitKind kind)
 	moveDir = (local.GetWorldPos() - m_pEnemy->GetPos());
 
 	//やられ状態によって移動速度を変更する
-	m_moveVec = moveDir * kMoveSpeed[static_cast<int>(kind)];
+	m_moveVec = moveDir * kMoveSpeedMap.at(kind);
 
 	//コンボとやられ状態の確認
 
 	//軽い吹き飛ばし攻撃
-	if (kind == HitKind::kMiddle)
+	if (kind == CharacterBase::HitReactionKind::kMiddle)
 	{
 		//二度受けていたら
 		if (hitAttackKinds[static_cast<int>(kind)] > 0)
@@ -186,7 +192,7 @@ void EnemyStateHitAttack::HitAttack(HitKind kind)
 
 	}
 	//下段スタン攻撃
-	else if (kind == HitKind::kBottomStan)
+	else if (kind == CharacterBase::HitReactionKind::kBottomStan)
 	{
 		//二度受けていたら
 		if (hitAttackKinds[static_cast<int>(kind)] > 0)
@@ -196,7 +202,7 @@ void EnemyStateHitAttack::HitAttack(HitKind kind)
 		}
 	}
 	//中段スタン攻撃
-	else if (kind == HitKind::kMiddleStan)
+	else if (kind == CharacterBase::HitReactionKind::kMiddleStan)
 	{
 		//二度受けていたら
 		if (hitAttackKinds[static_cast<int>(kind)] > 0)
@@ -244,7 +250,7 @@ void EnemyStateHitAttack::OnCollide(std::shared_ptr<Collidable> collider)
 	}
 }
 
-int EnemyStateHitAttack::GetNextAnimKind(HitKind kind)
+int EnemyStateHitAttack::GetNextAnimKind(CharacterBase::HitReactionKind kind)
 {
 
 	CharacterBase::AnimKind ans = CharacterBase::AnimKind::kLowHit1;

@@ -27,6 +27,21 @@ public:
 		kKindNum
 	};
 
+	enum class HitReactionKind
+	{
+		kNone,//なにもされていない状態
+		kLow,//弱
+		kMiddle,//中
+		kUpBurst,//上吹っ飛び
+		kDownBurst,//下吹っ飛び
+		kFarBurst,//奥吹っ飛び
+		kBottomStan,//下段スタン
+		kMiddleStan,//中段スタン
+		kGuard,//ガード状態
+		kGuardBreak,//ガードブレイク状態
+		kKindNum
+	};
+
 	enum class AnimKind
 	{
 		kIdle,
@@ -322,6 +337,18 @@ public:
 	/// <returns>アニメーション番号</returns>
 	AnimKind GetAttackAnimKind(std::string animName);
 
+	/// <summary>
+	/// 現在のやられ状態を返す
+	/// </summary>
+	/// <returns>現在のやられ状態</returns>
+	HitReactionKind GetHitReaction() { return m_nowHitReaction; }
+
+	/// <summary>
+	/// やられ状態を設定する
+	/// </summary>
+	/// <param name="kind">次のやられ状態</param>
+	void SetHitReaction(HitReactionKind kind) { m_nowHitReaction = kind; }
+
 protected:
 
 	/// <summary>
@@ -360,6 +387,8 @@ protected:
 	float m_nowHp;
 	//現在の気力
 	float m_nowMp;
+	//現在のやられ状態
+	HitReactionKind m_nowHitReaction;
 	//すべてのキャラで共通で使う通常攻撃の情報
 	std::map<std::string, NormalAttackData> m_normalAttackData;
 	//自身の向いている方向などを保存するためにローカル座標を持っておく
