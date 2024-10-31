@@ -81,7 +81,11 @@ public:
 		kDownChargeAttack,
 		kMiddleChargeAttack,
 		kUpChargeAttack,
-		kEnergyChargeAttack
+		kEnergyChargeAttack,
+		kRun,
+		kJumpStart,
+		kJumping,
+		kJumpEnd
 	};
 
 	enum class CharacterKind
@@ -271,7 +275,7 @@ public:
 	/// アニメーションが終了したかを取得する
 	/// </summary>
 	/// <returns>true:アニメーション終了時　false:アニメーション再生時</returns>
-	bool IsAnimEnd();
+	bool IsEndAnim() { return m_isEndAnim; }
 
 	/// <summary>
 	/// csvから持ってきたstringデータの必殺技の種類をSpecialAttackKindに変換する
@@ -306,7 +310,13 @@ public:
 	bool IsEndAnimationBlend() { return m_isEndAnimationBlend; }
 	
 	/// <summary>
-	/// 現在再生しているアニメーションを返す
+	/// アニメーションが終了しているかどうかを取得する
+	/// </summary>
+	/// <returns>アニメーションが終了していたらtrue</returns>
+	bool IsAnimEnd();
+
+	/// <summary>
+	/// 現在再生しているアニメーションを取得する
 	/// </summary>
 	/// <returns>アニメーションの種類</returns>
 	AnimKind GetPlayAnimKind() { return m_playAnimKind; }
@@ -318,7 +328,7 @@ public:
 	void SetFrontPos(MyEngine::Vector3 frontPos);
 
 	/// <summary>
-	/// 前方にターゲットがいるかどうかを返す
+	/// 前方にターゲットがいるかどうかを取得
 	/// </summary>
 	/// <param name="isPlayer">プレイヤーならtrueを入れる</param>
 	/// <returns>前方にいるならtrue</returns>
@@ -338,7 +348,7 @@ public:
 	AnimKind GetAttackAnimKind(std::string animName);
 
 	/// <summary>
-	/// 現在のやられ状態を返す
+	/// 現在のやられ状態を取得する
 	/// </summary>
 	/// <returns>現在のやられ状態</returns>
 	HitReactionKind GetHitReaction() { return m_nowHitReaction; }
@@ -349,6 +359,17 @@ public:
 	/// <param name="kind">次のやられ状態</param>
 	void SetHitReaction(HitReactionKind kind) { m_nowHitReaction = kind; }
 
+	/// <summary>
+	/// 今地上にいるかどうかを取得する
+	/// </summary>
+	/// <returns>今地上にいるならtrue</returns>
+	bool IsGround() { return m_isGround; }
+
+	/// <summary>
+	/// キャラクターの当たり判定の大きさを返す
+	/// </summary>
+	/// <returns>当たり判定の大きさ</returns>
+	float GetRadius();
 protected:
 
 	/// <summary>
@@ -389,6 +410,8 @@ protected:
 	float m_nowMp;
 	//現在のやられ状態
 	HitReactionKind m_nowHitReaction;
+	//今地上にいるかどうか
+	bool m_isGround;
 	//すべてのキャラで共通で使う通常攻撃の情報
 	std::map<std::string, NormalAttackData> m_normalAttackData;
 	//自身の向いている方向などを保存するためにローカル座標を持っておく
@@ -397,6 +420,8 @@ protected:
 	int m_attachAnim;
 	//今再生しているアニメの種類
 	AnimKind m_playAnimKind;
+	//アニメーションが終わったかどうか
+	bool m_isEndAnim;
 	//アニメーションの合計時間
 	float m_totalAnimTime;
 	//アニメーションの現在の再生時間

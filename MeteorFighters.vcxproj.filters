@@ -198,6 +198,9 @@
     <ClCompile Include="PlayerStateSpecialAttack.cpp">
       <Filter>ソース ファイル\Actor\Character\Player</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerStateJump.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -343,6 +346,9 @@
     </ClInclude>
     <ClInclude Include="PlayerStateSpecialAttack.h">
       <Filter>ヘッダー ファイル\Actor\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerStateJump.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

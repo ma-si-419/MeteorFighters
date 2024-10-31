@@ -8,7 +8,7 @@ public:
 	MyEngine::Vector3 m_startPos;
 	MyEngine::Vector3 m_nextStartPos;
 	float m_radius;
-	float m_length;
+	MyEngine::Vector3 m_lange;
 	bool m_isMoveStartPos;
 };
 

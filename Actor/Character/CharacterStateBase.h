@@ -9,6 +9,7 @@ public:
 	{
 		kIdle,//何もしていない状態
 		kMove,//移動状態
+		kJump,//ジャンプ状態
 		kGuard,//ガード状態
 		kAttack,//攻撃状態
 		kRush,//突撃状態

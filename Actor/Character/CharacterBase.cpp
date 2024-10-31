@@ -74,7 +74,9 @@ CharacterBase::CharacterBase(ObjectTag tag, CharacterKind kind) :
 	m_lastAnim(-1),
 	m_animBlendRate(1.0f),
 	m_animBlendSpeed(kAnimBlendSpeed),
-	m_isEndAnimationBlend(true)
+	m_isEndAnimationBlend(true),
+	m_isGround(false),
+	m_isEndAnim(false)
 {
 	auto sphereData = std::dynamic_pointer_cast<SphereColliderData>(m_pColData);
 
@@ -114,46 +116,75 @@ void CharacterBase::ChangeAnim(AnimKind animKind, bool loop)
 void CharacterBase::ChangeAnim(AnimKind animKind, bool loop, float blendSpeed)
 {
 
-	//アニメーションをけしておく
+	//ひとつ前のアニメーションをけしておく
 	if (m_lastAnim != -1)
 	{
 		MV1DetachAnim(m_modelHandle, m_lastAnim);
 	}
 
+	//アニメーション番号を設定
 	int animNumber = static_cast<int>(animKind);
+	//今再生していたアニメーションを保存する
 	m_lastAnim = m_attachAnim;
+	//今から再生するアニメーションを設定する
 	m_attachAnim = MV1AttachAnim(m_modelHandle, animNumber);
+	//今から再生するアニメーションが何かを保存する
 	m_playAnimKind = animKind;
+	//アニメーションの合計再生時間を設定する
 	m_totalAnimTime = MV1GetAnimTotalTime(m_modelHandle, animNumber);
+	//さっきまで再生していたアニメーションの再生時間を保存する(ブレンドの際におかしくならないように)
 	m_lastPlayAnimTime = m_nowPlayAnimTime;
+	//再生時間をリセット
 	m_nowPlayAnimTime = 0;
+	//アニメーションの再生時間を設定
 	m_animPlaySpeed = 1.0f;
+	//アニメーションがループするかどうかを設定
 	m_isLoop = loop;
+	//アニメーションブレンド率のリセット
 	m_animBlendRate = 0.0f;
+	//アニメーションをブレンドする速さを設定
 	m_animBlendSpeed = blendSpeed;
+	//ブレンドが終わったかどうかをfalseにする
 	m_isEndAnimationBlend = false;
+	//アニメーションが終わったフラグをfalseにする
+	m_isEndAnim = false;
 }
 
 void CharacterBase::PlayAnim()
 {
+	//アニメーションの再生フレームを設定
 	MV1SetAttachAnimTime(m_modelHandle, m_lastAnim, m_lastPlayAnimTime);
 	MV1SetAttachAnimTime(m_modelHandle, m_attachAnim, m_nowPlayAnimTime);
+	//再生中のアニメーションを進める
 	m_nowPlayAnimTime += m_animPlaySpeed;
+	//アニメーションが最後まで言った場合
 	if (m_nowPlayAnimTime > m_totalAnimTime)
 	{
+		//ループするなら
 		if (m_isLoop)
 		{
+			//再生時間をリセットする
 			m_nowPlayAnimTime = 0;
+		}
+		//ループしないなら
+		else
+		{
+			//アニメーションが終わったフラグをtrueにする
+			m_isEndAnim = true;
 		}
 	}
 
 	//ブレンド率の調整
 	m_animBlendRate += m_animBlendSpeed;
 
+	//アニメーションのブレンドが終わったら
 	if (m_animBlendRate > 1.0f)
 	{
+		//変な値にならないようにする
 		m_animBlendRate = 1.0f;
+		//アニメーションブレンドが終わったフラグをtrueにする
 		m_isEndAnimationBlend = true;
+		//ひとつ前のアニメーションを消す
 		m_lastPlayAnimTime = 0;
 		MV1DetachAnim(m_modelHandle,m_lastAnim);
 	}
@@ -327,4 +358,9 @@ void CharacterBase::SetDrawPos(MyEngine::Vector3 pos)
 CharacterBase::AnimKind CharacterBase::GetAttackAnimKind(std::string animName)
 {	
 	return kAttackAnimKindMap.at(animName);
+}
+
+float CharacterBase::GetRadius()
+{
+	return kCharacterRadius;
 }

@@ -40,6 +40,12 @@ private:
 	//衝突した時に物理挙動をしない時にtrueにする
 	bool m_isTrigger;
 
+	//移動してるかどうか
+	bool m_isMove;
+
+	//ステージのポリゴンとぶつかったかどうか
+	bool m_isHitStage;
+
 	//PhysicsがCollidableを自由に管理できるように
 	friend Physics;
 };

@@ -5,6 +5,8 @@
 namespace
 {
 	constexpr float kEnergyAttackTrackRange = 2.5f;
+
+	constexpr float kAttackLange = 0.5f;
 }
 
 Attack::Attack(ObjectTag tag, MyEngine::Vector3 pos) :
@@ -27,7 +29,7 @@ void Attack::Init(AttackStatus status)
 	Collidable::Init();
 	auto col = std::dynamic_pointer_cast<CapsuleColliderData>(m_pColData);
 	col->m_radius = status.radius;
-	col->m_length = 0.1f;
+	col->m_lange = (m_status.targetPos - m_rigidbody.GetPos()).Normalize() * kAttackLange;
 
 	m_dir = (m_status.targetPos - m_rigidbody.GetPos()).Normalize();
 }
