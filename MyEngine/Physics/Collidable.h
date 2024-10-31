@@ -44,7 +44,7 @@ private:
 	bool m_isMove;
 
 	//ステージのポリゴンとぶつかったかどうか
-	bool m_isHitStage;
+	bool m_isHitWall;
 
 	//PhysicsがCollidableを自由に管理できるように
 	friend Physics;

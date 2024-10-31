@@ -8,7 +8,7 @@ Collidable::Collidable(ObjectTag tag, ColliderData::Kind colKind) :
 	m_pColData(nullptr),
 	m_tag(tag),
 	m_isTrigger(false),
-	m_isMoveFlag(false)
+	m_isMove(false)
 {
 	m_pColData = CreateColliderData(colKind);
 }
