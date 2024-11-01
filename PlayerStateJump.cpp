@@ -40,7 +40,7 @@ void PlayerStateJump::Enter()
 		m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kJumpStart, false);
 	}
 
-	m_pFallCollider = std::make_shared<CapsuleColliderData>(ObjectTag::kFallCollide, ColliderData::Kind::kCapsule);
+	//m_pFallCollider = std::make_shared<CapsuleColliderData>(ObjectTag::kPlayer, ColliderData::Kind::kCapsule);
 
 	m_pFallCollider->m_radius = m_pPlayer->GetRadius();
 

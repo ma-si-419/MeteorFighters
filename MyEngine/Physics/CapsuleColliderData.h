@@ -11,4 +11,3 @@ public:
 	MyEngine::Vector3 m_lange;
 	bool m_isMoveEndPos;
 };
-

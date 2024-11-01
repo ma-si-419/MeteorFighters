@@ -8,6 +8,7 @@
 class Player;
 class Enemy;
 class Attack;
+class Stage;
 class GameManager : public std::enable_shared_from_this<GameManager>
 {
 public:
@@ -100,4 +101,7 @@ private:
 	std::shared_ptr<Enemy> m_pEnemy;
 	//攻撃の情報を持っているマネージャー
 	std::vector<std::shared_ptr<Attack>> m_pAttacks;
+	//ステージクラス
+	std::shared_ptr<Stage> m_pStage;
+	
 };

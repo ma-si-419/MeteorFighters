@@ -53,15 +53,17 @@ public:
 	/// <summary>
 	/// ステージの当たり判定の更新を行う
 	/// </summary>
-	/// <param name="stageModelHandle">ステージのモデルハンドル</param>
-	void StageColUpdate(int stageModelHandle);
+	void StageColUpdate();
+
+	/// <summary>
+	/// 当たり判定を行うステージモデルをセットする
+	/// </summary>
+	void SetStage(int stageHandle);
 
 	/// <summary>
 	/// 当たり判定の表示を行う
 	/// </summary>
 	void DebugDraw();
-
-
 
 	/// <summary>
 	/// 登録していないけど当たり判定を取りたいものと登録している当たり判定がぶつかっているか取得する
@@ -90,7 +92,7 @@ private:
 	void FixPositionWithWall(std::shared_ptr<Collidable> collider);
 	void FixPositionWithWallInternal(std::shared_ptr<Collidable> collider);
 	//床ポリゴンとの当たり判定をチェックし、移動させる
-	void FixNowPositionWithFloor();
+	void FixNowPositionWithFloor(std::shared_ptr<Collidable> collider);
 
 	bool IsCheckCollide(std::shared_ptr<Collidable> first, std::shared_ptr<Collidable> second);
 private:
@@ -102,12 +104,15 @@ private:
 	int m_floorNum = 0;				
 	//当たり判定結果構造体
 	MV1_COLL_RESULT_POLY_DIM m_hitDim{};
-	// 壁ポリゴンと判断されたポリゴンの構造体のアドレスを保存しておくためのポインタ配列
+	//壁ポリゴンと判断されたポリゴンの構造体のアドレスを保存しておくためのポインタ配列
 	MV1_COLL_RESULT_POLY* m_pWallPoly[kMaxColHitPolyNum]{};
-	// 床ポリゴンと判断されたポリゴンの構造体のアドレスを保存しておくためのポインタ配列
+	//床ポリゴンと判断されたポリゴンの構造体のアドレスを保存しておくためのポインタ配列
 	MV1_COLL_RESULT_POLY* m_pFloorPoly[kMaxColHitPolyNum]{};
-	// ポリゴンの構造体にアクセスするために使用するポインタ
+	//ポリゴンの構造体にアクセスするために使用するポインタ
 	MV1_COLL_RESULT_POLY* m_pPoly = nullptr;
-	// 線分とポリゴンとの当たり判定の結果を代入する構造体
+	//線分とポリゴンとの当たり判定の結果を代入する構造体
 	HITRESULT_LINE m_lineRes{};
+	//ステージのモデルハンドル
+	int m_stageHandle = -1;
+
 };

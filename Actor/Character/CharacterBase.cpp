@@ -9,7 +9,7 @@
 namespace
 {
 	constexpr float kCharacterHeight = 4.5f;
-	constexpr float kCharacterRadius = 3.0f;
+	constexpr float kCharacterRadius = 5.0f;
 
 	constexpr float kAttackPopPos = kCharacterRadius * 3.0f;
 

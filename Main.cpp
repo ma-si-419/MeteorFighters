@@ -68,9 +68,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		if (!isStop || isMove)
 		{
 #endif // _DEBUG
-			sceneManager.Update();
-
 			Physics::GetInstance().Update();
+
+			sceneManager.Update();
 		
 #ifdef _DEBUG
 

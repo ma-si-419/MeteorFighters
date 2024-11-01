@@ -3,10 +3,12 @@
 #include "Enemy.h"
 #include "Attack.h"
 #include "LoadCsv.h"
+#include "Stage.h"
 
 GameManager::GameManager()
 {
-	
+	m_pStage = std::make_shared<Stage>();
+	m_pStage->Init();
 }
 
 GameManager::~GameManager()
@@ -56,6 +58,10 @@ void GameManager::Draw()
 		//UŒ‚‚Ì•`‰æ
 		item->Draw();
 	}
+
+	//ƒXƒe[ƒW‚Ì•`‰æ
+	m_pStage->Draw();
+
 }
 
 void GameManager::SetPlayerStatus(int number,std::vector<std::string> statusData)

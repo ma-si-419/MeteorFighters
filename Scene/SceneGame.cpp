@@ -14,7 +14,6 @@ namespace
 SceneGame::SceneGame(SceneManager& sceneManager) :
 	SceneBase(sceneManager)
 {
-
 }
 
 SceneGame::~SceneGame()
@@ -43,6 +42,8 @@ void SceneGame::Update()
 
 void SceneGame::Draw()
 {
+	m_pGameManager->Draw();
+
 #ifdef _DEBUG
 
 	DrawString(0, 0, "SceneGame", kWhiteColor);
@@ -51,13 +52,10 @@ void SceneGame::Draw()
 
 #endif // _DEBUG
 
-
 	for (auto& actor : m_pActors)
 	{
 		actor->Draw();
 	}
-
-	m_pGameManager->Draw();
 }
 
 void SceneGame::End()

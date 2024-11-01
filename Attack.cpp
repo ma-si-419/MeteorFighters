@@ -30,6 +30,7 @@ void Attack::Init(AttackStatus status)
 	auto col = std::dynamic_pointer_cast<CapsuleColliderData>(m_pColData);
 	col->m_radius = status.radius;
 	col->m_lange = (m_status.targetPos - m_rigidbody.GetPos()).Normalize() * kAttackLange;
+	col->m_endPos = m_rigidbody.GetPos() + col->m_lange;
 
 	m_dir = (m_status.targetPos - m_rigidbody.GetPos()).Normalize();
 }
