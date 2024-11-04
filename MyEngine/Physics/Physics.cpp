@@ -838,7 +838,7 @@ void Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable> collider)
 				VECTOR nextPos = collider->m_nextPos.CastVECTOR();
 
 				//“_‚Æ‚Ì“–‚½‚è”»’è
-				m_lineRes = HitCheck_Line_Triangle(collider->m_nextPos.CastVECTOR(), (collider->m_nextPos + MyEngine::Vector3(0.1f,0.0f,0.0f)).CastVECTOR(),
+				m_lineRes = HitCheck_Line_Triangle((collider->m_nextPos + MyEngine::Vector3(0.0f,sphere->m_radius,0.0f)).CastVECTOR(), (collider->m_nextPos + MyEngine::Vector3(0.0f,-sphere->m_radius, 0.0f)).CastVECTOR(),
 					m_pPoly->Position[0], m_pPoly->Position[1], m_pPoly->Position[2]);
 
 				//ÚG‚µ‚Ä‚¢‚È‚¯‚ê‚Î‰½‚à‚µ‚È‚¢
