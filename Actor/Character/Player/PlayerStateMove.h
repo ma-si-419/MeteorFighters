@@ -16,6 +16,15 @@ private:
 
 	std::string m_attackKey;
 
+	//空中に浮くかどうか
+	bool m_isFloat;
+
+	//今自分にかかっている重力
+	float m_gravityPower;
+
+	//前のフレームに地上にいたかどうか
+	bool m_isLastGround;
+
 	int m_attackButtonPushTime;
 };
 

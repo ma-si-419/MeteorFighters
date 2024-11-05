@@ -15,6 +15,8 @@ namespace
 	constexpr float kPhysicalAttackRadius = 5.0f;
 	//Ši“¬UŒ‚‚ÅÅ’áŒÀ—£‚ê‚é‹——£
 	constexpr float kPhysicalAttackNearLange = 8.0f;
+	//uŠÔˆÚ“®UŒ‚‚Å‚¸‚ç‚·‘å‚«‚³
+	constexpr float kTeleportationShiftLange = 10.0f;
 	//‹C’eUŒ‚‚ÌUŒ‚”»’è‚ªŽc‚éŽžŠÔ
 	constexpr int kEnergyAttackLifeTime = 240;
 	//‹C’eUŒ‚‚Ì”»’è‚Ì‘å‚«‚³
@@ -128,6 +130,8 @@ void PlayerStateNormalAttack::Enter()
 
 	m_moveTargetPos = GetEnemyPos() + shiftVec;
 
+	m_pPlayer->LookTarget(true);
+
 }
 
 void PlayerStateNormalAttack::Update()
@@ -212,6 +216,10 @@ void PlayerStateNormalAttack::Update()
 				//uŠÔˆÚ“®æ‚ÉUŒ‚‚ÌUŒ‚”ÍˆÍ•ª‚¾‚¯‚¸‚ê‚ð‘«‚·
 				MyEngine::Vector3 attackShiftVec = GetEnemyVelo();
 
+				teleportationPos += attackShiftVec.Normalize() * (kTeleportationShiftLange);
+
+				attackShiftVec.y = 0;
+
 				teleportationPos += attackShiftVec.Normalize() * (kPhysicalAttackRadius);
 
 				SetPlayerPos(teleportationPos);
@@ -239,6 +247,8 @@ void PlayerStateNormalAttack::Update()
 			m_pPlayer->ChangeAnim(anim, false);
 
 			m_isNextAttack = false;
+
+			m_pPlayer->LookTarget(true);
 		}
 	}
 

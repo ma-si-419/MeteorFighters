@@ -99,10 +99,6 @@ void Player::Update()
 
 	//ƒJƒƒ‰‚ÌXV
 	m_camera->Update();
-
-	
-	//“G‚Ì•ûŒü‚ðŒü‚­‚æ‚¤‚É‚·‚é
-	MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - m_pGameManager->GetEnemyPos()).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
 }
 void Player::Draw()
 {

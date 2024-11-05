@@ -1,28 +1,35 @@
 #include "PlayerStateMove.h"
 #include "PlayerStateIdle.h"
+#include "PlayerStateJump.h"
 #include "PlayerStateNormalAttack.h"
+#include "GameSceneConstant.h"
 #include "DxLib.h"
 #include "Input.h"
 #include "Player.h"
 #include <cmath>
-
-namespace
-{
-	constexpr int kChargeAttackTime = 15;
-}
-
 PlayerStateMove::PlayerStateMove(std::shared_ptr<Player> player) :
 	PlayerStateBase(player),
 	m_attackButtonPushTime(0.0f),
-	m_attackKey("empty")
+	m_attackKey("empty"),
+	m_isFloat(false),
+	m_gravityPower(0.0f),
+	m_isLastGround(false)
 {
-	m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kSkyIdle,true);
+	m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kSkyIdle, true);
 }
 
 void PlayerStateMove::Enter()
 {
 	m_pNextState = shared_from_this();
 	m_kind = CharacterStateKind::kMove;
+	if (m_pPlayer->IsGround())
+	{
+		m_isFloat = false;
+	}
+	else
+	{
+		m_isFloat = true;
+	}
 }
 
 void PlayerStateMove::Update()
@@ -63,17 +70,130 @@ void PlayerStateMove::Update()
 		//移動方向にスピードをかける
 		velo = dir * GetSpeed();
 	}
-	//ジャンプボタンが押されたら
-	if (input.IsPress("RB"))
+
+	//宙に浮いていない場合
+	if (!m_isFloat)
 	{
-		velo.y = GetSpeed();
+		m_gravityPower += GameSceneConstant::kSkyGravityPower;
+
+		if (m_gravityPower < GameSceneConstant::kMaxFallSpeed)
+		{
+			m_gravityPower = GameSceneConstant::kMaxFallSpeed;
+		}
+
+		velo.y += m_gravityPower;
 	}
-	//下降ボタンが押されたら
-	else if (input.IsPushTrigger(true))
+
+	//地上で
+	if (m_pPlayer->IsGround())
 	{
-		velo.y = -GetSpeed();
+
+		//ジャンプボタンが押されたら
+		if (input.IsTrigger("RB"))
+		{
+			//ジャンプStateに移行する
+			auto next = std::make_shared<PlayerStateJump>(m_pPlayer);
+
+			//今の移動ベクトルを渡す
+			next->StartJump(velo);
+
+			//ステートを変更する
+			ChangeState(next);
+
+			return;
+		}
+
+		m_gravityPower = GameSceneConstant::kGroundGravityPower;
+
+		m_isFloat = false;
+
+		MyEngine::Vector3 groundVelo = velo;
+
+		groundVelo.y = 0;
+
+		//移動していれば
+		if (groundVelo.SqLength() > 0.001f)
+		{
+			//プレイ中のアニメーションが地上移動でなければ
+			if (!(m_pPlayer->GetPlayAnimKind() == CharacterBase::AnimKind::kRun))
+			{
+				//アニメーションを変更する
+				m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kRun, true);
+			}
+
+			auto frontPos = m_pPlayer->GetPos() + groundVelo;
+
+			frontPos.y = m_pPlayer->GetPos().y;
+
+			m_pPlayer->SetFrontPos(frontPos);
+		}
+		//移動していなければ
+		else
+		{
+			//プレイ中のアニメーションが地上待機でなければ
+			if (!(m_pPlayer->GetPlayAnimKind() == CharacterBase::AnimKind::kIdle))
+			{
+				//アニメーションを変更する
+				m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kIdle, true);
+			}
+		}
+
+		//今のフレーム地上にいたかどうかを保存する
+		m_isLastGround = true;
+
 	}
-	
+	//空中で
+	else
+	{
+
+		//上昇ボタンが押されたら
+		if (input.IsPress("RB"))
+		{
+			velo.y = GetSpeed();
+			m_isFloat = true;
+		}
+		//下降ボタンが押されたら
+		else if (input.IsPushTrigger(true))
+		{
+			velo.y = -GetSpeed();
+		}
+
+		//前のフレームから空中にいれば
+		if (!m_isLastGround)
+		{
+			//敵の方向を向く(Y座標はプレイヤーと同じ座標にする)
+			auto frontPos = GetEnemyPos();
+
+			frontPos.y = m_pPlayer->GetPos().y;
+
+			m_pPlayer->SetFrontPos(frontPos);
+			//下降中で
+			if (velo.y < 0)
+			{
+				//プレイ中のアニメーションがジャンプ中でなければ
+				if (!(m_pPlayer->GetPlayAnimKind() == CharacterBase::AnimKind::kJumping))
+				{
+					//アニメーションを変更する
+					m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kJumping, true);
+				}
+			}
+			//上昇しているか上下移動をしていない場合
+			else if (velo.y >= 0)
+			{
+				//プレイ中のアニメーションが空中待機でなければ
+				if (!(m_pPlayer->GetPlayAnimKind() == CharacterBase::AnimKind::kSkyIdle))
+				{
+					//アニメーションを変更する
+					m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kSkyIdle, true);
+				}
+			}
+		}
+
+		//今のフレーム空中にいたことを保存する
+		m_isLastGround = false;
+
+	}
+
 	//攻撃ボタンが押されていないときに
 	if (m_attackKey == "empty")
 	{
@@ -95,10 +215,10 @@ void PlayerStateMove::Update()
 
 		//押していたボタンが離されたら
 		if (input.IsRelease(m_attackKey) ||
-			m_attackButtonPushTime > kChargeAttackTime)
+			m_attackButtonPushTime > GameSceneConstant::kChargeAttackTime)
 		{
 			//チャージされていたかどうか判定
-			bool isCharge = m_attackButtonPushTime > kChargeAttackTime;
+			bool isCharge = m_attackButtonPushTime > GameSceneConstant::kChargeAttackTime;
 			//次のStateのポインタ作成
 			std::shared_ptr<PlayerStateNormalAttack> next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
 			//何の攻撃を行うかをAttackStateに渡す

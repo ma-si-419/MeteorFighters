@@ -1,29 +1,34 @@
 #include "PlayerStateJump.h"
 #include "PlayerStateIdle.h"
+#include "PlayerStateMove.h"
+#include "PlayerStateNormalAttack.h"
 #include "Player.h"
 #include "CapsuleColliderData.h"
 #include "Physics.h"
+#include "GameSceneConstant.h"
+#include "Input.h"
 
 namespace
 {
-	//ジャンプ力
-	constexpr float kJumpPower = 6.0f;
-	//重力の強さ
-	constexpr float kGravityPower = -0.5f;
-	//落下速度の限界
-	constexpr float kMaxFallSpeed = -4.0f;
 	//前後左右移動をどのくらい反映させるか
-	constexpr float kMoveVecRate = 0.3f;
+	constexpr float kMoveVecRate = 0.9f;
 }
 
 PlayerStateJump::PlayerStateJump(std::shared_ptr<Player> player) :
-	PlayerStateBase(player)
+	PlayerStateBase(player),
+	m_attackKey("empty"),
+	m_attackButtonPushTime(0)
 {
 }
 
 void PlayerStateJump::StartJump(MyEngine::Vector3 moveVec)
 {
-	m_moveVec = (moveVec * kMoveVecRate) + MyEngine::Vector3(0.0f, kJumpPower, 0.0f);
+	m_moveVec = (moveVec * kMoveVecRate) + MyEngine::Vector3(0.0f, GameSceneConstant::kJumpPower, 0.0f);
+}
+
+void PlayerStateJump::StartJump()
+{
+	StartJump(MyEngine::Vector3(0.0f, 0.0f, 0.0f));
 }
 
 void PlayerStateJump::Enter()
@@ -40,12 +45,8 @@ void PlayerStateJump::Enter()
 		m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kJumpStart, false);
 	}
 
-	//m_pFallCollider = std::make_shared<CapsuleColliderData>(ObjectTag::kPlayer, ColliderData::Kind::kCapsule);
-
-	m_pFallCollider->m_radius = m_pPlayer->GetRadius();
-
-	m_pFallCollider->m_lange = MyEngine::Vector3(0, 0, 0);
-
+	m_pNextState = shared_from_this();
+	m_kind = CharacterStateKind::kJump;
 
 }
 
@@ -62,33 +63,67 @@ void PlayerStateJump::Update()
 		}
 	}
 	//重力をかける
-	m_moveVec.y += kGravityPower;
-	if (m_moveVec.y < kMaxFallSpeed)
+	m_moveVec.y += GameSceneConstant::kSkyGravityPower;
+	if (m_moveVec.y < GameSceneConstant::kMaxFallSpeed)
 	{
 		//落下速度が速くなりすぎないように
-		m_moveVec.y = kMaxFallSpeed;
-	}
-	//移動ベクトルが下を向いている場合
-	if (m_moveVec.y < 0)
-	{
-		//地面との当たり判定を下に伸ばす
-		m_pFallCollider->m_lange = MyEngine::Vector3(0.0f, m_moveVec.y, 0.0f);
+		m_moveVec.y = GameSceneConstant::kMaxFallSpeed;
 	}
 
-	//地面との当たり判定を取得する
-	if (Physics::GetInstance().GetHitObject(m_pFallCollider->m_endPos - m_pFallCollider->m_lange, m_pFallCollider, ObjectTag::kStage))
+	auto& input = MyEngine::Input::GetInstance();
+
+	//ジャンプボタンをもう一度押したら空中に止まる(ステートも変更する)
+	if (input.IsTrigger("RB"))
 	{
-		//ぶつかっていたら
-		m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kJumpEnd,false);
+		auto next = std::make_shared<PlayerStateMove>(m_pPlayer);
+		
+		ChangeState(next);
+	}
+	//攻撃ボタンが押されていないときに
+	if (m_attackKey == "empty")
+	{
+		//格闘ボタンが押された時
+		if (input.IsPress("X"))
+		{
+			m_attackKey = "X";
+		}
+		else if (input.IsPress("Y"))
+		{
+			m_attackKey = "Y";
+		}
+	}
+	//攻撃ボタンが押されていたら
+	else
+	{
+		//押しているフレーム数を数える
+		m_attackButtonPushTime++;
+
+		//押していたボタンが離されたら
+		if (input.IsRelease(m_attackKey) ||
+			m_attackButtonPushTime > GameSceneConstant::kChargeAttackTime)
+		{
+			//チャージされていたかどうか判定
+			bool isCharge = m_attackButtonPushTime > GameSceneConstant::kChargeAttackTime;
+			//次のStateのポインタ作成
+			std::shared_ptr<PlayerStateNormalAttack> next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
+			//何の攻撃を行うかをAttackStateに渡す
+			next->SetAttack(m_attackKey, isCharge);
+			//StateをAttackに変更する
+			ChangeState(next);
+			return;
+		}
 	}
 
+	SetPlayerVelo(m_moveVec);
 
 	//地上にいるなら
-	if (m_pPlayer->IsGround())
+	if (m_pPlayer->IsGround() && m_moveVec.y < 0)
 	{
 		//アイドル状態に戻る
-		std::shared_ptr<PlayerStateIdle>next = std::make_shared<PlayerStateIdle>(m_pPlayer);
+		auto next = std::make_shared<PlayerStateIdle>(m_pPlayer);
 		ChangeState(next);
+		
+		return;
 	}
 }
 

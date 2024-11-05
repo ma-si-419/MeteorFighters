@@ -4,11 +4,6 @@
 #include <memory>
 #include "Collidable.h"
 
-namespace
-{
-	constexpr int kMaxColHitPolyNum = 2000;
-}
-
 class Physics final
 {
 private:
@@ -97,17 +92,9 @@ private:
 	bool IsCheckCollide(std::shared_ptr<Collidable> first, std::shared_ptr<Collidable> second);
 private:
 
-	std::list<std::shared_ptr<Collidable>> m_collidables; //登録されたcollidableのリスト
-	//壁ポリゴンと判断されたポリゴン数
-	int m_wallNum = 0;				
-	//床ポリゴンと判断されたポリゴン数
-	int m_floorNum = 0;				
+	std::list<std::shared_ptr<Collidable>> m_collidables; //登録されたcollidableのリスト		
 	//当たり判定結果構造体
 	MV1_COLL_RESULT_POLY_DIM m_hitDim{};
-	//壁ポリゴンと判断されたポリゴンの構造体のアドレスを保存しておくためのポインタ配列
-	MV1_COLL_RESULT_POLY* m_pWallPoly[kMaxColHitPolyNum]{};
-	//床ポリゴンと判断されたポリゴンの構造体のアドレスを保存しておくためのポインタ配列
-	MV1_COLL_RESULT_POLY* m_pFloorPoly[kMaxColHitPolyNum]{};
 	//ポリゴンの構造体にアクセスするために使用するポインタ
 	MV1_COLL_RESULT_POLY* m_pPoly = nullptr;
 	//線分とポリゴンとの当たり判定の結果を代入する構造体

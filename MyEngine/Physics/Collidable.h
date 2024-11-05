@@ -3,6 +3,10 @@
 #include "ColliderData.h"
 #include "Rigidbody.h"
 #include <memory>
+namespace
+{
+	constexpr int kMaxColHitPolyNum = 2000;
+}
 
 class Physics;
 class Collidable abstract : public std::enable_shared_from_this<Collidable>
@@ -18,6 +22,7 @@ public:
 	/// </summary>
 	/// <returns>自身のObjectTag</returns>
 	ObjectTag GetTag() const { return m_tag; }
+
 
 	/// <summary>
 	/// Collidableどうしがぶつかった時の処理を書く
@@ -46,6 +51,15 @@ private:
 	//ステージのポリゴンとぶつかったかどうか
 	bool m_isHitPoly;
 
+
+	//壁ポリゴンと判断されたポリゴンの構造体のアドレスを保存しておくためのポインタ配列
+	MV1_COLL_RESULT_POLY* m_pWallPoly[kMaxColHitPolyNum]{};
+	//床ポリゴンと判断されたポリゴンの構造体のアドレスを保存しておくためのポインタ配列
+	MV1_COLL_RESULT_POLY* m_pFloorPoly[kMaxColHitPolyNum]{};
+	//壁ポリゴンと判断されたポリゴン数
+	int m_wallNum = 0;
+	//床ポリゴンと判断されたポリゴン数
+	int m_floorNum = 0;
 	//PhysicsがCollidableを自由に管理できるように
 	friend Physics;
 };

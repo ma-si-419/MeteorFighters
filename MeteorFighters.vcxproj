@@ -204,6 +204,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameCamera.h" />
     <ClInclude Include="GameManager.h" />
+    <ClInclude Include="GameSceneConstant.h" />
     <ClInclude Include="GraphManager.h" />
     <ClInclude Include="MyEngine\Utility\LocalPos.h" />
     <ClInclude Include="MyEngine\Utility\Matrix.h" />

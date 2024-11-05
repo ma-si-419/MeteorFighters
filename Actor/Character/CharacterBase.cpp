@@ -13,6 +13,8 @@ namespace
 
 	constexpr float kAttackPopPos = kCharacterRadius * 3.0f;
 
+	constexpr float kAttackMaxShiftY = kCharacterHeight * 0.5f;
+
 	const MyEngine::Vector3 kAttackPos(0.0f, 0.0f, kAttackPopPos);
 
 	constexpr float kAnimBlendSpeed = 0.08f;
@@ -75,7 +77,6 @@ CharacterBase::CharacterBase(ObjectTag tag, CharacterKind kind) :
 	m_animBlendRate(1.0f),
 	m_animBlendSpeed(kAnimBlendSpeed),
 	m_isEndAnimationBlend(true),
-	m_isGround(false),
 	m_isEndAnim(false)
 {
 	auto sphereData = std::dynamic_pointer_cast<SphereColliderData>(m_pColData);
@@ -268,21 +269,35 @@ void CharacterBase::CreateAttack(AttackData attackData)
 	if (attackData.isPlayer)
 	{
 		targetPos = m_pGameManager->GetEnemyPos();
-		toTarget = (targetPos - m_pGameManager->GetPlayerPos()).Normalize();
+		toTarget = targetPos - m_pGameManager->GetPlayerPos();
 	}
 	else
 	{
 		targetPos = m_pGameManager->GetPlayerPos();
-		toTarget = (targetPos - m_pGameManager->GetEnemyPos()).Normalize();
+		toTarget = targetPos - m_pGameManager->GetEnemyPos();
 	}
 
-	localPos.SetFrontPos(m_rigidbody.GetPos() + toTarget);
+	localPos.SetFrontPos(m_rigidbody.GetPos() + toTarget.Normalize());
 
 	//どのくらいずらすかを設定
 	localPos.SetLocalPos(kAttackPos);
 
 	//ローカル座標からワールド座標に変換
 	attackPos = localPos.GetWorldPos();
+
+	//y座標のずれを一定値までは補正
+	float shiftY = toTarget.y;
+
+	if (shiftY > kAttackMaxShiftY)
+	{
+		shiftY = kAttackMaxShiftY;
+	}
+	else if (shiftY < -kAttackMaxShiftY)
+	{
+		shiftY = -kAttackMaxShiftY;
+	}
+
+	attackPos.y += shiftY;
 
 	//攻撃のポインタ作成
 	ans = std::make_shared<Attack>(tag, attackPos);
@@ -363,4 +378,16 @@ CharacterBase::AnimKind CharacterBase::GetAttackAnimKind(std::string animName)
 float CharacterBase::GetRadius()
 {
 	return kCharacterRadius;
+}
+
+void CharacterBase::LookTarget(bool isPlayer)
+{
+	if (isPlayer)
+	{
+		MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - m_pGameManager->GetEnemyPos()).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
+	}
+	else
+	{
+		MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - m_pGameManager->GetPlayerPos()).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
+	}
 }

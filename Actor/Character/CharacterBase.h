@@ -360,16 +360,23 @@ public:
 	void SetHitReaction(HitReactionKind kind) { m_nowHitReaction = kind; }
 
 	/// <summary>
-	/// 今地上にいるかどうかを取得する
-	/// </summary>
-	/// <returns>今地上にいるならtrue</returns>
-	bool IsGround() { return m_isGround; }
-
-	/// <summary>
 	/// キャラクターの当たり判定の大きさを返す
 	/// </summary>
 	/// <returns>当たり判定の大きさ</returns>
 	float GetRadius();
+
+	/// <summary>
+	/// キャラクターが地上にいるかどうかを返す
+	/// </summary>
+	/// <returns>地上にいるのならtrue</returns>
+	bool IsGround() { return m_pColData->IsGround(); }
+
+	/// <summary>
+	/// ターゲットの方向を向くようにする
+	/// </summary>
+	/// <param name="isPlayer">プレイヤーならtrue</param>
+	void LookTarget(bool isPlayer);
+
 protected:
 
 	/// <summary>
@@ -410,8 +417,6 @@ protected:
 	float m_nowMp;
 	//現在のやられ状態
 	HitReactionKind m_nowHitReaction;
-	//今地上にいるかどうか
-	bool m_isGround;
 	//すべてのキャラで共通で使う通常攻撃の情報
 	std::map<std::string, NormalAttackData> m_normalAttackData;
 	//自身の向いている方向などを保存するためにローカル座標を持っておく

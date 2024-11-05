@@ -11,7 +11,7 @@ namespace
 	//移動したかを判断するための定数
 	constexpr float kMoveLange = 0.01f;
 	//壁と判断するための定数
-	constexpr float kWallPolyYDir = 0.4f;
+	constexpr float kWallPolyYDir = 0.6f;
 	//壁と判断する壁の高さ(階段状のもの等を壁と認識しない高さ)
 	constexpr float kWallHeight = 5.0f;
 	//壁から押し出しをする最大数
@@ -162,11 +162,6 @@ void Physics::StageColUpdate()
 		}
 
 		m_hitDim = hitDim;
-		if (item->GetTag() == ObjectTag::kPlayer)
-		{
-			printfDx("hitDim : %d\n", hitDim.HitNum);
-		}
-
 
 		//移動していたら移動フラグを立てる
 		if ((item->m_nextPos - item->m_rigidbody.GetPos()).Length() > kMoveLange)
@@ -436,8 +431,8 @@ void Physics::FixNextPosition(OnCollideInfo hitCol)
 void Physics::CheckWallAndFloor(std::shared_ptr<Collidable> collider)
 {
 	//壁ポリゴンと床ポリゴンの数を初期化する
-	m_wallNum = 0;
-	m_floorNum = 0;
+	collider->m_wallNum = 0;
+	collider->m_floorNum = 0;
 
 	//検出されたポリゴンの数だけ繰り返す
 	for (int i = 0; i < m_hitDim.HitNum; i++)
@@ -452,40 +447,35 @@ void Physics::CheckWallAndFloor(std::shared_ptr<Collidable> collider)
 				m_hitDim.Dim[i].Position[2].y > collider->m_rigidbody.GetPos().y + kWallHeight)
 			{
 				//ポリゴンの数が限界数に達していなければポリゴンを配列に追加
-				if (m_wallNum < kMaxColHitPolyNum)
+				if (collider->m_wallNum < kMaxColHitPolyNum)
 				{
 					//ポリゴンの構造体のアドレスを壁ポリゴンポインタ配列に保存する
-					m_pWallPoly[m_wallNum] = &m_hitDim.Dim[i];
+					collider->m_pWallPoly[collider->m_wallNum] = &m_hitDim.Dim[i];
 
 					//壁ポリゴンの数を加算する
-					m_wallNum++;
+					collider->m_wallNum++;
 				}
 			}
 		}
 		else
 		{
 			//ポリゴンの数が限界数に達していなければポリゴンを配列に追加
-			if (m_floorNum < kMaxColHitPolyNum)
+			if (collider->m_floorNum < kMaxColHitPolyNum)
 			{
 				//ポリゴンの構造体のアドレスを床ポリゴンの配列に追加する
-				m_pFloorPoly[m_floorNum] = &m_hitDim.Dim[i];
+				collider->m_pFloorPoly[collider->m_floorNum] = &m_hitDim.Dim[i];
 
 				//床ポリゴンの数を加算する
-				m_floorNum++;
+				collider->m_floorNum++;
 			}
 		}
-	}
-	if (collider->GetTag() == ObjectTag::kPlayer)
-	{
-		printfDx("floorNum : %d\n", m_floorNum);
-		printfDx("wallNum : %d\n", m_wallNum);
 	}
 }
 
 void Physics::FixPositionWithWall(std::shared_ptr<Collidable> collider)
 {
 	//壁ポリゴンがない場合は何もしない
-	if (m_wallNum == 0) return;
+	if (collider->m_wallNum == 0) return;
 
 	//壁ポリゴンとの当たり判定
 	//ステージに当たったかどうかフラグをfalseにしておく
@@ -503,10 +493,10 @@ void Physics::FixPositionWithWall(std::shared_ptr<Collidable> collider)
 			auto colData = std::dynamic_pointer_cast<CapsuleColliderData>(collider->m_pColData);
 
 			//壁ポリゴンの数だけ繰り返し
-			for (int i = 0; i < m_wallNum; i++)
+			for (int i = 0; i < collider->m_wallNum; i++)
 			{
 				//i番目の壁ポリゴンのアドレスを壁ポリゴンポインタ配列から取得
-				m_pPoly = m_pWallPoly[i];
+				m_pPoly = collider->m_pWallPoly[i];
 				//ポリゴンと当たり判定が当たっていなければ次のカウントへ
 				if (!HitCheck_Capsule_Triangle(colData->m_nextEndPos.CastVECTOR(), collider->m_nextPos.CastVECTOR(), colData->m_radius,
 					m_pPoly->Position[0], m_pPoly->Position[1], m_pPoly->Position[2]))continue;
@@ -533,10 +523,10 @@ void Physics::FixPositionWithWall(std::shared_ptr<Collidable> collider)
 		{
 			auto colData = std::dynamic_pointer_cast<SphereColliderData>(collider->m_pColData);
 			//壁ポリゴンの数だけ繰り返し
-			for (int i = 0; i < m_wallNum; i++)
+			for (int i = 0; i < collider->m_wallNum; i++)
 			{
 				//i番目の壁ポリゴンのアドレスを壁ポリゴンポインタ配列から取得
-				m_pPoly = m_pWallPoly[i];
+				m_pPoly = collider->m_pWallPoly[i];
 				//ポリゴンと当たり判定が当たっていなければ次のカウントへ
 				if (!HitCheck_Sphere_Triangle(collider->m_nextPos.CastVECTOR(), colData->m_radius,
 					m_pPoly->Position[0], m_pPoly->Position[1], m_pPoly->Position[2]))continue;
@@ -564,10 +554,10 @@ void Physics::FixPositionWithWall(std::shared_ptr<Collidable> collider)
 		//移動していない場合の処理
 
 		//壁ポリゴンの数だけ繰り返し
-		for (int i = 0; i < m_wallNum; i++)
+		for (int i = 0; i < collider->m_wallNum; i++)
 		{
 			//i番目の壁ポリゴンのアドレスを壁ポリゴン配列から取得
-			m_pPoly = m_pWallPoly[i];
+			m_pPoly = collider->m_pWallPoly[i];
 
 			//ポリゴンに当たっていたら当たったフラグを立てたうえでループから抜ける
 
@@ -621,10 +611,10 @@ void Physics::FixPositionWithWallInternal(std::shared_ptr<Collidable> collider)
 			auto colData = std::dynamic_pointer_cast<CapsuleColliderData>(collider->m_pColData);
 
 			//壁ポリゴンの数だけ繰り返し
-			for (int j = 0; j < m_wallNum; j++)
+			for (int j = 0; j < collider->m_wallNum; j++)
 			{
 				//j番目の壁ポリゴンのアドレスを壁ポリゴンポインタ配列から取得
-				m_pPoly = m_pWallPoly[j];
+				m_pPoly = collider->m_pWallPoly[j];
 
 
 				//当たり判定と当たっているかを判定
@@ -635,10 +625,10 @@ void Physics::FixPositionWithWallInternal(std::shared_ptr<Collidable> collider)
 				collider->m_nextPos = collider->m_nextPos + (MyEngine::Vector3(m_pPoly->Normal) * kColHitSlideLength);
 
 				//移動したうえで壁ポリゴンと接触しているかどうかを判定
-				for (int k = 0; k < m_wallNum; k++)
+				for (int k = 0; k < collider->m_wallNum; k++)
 				{
 					//当たっていたらループを抜ける
-					m_pPoly = m_pWallPoly[k];
+					m_pPoly = collider->m_pWallPoly[k];
 					if (HitCheck_Capsule_Triangle(collider->m_nextPos.CastVECTOR(), (collider->m_nextPos + colData->m_lange).CastVECTOR(), colData->m_radius,
 						m_pPoly->Position[0], m_pPoly->Position[1], m_pPoly->Position[2]))
 					{
@@ -652,10 +642,10 @@ void Physics::FixPositionWithWallInternal(std::shared_ptr<Collidable> collider)
 		{
 			auto colData = std::dynamic_pointer_cast<SphereColliderData>(collider->m_pColData);
 			//壁ポリゴンの数だけ繰り返し
-			for (int j = 0; j < m_wallNum; j++)
+			for (int j = 0; j < collider->m_wallNum; j++)
 			{
 				//j番目の壁ポリゴンのアドレスを壁ポリゴンポインタ配列から取得
-				m_pPoly = m_pWallPoly[j];
+				m_pPoly = collider->m_pWallPoly[j];
 
 
 				//当たり判定と当たっているかを判定
@@ -666,10 +656,10 @@ void Physics::FixPositionWithWallInternal(std::shared_ptr<Collidable> collider)
 				collider->m_nextPos = collider->m_nextPos + (MyEngine::Vector3(m_pPoly->Normal) * kColHitSlideLength);
 
 				//移動したうえで壁ポリゴンと接触しているかどうかを判定
-				for (int k = 0; k < m_wallNum; k++)
+				for (int k = 0; k < collider->m_wallNum; k++)
 				{
 					//当たっていたらループを抜ける
-					m_pPoly = m_pWallPoly[k];
+					m_pPoly = collider->m_pWallPoly[k];
 					if (HitCheck_Sphere_Triangle(collider->m_nextPos.CastVECTOR(), colData->m_radius,
 						m_pPoly->Position[0], m_pPoly->Position[1], m_pPoly->Position[2]))
 					{
@@ -689,13 +679,20 @@ void Physics::FixPositionWithWallInternal(std::shared_ptr<Collidable> collider)
 
 void Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable> collider)
 {
-	//床ポリゴンがない場合は何もしない
-	if (m_floorNum == 0)return;
+	//床ポリゴンがない場合
+	if (collider->m_floorNum == 0)
+	{
+		//床とぶつかっているかどうかをfalseにしておく
+		collider->m_pColData->SetIsGround(false);
+		return;
+	}
 
 	//床ポリゴンとの当たり判定処理
 
 	//当たったかどうかのフラグ初期化
 	bool isHitFlag = false;
+
+	
 
 	//物体が上昇していたら
 	if ((collider->m_nextPos.y - collider->m_rigidbody.GetPos().y) > 0)
@@ -712,10 +709,10 @@ void Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable> collider)
 			auto capsule = std::dynamic_pointer_cast<CapsuleColliderData>(collider->m_pColData);
 
 			//床のポリゴンの数だけ繰り返し
-			for (int i = 0; i < m_floorNum; i++)
+			for (int i = 0; i < collider->m_floorNum; i++)
 			{
 				//i番目の床ポリゴンのアドレスを床ポリゴンポインタ配列から取得
-				m_pPoly = m_pFloorPoly[i];
+				m_pPoly = collider->m_pFloorPoly[i];
 
 				//始点から終点までの間
 				m_lineRes = HitCheck_Line_Triangle(collider->m_nextPos.CastVECTOR(), (collider->m_nextPos + capsule->m_lange).CastVECTOR(),
@@ -741,10 +738,10 @@ void Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable> collider)
 			auto sphere = std::dynamic_pointer_cast<SphereColliderData>(collider->m_pColData);
 
 			//床のポリゴンの数だけ繰り返し
-			for (int i = 0; i < m_floorNum; i++)
+			for (int i = 0; i < collider->m_floorNum; i++)
 			{
 				//i番目の床ポリゴンのアドレスを床ポリゴンポインタ配列から取得
-				m_pPoly = m_pFloorPoly[i];
+				m_pPoly = collider->m_pFloorPoly[i];
 
 				VECTOR nextPos = collider->m_nextPos.CastVECTOR();
 
@@ -802,10 +799,10 @@ void Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable> collider)
 			auto capsule = std::dynamic_pointer_cast<CapsuleColliderData>(collider->m_pColData);
 
 			//床のポリゴンの数だけ繰り返し
-			for (int i = 0; i < m_floorNum; i++)
+			for (int i = 0; i < collider->m_floorNum; i++)
 			{
 				//i番目の床ポリゴンのアドレスを床ポリゴンポインタ配列から取得
-				m_pPoly = m_pFloorPoly[i];
+				m_pPoly = collider->m_pFloorPoly[i];
 
 				//始点から終点までの間
 				m_lineRes = HitCheck_Line_Triangle((collider->m_nextPos + capsule->m_lange).CastVECTOR(), collider->m_nextPos.CastVECTOR(),
@@ -830,20 +827,20 @@ void Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable> collider)
 			auto sphere = std::dynamic_pointer_cast<SphereColliderData>(collider->m_pColData);
 
 			//床のポリゴンの数だけ繰り返し
-			for (int i = 0; i < m_floorNum; i++)
+			for (int i = 0; i < collider->m_floorNum; i++)
 			{
 				//i番目の床ポリゴンのアドレスを床ポリゴンポインタ配列から取得
-				m_pPoly = m_pFloorPoly[i];
+				m_pPoly = collider->m_pFloorPoly[i];
 
 				VECTOR nextPos = collider->m_nextPos.CastVECTOR();
 
 				//点との当たり判定
-				m_lineRes = HitCheck_Line_Triangle((collider->m_nextPos + MyEngine::Vector3(0.0f,sphere->m_radius,0.0f)).CastVECTOR(), (collider->m_nextPos + MyEngine::Vector3(0.0f,-sphere->m_radius, 0.0f)).CastVECTOR(),
+				m_lineRes = HitCheck_Line_Triangle((collider->m_nextPos + MyEngine::Vector3(0.0f, sphere->m_radius, 0.0f)).CastVECTOR(), (collider->m_nextPos + MyEngine::Vector3(0.0f, -sphere->m_radius, 0.0f)).CastVECTOR(),
 					m_pPoly->Position[0], m_pPoly->Position[1], m_pPoly->Position[2]);
 
 				//接触していなければ何もしない
 				if (!m_lineRes.HitFlag)continue;
-				
+
 				//すでに当たったポリゴンがあり、かつ今まで検出した床ポリゴンより低い場合は何もしない
 				if (collider->m_isHitPoly && polyMaxPosY > m_lineRes.Position.y) continue;
 
@@ -859,14 +856,23 @@ void Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable> collider)
 		//床ポリゴンの当たり判定かつ、yベクトルが0よりも小さいかどうかで処理を分岐
 		if (collider->m_isHitPoly)
 		{
-			//接触したポリゴンで一番高いY座標を当たり判定のY座標にする
-			collider->m_nextPos.y = polyMaxPosY;
 			if (collider->m_pColData->GetKind() == ColliderData::Kind::kCapsule)
 			{
 				auto capsule = std::dynamic_pointer_cast<CapsuleColliderData>(collider->m_pColData);
+				
+				//接触したポリゴンで一番高いY座標を当たり判定のY座標にする
+				collider->m_nextPos.y = polyMaxPosY + capsule->m_radius;
 
-				capsule->m_nextEndPos.y = polyMaxPosY + capsule->m_lange.y;
+				capsule->m_nextEndPos.y = polyMaxPosY + capsule->m_radius +  capsule->m_lange.y;
 			}
+			else if (collider->m_pColData->GetKind() == ColliderData::Kind::kSphere)
+			{
+				auto sphere = std::dynamic_pointer_cast<SphereColliderData>(collider->m_pColData);
+
+				collider->m_nextPos.y = polyMaxPosY + sphere->m_radius;
+			}
+
+			collider->m_pColData->SetIsGround(true);
 		}
 	}
 }
