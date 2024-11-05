@@ -5,7 +5,7 @@
 #include <memory>
 namespace
 {
-	constexpr int kMaxColHitPolyNum = 2000;
+	constexpr int kMaxColHitPolyNum = 200;
 }
 
 class Physics;
