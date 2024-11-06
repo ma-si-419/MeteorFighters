@@ -1,6 +1,7 @@
 #include "PlayerStateJump.h"
 #include "PlayerStateIdle.h"
 #include "PlayerStateMove.h"
+#include "PlayerStateDash.h"
 #include "PlayerStateNormalAttack.h"
 #include "Player.h"
 #include "CapsuleColliderData.h"
@@ -109,6 +110,43 @@ void PlayerStateJump::Update()
 			//何の攻撃を行うかをAttackStateに渡す
 			next->SetAttack(m_attackKey, isCharge);
 			//StateをAttackに変更する
+			ChangeState(next);
+			return;
+		}
+	}
+
+	//ダッシュボタンが押されたら
+	if (input.IsTrigger("A"))
+	{
+
+		MyEngine::Vector3 leftStickDir(input.GetStickInfo().leftStickX,0, -input.GetStickInfo().leftStickY);
+
+		leftStickDir = leftStickDir.Normalize();
+
+		//敵との距離からダッシュかステップか判断する
+		//(ステップかダッシュかの判定はDashStateの中でも行う)
+		//(ここではMPを消費するかしないか、DashStateにはいるかどうかを判断する)
+		if ((GetEnemyPos() - m_pPlayer->GetPos()).Length() > GameSceneConstant::kNearLange)
+		{
+			//遠かった場合Mpを消費してダッシュする
+			if (m_pPlayer->SubMp(GameSceneConstant::kDashCost))
+			{
+				auto next = std::make_shared<PlayerStateDash>(m_pPlayer);
+
+				next->SetMoveDir(leftStickDir.Normalize());
+
+				ChangeState(next);
+				return;
+			}
+		}
+		//敵との距離が近い場合
+		else
+		{
+			//MPを消費せずにステップをする
+			auto next = std::make_shared<PlayerStateDash>(m_pPlayer);
+
+			next->SetMoveDir(leftStickDir.Normalize());
+
 			ChangeState(next);
 			return;
 		}

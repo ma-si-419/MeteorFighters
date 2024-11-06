@@ -81,7 +81,9 @@ void Enemy::Update()
 
 void Enemy::Draw()
 {
+	
 	MV1DrawModel(m_modelHandle);
+
 #ifdef _DEBUG
 
 	DrawFormatString(0, 144, GetColor(255, 255, 255), "%.0f", m_nowHp);

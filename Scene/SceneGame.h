@@ -27,5 +27,10 @@ public:
 private:
 	std::vector<std::shared_ptr<Actor>> m_pActors;
 	std::shared_ptr<GameManager> m_pGameManager;
+
+	int m_gameManagerScreenHandle;
+
+	int m_depthScreenHandle;
+
 };
 

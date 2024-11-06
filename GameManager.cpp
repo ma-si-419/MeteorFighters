@@ -4,15 +4,22 @@
 #include "Attack.h"
 #include "LoadCsv.h"
 #include "Stage.h"
+#include "GameCamera.h"
 
-GameManager::GameManager()
+GameManager::GameManager(std::shared_ptr<GameCamera> camera)
 {
 	m_pStage = std::make_shared<Stage>();
 	m_pStage->Init();
+	m_pCamera = camera;
 }
 
 GameManager::~GameManager()
 {
+}
+
+void GameManager::Init()
+{
+	m_pCamera->Init(GetPlayerPos());
 }
 
 void GameManager::Update()
@@ -29,6 +36,21 @@ void GameManager::Update()
 
 #endif // _DEBUG
 
+	//カメラの更新
+	MyEngine::Vector3 cameraTargetPos = GetEnemyPos();
+
+	cameraTargetPos.y = GetPlayerPos().y;
+
+	m_pCamera->SetPlayerPosAndTarget(GetPlayerPos(), cameraTargetPos);
+
+	//プレイヤーからエネミーへのベクトル
+	MyEngine::Vector3 playerToTarget = (GetEnemyPos() - GetPlayerPos()).Normalize();
+
+	//カメラの正面方向を設定
+	m_pCamera->SetPlayerFrontPos(GetPlayerPos() + playerToTarget);
+
+	//カメラの更新
+	m_pCamera->Update();
 
 	for (auto& item : m_pAttacks)
 	{

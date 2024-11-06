@@ -176,6 +176,7 @@
     <ClCompile Include="Actor\Character\Player\PlayerStateIdle.cpp" />
     <ClCompile Include="Actor\Character\Player\PlayerStateMove.cpp" />
     <ClCompile Include="Actor\Character\Player\PlayerStateRush.cpp" />
+    <ClCompile Include="PlayerStateDash.cpp" />
     <ClCompile Include="PlayerStateJump.cpp" />
     <ClCompile Include="PlayerStateSpecialAttack.cpp" />
     <ClCompile Include="Scene\SceneBase.cpp" />
@@ -228,6 +229,7 @@
     <ClInclude Include="Actor\Character\Player\PlayerStateIdle.h" />
     <ClInclude Include="Actor\Character\Player\PlayerStateMove.h" />
     <ClInclude Include="Actor\Character\Player\PlayerStateRush.h" />
+    <ClInclude Include="PlayerStateDash.h" />
     <ClInclude Include="PlayerStateJump.h" />
     <ClInclude Include="PlayerStateSpecialAttack.h" />
     <ClInclude Include="resource.h" />

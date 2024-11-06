@@ -2,6 +2,7 @@
 #include "PlayerStateNormalAttack.h"
 #include "PlayerStateMove.h"
 #include "PlayerStateJump.h"
+#include "PlayerStateDash.h"
 #include "PlayerStateGuard.h"
 #include "DxLib.h"
 #include "Input.h"
@@ -77,6 +78,39 @@ void PlayerStateIdle::Update()
 		ChangeState(next);
 		return;
 	}
+
+	//ダッシュボタンが押されたら
+	if (input.IsTrigger("A"))
+	{
+		//敵との距離からダッシュかステップか判断する
+		//(ステップかダッシュかの判定はDashStateの中でも行う)
+		//(ここではMPを消費するかしないか、DashStateにはいるかどうかを判断する)
+		if ((GetEnemyPos() - m_pPlayer->GetPos()).Length() > GameSceneConstant::kNearLange)
+		{
+			//遠かった場合Mpを消費してダッシュする
+			if (m_pPlayer->SubMp(GameSceneConstant::kDashCost))
+			{
+				auto next = std::make_shared<PlayerStateDash>(m_pPlayer);
+
+				next->SetMoveDir(MyEngine::Vector3(0.0f,0.0f,1.0f));
+
+				ChangeState(next);
+				return;
+			}
+		}
+		//敵との距離が近い場合
+		else
+		{
+			//MPを消費せずにステップをする
+			auto next = std::make_shared<PlayerStateDash>(m_pPlayer);
+
+			next->SetMoveDir(MyEngine::Vector3(0.0f, 0.0f, 1.0f));
+
+			ChangeState(next);
+			return;
+		}
+	}
+
 
 	//地上にいるときに
 	if (m_pPlayer->IsGround())

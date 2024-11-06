@@ -5,6 +5,8 @@
 #include <cassert>
 #include "GameManager.h"
 #include "LocalPos.h"
+#include "SceneGame.h"
+#include "Game.h"
 
 namespace
 {
@@ -107,6 +109,20 @@ MyEngine::Vector3 CharacterBase::GetPos()
 MyEngine::Vector3 CharacterBase::GetVelo()
 {
 	return m_rigidbody.GetVelo();
+}
+
+bool CharacterBase::SubMp(int subMp)
+{
+	if (m_nowMp > subMp)
+	{
+		m_nowMp -= subMp;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	return false;
 }
 
 void CharacterBase::ChangeAnim(AnimKind animKind, bool loop)
@@ -327,6 +343,9 @@ void CharacterBase::SetFrontPos(MyEngine::Vector3 frontPos)
 	//ローカル座標の前方向を修正
 	m_targetLocalPos.SetFrontPos(frontPos);
 
+	//前方向を保存する
+	m_lookPos = frontPos;
+
 	//モデルの前方向を修正する
 	MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - frontPos).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
 }
@@ -385,9 +404,11 @@ void CharacterBase::LookTarget(bool isPlayer)
 	if (isPlayer)
 	{
 		MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - m_pGameManager->GetEnemyPos()).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
+		m_lookPos = m_pGameManager->GetEnemyPos();
 	}
 	else
 	{
 		MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - m_pGameManager->GetPlayerPos()).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
+		m_lookPos = m_pGameManager->GetPlayerPos();
 	}
 }

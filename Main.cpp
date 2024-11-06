@@ -91,6 +91,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		}
 
+		DrawFormatString(1400,0,GetColor(255,255,255),"FPS:%0.2f",GetFPS());
+
 #endif // _DEBUG
 		sceneManager.Draw();
 

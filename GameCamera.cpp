@@ -9,13 +9,14 @@ namespace
 }
 
 GameCamera::GameCamera():
-	m_cameraHandle(-1)
+	m_lightHandle(-1)
 {
+	m_lightHandle = CreateDirLightHandle(VGet(0, 0, 0));
 }
 
 GameCamera::~GameCamera()
 {
-
+	DeleteLightHandle(m_lightHandle);
 }
 
 void GameCamera::Init(MyEngine::Vector3 centerPos)
@@ -23,9 +24,6 @@ void GameCamera::Init(MyEngine::Vector3 centerPos)
 	m_localPos.SetCenterPos(centerPos);
 	m_localPos.SetLocalPos(kPlayerToCameraInitVec);
 	SetCameraNearFar(kCameraNear, kCameraFar);
-
-	m_cameraHandle = CreateDirLightHandle(VGet(0,0,0));
-
 }
 
 void GameCamera::Update()
@@ -33,7 +31,7 @@ void GameCamera::Update()
 	MyEngine::Vector3 cameraPos = m_localPos.GetWorldPos();
 	SetCameraPositionAndTarget_UpVecY(cameraPos.CastVECTOR(),m_targetPos.CastVECTOR());
 
-	SetLightDirectionHandle(m_cameraHandle,(cameraPos - m_targetPos).Normalize().CastVECTOR());
+	SetLightDirectionHandle(m_lightHandle,(cameraPos - m_targetPos).Normalize().CastVECTOR());
 }
 
 void GameCamera::SetPlayerPosAndTarget(MyEngine::Vector3 player, MyEngine::Vector3 target)
@@ -45,4 +43,14 @@ void GameCamera::SetPlayerPosAndTarget(MyEngine::Vector3 player, MyEngine::Vecto
 void GameCamera::SetPlayerFrontPos(MyEngine::Vector3 pos)
 {
 	m_localPos.SetFrontPos(pos);
+}
+
+void GameCamera::SetCamera()
+{
+	SetCameraNearFar(kCameraNear, kCameraFar);
+
+	MyEngine::Vector3 cameraPos = m_localPos.GetWorldPos();
+	SetCameraPositionAndTarget_UpVecY(cameraPos.CastVECTOR(), m_targetPos.CastVECTOR());
+
+	SetLightDirectionHandle(m_lightHandle, (cameraPos - m_targetPos).Normalize().CastVECTOR());
 }

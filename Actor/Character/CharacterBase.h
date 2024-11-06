@@ -27,6 +27,9 @@ public:
 		kKindNum
 	};
 
+	/// <summary>
+	/// 自分の状態
+	/// </summary>
 	enum class HitReactionKind
 	{
 		kNone,//なにもされていない状態
@@ -45,7 +48,7 @@ public:
 	enum class AnimKind
 	{
 		kIdle,
-		kAssault,
+		kSkyDash,
 		kGuard,
 		kDodge,
 		kStartCharge,
@@ -85,7 +88,8 @@ public:
 		kRun,
 		kJumpStart,
 		kJumping,
-		kJumpEnd
+		kJumpEnd,
+		kGroundDash
 	};
 
 	enum class CharacterKind
@@ -227,6 +231,13 @@ public:
 	/// </summary>
 	/// <param name="subHp">減少量</param>
 	void SubHp(int subHp) { m_nowHp -= subHp; }
+
+	/// <summary>
+	/// 気力を減らす
+	/// </summary>
+	/// <param name="subMp">減少量</param>
+	/// <returns>足りなければfalse</returns>
+	bool SubMp(int subMp);
 
 	/// <summary>
 	/// キャラクターの攻撃力を取得する
@@ -377,6 +388,11 @@ public:
 	/// <param name="isPlayer">プレイヤーならtrue</param>
 	void LookTarget(bool isPlayer);
 
+	/// <summary>
+	/// 透かして描画したいときはこれをtrueにする
+	/// </summary>
+	/// <param name="flag">ぼかしたいときはtrue</param>
+	void SetBlur(bool flag) { m_isBlur = flag; }
 protected:
 
 	/// <summary>
@@ -415,6 +431,10 @@ protected:
 	float m_nowHp;
 	//現在の気力
 	float m_nowMp;
+	//ぼかして描画するかどうか
+	bool m_isBlur;
+	//今向いている方向座標
+	MyEngine::Vector3 m_lookPos;
 	//現在のやられ状態
 	HitReactionKind m_nowHitReaction;
 	//すべてのキャラで共通で使う通常攻撃の情報
@@ -445,5 +465,4 @@ protected:
 	int m_lastAnim;
 	//アニメーションブレンドが終わったかどうか
 	bool m_isEndAnimationBlend;
-
 };

@@ -40,6 +40,12 @@ protected:
 	void SetPlayerPos(MyEngine::Vector3 pos);
 
 	/// <summary>
+	/// プレイヤーをぼかして表示する
+	/// </summary>
+	/// <param name="flag">ぼかすならtrue</param>
+	void SetPlayerBlur(bool flag);
+
+	/// <summary>
 	/// アニメーション番号を取得する
 	/// </summary>
 	/// <param name="animName">アニメーションの名前</param>

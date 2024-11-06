@@ -7,15 +7,20 @@
 
 class Player;
 class Enemy;
+class GameCamera;
 class Attack;
 class Stage;
 class GameManager : public std::enable_shared_from_this<GameManager>
 {
 public:
 
-	GameManager();
+	GameManager(std::shared_ptr<GameCamera> camera);
 	~GameManager();
 
+	/// <summary>
+	/// ゲームマネージャーの初期化
+	/// </summary>
+	void Init();
 
 	/// <summary>
 	/// ゲームマネージャーの更新
@@ -103,5 +108,7 @@ private:
 	std::vector<std::shared_ptr<Attack>> m_pAttacks;
 	//ステージクラス
 	std::shared_ptr<Stage> m_pStage;
+	//カメラクラス
+	std::shared_ptr<GameCamera> m_pCamera;
 	
 };

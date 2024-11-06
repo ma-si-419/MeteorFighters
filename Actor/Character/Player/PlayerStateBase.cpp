@@ -32,6 +32,11 @@ void PlayerStateBase::SetPlayerPos(MyEngine::Vector3 pos)
 	m_pPlayer->m_rigidbody.SetPos(pos);
 }
 
+void PlayerStateBase::SetPlayerBlur(bool flag)
+{
+	m_pPlayer->SetBlur(flag);
+}
+
 int PlayerStateBase::GetAttackAnimKind(std::string animName)
 {
 	return static_cast<int>(m_pPlayer->GetAttackAnimKind(animName));

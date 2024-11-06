@@ -23,6 +23,10 @@ public:
 	/// <param name="pos">プレイヤーの前方向とする座標</param>
 	void SetPlayerFrontPos(MyEngine::Vector3 pos);
 
+	/// <summary>
+	/// スクリーンなどを変更した時にカメラの座標などを設定する
+	/// </summary>
+	void SetCamera();
 
 private:
 
@@ -30,6 +34,6 @@ private:
 
 	MyEngine::Vector3 m_targetPos;
 
-	int m_cameraHandle;
+	int m_lightHandle;
 };
 

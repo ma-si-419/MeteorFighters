@@ -1,7 +1,6 @@
 #pragma once
 #include "CharacterBase.h"
 class PlayerStateBase;
-class GameCamera;
 class Player : public CharacterBase
 {
 public:
@@ -16,8 +15,6 @@ public:
 	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
 
 private:
-
-	std::shared_ptr<GameCamera> m_camera;
 
 	friend PlayerStateBase;
 };

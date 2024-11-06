@@ -10,5 +10,6 @@ public:
 	virtual void Update() abstract;
 	virtual void Draw() abstract;
 
+private:
 };
 

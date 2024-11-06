@@ -1,6 +1,7 @@
 #include "PlayerStateMove.h"
 #include "PlayerStateIdle.h"
 #include "PlayerStateJump.h"
+#include "PlayerStateDash.h"
 #include "PlayerStateNormalAttack.h"
 #include "GameSceneConstant.h"
 #include "DxLib.h"
@@ -59,13 +60,25 @@ void PlayerStateMove::Update()
 		float vX = GetEnemyPos().x - m_pPlayer->GetPos().x;
 		float vZ = GetEnemyPos().z - m_pPlayer->GetPos().z;
 
-		float angle = std::atan2f(vX, vZ);
+		float yAngle = std::atan2f(vX, vZ);
 
-		MyEngine::Vector3 rotation(0.0f, angle, 0.0f);
+		MyEngine::Vector3 rotation;
+
+		rotation = MyEngine::Vector3(0.0f, yAngle, 0.0f);
 
 		MATRIX mat = rotation.GetRotationMat();
 
 		dir = dir.MatTransform(mat);
+
+		//空中にいて前入力されていたら
+		if (leftStickDir.Normalize().z > 0 && m_isFloat)
+		{
+			float frontRate = leftStickDir.Normalize().z;
+
+			MyEngine::Vector3 toTarget = (GetEnemyPos() - m_pPlayer->GetPos()).Normalize();
+
+			dir = (dir * (1.0 - frontRate)) + toTarget * frontRate;
+		}
 
 		//移動方向にスピードをかける
 		velo = dir * GetSpeed();
@@ -83,6 +96,39 @@ void PlayerStateMove::Update()
 
 		velo.y += m_gravityPower;
 	}
+
+	//ダッシュボタンが押されたら
+	if (input.IsTrigger("A"))
+	{
+		//敵との距離からダッシュかステップか判断する
+		//(ステップかダッシュかの判定はDashStateの中でも行う)
+		//(ここではMPを消費するかしないか、DashStateにはいるかどうかを判断する)
+		if ((GetEnemyPos() - m_pPlayer->GetPos()).Length() > GameSceneConstant::kNearLange)
+		{
+			//遠かった場合Mpを消費してダッシュする
+			if (m_pPlayer->SubMp(GameSceneConstant::kDashCost))
+			{
+				auto next = std::make_shared<PlayerStateDash>(m_pPlayer);
+
+				next->SetMoveDir(leftStickDir.Normalize());
+
+				ChangeState(next);
+				return;
+			}
+		}
+		//敵との距離が近い場合
+		else
+		{
+			//MPを消費せずにステップをする
+			auto next = std::make_shared<PlayerStateDash>(m_pPlayer);
+
+			next->SetMoveDir(leftStickDir.Normalize());
+
+			ChangeState(next);
+			return;
+		}
+	}
+
 
 	//地上で
 	if (m_pPlayer->IsGround())
@@ -156,6 +202,14 @@ void PlayerStateMove::Update()
 		else if (input.IsPushTrigger(true))
 		{
 			velo.y = -GetSpeed();
+
+			//プレイ中のアニメーションがジャンプ中でなければ
+			if (!(m_pPlayer->GetPlayAnimKind() == CharacterBase::AnimKind::kJumping))
+			{
+				//アニメーションを変更する
+				m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kJumping, true);
+			}
+
 		}
 
 		//前のフレームから空中にいれば
@@ -167,18 +221,9 @@ void PlayerStateMove::Update()
 			frontPos.y = m_pPlayer->GetPos().y;
 
 			m_pPlayer->SetFrontPos(frontPos);
-			//下降中で
-			if (velo.y < 0)
-			{
-				//プレイ中のアニメーションがジャンプ中でなければ
-				if (!(m_pPlayer->GetPlayAnimKind() == CharacterBase::AnimKind::kJumping))
-				{
-					//アニメーションを変更する
-					m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kJumping, true);
-				}
-			}
+
 			//上昇しているか上下移動をしていない場合
-			else if (velo.y >= 0)
+			if (velo.y >= 0)
 			{
 				//プレイ中のアニメーションが空中待機でなければ
 				if (!(m_pPlayer->GetPlayAnimKind() == CharacterBase::AnimKind::kSkyIdle))

@@ -14,5 +14,9 @@ namespace GameSceneConstant
 	constexpr float kMaxFallSpeed = -3.5f;
 	//チャージ攻撃と判定する長押しの時間
 	constexpr int kChargeAttackTime = 15;
+	//ダッシュに使う気力
+	constexpr int kDashCost = 20;
+	//敵との距離が近いと判定する距離
+	constexpr float kNearLange = 5.0f;
 
 }

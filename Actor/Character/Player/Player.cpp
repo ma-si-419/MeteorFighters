@@ -15,12 +15,20 @@ namespace
 	const int kWhite = GetColor(255, 255, 255);
 #endif // _DEBUG
 
+	constexpr int kOnBlurDrawModelNum = 2;
+
+	constexpr int kOnBlurShiftLange = 1;
+
+	constexpr float kCharacterHeight = 4.5f;
+
+	constexpr float kBlurLangeScale = 0.01f;
+
 	constexpr float kModelScale = 0.1f;
 
 }
 
 Player::Player(CharacterKind kind) :
-	CharacterBase(ObjectTag::kPlayer,kind)
+	CharacterBase(ObjectTag::kPlayer, kind)
 {
 }
 
@@ -35,10 +43,7 @@ void Player::Init()
 
 	MV1SetScale(m_modelHandle, VGet(kModelScale, kModelScale, kModelScale));
 
-	m_camera = std::make_shared<GameCamera>();
-
 	Collidable::Init();
-	m_camera->Init(m_rigidbody.GetPos());
 
 	m_nowHp = m_status.hp;
 	m_nowMp = m_status.startMp;
@@ -56,7 +61,7 @@ void Player::Update()
 	{
 		m_pState = m_pState->m_pNextState;
 	}
-	
+
 	//Stateの更新処理
 	m_pState->Update();
 
@@ -67,42 +72,40 @@ void Player::Update()
 	//描画座標の設定
 	SetDrawPos(m_rigidbody.GetPos());
 
-	MyEngine::Vector3 cameraTargetPos = m_pGameManager->GetEnemyPos();
-
-	cameraTargetPos.y = m_rigidbody.GetPos().y;
-
-	m_camera->SetPlayerPosAndTarget(m_rigidbody.GetPos(),cameraTargetPos);
-	
-	//プレイヤーからエネミーへのベクトル
-	MyEngine::Vector3 playerToTarget = (m_pGameManager->GetEnemyPos() - m_rigidbody.GetPos()).Normalize();
-
-#ifdef _DEBUG
-
-	LocalPos enemy;
-
-	enemy.SetCenterPos(m_rigidbody.GetPos());
-
-	enemy.SetFrontPos(m_rigidbody.GetPos() + playerToTarget);
-
-	enemy.SetLocalPos(enemy.ChangeWorldToLocal(m_pGameManager->GetEnemyPos()));
-
-	MyEngine::Vector3 pos = enemy.GetLocalPos();
-
-	DrawFormatString(0,112,GetColor(255,255,255),"プレイヤーから見たエネミー座標(X:%0.1f,Y:%0.1f,Z:%0.1f)",pos.x, pos.y, pos.z);
-
-#endif // _DEBUG
-
-
-
-	//カメラの正面方向を設定
-	m_camera->SetPlayerFrontPos(m_rigidbody.GetPos() + playerToTarget);
-
-	//カメラの更新
-	m_camera->Update();
 }
 void Player::Draw()
 {
-	MV1DrawModel(m_modelHandle);
+	//ぼかす時の処理
+	if (m_isBlur)
+	{
+		for (int i = 0; i < kOnBlurDrawModelNum; i++)
+		{
+			int handle = MV1DuplicateModel(m_modelHandle);
+			MyEngine::Vector3 drawPos = m_rigidbody.GetPos();
+			MV1SetPosition(handle,drawPos.CastVECTOR());
+			MV1SetRotationZYAxis(handle, (drawPos - m_lookPos).CastVECTOR(),VGet(0.0f,1.0f,0.0f),0.0f);
+			drawPos.y -= kCharacterHeight;
+			drawPos.x += static_cast<float>(GetRand(kOnBlurShiftLange) - static_cast<int>(kOnBlurShiftLange * 0.5f)) * kBlurLangeScale;
+			drawPos.y += static_cast<float>(GetRand(kOnBlurShiftLange) - static_cast<int>(kOnBlurShiftLange * 0.5f)) * kBlurLangeScale;
+			drawPos.z += static_cast<float>(GetRand(kOnBlurShiftLange) - static_cast<int>(kOnBlurShiftLange * 0.5f)) * kBlurLangeScale;
+			MV1SetPosition(handle,drawPos.CastVECTOR());
+			MV1SetScale(handle, VGet(kModelScale, kModelScale, kModelScale));
+			MV1AttachAnim(handle,MV1GetAttachAnim(m_modelHandle,m_lastAnim));
+			MV1AttachAnim(handle,MV1GetAttachAnim(m_modelHandle,m_attachAnim));
+			MV1SetAttachAnimTime(handle,m_lastAnim,m_lastPlayAnimTime);
+			MV1SetAttachAnimTime(handle,m_attachAnim,m_nowPlayAnimTime);
+			MV1SetAttachAnimBlendRate(handle,m_lastAnim,1.0 - m_animBlendRate);
+			MV1SetAttachAnimBlendRate(handle,m_attachAnim,m_animBlendRate);
+			MV1SetOpacityRate(handle,1.0 / kOnBlurDrawModelNum);
+			MV1DrawModel(handle);
+			MV1DeleteModel(handle);
+		}
+	}
+	//通常時の処理
+	else
+	{
+		MV1DrawModel(m_modelHandle);
+	}
 }
 
 void Player::OnCollide(std::shared_ptr<Collidable> collider)
