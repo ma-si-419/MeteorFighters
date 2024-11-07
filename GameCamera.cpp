@@ -10,13 +10,13 @@ namespace
 
 	constexpr float kCameraToPlayerLange = 50.0f;
 
-	constexpr float kMaxLocalPosX = 30;
-	constexpr float kMaxLocalPosY = 10;
-	constexpr float kMaxLocalPosZ = -35;
+	constexpr float kMaxLocalPosX = 35;//左幅(大きいほど左に広がる)
+	constexpr float kMaxLocalPosY = 12;//下幅(大きいほど下に広がる)
+	constexpr float kMaxLocalPosZ = -30;//手前幅(大きいほどプレイヤーが手前に来る)
 
-	constexpr float kMinLocalPosX = -30;
-	constexpr float kMinLocalPosY = -15;
-	constexpr float kMinLocalPosZ = -45;
+	constexpr float kMinLocalPosX = -35;//右幅(小さいほど右に広がる)
+	constexpr float kMinLocalPosY = -15;//上幅(小さいほど上に広がる)
+	constexpr float kMinLocalPosZ = -40;//奥幅(小さいほどプレイヤーが奥に行く)
 }
 
 GameCamera::GameCamera() :
