@@ -2,6 +2,7 @@
 #include "Actor.h"
 #include "LocalPos.h"
 #include <vector>
+#include <list>
 #include <string>
 #include <map>
 class SceneGame;
@@ -50,7 +51,10 @@ public:
 		kIdle,
 		kSkyDash,
 		kGuard,
-		kDodge,
+		kDodgeLeft,
+		kDodgeRight,
+		kDodgeBack,
+		kDodgeFront,
 		kStartCharge,
 		kInCharge,
 		kEndCharge,
@@ -195,6 +199,17 @@ public:
 		float radius = 0;
 		AttackKind attackKind = AttackKind::kPhysical;
 		AttackHitKind attackHitKind = AttackHitKind::kLow;
+	};
+
+	/// <summary>
+	/// 残像の情報
+	/// </summary>
+	struct AfterImage
+	{
+		int handle = -1;
+		float nowOpacityRate = 1.0f;
+		float maxOpacityRate = 1.0f;
+		float DeleteSpeed = 0.0f;
 	};
 
 public:
@@ -389,10 +404,15 @@ public:
 	void LookTarget(bool isPlayer);
 
 	/// <summary>
-	/// 透かして描画したいときはこれをtrueにする
+	/// 残像を作成する
 	/// </summary>
-	/// <param name="flag">ぼかしたいときはtrue</param>
-	void SetBlur(bool flag) { m_isBlur = flag; }
+	void CreateAfterImage();
+
+	/// <summary>
+	/// 情報を設定して残像を作成する
+	/// </summary>
+	/// <param name="afterImageInfo">ハンドル以外の残像の情報</param>
+	void CreateAfterImage(AfterImage afterImageInfo);
 protected:
 
 	/// <summary>
@@ -414,6 +434,7 @@ protected:
 		kAnimationName//アニメーションの名前
 	};
 
+	
 
 	//モデルハンドル
 	int m_modelHandle;
@@ -423,6 +444,8 @@ protected:
 	std::shared_ptr<GameManager> m_pGameManager;
 	//State
 	std::shared_ptr<CharacterStateBase> m_pState;
+	//作成した残像
+	std::list<AfterImage> m_afterImageList;
 	//使うキャラクターの種類
 	CharacterKind m_characterKind;
 	//自身のステータス
@@ -431,8 +454,6 @@ protected:
 	float m_nowHp;
 	//現在の気力
 	float m_nowMp;
-	//ぼかして描画するかどうか
-	bool m_isBlur;
 	//今向いている方向座標
 	MyEngine::Vector3 m_lookPos;
 	//現在のやられ状態

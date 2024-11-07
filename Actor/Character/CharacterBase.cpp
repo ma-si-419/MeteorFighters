@@ -7,6 +7,7 @@
 #include "LocalPos.h"
 #include "SceneGame.h"
 #include "Game.h"
+#include "GameSceneConstant.h"
 
 namespace
 {
@@ -203,7 +204,7 @@ void CharacterBase::PlayAnim()
 		m_isEndAnimationBlend = true;
 		//ひとつ前のアニメーションを消す
 		m_lastPlayAnimTime = 0;
-		MV1DetachAnim(m_modelHandle,m_lastAnim);
+		MV1DetachAnim(m_modelHandle, m_lastAnim);
 	}
 
 	//アニメーションのブレンド
@@ -376,7 +377,7 @@ bool CharacterBase::IsFrontTarget(bool isPlayer)
 	{
 		return false;
 	}
-	
+
 	//警告けしのため
 	return true;
 
@@ -386,11 +387,11 @@ void CharacterBase::SetDrawPos(MyEngine::Vector3 pos)
 {
 	pos.y -= kCharacterHeight;
 
-	MV1SetPosition(m_modelHandle,pos.CastVECTOR());
+	MV1SetPosition(m_modelHandle, pos.CastVECTOR());
 }
 
 CharacterBase::AnimKind CharacterBase::GetAttackAnimKind(std::string animName)
-{	
+{
 	return kAttackAnimKindMap.at(animName);
 }
 
@@ -411,4 +412,50 @@ void CharacterBase::LookTarget(bool isPlayer)
 		MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - m_pGameManager->GetPlayerPos()).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
 		m_lookPos = m_pGameManager->GetPlayerPos();
 	}
+}
+
+void CharacterBase::CreateAfterImage()
+{
+	AfterImage data;
+
+	data.DeleteSpeed = GameSceneConstant::kAfterImageDeleteSpeed;
+
+	data.nowOpacityRate = GameSceneConstant::kAfterImageInitOpacityRate;
+
+	data.maxOpacityRate = GameSceneConstant::kAfterImageMaxOpacityRate;
+
+	CreateAfterImage(data);
+}
+
+void CharacterBase::CreateAfterImage(AfterImage afterImageInfo)
+{
+	CharacterBase::AfterImage ans;
+
+	int handle = MV1DuplicateModel(m_modelHandle);
+	MyEngine::Vector3 drawPos = MV1GetPosition(m_modelHandle);
+	MV1SetScale(handle, VGet(GameSceneConstant::kModelScale, GameSceneConstant::kModelScale, GameSceneConstant::kModelScale));
+	MV1SetPosition(handle, drawPos.CastVECTOR());
+	MV1SetRotationZYAxis(handle, (m_rigidbody.GetPos() - m_lookPos).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
+
+	//アニメーションブレンドが終わっていなければ
+	if (!m_isEndAnimationBlend)
+	{
+		MV1AttachAnim(handle, MV1GetAttachAnim(m_modelHandle, m_lastAnim));
+		MV1SetAttachAnimTime(handle, m_lastAnim, m_lastPlayAnimTime);
+		MV1SetAttachAnimBlendRate(handle, m_lastAnim, 1.0 - m_animBlendRate);
+	}
+
+	int anim = MV1AttachAnim(handle, MV1GetAttachAnim(m_modelHandle, m_attachAnim));
+	MV1SetAttachAnimTime(handle, anim, m_nowPlayAnimTime);
+	MV1SetAttachAnimBlendRate(handle, anim, m_animBlendRate);
+
+	ans.handle = handle;
+
+	ans.nowOpacityRate = afterImageInfo.nowOpacityRate;
+
+	ans.maxOpacityRate = afterImageInfo.maxOpacityRate;
+
+	ans.DeleteSpeed = afterImageInfo.DeleteSpeed;
+
+	m_afterImageList.push_back(ans);
 }

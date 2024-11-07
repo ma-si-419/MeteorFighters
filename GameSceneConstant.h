@@ -17,6 +17,15 @@ namespace GameSceneConstant
 	//ダッシュに使う気力
 	constexpr int kDashCost = 20;
 	//敵との距離が近いと判定する距離
-	constexpr float kNearLange = 5.0f;
-
+	constexpr float kNearLange = 75.0f;
+	//モデルの大きさ
+	constexpr float kModelScale = 0.1f;
+	//残像の初期透明度
+	constexpr float kAfterImageInitOpacityRate = 3.0f;
+	//残像の一番濃い透明度
+	constexpr float kAfterImageMaxOpacityRate = 0.65f;
+	//残像を作成する感覚
+	constexpr int kAfterImageCreateTime = 6;
+	//残像を消す速さ
+	constexpr float kAfterImageDeleteSpeed = kAfterImageInitOpacityRate / 10;
 }

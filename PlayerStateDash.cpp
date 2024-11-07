@@ -1,6 +1,7 @@
 #include "PlayerStateDash.h"
 #include "PlayerStateIdle.h"
 #include "Player.h"
+#include "GameSceneConstant.h"
 #include <cmath>
 
 namespace
@@ -9,14 +10,19 @@ namespace
 
 	constexpr float kDashSpeed = 4.0f;
 
+	constexpr float kDodgeSpeed = 1.5f;
+
 	constexpr int kDashTime = 15;
+
+	constexpr int kDodgeTime = 30;
 
 	constexpr float kAnimationBlendSpeed = 0.12f;
 }
 
 PlayerStateDash::PlayerStateDash(std::shared_ptr<Player> player) :
 	PlayerStateBase(player),
-	m_moveDir(kDefaultMoveDir)
+	m_moveDir(kDefaultMoveDir),
+	m_isDodge(false)
 {
 }
 
@@ -31,14 +37,42 @@ void PlayerStateDash::Enter()
 	m_kind = GetKind();
 	if (m_pPlayer->IsGround())
 	{
-		m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kGroundDash, true,kAnimationBlendSpeed);
+		m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kGroundDash, true, kAnimationBlendSpeed);
 	}
 	else
 	{
-		m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kSkyDash, true,kAnimationBlendSpeed);
+		m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kSkyDash, true, kAnimationBlendSpeed);
 	}
 
-	SetPlayerBlur(true);
+	//敵の距離が近ければ
+	if ((GetEnemyPos() - m_pPlayer->GetPos()).Length() < GameSceneConstant::kNearLange)
+	{
+		//回避行動をする
+		m_isDodge = true;
+
+		//向きによってアニメーションを変える
+		//回避の場合は移動方向を前後左右の四通りに限定する(斜めをなくす)
+		if (m_moveDir.z >= 0.5f)
+		{
+			m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kDodgeFront, false, kAnimationBlendSpeed);
+			m_moveDir = MyEngine::Vector3(0.0f, 0.0f, 1.0f);
+		}
+		else if (m_moveDir.z < -0.5f)
+		{
+			m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kDodgeBack, false, kAnimationBlendSpeed);
+			m_moveDir = MyEngine::Vector3(0.0f, 0.0f, -1.0f);
+		}
+		else if (m_moveDir.x >= 0.5f)
+		{
+			m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kDodgeRight, false, kAnimationBlendSpeed);
+			m_moveDir = MyEngine::Vector3(1.0f, 0.0f, 0.0f);
+		}
+		else
+		{
+			m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kDodgeLeft, false, kAnimationBlendSpeed);
+			m_moveDir = MyEngine::Vector3(-1.0f, 0.0f, 0.0f);
+		}
+	}
 
 }
 
@@ -56,6 +90,7 @@ void PlayerStateDash::Update()
 
 	MATRIX mat = rotation.GetRotationMat();
 
+
 	MyEngine::Vector3 dir = m_moveDir.MatTransform(mat);
 
 	//空中にいて前入力されていたら
@@ -68,27 +103,65 @@ void PlayerStateDash::Update()
 		dir = (dir * (1.0 - frontRate)) + toTarget * frontRate;
 	}
 
-	MyEngine::Vector3 velo = dir * kDashSpeed;
+	MyEngine::Vector3 velo;
+
+	if (m_isDodge)
+	{
+		velo = dir * kDodgeSpeed;
+	}
+	else
+	{
+		velo = dir * kDashSpeed;
+	}
 
 	//移動方向にスピードをかける
 	SetPlayerVelo(velo);
 
-	//移動方向を向く
-	m_pPlayer->SetFrontPos(m_pPlayer->GetPos() + velo);
-
-	//一定時間移動したらアイドルStateに戻る
-	if (m_time > kDashTime)
+	if (m_isDodge)
 	{
-		auto next = std::make_shared<PlayerStateIdle>(m_pPlayer);
+		//回避なら敵の方を向く
+		m_pPlayer->LookTarget(true);
+	}
+	else
+	{
+		//ダッシュなら移動方向を向く
+		m_pPlayer->SetFrontPos(m_pPlayer->GetPos() + velo);
+	}
 
-		ChangeState(next);
-		return;
+	//回避の場合
+	if (m_isDodge)
+	{
+		//残像を作成するタイミングになったら
+		if (static_cast<int>(m_time) % GameSceneConstant::kAfterImageCreateTime == 0)
+		{
+			CreateAfterImage();
+		}
+
+		//一定時間移動したらアイドルStateに戻る
+		if (m_time > kDodgeTime)
+		{
+			auto next = std::make_shared<PlayerStateIdle>(m_pPlayer);
+
+			ChangeState(next);
+			return;
+		}
+	}
+	//ダッシュの場合
+	else
+	{
+		//一定時間移動したらアイドルStateに戻る
+		if (m_time > kDashTime)
+		{
+			auto next = std::make_shared<PlayerStateIdle>(m_pPlayer);
+
+			ChangeState(next);
+			return;
+		}
 	}
 }
 
 void PlayerStateDash::Exit()
 {
-	SetPlayerBlur(false);
 }
 
 void PlayerStateDash::OnCollide(std::shared_ptr<Collidable> collider)

@@ -1,10 +1,10 @@
 #pragma once
 #include "EnemyStateBase.h"
-class EnemyStateAttack : public EnemyStateBase, public std::enable_shared_from_this<EnemyStateAttack>
+class EnemyStateNormalAttack : public EnemyStateBase, public std::enable_shared_from_this<EnemyStateNormalAttack>
 {
 public:
 
-	EnemyStateAttack(std::shared_ptr<Enemy> enemy);
+	EnemyStateNormalAttack(std::shared_ptr<Enemy> enemy);
 
 	virtual void Enter() override;
 

@@ -95,6 +95,18 @@ void PlayerStateMove::Update()
 		}
 
 		velo.y += m_gravityPower;
+
+		//地上にいなく
+		if (!m_pPlayer->IsGround())
+		{
+
+			//プレイ中のアニメーションがジャンプ中でなければ
+			if (!(m_pPlayer->GetPlayAnimKind() == CharacterBase::AnimKind::kJumping))
+			{
+				//アニメーションを変更する
+				m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kJumping, true);
+			}
+		}
 	}
 
 	//ダッシュボタンが押されたら

@@ -24,6 +24,12 @@ public:
 	void SetPlayerFrontPos(MyEngine::Vector3 pos);
 
 	/// <summary>
+	/// プレイヤーのベロシティを設定する
+	/// </summary>
+	/// <param name="velo">プレイヤーのベロシティ</param>
+	void SetPlayerVelo(MyEngine::Vector3 velo);
+
+	/// <summary>
 	/// スクリーンなどを変更した時にカメラの座標などを設定する
 	/// </summary>
 	void SetCamera();
@@ -33,6 +39,10 @@ private:
 	LocalPos m_localPos;
 
 	MyEngine::Vector3 m_targetPos;
+
+	MyEngine::Vector3 m_lastCameraPos;
+
+	MyEngine::Vector3 m_playerVelo;
 
 	int m_lightHandle;
 };

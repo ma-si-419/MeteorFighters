@@ -12,6 +12,12 @@ struct LocalPos
 	MyEngine::Vector3 GetWorldPos();
 
 	/// <summary>
+	/// 中心座標を取得する
+	/// </summary>
+	/// <returns>中心としている座標</returns>
+	MyEngine::Vector3 GetCenterPos() { return m_centerPos; };
+
+	/// <summary>
 	/// 中心とする座標を設定
 	/// </summary>
 	/// <param name="pos">中心座標(ワールド座標)</param>

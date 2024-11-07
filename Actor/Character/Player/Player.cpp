@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "GameCamera.h"
 #include "GameManager.h"
+#include "GameSceneConstant.h"
 #include <cmath>
 #include "PlayerStateIdle.h"
 
@@ -15,16 +16,7 @@ namespace
 	const int kWhite = GetColor(255, 255, 255);
 #endif // _DEBUG
 
-	constexpr int kOnBlurDrawModelNum = 2;
-
-	constexpr int kOnBlurShiftLange = 1;
-
 	constexpr float kCharacterHeight = 4.5f;
-
-	constexpr float kBlurLangeScale = 0.01f;
-
-	constexpr float kModelScale = 0.1f;
-
 }
 
 Player::Player(CharacterKind kind) :
@@ -41,7 +33,7 @@ void Player::Init()
 {
 	m_modelHandle = MV1LoadModel("data/model/Fighter.mv1");
 
-	MV1SetScale(m_modelHandle, VGet(kModelScale, kModelScale, kModelScale));
+	MV1SetScale(m_modelHandle, VGet(GameSceneConstant::kModelScale, GameSceneConstant::kModelScale, GameSceneConstant::kModelScale));
 
 	Collidable::Init();
 
@@ -65,6 +57,34 @@ void Player::Update()
 	//Stateの更新処理
 	m_pState->Update();
 
+
+	//残像の更新
+	int deleteNum = 0;
+
+	for (auto& item : m_afterImageList)
+	{
+		item.nowOpacityRate -= item.DeleteSpeed;
+
+		float rate = fmin(item.maxOpacityRate,item.nowOpacityRate);
+
+		MV1SetOpacityRate(item.handle,rate);
+		
+		if (item.nowOpacityRate < 0.0f)
+		{
+			MV1DeleteModel(item.handle);
+
+			deleteNum++;
+		}
+	}
+
+//	CreateAfterImage();
+
+	for (int i = 0; i < deleteNum; i++)
+	{
+		m_afterImageList.pop_front();
+	}
+
+
 	//アニメーションの更新
 	PlayAnim();
 
@@ -75,36 +95,13 @@ void Player::Update()
 }
 void Player::Draw()
 {
-	//ぼかす時の処理
-	if (m_isBlur)
+	//キャラクターの描画
+	MV1DrawModel(m_modelHandle);
+
+	//残像の描画
+	for (auto item : m_afterImageList)
 	{
-		for (int i = 0; i < kOnBlurDrawModelNum; i++)
-		{
-			int handle = MV1DuplicateModel(m_modelHandle);
-			MyEngine::Vector3 drawPos = m_rigidbody.GetPos();
-			MV1SetPosition(handle,drawPos.CastVECTOR());
-			MV1SetRotationZYAxis(handle, (drawPos - m_lookPos).CastVECTOR(),VGet(0.0f,1.0f,0.0f),0.0f);
-			drawPos.y -= kCharacterHeight;
-			drawPos.x += static_cast<float>(GetRand(kOnBlurShiftLange) - static_cast<int>(kOnBlurShiftLange * 0.5f)) * kBlurLangeScale;
-			drawPos.y += static_cast<float>(GetRand(kOnBlurShiftLange) - static_cast<int>(kOnBlurShiftLange * 0.5f)) * kBlurLangeScale;
-			drawPos.z += static_cast<float>(GetRand(kOnBlurShiftLange) - static_cast<int>(kOnBlurShiftLange * 0.5f)) * kBlurLangeScale;
-			MV1SetPosition(handle,drawPos.CastVECTOR());
-			MV1SetScale(handle, VGet(kModelScale, kModelScale, kModelScale));
-			MV1AttachAnim(handle,MV1GetAttachAnim(m_modelHandle,m_lastAnim));
-			MV1AttachAnim(handle,MV1GetAttachAnim(m_modelHandle,m_attachAnim));
-			MV1SetAttachAnimTime(handle,m_lastAnim,m_lastPlayAnimTime);
-			MV1SetAttachAnimTime(handle,m_attachAnim,m_nowPlayAnimTime);
-			MV1SetAttachAnimBlendRate(handle,m_lastAnim,1.0 - m_animBlendRate);
-			MV1SetAttachAnimBlendRate(handle,m_attachAnim,m_animBlendRate);
-			MV1SetOpacityRate(handle,1.0 / kOnBlurDrawModelNum);
-			MV1DrawModel(handle);
-			MV1DeleteModel(handle);
-		}
-	}
-	//通常時の処理
-	else
-	{
-		MV1DrawModel(m_modelHandle);
+		MV1DrawModel(item.handle);
 	}
 }
 

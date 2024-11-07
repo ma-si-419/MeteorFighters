@@ -7,7 +7,7 @@
 
 namespace
 {
-	const std::map<CharacterBase::HitReactionKind,int> kDownTimeMap =
+	const std::map<CharacterBase::HitReactionKind, int> kDownTimeMap =
 	{
 		{CharacterBase::HitReactionKind::kLow,40},
 		{CharacterBase::HitReactionKind::kMiddle,40},
@@ -233,6 +233,23 @@ void EnemyStateHitAttack::HitAttack(CharacterBase::HitReactionKind kind)
 	//アニメーションの変更
 	m_pEnemy->ChangeAnim(static_cast<CharacterBase::AnimKind>(GetNextAnimKind(kind)), false);
 
+	//前からの吹っ飛びアニメーションの場合
+	if (m_pEnemy->GetPlayAnimKind() == CharacterBase::AnimKind::kFrontBurst)
+	{
+		//動いている方向と逆の方向を向く
+		MyEngine::Vector3 frontPos = m_pEnemy->GetPos() - m_moveVec;
+
+		m_pEnemy->SetFrontPos(frontPos);
+	}
+	//後ろからの場合
+	else if (m_pEnemy->GetPlayAnimKind() == CharacterBase::AnimKind::kBackBurst)
+	{
+		//動いている方向を向く
+		MyEngine::Vector3 frontPos = m_pEnemy->GetPos() + m_moveVec;
+
+		m_pEnemy->SetFrontPos(frontPos);
+	}
+	
 	//今まで受けた攻撃を保存しておく
 	m_hitReactions.push_back(kind);
 }

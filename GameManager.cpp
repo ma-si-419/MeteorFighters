@@ -49,6 +49,9 @@ void GameManager::Update()
 	//カメラの正面方向を設定
 	m_pCamera->SetPlayerFrontPos(GetPlayerPos() + playerToTarget);
 
+	//カメラにプレイヤーのベロシティを設定する
+	m_pCamera->SetPlayerVelo(m_pPlayer->GetVelo());
+
 	//カメラの更新
 	m_pCamera->Update();
 

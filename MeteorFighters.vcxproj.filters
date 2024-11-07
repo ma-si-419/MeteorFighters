@@ -168,7 +168,7 @@
     <ClCompile Include="Actor\Actor.cpp">
       <Filter>ソース ファイル\Actor</Filter>
     </ClCompile>
-    <ClCompile Include="Actor\Character\Enemy\EnemyStateAttack.cpp">
+    <ClCompile Include="Actor\Character\Enemy\EnemyStateNormalAttack.cpp">
       <Filter>ソース ファイル\Actor\Character\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Actor\Character\Enemy\EnemyStateBase.cpp">
@@ -205,7 +205,7 @@
       <Filter>ソース ファイル\Actor\Character\Player</Filter>
     </ClCompile>
     <ClCompile Include="PlayerStateDash.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Actor\Character\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -323,7 +323,7 @@
     <ClInclude Include="Actor\StateBase.h">
       <Filter>ヘッダー ファイル\Actor</Filter>
     </ClInclude>
-    <ClInclude Include="Actor\Character\Enemy\EnemyStateAttack.h">
+    <ClInclude Include="Actor\Character\Enemy\EnemyStateNormalAttack.h">
       <Filter>ヘッダー ファイル\Actor\Character\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Actor\Character\Enemy\EnemyStateBase.h">

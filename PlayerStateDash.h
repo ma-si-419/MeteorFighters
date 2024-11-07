@@ -17,4 +17,6 @@ public:
 
 private:
 	MyEngine::Vector3 m_moveDir;
+
+	bool m_isDodge;
 };

@@ -32,9 +32,9 @@ void PlayerStateBase::SetPlayerPos(MyEngine::Vector3 pos)
 	m_pPlayer->m_rigidbody.SetPos(pos);
 }
 
-void PlayerStateBase::SetPlayerBlur(bool flag)
+void PlayerStateBase::CreateAfterImage()
 {
-	m_pPlayer->SetBlur(flag);
+	m_pPlayer->CreateAfterImage();
 }
 
 int PlayerStateBase::GetAttackAnimKind(std::string animName)

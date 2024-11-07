@@ -1,6 +1,7 @@
 #include "Enemy.h"
 #include "EnemyStateIdle.h"
 #include "GameManager.h"
+#include "GameSceneConstant.h"
 
 namespace
 {
@@ -17,7 +18,7 @@ Enemy::Enemy(CharacterKind kind) :
 {
 	m_modelHandle = MV1LoadModel("data/model/Fighter.mv1");
 
-	MV1SetScale(m_modelHandle, VGet(0.1f, 0.1f, 0.1f));
+	MV1SetScale(m_modelHandle, VGet(GameSceneConstant::kModelScale, GameSceneConstant::kModelScale, GameSceneConstant::kModelScale));
 
 	ChangeAnim(AnimKind::kLowAttack1, true);
 }

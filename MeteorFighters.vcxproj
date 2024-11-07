@@ -144,7 +144,7 @@
     <ClCompile Include="Actor\Character\CharacterBase.cpp" />
     <ClCompile Include="Actor\Character\CharacterStateBase.cpp" />
     <ClCompile Include="Actor\Character\Enemy\Enemy.cpp" />
-    <ClCompile Include="Actor\Character\Enemy\EnemyStateAttack.cpp" />
+    <ClCompile Include="Actor\Character\Enemy\EnemyStateNormalAttack.cpp" />
     <ClCompile Include="Actor\Character\Enemy\EnemyStateBase.cpp" />
     <ClCompile Include="Actor\Character\Enemy\EnemyStateButtonBashing.cpp" />
     <ClCompile Include="Actor\Character\Enemy\EnemyStateGuard.cpp" />
@@ -194,7 +194,7 @@
     <ClInclude Include="Actor\Character\CharacterBase.h" />
     <ClInclude Include="Actor\Character\CharacterStateBase.h" />
     <ClInclude Include="Actor\Character\Enemy\Enemy.h" />
-    <ClInclude Include="Actor\Character\Enemy\EnemyStateAttack.h" />
+    <ClInclude Include="Actor\Character\Enemy\EnemyStateNormalAttack.h" />
     <ClInclude Include="Actor\Character\Enemy\EnemyStateBase.h" />
     <ClInclude Include="Actor\Character\Enemy\EnemyStateButtonBashing.h" />
     <ClInclude Include="Actor\Character\Enemy\EnemyStateGuard.h" />

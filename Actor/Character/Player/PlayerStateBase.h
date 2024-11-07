@@ -40,10 +40,9 @@ protected:
 	void SetPlayerPos(MyEngine::Vector3 pos);
 
 	/// <summary>
-	/// プレイヤーをぼかして表示する
+	/// プレイヤーの残像を作成する
 	/// </summary>
-	/// <param name="flag">ぼかすならtrue</param>
-	void SetPlayerBlur(bool flag);
+	void CreateAfterImage();
 
 	/// <summary>
 	/// アニメーション番号を取得する
