@@ -459,3 +459,8 @@ void CharacterBase::CreateAfterImage(AfterImage afterImageInfo)
 
 	m_afterImageList.push_back(ans);
 }
+
+void CharacterBase::StartFastCameraMove()
+{
+	m_pGameManager->StartFastCameraMove();
+}

@@ -36,11 +36,18 @@ namespace
 	//距離によって横移動のあそびを減らす割合
 	constexpr float kLangeSubRate = 0.1f;
 
+	//前のフレームのカメラ座標と次のフレームのカメラ座標の距離が遠いと判定する距離
+	constexpr float kCameraFarLange = 100.0f;
+
+	//カメラの次の座標が遠いときの移動速度
+	constexpr float kFarCameraMoveSpeed = 15.0f;
+
 }
 
 GameCamera::GameCamera() :
 	m_lightHandle(-1),
-	m_stopTime(0)
+	m_stopTime(0),
+	m_isFastMove(false)
 {
 	m_lightHandle = CreateDirLightHandle(VGet(0, 0, 0));
 }
@@ -60,8 +67,6 @@ void GameCamera::Init(MyEngine::Vector3 centerPos)
 
 void GameCamera::Update()
 {
-	//ローカル座標の設定
-	m_localPos.SetLocalPos(m_nextCameraPos);
 
 	//今のカメラのワールド座標
 	MyEngine::Vector3 cameraWorldPos = m_localPos.GetWorldPos();
@@ -77,22 +82,22 @@ void GameCamera::Update()
 	//X,Y,Zそれぞれを一定の値の中にとどめるようにする
 
 	//最大値の調整
-	
+
 	//X座標は離れるほどあそびを小さくしていく
 	float maxX = kOnMoveMaxLocalPosX - ((m_nextCameraPos - m_targetPos).Length()) * kLangeSubRate;
 	m_nextCameraPos.x = std::fmin(m_nextCameraPos.x, maxX);
-	
-	
+
+
 	m_nextCameraPos.y = std::fmin(m_nextCameraPos.y, kOnMoveMaxLocalPosY);
 	m_nextCameraPos.z = std::fmin(m_nextCameraPos.z, kOnMoveMaxLocalPosZ);
 
 	//最小値の調整
-	
+
 	//X座標は離れるほどあそびを小さくしていく
 	float minX = kOnMoveMinLocalPosX + ((m_nextCameraPos - m_targetPos).Length()) * kLangeSubRate;
 	m_nextCameraPos.x = std::fmax(m_nextCameraPos.x, minX);
-	
-	
+
+
 	m_nextCameraPos.y = std::fmax(m_nextCameraPos.y, kOnMoveMinLocalPosY);
 	m_nextCameraPos.z = std::fmax(m_nextCameraPos.z, kOnMoveMinLocalPosZ);
 
@@ -101,7 +106,7 @@ void GameCamera::Update()
 	{
 		//移動していない時間を計る
 		m_stopTime++;
-		
+
 		//移動していない時間が一定時間たったら
 		if (m_stopTime > kLocalPosMoveStartTime)
 		{
@@ -153,12 +158,38 @@ void GameCamera::Update()
 		m_stopTime = 0;
 	}
 
+
+
+	//カメラが速く移動すると設定されていたら
+	if (m_isFastMove)
+	{
+		//向かいたいローカル座標を設定
+		m_localPos.SetLocalPos(m_nextCameraPos);
+		//そのローカル座標に向かうベクトルを作成
+		MyEngine::Vector3 toNextPos = m_localPos.GetWorldPos() - m_lastCameraPos;
+		//カメラを瞬間移動させずに速く移動させる
+		m_moveVec = toNextPos.Normalize() * kFarCameraMoveSpeed;
+
+		if (m_moveVec.Length() > toNextPos.Length())
+		{
+			m_moveVec = m_moveVec.Normalize() * toNextPos.Length();
+			m_isFastMove = false;
+		}
+
+		m_nextCameraPos = m_localPos.ChangeWorldToLocal(m_lastCameraPos + m_moveVec);
+	}
+
+	//ローカル座標の設定
+	m_localPos.SetLocalPos(m_nextCameraPos);
+
 	//ターゲット座標の設定
 	MyEngine::Vector3 targetPos = (m_targetPos - m_localPos.GetCenterPos()) * kCameraTargetPosRate + m_localPos.GetCenterPos();
 
-	SetCameraPositionAndTarget_UpVecY(cameraWorldPos.CastVECTOR(), targetPos.CastVECTOR());
+	SetCameraPositionAndTarget_UpVecY(m_localPos.GetWorldPos().CastVECTOR(), targetPos.CastVECTOR());
 
-	SetLightDirectionHandle(m_lightHandle, (cameraWorldPos - targetPos).Normalize().CastVECTOR());
+	SetLightDirectionHandle(m_lightHandle, (m_localPos.GetWorldPos() - targetPos).Normalize().CastVECTOR());
+
+	m_lastCameraPos = m_localPos.GetWorldPos();
 }
 
 void GameCamera::SetPlayerPosAndTarget(MyEngine::Vector3 player, MyEngine::Vector3 target)

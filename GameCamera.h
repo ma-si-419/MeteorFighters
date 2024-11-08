@@ -34,6 +34,11 @@ public:
 	/// </summary>
 	void SetCamera();
 
+	/// <summary>
+	/// ƒJƒƒ‰‚ğ‚‘¬ˆÚ“®‚Å“®‚©‚µ‚½‚¢‚Æ‚«‚ÉŒÄ‚ÔŠÖ”
+	/// </summary>
+	void StartFastCameraMove() { m_isFastMove = true; }
+
 private:
 
 	LocalPos m_localPos;
@@ -44,10 +49,14 @@ private:
 
 	MyEngine::Vector3 m_nextCameraPos;
 
+	MyEngine::Vector3 m_lastCameraPos;
+
 	MyEngine::Vector3 m_playerVelo;
 
 	int m_stopTime;
 
 	int m_lightHandle;
+
+	bool m_isFastMove;
 };
 

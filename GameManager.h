@@ -98,6 +98,7 @@ public:
 	/// <param name="attack">追加する攻撃クラスのポインタ</param>
 	void AddAttack(std::shared_ptr<Attack> attack);
 
+	void StartFastCameraMove();
 private:
 
 	//プレイヤーのポインタ

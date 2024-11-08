@@ -211,14 +211,7 @@ void PlayerStateNormalAttack::Update()
 			//uŠÔˆÚ“®‚·‚éUŒ‚‚Å‚ ‚ê‚ÎuŠÔˆÚ“®‚·‚é
 			if (attackData.isTeleportation)
 			{
-				////c‘œ‚ğc‚·
-				//CharacterBase::AfterImage data;
-
-				//data.DeleteSpeed = 0.1f;
-				//data.maxOpacityRate = 0.8f;
-				//data.nowOpacityRate = 2.5f;
-
-				//m_pPlayer->CreateAfterImage(data);
+				m_pPlayer->StartFastCameraMove();
 
 				//Ÿ‚ÌUŒ‚”­¶ƒtƒŒ[ƒ€‚É“G‚ª‚¢‚éêŠ‚ğŒvZ‚·‚é
 				MyEngine::Vector3 teleportationPos = GetEnemyPos() + (GetEnemyVelo() * (attackData.attackFrame));

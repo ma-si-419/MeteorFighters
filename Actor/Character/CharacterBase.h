@@ -413,6 +413,8 @@ public:
 	/// </summary>
 	/// <param name="afterImageInfo">ハンドル以外の残像の情報</param>
 	void CreateAfterImage(AfterImage afterImageInfo);
+
+	void StartFastCameraMove();
 protected:
 
 	/// <summary>

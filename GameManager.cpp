@@ -195,3 +195,8 @@ void GameManager::AddAttack(std::shared_ptr<Attack> attack)
 {
 	m_pAttacks.push_back(attack);
 }
+
+void GameManager::StartFastCameraMove()
+{
+	m_pCamera->StartFastCameraMove();
+}
