@@ -77,7 +77,7 @@ void PlayerStateJump::Update()
 	if (input.IsTrigger("RB"))
 	{
 		auto next = std::make_shared<PlayerStateMove>(m_pPlayer);
-		
+
 		ChangeState(next);
 	}
 	//攻撃ボタンが押されていないときに
@@ -119,7 +119,7 @@ void PlayerStateJump::Update()
 	if (input.IsTrigger("A"))
 	{
 
-		MyEngine::Vector3 leftStickDir(input.GetStickInfo().leftStickX,0, -input.GetStickInfo().leftStickY);
+		MyEngine::Vector3 leftStickDir(input.GetStickInfo().leftStickX, 0, -input.GetStickInfo().leftStickY);
 
 		leftStickDir = leftStickDir.Normalize();
 
@@ -133,7 +133,14 @@ void PlayerStateJump::Update()
 			{
 				auto next = std::make_shared<PlayerStateDash>(m_pPlayer);
 
-				next->SetMoveDir(leftStickDir.Normalize());
+				if (leftStickDir.SqLength() < 0.01f)
+				{
+					next->SetMoveDir(MyEngine::Vector3(0,0,1));
+				}
+				else
+				{
+					next->SetMoveDir(leftStickDir);
+				}
 
 				ChangeState(next);
 				return;
@@ -145,7 +152,14 @@ void PlayerStateJump::Update()
 			//MPを消費せずにステップをする
 			auto next = std::make_shared<PlayerStateDash>(m_pPlayer);
 
-			next->SetMoveDir(leftStickDir.Normalize());
+			if (leftStickDir.SqLength() < 0.01f)
+			{
+				next->SetMoveDir(MyEngine::Vector3(0, 0, 1));
+			}
+			else
+			{
+				next->SetMoveDir(leftStickDir);
+			}
 
 			ChangeState(next);
 			return;
@@ -160,7 +174,7 @@ void PlayerStateJump::Update()
 		//アイドル状態に戻る
 		auto next = std::make_shared<PlayerStateIdle>(m_pPlayer);
 		ChangeState(next);
-		
+
 		return;
 	}
 }

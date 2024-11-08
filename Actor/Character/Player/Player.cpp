@@ -77,8 +77,6 @@ void Player::Update()
 		}
 	}
 
-//	CreateAfterImage();
-
 	for (int i = 0; i < deleteNum; i++)
 	{
 		m_afterImageList.pop_front();
