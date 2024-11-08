@@ -40,9 +40,13 @@ private:
 
 	MyEngine::Vector3 m_targetPos;
 
-	MyEngine::Vector3 m_lastCameraPos;
+	MyEngine::Vector3 m_moveVec;
+
+	MyEngine::Vector3 m_nextCameraPos;
 
 	MyEngine::Vector3 m_playerVelo;
+
+	int m_stopTime;
 
 	int m_lightHandle;
 };

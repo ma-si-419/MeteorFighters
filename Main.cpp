@@ -58,12 +58,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		MyEngine::Input::GetInstance().Update();
 #ifdef _DEBUG
 
-
-		if (MyEngine::Input::GetInstance().IsTrigger("A"))
+		if (MyEngine::Input::GetInstance().IsTrigger("LB"))
 		{
 			isMove = true;
 		}
-
 
 		if (!isStop || isMove)
 		{
