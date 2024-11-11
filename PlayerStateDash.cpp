@@ -158,6 +158,11 @@ void PlayerStateDash::Update()
 			return;
 		}
 	}
+#ifdef _DEBUG
+
+	DrawString(0, 16, "PlayerState:Dash", GetColor(255, 255, 255));
+
+#endif // _DEBUG
 }
 
 void PlayerStateDash::Exit()

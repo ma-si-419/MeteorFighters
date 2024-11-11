@@ -54,11 +54,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		// 描画を行う前に画面をクリアする
 		ClearDrawScreen();
 
+		auto& input = MyEngine::Input::GetInstance();
+
 		// ゲームの処理
-		MyEngine::Input::GetInstance().Update();
+		input.Update();
 #ifdef _DEBUG
 
-		if (MyEngine::Input::GetInstance().IsTrigger("LB"))
+		if (input.IsTrigger("LB"))
 		{
 			isMove = true;
 		}
@@ -74,14 +76,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		}
 
-		if (MyEngine::Input::GetInstance().IsTrigger("Pause"))
+		if (input.IsTrigger("Pause"))
 		{
 			isStop = !isStop;
 		}
 
 		isMove = false;
 
-		if (MyEngine::Input::GetInstance().IsTrigger("Select"))
+		if (input.IsTrigger("Select"))
 		{
 			isWindow = !isWindow;
 
@@ -93,6 +95,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 #endif // _DEBUG
 		sceneManager.Draw();
+
+		printfDx("%d\n", input.GetPushTriggerTime(true));
 
 		// 画面が切り替わるのを待つ
 		ScreenFlip();

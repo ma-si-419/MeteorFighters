@@ -13,6 +13,9 @@ namespace
 {
 	//前後左右移動をどのくらい反映させるか
 	constexpr float kMoveVecRate = 0.9f;
+
+	//着地時の硬直時間
+	constexpr int kLandingTime = 7;
 }
 
 PlayerStateJump::PlayerStateJump(std::shared_ptr<Player> player) :
@@ -173,6 +176,9 @@ void PlayerStateJump::Update()
 	{
 		//アイドル状態に戻る
 		auto next = std::make_shared<PlayerStateIdle>(m_pPlayer);
+
+		next->SetEndAnim(static_cast<int>(CharacterBase::AnimKind::kJumpEnd),kLandingTime);
+
 		ChangeState(next);
 
 		return;

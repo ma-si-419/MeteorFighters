@@ -255,6 +255,11 @@ public:
 	bool SubMp(int subMp);
 
 	/// <summary>
+	/// 気力を貯める
+	/// </summary>
+	void ChargeMp();
+
+	/// <summary>
 	/// キャラクターの攻撃力を取得する
 	/// </summary>
 	/// <returns>キャラクターの攻撃力</returns>
@@ -414,7 +419,11 @@ public:
 	/// <param name="afterImageInfo">ハンドル以外の残像の情報</param>
 	void CreateAfterImage(AfterImage afterImageInfo);
 
+	/// <summary>
+	/// カメラを速く動かす時に呼ぶ関数(ダッシュするときなど)
+	/// </summary>
 	void StartFastCameraMove();
+
 protected:
 
 	/// <summary>

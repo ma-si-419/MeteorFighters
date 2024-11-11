@@ -11,11 +11,13 @@ public:
 		kMove,//移動状態
 		kJump,//ジャンプ状態
 		kGuard,//ガード状態
-		kAttack,//攻撃状態
+		kNormalAttack,//通常攻撃状態
+		kSpecialAttack,//必殺技状態
 		kRush,//突撃状態
 		kHitAttack,//攻撃を受けた時
 		kButtonBashing,//敵との押し合い
 		kEnergyAttack,//気弾攻撃
+		kCharge,//チャージ状態
 		kStateKindNum//Stateの数
 	};
 

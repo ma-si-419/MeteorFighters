@@ -3,6 +3,7 @@
 #include "PlayerStateJump.h"
 #include "PlayerStateDash.h"
 #include "PlayerStateNormalAttack.h"
+#include "PlayerStateCharge.h"
 #include "GameSceneConstant.h"
 #include "DxLib.h"
 #include "Input.h"
@@ -284,6 +285,16 @@ void PlayerStateMove::Update()
 			ChangeState(next);
 			return;
 		}
+	}
+
+	//一定時間レフトショルダーボタンが押されたら
+	if (input.GetPushTriggerTime(false) > GameSceneConstant::kChargeStateChangeTime)
+	{
+		//次のStateのポインタ作成
+		auto next = std::make_shared<PlayerStateCharge>(m_pPlayer);
+		//StateをChargeに変更する
+		ChangeState(next);
+		return;
 	}
 
 	//移動していなかったら

@@ -6,6 +6,8 @@ namespace
 {
 	//トリガーを押していると判定する強さ
 	constexpr float kTriggerPower = 128;
+	//何フレーム前の入力まで残すか
+	constexpr int kLastInputSaveNum = 30;
 }
 
 MyEngine::Input::~Input()
@@ -14,6 +16,10 @@ MyEngine::Input::~Input()
 
 void Input::Init()
 {
+	//インプットを保存する数
+	m_lastInput.resize(kLastInputSaveNum);
+	m_lastTriggerInfo.resize(kLastInputSaveNum);
+
 	//ボタンの設定
 	m_inputActionMap["Ok"] = { {InputType::kKeyboard,KEY_INPUT_RETURN},{InputType::kPad,PAD_INPUT_A} };
 	m_inputActionMap["Pause"] = { {InputType::kKeyboard,KEY_INPUT_P}, {InputType::kPad,PAD_INPUT_START} };
@@ -32,8 +38,24 @@ void Input::Init()
 }
 void Input::Update()
 {
-	//前のフレームの入力情報を保存する
-	m_lastInput = m_currentInput;
+	//前のフレームの入力値を保存する
+	for (int i = kLastInputSaveNum - 1; i > 0; i--)
+	{
+		//保存しているインプットをずらす
+		m_lastInput[i] = m_lastInput[i - 1];
+	}
+
+	m_lastInput[0] = m_currentInput;
+
+	//前のフレームの入力値を保存する
+	for (int i = kLastInputSaveNum - 1; i > 0; i--)
+	{
+		//保存しているトリガーの情報をずらす
+		m_lastTriggerInfo[i] = m_lastTriggerInfo[i - 1];
+	}
+
+	m_lastTriggerInfo[0] = m_triggerInfo;
+
 
 	//すべての入力を取得する
 	char keyState[256] = {};
@@ -98,9 +120,12 @@ void MyEngine::Input::StopUpdate()
 		item.second = false;
 	}
 
-	for (auto& item : m_lastInput)
+	for (auto& map : m_lastInput)
 	{
-		item.second = false;
+		for (auto& item : map)
+		{
+			item.second = false;
+		}
 	}
 
 	m_stickInfo.leftStickX = 0;
@@ -128,15 +153,52 @@ bool Input::IsPress(const std::string& action) const
 	}
 }
 
+int MyEngine::Input::GetPressTime(const std::string& action) const
+{
+	int pressTime = 0;
+	//まず押されているかどうか判定
+	if (IsPress(action))
+	{
+		for (int i = 0; i < m_lastInput.size(); i++)
+		{
+			auto last = m_lastInput[i].find(action);
+			//未定義のボタン名が来たら0を返す
+			if (last == m_lastInput[i].end())
+			{
+				return 0;
+			}
+			//何フレーム前から押されているか調べる
+			else
+			{
+				//押されていたら時間プラス
+				if (last->second)
+				{
+					pressTime++;
+				}
+				//離されていたらそのフレームまでの時間を返す
+				else
+				{
+					return pressTime;
+				}
+			}
+		}
+	}
+	else
+	{
+		return pressTime;
+	}
+	return pressTime;
+}
+
 bool Input::IsTrigger(const std::string& action) const
 {
 	//まず押されているかどうか判定
 	if (IsPress(action))
 	{
 		//前のフレームを参照
-		auto last = m_lastInput.find(action);
+		auto last = m_lastInput[0].find(action);
 		//未定義のボタン名が来たらfalseを返す
-		if (last == m_lastInput.end())
+		if (last == m_lastInput[0].end())
 		{
 			return false;
 		}
@@ -164,9 +226,9 @@ bool MyEngine::Input::IsRelease(const std::string& action) const
 	else
 	{
 		//前のフレームを参照
-		auto last = m_lastInput.find(action);
+		auto last = m_lastInput[0].find(action);
 		//未定義のボタン名が来たらfalseを返す
-		if (last == m_lastInput.end())
+		if (last == m_lastInput[0].end())
 		{
 			return false;
 		}
@@ -209,4 +271,69 @@ bool MyEngine::Input::IsPushTrigger(bool right, int power)
 bool MyEngine::Input::IsPushTrigger(bool right)
 {
 	return IsPushTrigger(right, kTriggerPower);
+}
+
+int MyEngine::Input::GetPushTriggerTime(bool right, int power)
+{
+	//現在のトリガーの状態取得
+	auto trigger = GetTriggerInfo();
+
+	int pushTime = 0;
+
+	//右側を判定する場合
+	if (right)
+	{
+		//まずは今のフレーム押されているかを取得
+		if (trigger.right >= power)
+		{
+			//押されていれば前のフレームを見て何フレーム前から押しているかを返す
+			for (int i = 0; i < kLastInputSaveNum; i++)
+			{
+				if (m_lastTriggerInfo[i].right > power)
+				{
+					pushTime++;
+				}
+				else
+				{
+					return pushTime;
+				}
+			}
+		}
+		//押されていなければ0を返す
+		else
+		{
+			return 0;
+		}
+	}
+	//左側を判定する場合
+	else
+	{
+		//まずは今のフレーム押されているかを取得
+		if (trigger.left >= power)
+		{
+			//押されていれば前のフレームを見て何フレーム前から押しているかを返す
+			for (int i = 0; i < kLastInputSaveNum; i++)
+			{
+				if (m_lastTriggerInfo[i].left > power)
+				{
+					pushTime++;
+				}
+				else
+				{
+					return pushTime;
+				}
+			}
+		}
+		//押されていなければ0を返す
+		else
+		{
+			return 0;
+		}
+	}
+	return pushTime;
+}
+
+int MyEngine::Input::GetPushTriggerTime(bool right)
+{
+	return GetPushTriggerTime(right, kTriggerPower);
 }

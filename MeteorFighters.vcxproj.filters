@@ -207,6 +207,9 @@
     <ClCompile Include="PlayerStateDash.cpp">
       <Filter>ソース ファイル\Actor\Character\Player</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerStateCharge.cpp">
+      <Filter>ソース ファイル\Actor\Character\Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -363,6 +366,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="PlayerStateDash.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerStateCharge.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

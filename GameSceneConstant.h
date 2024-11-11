@@ -28,4 +28,10 @@ namespace GameSceneConstant
 	constexpr int kAfterImageCreateTime = 6;
 	//残像を消す速さ
 	constexpr float kAfterImageDeleteSpeed = kAfterImageInitOpacityRate / 10;
+	//突撃しているときの移動速度倍率
+	constexpr float kRushMoveSpeedRate = 2.0f;
+	//突撃するとき移動ベクトルの向きの変えやすさ
+	constexpr float kRushMoveDirChangeRate = 0.4f;
+	//何フレームレフトショルダーボタンを押していたらチャージ状態に移行するか
+	constexpr float kChargeStateChangeTime = 20;
 }

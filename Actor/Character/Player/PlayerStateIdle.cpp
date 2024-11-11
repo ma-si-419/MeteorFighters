@@ -4,6 +4,7 @@
 #include "PlayerStateJump.h"
 #include "PlayerStateDash.h"
 #include "PlayerStateGuard.h"
+#include "PlayerStateCharge.h"
 #include "DxLib.h"
 #include "Input.h"
 #include "Player.h"
@@ -11,15 +12,23 @@
 PlayerStateIdle::PlayerStateIdle(std::shared_ptr<Player> player) :
 	PlayerStateBase(player),
 	m_attackKey("empty"),
-	m_attackButtonPushTime(0)
+	m_attackButtonPushTime(0),
+	m_isPlayEndAnim(false),
+	m_endAnimTime(0)
 {
+}
+
+void PlayerStateIdle::SetEndAnim(int kind, int time)
+{
+	m_pPlayer->ChangeAnim(static_cast<CharacterBase::AnimKind>(kind), false);
+	m_endAnimTime = time;
+	m_isPlayEndAnim = true;
 }
 
 void PlayerStateIdle::Enter()
 {
 	m_pNextState = shared_from_this();
 	m_kind = CharacterStateKind::kIdle;
-	m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kIdle, true);
 }
 
 void PlayerStateIdle::Update()
@@ -30,6 +39,27 @@ void PlayerStateIdle::Update()
 	DrawString(0, 16, "PlayerState:Idle", GetColor(255, 255, 255));
 
 #endif // _DEBUG
+
+
+	//Stateにいる時間を計測する
+	m_time++;
+
+	//アイドル状態の時は移動しない
+	SetPlayerVelo(MyEngine::Vector3(0, 0, 0));
+	
+	//アニメーションが終わる時間になっていれば
+	if (m_time > m_endAnimTime)
+	{
+		m_isPlayEndAnim = false;
+		//アイドルアニメーションでなければ
+		if (m_pPlayer->GetPlayAnimKind() != CharacterBase::AnimKind::kIdle)
+		{
+			m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kIdle, true);
+		}
+	}
+
+	//前のフレームの終了アニメーションが再生されていたら下の条件分岐を通らない
+	if (m_isPlayEndAnim) return;
 
 	auto& input = MyEngine::Input::GetInstance();
 
@@ -79,6 +109,16 @@ void PlayerStateIdle::Update()
 		return;
 	}
 
+	//一定時間レフトショルダーボタンが押されたら
+	if (input.GetPushTriggerTime(false) > GameSceneConstant::kChargeStateChangeTime)
+	{
+		//次のStateのポインタ作成
+		auto next = std::make_shared<PlayerStateCharge>(m_pPlayer);
+		//StateをChargeに変更する
+		ChangeState(next);
+		return;
+	}
+
 	//ダッシュボタンが押されたら
 	if (input.IsTrigger("A"))
 	{
@@ -92,7 +132,7 @@ void PlayerStateIdle::Update()
 			{
 				auto next = std::make_shared<PlayerStateDash>(m_pPlayer);
 
-				next->SetMoveDir(MyEngine::Vector3(0.0f,0.0f,1.0f));
+				next->SetMoveDir(MyEngine::Vector3(0.0f, 0.0f, 1.0f));
 
 				ChangeState(next);
 				return;
@@ -134,7 +174,7 @@ void PlayerStateIdle::Update()
 	else
 	{
 		//上昇ボタンか下降ボタンが押されたら
-		if (input.IsPress("RB")||
+		if (input.IsPress("RB") ||
 			input.IsPushTrigger(true))
 		{
 			//次のStateのポインタ作成
@@ -155,7 +195,6 @@ void PlayerStateIdle::Update()
 		return;
 	}
 
-	SetPlayerVelo(MyEngine::Vector3(0, 0, 0));
 
 }
 void PlayerStateIdle::Exit()

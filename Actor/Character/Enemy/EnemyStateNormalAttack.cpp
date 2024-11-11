@@ -10,7 +10,7 @@ EnemyStateNormalAttack::EnemyStateNormalAttack(std::shared_ptr<Enemy> enemy):
 void EnemyStateNormalAttack::Enter()
 {
 	m_pNextState = shared_from_this();
-	m_kind = CharacterStateKind::kAttack;
+	m_kind = CharacterStateKind::kNormalAttack;
 }
 
 void EnemyStateNormalAttack::Update()

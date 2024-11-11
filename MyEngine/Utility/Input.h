@@ -73,6 +73,13 @@ namespace MyEngine
 		bool IsPress(const std::string& action)const;
 
 		/// <summary>
+		/// キーが押されている時間を返す()
+		/// </summary>
+		/// <param name="action">判定したいキー</param>
+		/// <returns>押している時間</returns>
+		int GetPressTime(const std::string& action)const;
+
+		/// <summary>
 		/// キーが押された瞬間だけ取得する
 		/// </summary>
 		/// <param name="action">判定したいキー</param>
@@ -103,15 +110,30 @@ namespace MyEngine
 		/// </summary>
 		/// <param name="right">右側のボタンが取得したいならtrue</param>
 		/// <param name="power">どのくらい押し込まれていたらtrueとするか(最大255,最小0)</param>
-		/// <returns></returns>
+		/// <returns>押されていたらtrue</returns>
 		bool IsPushTrigger(bool right, int power);
 
 		/// <summary>
 		/// トリガーボタンを押しているかどうかを返す(押し込みの強さ固定)
 		/// </summary>
-		/// <param name="right">右側のボタンを取得したい場合</param>
-		/// <returns></returns>
+		/// <param name="right">右側のボタンを取得したい場合true</param>
+		/// <returns>押されていたらtrue</returns>
 		bool IsPushTrigger(bool right);
+
+		/// <summary>
+		/// トリガーボタンを押している時間を返す(押し込みの強さ可変)
+		/// </summary>
+		/// <param name="right">右側のトリガーの情報を取得したい場合true</param>
+		/// <param name="power">どのくらい押し込まれていたらtrueとするか(最大255,最小0)</param>
+		/// <returns>押されている時間</returns>
+		int GetPushTriggerTime(bool right,int power);
+
+		/// <summary>
+		/// トリガーボタンを押している時間を返す(押し込みの強さ固定)
+		/// </summary>
+		/// <param name="right">右側のトリガーの情報を取得したい場合true</param>
+		/// <returns>押されている時間</returns>
+		int GetPushTriggerTime(bool right);
 
 	private:
 		/// <summary>
@@ -134,11 +156,13 @@ namespace MyEngine
 
 		//現在のフレームの入力
 		std::map<std::string, bool> m_currentInput;
-		//１フレーム前の入力
-		std::map<std::string, bool> m_lastInput;
+		//前の入力
+		std::vector<std::map<std::string, bool>>m_lastInput;
 
 		StickInfo m_stickInfo = StickInfo();
 
 		TriggerInfo m_triggerInfo = TriggerInfo();
+
+		std::vector<TriggerInfo> m_lastTriggerInfo;
 	};
 }

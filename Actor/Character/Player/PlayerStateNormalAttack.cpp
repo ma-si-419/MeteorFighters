@@ -111,7 +111,7 @@ void PlayerStateNormalAttack::SetAttack(std::string key, bool isCharge)
 void PlayerStateNormalAttack::Enter()
 {
 	m_pNextState = shared_from_this();
-	m_kind = CharacterStateKind::kAttack;
+	m_kind = CharacterStateKind::kNormalAttack;
 
 	//設定された攻撃のアニメーション取得
 	std::string animName = m_pPlayer->GetNormalAttackData(m_nowAttackName).animationName;

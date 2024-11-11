@@ -126,6 +126,11 @@ bool CharacterBase::SubMp(int subMp)
 	return false;
 }
 
+void CharacterBase::ChargeMp()
+{
+	m_nowMp += m_status.chargeSpd;
+}
+
 void CharacterBase::ChangeAnim(AnimKind animKind, bool loop)
 {
 	ChangeAnim(animKind, loop, kAnimBlendSpeed);
