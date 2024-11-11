@@ -469,3 +469,14 @@ void CharacterBase::StartFastCameraMove()
 {
 	m_pGameManager->StartFastCameraMove();
 }
+
+MyEngine::Vector3 CharacterBase::GetBackPos(float distance)
+{
+	MyEngine::Vector3 toBackPos = m_rigidbody.GetPos() - m_lookPos;
+
+	toBackPos = toBackPos.Normalize();
+
+	MyEngine::Vector3 ans = m_rigidbody.GetPos() + (toBackPos * distance);
+
+	return ans;
+}

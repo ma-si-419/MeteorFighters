@@ -200,3 +200,13 @@ void GameManager::StartFastCameraMove()
 {
 	m_pCamera->StartFastCameraMove();
 }
+
+MyEngine::Vector3 GameManager::GetPlayerBackPos(float distance)
+{
+	return m_pPlayer->GetBackPos(distance);
+}
+
+MyEngine::Vector3 GameManager::GetEnemyBackPos(float distance)
+{
+	return m_pEnemy->GetBackPos(distance);
+}

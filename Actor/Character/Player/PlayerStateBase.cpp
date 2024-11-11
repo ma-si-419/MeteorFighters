@@ -32,6 +32,11 @@ void PlayerStateBase::SetPlayerPos(MyEngine::Vector3 pos)
 	m_pPlayer->m_rigidbody.SetPos(pos);
 }
 
+MyEngine::Vector3 PlayerStateBase::GetEnemyBackPos(float distance)
+{
+	return m_pPlayer->m_pGameManager->GetEnemyBackPos(distance);
+}
+
 void PlayerStateBase::CreateAfterImage()
 {
 	m_pPlayer->CreateAfterImage();

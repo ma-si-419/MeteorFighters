@@ -40,6 +40,13 @@ protected:
 	void SetPlayerPos(MyEngine::Vector3 pos);
 
 	/// <summary>
+	/// エネミーの背後座標を取得する
+	/// </summary>
+	/// <param name="distance">距離</param>
+	/// <returns>エネミーの背後座標</returns>
+	MyEngine::Vector3 GetEnemyBackPos(float distance);
+
+	/// <summary>
 	/// プレイヤーの残像を作成する
 	/// </summary>
 	void CreateAfterImage();

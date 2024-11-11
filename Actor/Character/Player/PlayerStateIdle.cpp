@@ -3,6 +3,7 @@
 #include "PlayerStateMove.h"
 #include "PlayerStateJump.h"
 #include "PlayerStateDash.h"
+#include "PlayerStateRush.h"
 #include "PlayerStateGuard.h"
 #include "PlayerStateCharge.h"
 #include "DxLib.h"
@@ -119,9 +120,25 @@ void PlayerStateIdle::Update()
 		return;
 	}
 
-	//ダッシュボタンが押されたら
+	//ダッシュボタンが押された時
 	if (input.IsTrigger("A"))
 	{
+		//一緒にレフトショルダーも押されていたら
+		if (input.IsPushTrigger(false))
+		{
+			//ダッシュのコストがあれば
+			if (m_pPlayer->SubMp(GameSceneConstant::kDashCost))
+			{
+				//突撃状態に移行する
+				auto next = std::make_shared<PlayerStateRush>(m_pPlayer);
+
+				next->SetMoveDir(MyEngine::Vector3(0,0,1));
+
+				ChangeState(next);
+				return;
+			}
+		}
+
 		//敵との距離からダッシュかステップか判断する
 		//(ステップかダッシュかの判定はDashStateの中でも行う)
 		//(ここではMPを消費するかしないか、DashStateにはいるかどうかを判断する)

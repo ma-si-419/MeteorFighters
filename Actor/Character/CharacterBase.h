@@ -424,6 +424,13 @@ public:
 	/// </summary>
 	void StartFastCameraMove();
 
+	/// <summary>
+	/// 背後の座標を取得する
+	/// </summary>
+	/// <returns>キャラクターが向いている方向と逆方向の座標</returns>
+	/// <param name="distance">ハンドル以外の残像の情報</param>
+	MyEngine::Vector3 GetBackPos(float distance);
+
 protected:
 
 	/// <summary>

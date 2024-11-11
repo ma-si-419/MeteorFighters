@@ -160,7 +160,7 @@ void PlayerStateDash::Update()
 	}
 #ifdef _DEBUG
 
-	DrawString(0, 16, "PlayerState:Dash", GetColor(255, 255, 255));
+	DrawString(0, 16, "PlayerState:DashW", GetColor(255, 255, 255));
 
 #endif // _DEBUG
 }

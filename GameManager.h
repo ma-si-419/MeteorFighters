@@ -99,6 +99,10 @@ public:
 	void AddAttack(std::shared_ptr<Attack> attack);
 
 	void StartFastCameraMove();
+
+	MyEngine::Vector3 GetPlayerBackPos(float distance);
+
+	MyEngine::Vector3 GetEnemyBackPos(float distance);
 private:
 
 	//プレイヤーのポインタ

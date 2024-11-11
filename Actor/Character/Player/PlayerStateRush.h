@@ -21,5 +21,8 @@ private:
 
 	//“G‚ÌŒã‚ë‚ÉŒü‚©‚Á‚Ä“ËŒ‚‚·‚é‚©‚Ç‚¤‚©
 	bool m_isRushEnemy;
+
+	//“ËŒ‚‚Ì–Ú“IÀ•W
+	MyEngine::Vector3 m_rushTargetPos;
 };
 
