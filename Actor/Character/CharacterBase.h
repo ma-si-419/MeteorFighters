@@ -112,6 +112,7 @@ public:
 		kDef,
 		kSpd,
 		kChargeSpd,
+		kChaseNum,
 		kFirstSpecialName,
 		kFirstSpecialCost,
 		kFirstSpecialDamageRate,
@@ -154,6 +155,7 @@ public:
 		AttackHitKind attackHitKind = AttackHitKind::kLow;
 		AttackKind attackKind = AttackKind::kPhysical;
 		std::string nextComboName = "empty";
+		std::string targetHitReaction = "empty";
 		std::string animationName = "empty";
 	};
 
@@ -183,6 +185,7 @@ public:
 		float def = 0;
 		float spd = 0;
 		float chargeSpd = 0;
+		int chaseAttackNum = 0;
 		SpecialAttackData firstSpecialAttackData;
 		SpecialAttackData secondSpecialAttackData;
 	};
@@ -270,6 +273,12 @@ public:
 	/// </summary>
 	/// <returns>キャラクターの移動速度</returns>
 	float GetSpeed() { return m_status.spd; }
+
+	/// <summary>
+	/// キャラクターの瞬間移動攻撃できる回数を取得
+	/// </summary>
+	/// <returns>瞬間移動攻撃できる回数</returns>
+	int GetChaseNum() { return m_status.chaseAttackNum; }
 
 	/// <summary>
 	/// 再生するアニメーションを変える(ブレンドスピード固定)
@@ -391,12 +400,6 @@ public:
 	void SetHitReaction(HitReactionKind kind) { m_nowHitReaction = kind; }
 
 	/// <summary>
-	/// キャラクターの当たり判定の大きさを返す
-	/// </summary>
-	/// <returns>当たり判定の大きさ</returns>
-	float GetRadius();
-
-	/// <summary>
 	/// キャラクターが地上にいるかどうかを返す
 	/// </summary>
 	/// <returns>地上にいるのならtrue</returns>
@@ -431,6 +434,12 @@ public:
 	/// <param name="distance">ハンドル以外の残像の情報</param>
 	MyEngine::Vector3 GetBackPos(float distance);
 
+	/// <summary>
+	/// なにかと衝突した時に物理挙動を行うかを設定する
+	/// </summary>
+	/// <param name="flag">ぶつかるかどうか</param>
+	void SetIsTrigger(bool flag);
+
 protected:
 
 	/// <summary>
@@ -449,6 +458,7 @@ protected:
 		kAttackHitKind,//この攻撃を受けた時のやられ状態
 		kAttackKind,//攻撃の種類
 		kNextComboName,//次に出る攻撃の名前
+		kTargetHitReaction,//敵の状態が何だったら攻撃を出せるか
 		kAnimationName//アニメーションの名前
 	};
 

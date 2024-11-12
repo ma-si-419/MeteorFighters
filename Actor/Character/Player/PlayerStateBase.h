@@ -64,6 +64,16 @@ protected:
 	/// <returns>使用しているキャラクターの移動速度</returns>
 	float GetSpeed();
 
+	/// <summary>
+	/// カメラの移動を止める
+	/// </summary>
+	void StopMoveCamera();
+
+	/// <summary>
+	/// カメラの移動を始める
+	/// </summary>
+	void StartMoveCamera();
+
 	//プレイヤーのポインタ
 	std::shared_ptr<Player> m_pPlayer;
 

@@ -105,7 +105,8 @@ void GameManager::SetPlayerStatus(int number,std::vector<std::string> statusData
 	status.def = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kDef)]);
 	status.spd = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSpd)]);
 	status.chargeSpd = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kChargeSpd)]);
-	
+	status.chaseAttackNum = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kChaseNum)]);
+
 	//ˆê‚Â–Ú‚Ì•KE‹Z‚Ìî•ñİ’è
 	status.firstSpecialAttackData.name = statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialName)];
 	status.firstSpecialAttackData.cost = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialCost)]);
@@ -140,7 +141,9 @@ void GameManager::SetEnemyStatus(int number,std::vector<std::string> statusData)
 	status.atk = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kAtk)]);
 	status.def = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kDef)]);
 	status.spd = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSpd)]);
-	status.chargeSpd = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kChargeSpd)]);
+	status.chargeSpd = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kChargeSpd)]);	
+	status.chaseAttackNum = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kChaseNum)]);
+
 	//ˆê‚Â–Ú‚Ì•KE‹Z‚Ìî•ñİ’è
 	status.firstSpecialAttackData.name = statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialName)];
 	status.firstSpecialAttackData.cost = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialCost)]);
@@ -181,12 +184,12 @@ MyEngine::Vector3 GameManager::GetEnemyVelo()
 	return m_pEnemy->GetVelo();
 }
 
-int GameManager::GetPlayerReactionKind()
+int GameManager::GetPlayerHitReaction()
 {
 	return static_cast<int>(m_pPlayer->GetHitReaction());
 }
 
-int GameManager::GetEnemyReactionKind()
+int GameManager::GetEnemyHitReaction()
 {
 	return static_cast<int>(m_pEnemy->GetHitReaction());
 }
@@ -199,6 +202,16 @@ void GameManager::AddAttack(std::shared_ptr<Attack> attack)
 void GameManager::StartFastCameraMove()
 {
 	m_pCamera->StartFastCameraMove();
+}
+
+void GameManager::StopMoveCamera()
+{
+	m_pCamera->StopCamera();
+}
+
+void GameManager::StartMoveCamera()
+{
+	m_pCamera->StartMoveCamera();
 }
 
 MyEngine::Vector3 GameManager::GetPlayerBackPos(float distance)

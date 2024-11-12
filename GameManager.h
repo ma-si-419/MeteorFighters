@@ -84,13 +84,13 @@ public:
 	/// プレイヤーの今のやられ状態を取得する
 	/// </summary>
 	/// <returns>プレイヤーのやられ状態</returns>
-	int GetPlayerReactionKind();
+	int GetPlayerHitReaction();
 
 	/// <summary>
 	/// エネミーの今のやられ状態を取得する
 	/// </summary>
 	/// <returns>エネミーのやられ状態</returns>
-	int GetEnemyReactionKind();
+	int GetEnemyHitReaction();
 
 	/// <summary>
 	/// 管理する攻撃を追加する
@@ -98,11 +98,35 @@ public:
 	/// <param name="attack">追加する攻撃クラスのポインタ</param>
 	void AddAttack(std::shared_ptr<Attack> attack);
 
+	/// <summary>
+	/// カメラを高速移動させる
+	/// </summary>
 	void StartFastCameraMove();
 
+	/// <summary>
+	/// カメラの移動を止める
+	/// </summary>
+	void StopMoveCamera();
+
+	/// <summary>
+	/// カメラの移動を始める
+	/// </summary>
+	void StartMoveCamera();
+
+	/// <summary>
+	/// プレイヤーの背後座標を取得する
+	/// </summary>
+	/// <param name="distance">背後の距離</param>
+	/// <returns>プレイヤーの背後座標</returns>
 	MyEngine::Vector3 GetPlayerBackPos(float distance);
 
+	/// <summary>
+	/// エネミーの背後座標を取得する
+	/// </summary>
+	/// <param name="distance">背後の距離</param>
+	/// <returns>エネミーの背後座標</returns>
 	MyEngine::Vector3 GetEnemyBackPos(float distance);
+
 private:
 
 	//プレイヤーのポインタ

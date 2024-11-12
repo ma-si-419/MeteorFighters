@@ -9,10 +9,18 @@
 
 namespace
 {
+	//スティック操作がされていないとき上下移動
 	constexpr float kMoveVerticalPower = 0.03f;
+	//スティック操作がされているときの上下移動
+	constexpr float kOnStickVerticalPower = 200.0f;
 
 	constexpr float kVerticalMoveMax = 0.5f;
 	constexpr float kVerticalMoveMin = -0.5f;
+
+	constexpr float kCurveScale = -80;
+
+	//移動ベクトルがカーブする距離
+	constexpr float kCurveDistance = 300.0f;
 }
 
 PlayerStateRush::PlayerStateRush(std::shared_ptr<Player> player) :
@@ -106,64 +114,109 @@ void PlayerStateRush::Update()
 		}
 
 		//移動の方向ベクトル
-		m_moveDir = stickDir = stickDir.Normalize();
+		MyEngine::Vector3 moveDir = stickDir;
 
+		if (input.IsPress("RB"))
+		{
+			moveDir.y += kOnStickVerticalPower;
+		}
+		if (input.IsPushTrigger(true))
+		{
+			moveDir.y -= kOnStickVerticalPower;
+		}
+
+		//エネミーの方向に移動方向を回転させる
+		float vX = GetEnemyPos().x - m_pPlayer->GetPos().x;
+		float vZ = GetEnemyPos().z - m_pPlayer->GetPos().z;
+
+		float yAngle = std::atan2f(vX, vZ);
+
+		MyEngine::Vector3 rotation;
+
+		rotation = MyEngine::Vector3(0.0f, yAngle, 0.0f);
+
+		MATRIX mat = rotation.GetRotationMat();
+
+		if (stickDir.z > 0)
+		{
+			MyEngine::Vector3 toTarget;////////////////////
+
+			moveDir = moveDir * (1.0 - stickDir.Normalize().z) + ;
+		}
+
+		//MyEngine::Vector3 dir = m_moveDir.MatTransform(mat);
+		m_moveDir = moveDir.Normalize().MatTransform(mat);
 	}
-	//エネミーの方向に移動方向を回転させる
-	float vX = GetEnemyPos().x - m_pPlayer->GetPos().x;
-	float vZ = GetEnemyPos().z - m_pPlayer->GetPos().z;
-
-	float yAngle = std::atan2f(vX, vZ);
-
-	MyEngine::Vector3 rotation;
-
-	rotation = MyEngine::Vector3(0.0f, yAngle, 0.0f);
-
-	MATRIX mat = rotation.GetRotationMat();
-
-	if (input.IsPress("RB"))
+	else
 	{
-		m_moveDir.y += kMoveVerticalPower;
-	}
-	if (input.IsPushTrigger(true))
-	{
-		m_moveDir.y -= kMoveVerticalPower;
+		if (input.IsPress("RB"))
+		{
+			m_moveDir.y += kMoveVerticalPower;
+		}
+		if (input.IsPushTrigger(true))
+		{
+			m_moveDir.y -= kMoveVerticalPower;
+		}
 	}
 
 	//上にも下にも傾きすぎないように
+
 	m_moveDir.y = std::fmax(m_moveDir.y, kVerticalMoveMin);
 	m_moveDir.y = std::fmin(m_moveDir.y, kVerticalMoveMax);
-
-
-
-	MyEngine::Vector3 dir = m_moveDir.MatTransform(mat);
-
-	MyEngine::Vector3 velo = dir * speed;
+	MyEngine::Vector3 velo = m_moveDir * speed;
 
 	//敵の背後に向かうフラグが立っていれば
 	if (m_isRushEnemy)
 	{
+		//障害物に当たらないようにする
+		m_pPlayer->SetIsTrigger(true);
+
 		MyEngine::Vector3 toTarget = m_rushTargetPos - m_pPlayer->GetPos();
 
-		dir = toTarget.Normalize();
+		m_moveDir = toTarget.Normalize();
+
+		//一定距離から移動方向を変えるため、距離の割合をとる
+		float langeRate = toTarget.Length() / kCurveDistance;
+		//カーブの割合
+		float curveRate = 0.0f;
+
+		//一定距離まで近づいたら
+		if (langeRate < 1.0f)
+		{
+			//0から1の間で-1から+1にするために*2-1をする
+			curveRate = std::sinf(langeRate * 2.0f - 1.0f);
+
+			printfDx("%0.2f\n", langeRate);
+
+			float yAngle = curveRate * kCurveScale;
+
+			MyEngine::Vector3 rotation(0.0f, curveRate, 0.0f);
+
+			MATRIX mat = rotation.GetRotationMat();
+
+			m_moveDir = m_moveDir.MatTransform(mat);
+		}
 
 		if (toTarget.Length() > GameSceneConstant::kRushSpeed)
 		{
-			velo = dir * GameSceneConstant::kRushSpeed;
+			velo = m_moveDir * GameSceneConstant::kRushSpeed;
 		}
 		else
 		{
-			velo = dir * toTarget.Length();
+			velo = m_moveDir * toTarget.Length();
 		}
 
 		//一定距離までは目的座標を更新し続ける
 		if ((GetEnemyBackPos(GameSceneConstant::kEnemyBackPosDistance) - m_pPlayer->GetPos()).Length() > GameSceneConstant::kCameraMoveDistance)
 		{
 			m_rushTargetPos = GetEnemyBackPos(GameSceneConstant::kEnemyBackPosDistance);
+			StopMoveCamera();
 		}
 		//一定距離まで近づいたら
 		else
 		{
+			StartMoveCamera();
+
 			//カメラを高速移動させる
 			m_pPlayer->StartFastCameraMove();
 
@@ -173,12 +226,21 @@ void PlayerStateRush::Update()
 				auto next = std::make_shared<PlayerStateIdle>(m_pPlayer);
 
 				ChangeState(next);
+
+				//障害物に当たるようにする
+				m_pPlayer->SetIsTrigger(false);
+
+				//敵の方向を向く
+				MyEngine::Vector3 nextPos = m_pPlayer->GetPos() + velo;
+
+				MyEngine::Vector3 nextToTarget = GetEnemyPos() - nextPos;
+
+				m_pPlayer->SetFrontPos(nextToTarget + m_pPlayer->GetPos());
+
 				return;
 			}
 		}
 	}
-
-
 
 	SetPlayerVelo(velo);
 

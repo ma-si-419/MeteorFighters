@@ -20,8 +20,8 @@ namespace
 
 
 	constexpr float kLocalInitPosX = 27.0f;
-	constexpr float kLocalInitTopPosY = -2.0f;
-	constexpr float kLocalInitUnderPosY = 8.0f;
+	constexpr float kLocalInitTopPosY = 0.0f;
+	constexpr float kLocalInitUnderPosY = 11.0f;
 	constexpr float kLocalInitPosZ = -30.0f;
 
 	//プレイヤーとターゲットの間でどの当たりにカメラの焦点を合わせるか
@@ -39,15 +39,22 @@ namespace
 	//前のフレームのカメラ座標と次のフレームのカメラ座標の距離が遠いと判定する距離
 	constexpr float kCameraFarLange = 100.0f;
 
-	//カメラの次の座標が遠いときの移動速度
-	constexpr float kFarCameraMoveSpeed = 15.0f;
+	//カメラの次の座標が遠いときの移動速度の最大
+	constexpr float kFarCameraMaxMoveSpeed = 50.0f;
+
+	//カメラが高速移動するときに目標座標まで行くのにかかる時間
+	constexpr int kFastMoveTime = 5;
+
+	//最小移動ベクトル
+	constexpr float kSmallestMoveVecLength = 2.0f;
 
 }
 
 GameCamera::GameCamera() :
 	m_lightHandle(-1),
 	m_stopTime(0),
-	m_isFastMove(false)
+	m_isFastMove(false),
+	m_isStop(false)
 {
 	m_lightHandle = CreateDirLightHandle(VGet(0, 0, 0));
 }
@@ -67,6 +74,14 @@ void GameCamera::Init(MyEngine::Vector3 centerPos)
 
 void GameCamera::Update()
 {
+	//動かないと設定されていたらリターン
+	if (m_isStop)return;
+
+	//一定値以下の移動ベクトルは0に戻しておく
+	if (m_moveVec.Length() < kSmallestMoveVecLength)
+	{
+		m_moveVec = MyEngine::Vector3(0.0f, 0.0f, 0.0f);
+	}
 
 	//今のカメラのワールド座標
 	MyEngine::Vector3 cameraWorldPos = m_localPos.GetWorldPos();
@@ -167,8 +182,14 @@ void GameCamera::Update()
 		m_localPos.SetLocalPos(m_nextCameraPos);
 		//そのローカル座標に向かうベクトルを作成
 		MyEngine::Vector3 toNextPos = m_localPos.GetWorldPos() - m_lastCameraPos;
+		//移動速度
+		float speed = toNextPos.Length() / kFastMoveTime;
+
+		//最大速度を超えないようにする
+		speed = std::fmin(speed,kFarCameraMaxMoveSpeed);
+
 		//カメラを瞬間移動させずに速く移動させる
-		m_moveVec = toNextPos.Normalize() * kFarCameraMoveSpeed;
+		m_moveVec = toNextPos.Normalize() * speed;
 
 		if (m_moveVec.Length() > toNextPos.Length())
 		{

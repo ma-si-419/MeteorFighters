@@ -47,6 +47,9 @@ private:
 	//Ÿ‚ÉUŒ‚‚ğs‚¤‚©‚Ç‚¤‚©
 	bool m_isNextAttack;
 
+	//uŠÔˆÚ“®UŒ‚‚Ì’ÇŒ‚‚ğs‚Á‚½‚©‚Ç‚¤‚©
+	int m_chaseAttackNum;
+
 	//Ši“¬UŒ‚‚ÅˆÚ“®‚·‚éÀ•W
 	MyEngine::Vector3 m_moveTargetPos;
 };

@@ -19,7 +19,7 @@ MyEngine::Vector3 PlayerStateBase::GetEnemyVelo()
 
 int PlayerStateBase::GetEnemyHitReaction()
 {
-	return m_pPlayer->m_pGameManager->GetEnemyReactionKind();
+	return m_pPlayer->m_pGameManager->GetEnemyHitReaction();
 }
 
 void PlayerStateBase::SetPlayerVelo(MyEngine::Vector3 velo)
@@ -50,4 +50,14 @@ int PlayerStateBase::GetAttackAnimKind(std::string animName)
 float PlayerStateBase::GetSpeed()
 {
 	return m_pPlayer->GetSpeed();
+}
+
+void PlayerStateBase::StopMoveCamera()
+{
+	m_pPlayer->m_pGameManager->StopMoveCamera();
+}
+
+void PlayerStateBase::StartMoveCamera()
+{
+	m_pPlayer->m_pGameManager->StartMoveCamera();
 }

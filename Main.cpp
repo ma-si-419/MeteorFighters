@@ -96,8 +96,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #endif // _DEBUG
 		sceneManager.Draw();
 
-		printfDx("%d\n", input.GetPushTriggerTime(true));
-
 		// ‰æ–Ê‚ªØ‚è‘Ö‚í‚é‚Ì‚ğ‘Ò‚Â
 		ScreenFlip();
 

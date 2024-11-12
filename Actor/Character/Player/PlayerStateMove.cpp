@@ -10,6 +10,15 @@
 #include "Input.h"
 #include "Player.h"
 #include <cmath>
+
+namespace
+{
+	//移動速度を遅くする割合
+	constexpr float kSlowMoveSpeed = 0.6f;
+	//さらに移動速度を遅くする距離
+	constexpr float kNearestLange = 10.0f;
+}
+
 PlayerStateMove::PlayerStateMove(std::shared_ptr<Player> player) :
 	PlayerStateBase(player),
 	m_attackButtonPushTime(0.0f),
@@ -72,18 +81,30 @@ void PlayerStateMove::Update()
 
 		dir = dir.MatTransform(mat);
 
+		MyEngine::Vector3 toTarget = (GetEnemyPos() - m_pPlayer->GetPos());
+		MyEngine::Vector3 toTargetDir = toTarget.Normalize();
+
 		//空中にいて前入力されていたら
 		if (leftStickDir.Normalize().z > 0 && m_isFloat)
 		{
 			float frontRate = leftStickDir.Normalize().z;
 
-			MyEngine::Vector3 toTarget = (GetEnemyPos() - m_pPlayer->GetPos()).Normalize();
+			dir = (dir * (1.0 - frontRate)) + toTargetDir * frontRate;
+		}
 
-			dir = (dir * (1.0 - frontRate)) + toTarget * frontRate;
+		//移動速度
+		float speed = GetSpeed();
+
+		//一定以上敵に近くなると移動速度を遅くする
+		if (toTarget.Length() < GameSceneConstant::kNearLange)
+		{
+			speed *= kSlowMoveSpeed;
 		}
 
 		//移動方向にスピードをかける
-		velo = dir * GetSpeed();
+		velo = dir * speed;
+
+
 	}
 
 	//宙に浮いていない場合

@@ -4,6 +4,8 @@
 /// </summary>
 namespace GameSceneConstant
 {
+	//キャラクターの当たり判定の大きさ
+	constexpr float kCharacterRadius = 5.0f;
 	//ジャンプ力
 	constexpr float kJumpPower = 6.0f;
 	//空中での重力の強さ
@@ -35,10 +37,9 @@ namespace GameSceneConstant
 	//何フレームレフトショルダーボタンを押していたらチャージ状態に移行するか
 	constexpr float kChargeStateChangeTime = 20;
 	//突撃中にカメラが高速移動を始める距離
-	constexpr float kCameraMoveDistance = 20.0f;
+	constexpr float kCameraMoveDistance = 200.0f;
 	//敵の背後に行くときにどれだけ離れるか
-	constexpr float kEnemyBackPosDistance = 3.0f;
+	constexpr float kEnemyBackPosDistance = 4.0f;
 	//突撃の速さ
-	constexpr float kRushSpeed = 10.0f;
-
+	constexpr float kRushSpeed = 15.0f;
 }

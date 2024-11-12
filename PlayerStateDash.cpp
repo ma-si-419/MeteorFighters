@@ -14,9 +14,11 @@ namespace
 
 	constexpr int kDashTime = 15;
 
-	constexpr int kDodgeTime = 30;
+	constexpr int kDodgeTime = 20;
 
 	constexpr float kAnimationBlendSpeed = 0.12f;
+
+	constexpr float kAnimPlaySpeed = 1.5f;
 }
 
 PlayerStateDash::PlayerStateDash(std::shared_ptr<Player> player) :
@@ -74,6 +76,7 @@ void PlayerStateDash::Enter()
 		}
 	}
 
+	m_pPlayer->SetAnimPlaySpeed(kAnimPlaySpeed);
 }
 
 void PlayerStateDash::Update()
@@ -90,13 +93,22 @@ void PlayerStateDash::Update()
 
 	MATRIX mat = rotation.GetRotationMat();
 
-
 	MyEngine::Vector3 dir = m_moveDir.MatTransform(mat);
 
 	//‹ó’†‚É‚¢‚Ä‘O“ü—Í‚³‚ê‚Ä‚¢‚½‚ç
 	if (m_moveDir.z > 0 && !m_pPlayer->IsGround())
 	{
 		float frontRate = m_moveDir.z;
+
+		LocalPos enemyLocal;
+
+		enemyLocal.SetCenterPos(GetEnemyPos());
+
+		enemyLocal.SetLocalPos(MyEngine::Vector3(0.0f,0.0f,GameSceneConstant::kCharacterRadius));
+
+		enemyLocal.SetFrontPos(m_pPlayer->GetPos());
+
+		MyEngine::Vector3 targetPos = GetEnemyPos() + enemyLocal.GetWorldPos();
 
 		MyEngine::Vector3 toTarget = (GetEnemyPos() - m_pPlayer->GetPos()).Normalize();
 
@@ -167,6 +179,7 @@ void PlayerStateDash::Update()
 
 void PlayerStateDash::Exit()
 {
+	m_pPlayer->SetAnimPlaySpeed();
 }
 
 void PlayerStateDash::OnCollide(std::shared_ptr<Collidable> collider)

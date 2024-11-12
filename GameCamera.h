@@ -35,6 +35,16 @@ public:
 	void SetCamera();
 
 	/// <summary>
+	/// カメラを止める
+	/// </summary>
+	void StopCamera() { m_isStop = true; }
+
+	/// <summary>
+	/// カメラの移動を始める
+	/// </summary>
+	void StartMoveCamera() { m_isStop = false; }
+
+	/// <summary>
 	/// カメラを高速移動で動かしたいときに呼ぶ関数
 	/// </summary>
 	void StartFastCameraMove() { m_isFastMove = true; }
@@ -58,5 +68,7 @@ private:
 	int m_lightHandle;
 
 	bool m_isFastMove;
+
+	bool m_isStop;
 };
 

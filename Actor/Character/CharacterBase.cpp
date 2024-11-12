@@ -3,6 +3,7 @@
 #include "LoadCsv.h"
 #include "Attack.h"
 #include <cassert>
+#include <cmath>
 #include "GameManager.h"
 #include "LocalPos.h"
 #include "SceneGame.h"
@@ -12,13 +13,10 @@
 namespace
 {
 	constexpr float kCharacterHeight = 4.5f;
-	constexpr float kCharacterRadius = 5.0f;
 
-	constexpr float kAttackPopPos = kCharacterRadius * 3.0f;
+	constexpr float kAttackPopPos = GameSceneConstant::kCharacterRadius * 3.0f;
 
-	constexpr float kAttackMaxShiftY = kCharacterHeight * 0.5f;
-
-	const MyEngine::Vector3 kAttackPos(0.0f, 0.0f, kAttackPopPos);
+	constexpr float kAttackMaxShiftPosY = kCharacterHeight * 1.5f;
 
 	constexpr float kAnimBlendSpeed = 0.08f;
 
@@ -64,7 +62,6 @@ namespace
 		{"DownChargeAttack",CharacterBase::AnimKind::kDownChargeAttack},
 		{"EnergyChargeAttack",CharacterBase::AnimKind::kEnergyChargeAttack}
 	};
-
 }
 
 CharacterBase::CharacterBase(ObjectTag tag, CharacterKind kind) :
@@ -84,7 +81,7 @@ CharacterBase::CharacterBase(ObjectTag tag, CharacterKind kind) :
 {
 	auto sphereData = std::dynamic_pointer_cast<SphereColliderData>(m_pColData);
 
-	sphereData->m_radius = kCharacterRadius;
+	sphereData->m_radius = GameSceneConstant::kCharacterRadius;
 
 	LoadCsv load;
 
@@ -253,6 +250,7 @@ void CharacterBase::SetNormalAttackData(std::vector<std::vector<std::string>> no
 		pushData.animationName = item[static_cast<int>(NormalAttackDataSort::kAnimationName)];
 		pushData.attackKind = static_cast<AttackKind>(stoi(item[static_cast<int>(NormalAttackDataSort::kAttackKind)]));
 		pushData.nextComboName = item[static_cast<int>(NormalAttackDataSort::kNextComboName)];
+		pushData.targetHitReaction = item[static_cast<int>(NormalAttackDataSort::kTargetHitReaction)];
 		pushData.attackHitKind = kAttackHitKindMap.at(item[static_cast<int>(NormalAttackDataSort::kAttackHitKind)]);
 
 		m_normalAttackData[item[static_cast<int>(NormalAttackDataSort::kAttackName)]] = pushData;
@@ -302,22 +300,20 @@ void CharacterBase::CreateAttack(AttackData attackData)
 	localPos.SetFrontPos(m_rigidbody.GetPos() + toTarget.Normalize());
 
 	//どのくらいずらすかを設定
-	localPos.SetLocalPos(kAttackPos);
+	MyEngine::Vector3 localAttackPos;
+
+	localAttackPos.z = std::fmin(std::fabs(toTarget.z), kAttackPopPos);
+
+	localPos.SetLocalPos(localAttackPos);
 
 	//ローカル座標からワールド座標に変換
 	attackPos = localPos.GetWorldPos();
 
 	//y座標のずれを一定値までは補正
 	float shiftY = toTarget.y;
-
-	if (shiftY > kAttackMaxShiftY)
-	{
-		shiftY = kAttackMaxShiftY;
-	}
-	else if (shiftY < -kAttackMaxShiftY)
-	{
-		shiftY = -kAttackMaxShiftY;
-	}
+	
+	shiftY = std::fmin(shiftY, kAttackMaxShiftPosY);
+	shiftY = std::fmax(shiftY, -kAttackMaxShiftPosY);
 
 	attackPos.y += shiftY;
 
@@ -400,11 +396,6 @@ CharacterBase::AnimKind CharacterBase::GetAttackAnimKind(std::string animName)
 	return kAttackAnimKindMap.at(animName);
 }
 
-float CharacterBase::GetRadius()
-{
-	return kCharacterRadius;
-}
-
 void CharacterBase::LookTarget(bool isPlayer)
 {
 	if (isPlayer)
@@ -476,7 +467,12 @@ MyEngine::Vector3 CharacterBase::GetBackPos(float distance)
 
 	toBackPos = toBackPos.Normalize();
 
-	MyEngine::Vector3 ans = m_rigidbody.GetPos() + (toBackPos * distance);
+	MyEngine::Vector3 ans = m_rigidbody.GetPos() + (toBackPos * (distance + GameSceneConstant::kCharacterRadius));
 
 	return ans;
+}
+
+void CharacterBase::SetIsTrigger(bool flag)
+{
+	m_pColData->SetIsTrigger(flag);
 }

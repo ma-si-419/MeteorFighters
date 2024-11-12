@@ -139,7 +139,8 @@ void Physics::StageColUpdate()
 	//当たり判定リスト
 	for (auto& item : m_collidables)
 	{
-
+		//物理挙動をしないものは判定しない
+		if (item->m_isTrigger)return;
 
 		MV1_COLL_RESULT_POLY_DIM hitDim;
 
@@ -692,7 +693,7 @@ void Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable> collider)
 	//当たったかどうかのフラグ初期化
 	bool isHitFlag = false;
 
-	
+
 
 	//物体が上昇していたら
 	if ((collider->m_nextPos.y - collider->m_rigidbody.GetPos().y) > 0)
@@ -859,11 +860,11 @@ void Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable> collider)
 			if (collider->m_pColData->GetKind() == ColliderData::Kind::kCapsule)
 			{
 				auto capsule = std::dynamic_pointer_cast<CapsuleColliderData>(collider->m_pColData);
-				
+
 				//接触したポリゴンで一番高いY座標を当たり判定のY座標にする
 				collider->m_nextPos.y = polyMaxPosY + capsule->m_radius;
 
-				capsule->m_nextEndPos.y = polyMaxPosY + capsule->m_radius +  capsule->m_lange.y;
+				capsule->m_nextEndPos.y = polyMaxPosY + capsule->m_radius + capsule->m_lange.y;
 			}
 			else if (collider->m_pColData->GetKind() == ColliderData::Kind::kSphere)
 			{

@@ -56,7 +56,8 @@ PlayerStateNormalAttack::PlayerStateNormalAttack(std::shared_ptr<Player> player)
 	m_attackKey("empty"),
 	m_chargeTime(0.0f),
 	m_isAttacked(false),
-	m_isNextCharge(false)
+	m_isNextCharge(false),
+	m_chaseAttackNum(0)
 {
 }
 void PlayerStateNormalAttack::SetAttack(std::string key, bool isCharge)
@@ -191,30 +192,57 @@ void PlayerStateNormalAttack::Update()
 		//Ÿ‚ÉUŒ‚‚ğs‚¤‚ÆŒˆ’è‚µ‚Ä‚¢‚ê‚Î
 		if (m_isNextAttack)
 		{
-			//Ÿ‚ÌUŒ‚‚ª‚È‚¢UŒ‚‚¾‚Á‚½‚ç
+			//Ÿ‚ÌUŒ‚‚ª‚È‚¢UŒ‚‚¾‚Á‚½‚çUŒ‚‚ğs‚í‚È‚¢
 			if (m_nextAttackName == "None") return;
-			//ŠÔ‚ÌƒŠƒZƒbƒg
-			m_time = 0;
-			//UŒ‚‚ğs‚Á‚Ä‚¢‚È‚¢ó‘Ô‚É•Ï‰»
-			m_isAttacked = false;
-			//Ÿ‚És‚¤UŒ‚‚Ìİ’è
-			m_nowAttackName = m_nextAttackName;
-			m_nextAttackName = "empty";
 
-			//Ÿ‚ÌUŒ‚‚ªƒ`ƒƒ[ƒW‚Å‚«‚é‚©‚Ç‚¤‚©
-			m_isCharge = m_isNextCharge;
-			m_isNextCharge = false;
+			//Ÿ‚ÌUŒ‚‚Ìî•ñ
+			CharacterBase::NormalAttackData nextAttack = m_pPlayer->GetNormalAttackData(m_nextAttackName);
 
-			//UŒ‚î•ñ‚ÌXV
-			attackData = m_pPlayer->GetNormalAttackData(m_nowAttackName);
+			//Ÿ‚ÌUŒ‚‚ğo‚·ğŒ‚É“G‚Ìó‘Ô‚ª‚ ‚ê‚Î¡‚Ì“G‚Ì‚â‚ç‚êó‘Ô‚ÆÆ‚ç‚µ‡‚í‚¹‚é
+			CharacterBase::HitReactionKind enemyHitReaction = static_cast<CharacterBase::HitReactionKind>(GetEnemyHitReaction());
+
+			if (nextAttack.targetHitReaction == "’†")
+			{
+				//’†‚â‚ç‚ê‚¶‚á‚È‚¯‚ê‚Î
+				if (enemyHitReaction != CharacterBase::HitReactionKind::kMiddle)return;
+			}
+			else if (nextAttack.targetHitReaction == "‚Á”ò‚Ñ")
+			{
+				//‚Á”ò‚Ñó‘Ô‚Å‚È‚¯‚ê‚Î‚¶‚á‚È‚¯‚ê‚Î
+				bool flag = false;
+
+				//‰º‚Ì’†‚Ì‚Ç‚ê‚©‚ğ’Ê‚ê‚ÎOK
+				if (enemyHitReaction != CharacterBase::HitReactionKind::kUpBurst)
+				{
+					flag = true;
+				}
+				else if (enemyHitReaction != CharacterBase::HitReactionKind::kFarBurst)
+				{
+					flag = true;
+				}
+				else if (enemyHitReaction != CharacterBase::HitReactionKind::kDownBurst)
+				{
+					flag = true;
+				}
+
+				//1‚Â‚à’Ê‚Á‚Ä‚¢‚È‚¯‚ê‚ÎUŒ‚‚ğo‚³‚È‚¢
+				if (!flag) return;
+			}
 
 			//uŠÔˆÚ“®‚·‚éUŒ‚‚Å‚ ‚ê‚ÎuŠÔˆÚ“®‚·‚é
-			if (attackData.isTeleportation)
+			if (nextAttack.isTeleportation)
 			{
-				m_pPlayer->StartFastCameraMove();
+				//‚±‚ÌUŒ‚‚ª‚xƒ{ƒ^ƒ“‚É‚æ‚é’ÇŒ‚‚Å
+				if (m_attackKey == "Y")
+				{
+					//‚±‚êˆÈã’ÇŒ‚‚Å‚«‚È‚¯‚ê‚Î
+					if (m_chaseAttackNum >= m_pPlayer->GetChaseNum()) return;
+					//’ÇŒ‚‚Å‚«‚é‚Ì‚È‚ç’ÇŒ‚‚µ‚½‰ñ”‚ğ‘‚â‚·
+					m_chaseAttackNum++;
+				}
 
 				//Ÿ‚ÌUŒ‚”­¶ƒtƒŒ[ƒ€‚É“G‚ª‚¢‚éêŠ‚ğŒvZ‚·‚é
-				MyEngine::Vector3 teleportationPos = GetEnemyPos() + (GetEnemyVelo() * (attackData.attackFrame));
+				MyEngine::Vector3 teleportationPos = GetEnemyPos() + (GetEnemyVelo() * (nextAttack.attackFrame));
 				//uŠÔˆÚ“®æ‚ÉUŒ‚‚ÌUŒ‚”ÍˆÍ•ª‚¾‚¯‚¸‚ê‚ğ‘«‚·
 				MyEngine::Vector3 attackShiftVec = GetEnemyVelo();
 
@@ -226,6 +254,18 @@ void PlayerStateNormalAttack::Update()
 
 				SetPlayerPos(teleportationPos);
 			}
+
+			//ŠÔ‚ÌƒŠƒZƒbƒg
+			m_time = 0;
+			//UŒ‚‚ğs‚Á‚Ä‚¢‚È‚¢ó‘Ô‚É•Ï‰»
+			m_isAttacked = false;
+			//Ÿ‚És‚¤UŒ‚‚Ìİ’è
+			m_nowAttackName = m_nextAttackName;
+			m_nextAttackName = "empty";
+
+			//Ÿ‚ÌUŒ‚‚ªƒ`ƒƒ[ƒW‚Å‚«‚é‚©‚Ç‚¤‚©
+			m_isCharge = m_isNextCharge;
+			m_isNextCharge = false;
 
 			//UŒ‚‚ğs‚¤•ûŒü‚ğİ’è‚·‚é
 			LocalPos attackPos;
@@ -244,13 +284,17 @@ void PlayerStateNormalAttack::Update()
 			shiftVec.y = 0;
 
 			m_moveTargetPos = GetEnemyPos() + shiftVec;
-			CharacterBase::AnimKind anim = static_cast<CharacterBase::AnimKind>(GetAttackAnimKind(attackData.animationName));
+			CharacterBase::AnimKind anim = static_cast<CharacterBase::AnimKind>(GetAttackAnimKind(nextAttack.animationName));
 
 			m_pPlayer->ChangeAnim(anim, false);
 
 			m_isNextAttack = false;
 
 			m_pPlayer->LookTarget(true);
+
+			//UŒ‚î•ñ‚ÌXV
+			attackData = nextAttack;
+
 		}
 	}
 
@@ -373,7 +417,7 @@ void PlayerStateNormalAttack::Update()
 	}
 
 	//Ÿ‚ÌUŒ‚‚ğs‚¤‚©”»’è‚·‚é
-	if (!m_isNextAttack &&
+	if (m_time < attackData.cancelFrame &&
 		m_time > kNextAttackInputTime)
 	{
 		//Ši“¬UŒ‚‚È‚ç
@@ -389,20 +433,25 @@ void PlayerStateNormalAttack::Update()
 			//Yƒ{ƒ^ƒ“‚Å”h¶UŒ‚‚ğo‚·
 			else if (MyEngine::Input::GetInstance().IsTrigger("Y"))
 			{
-				//Yƒ{ƒ^ƒ“‚Ì”h¶‹Z‚ÍŠî–{ƒ`ƒƒ[ƒW‚ª‚Å‚«‚é
-				m_isNextCharge = true;
-				//ã“ü—Í‚µ‚È‚ª‚ç‚Ì”h¶UŒ‚
-				if (MyEngine::Input::GetInstance().GetStickInfo().leftStickY < -kPhysicalAttackStickPower)
+				//‘O‚ÌUŒ‚‚ª’ÊíUŒ‚‚È‚ç”h¶UŒ‚‚ÉˆÚ‚ê‚é
+				if (m_attackKey == "X")
 				{
-					m_nextAttackName = kUpperAttackName;
-				}
-				else if (MyEngine::Input::GetInstance().GetStickInfo().leftStickY > kPhysicalAttackStickPower)
-				{
-					m_nextAttackName = kLegSweepAttackName;
-				}
-				else
-				{
-					m_nextAttackName = kStanAttackName;
+					//Yƒ{ƒ^ƒ“‚Ì”h¶‹Z‚ÍŠî–{ƒ`ƒƒ[ƒW‚ª‚Å‚«‚é
+					m_isNextCharge = true;
+					//ã“ü—Í‚µ‚È‚ª‚ç‚Ì”h¶UŒ‚
+					if (MyEngine::Input::GetInstance().GetStickInfo().leftStickY < -kPhysicalAttackStickPower)
+					{
+						m_nextAttackName = kUpperAttackName;
+					}
+					else if (MyEngine::Input::GetInstance().GetStickInfo().leftStickY > kPhysicalAttackStickPower)
+					{
+						m_nextAttackName = kLegSweepAttackName;
+					}
+					else
+					{
+						m_nextAttackName = kStanAttackName;
+					}
+					m_isNextAttack = true;
 				}
 				//“G‚ª‚Á”ò‚Ñó‘Ô‚Ì‚É”h¶UŒ‚‚ğ‚µ‚Ä‚¢‚½‚ç
 				CharacterBase::HitReactionKind kind = static_cast<CharacterBase::HitReactionKind>(GetEnemyHitReaction());
@@ -413,8 +462,8 @@ void PlayerStateNormalAttack::Update()
 					m_nextAttackName = kTeleportationAttack;
 					//uŠÔˆÚ“®UŒ‚‚¾‚¯ƒ`ƒƒ[ƒW‚ª‚Å‚«‚È‚¢
 					m_isNextCharge = false;
+					m_isNextAttack = true;
 				}
-				m_isNextAttack = true;
 				m_attackKey = "Y";
 			}
 		}
