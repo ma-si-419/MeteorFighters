@@ -214,6 +214,11 @@ void GameManager::StartMoveCamera()
 	m_pCamera->StartMoveCamera();
 }
 
+void GameManager::ShakeCamera(int time)
+{
+	m_pCamera->ShakeCamera(time);
+}
+
 MyEngine::Vector3 GameManager::GetPlayerBackPos(float distance)
 {
 	return m_pPlayer->GetBackPos(distance);

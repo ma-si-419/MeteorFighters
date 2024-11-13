@@ -10,9 +10,15 @@ public:
 	/// <summary>
 	/// このStateに入るときに最初に呼ぶ関数
 	/// </summary>
-	/// <param name="key">何のボタンを押したのか</param>
-	/// <param name="isCharge">チャージしたのか</param>
-	void SetAttack(std::string key,bool isCharge);
+	/// <param name="key">どのキーが押されたのか</param>
+	/// <param name="attackName">何の攻撃を行うのか</param>
+	void SetAttack(std::string key,std::string attackName);
+
+	/// <summary>
+	/// ダッシュから攻撃など移動が変化する攻撃の際に呼ぶ関数
+	/// </summary>
+	/// <param name="velo">攻撃の移動ベクトル</param>
+	void SetAttackVelo(MyEngine::Vector3 velo);
 
 	virtual void Enter() override;
 
@@ -49,6 +55,9 @@ private:
 
 	//瞬間移動攻撃の追撃を行ったかどうか
 	int m_chaseAttackNum;
+
+	//最初の攻撃だけ移動が変わる可能性があるため
+	MyEngine::Vector3 m_firstAttackMoveVec;
 
 	//格闘攻撃で移動する座標
 	MyEngine::Vector3 m_moveTargetPos;

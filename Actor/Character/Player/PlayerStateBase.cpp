@@ -61,3 +61,8 @@ void PlayerStateBase::StartMoveCamera()
 {
 	m_pPlayer->m_pGameManager->StartMoveCamera();
 }
+
+void PlayerStateBase::ShakeCamera(int time)
+{
+	m_pPlayer->m_pGameManager->ShakeCamera(time);
+}

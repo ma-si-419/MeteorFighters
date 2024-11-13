@@ -10,6 +10,7 @@
 #include "Input.h"
 #include "Player.h"
 #include "GameSceneConstant.h"
+
 PlayerStateIdle::PlayerStateIdle(std::shared_ptr<Player> player) :
 	PlayerStateBase(player),
 	m_attackKey("empty"),
@@ -22,6 +23,13 @@ PlayerStateIdle::PlayerStateIdle(std::shared_ptr<Player> player) :
 void PlayerStateIdle::SetEndAnim(int kind, int time)
 {
 	m_pPlayer->ChangeAnim(static_cast<CharacterBase::AnimKind>(kind), false);
+	m_endAnimTime = time;
+	m_isPlayEndAnim = true;
+}
+
+void PlayerStateIdle::SetEndAnim(int kind, int time, float blendSpeed)
+{
+	m_pPlayer->ChangeAnim(static_cast<CharacterBase::AnimKind>(kind), false, blendSpeed);
 	m_endAnimTime = time;
 	m_isPlayEndAnim = true;
 }
@@ -45,9 +53,8 @@ void PlayerStateIdle::Update()
 	//Stateにいる時間を計測する
 	m_time++;
 
-	//アイドル状態の時は移動しない
-	SetPlayerVelo(MyEngine::Vector3(0, 0, 0));
-	
+	MyEngine::Vector3 velo;
+
 	//アニメーションが終わる時間になっていれば
 	if (m_time > m_endAnimTime)
 	{
@@ -55,7 +62,10 @@ void PlayerStateIdle::Update()
 		//アイドルアニメーションでなければ
 		if (m_pPlayer->GetPlayAnimKind() != CharacterBase::AnimKind::kIdle)
 		{
+			//アイドルアニメーションに変える
 			m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kIdle, true);
+			//一応再生速度をリセットしておく
+			m_pPlayer->SetAnimPlaySpeed();
 		}
 	}
 
@@ -91,8 +101,52 @@ void PlayerStateIdle::Update()
 			bool isCharge = m_attackButtonPushTime > GameSceneConstant::kChargeAttackTime;
 			//次のStateのポインタ作成
 			auto next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
+
 			//何の攻撃を行うかをAttackStateに渡す
-			next->SetAttack(m_attackKey, isCharge);
+			std::string attackName = "empty";
+
+			//チャージされていて
+			if (isCharge)
+			{
+				//Xボタンが押されていて
+				if (m_attackKey == "X")
+				{
+					//スティックを上に傾けていたら
+					if (input.GetStickInfo().leftStickY < -GameSceneConstant::kPhysicalAttackStickPower)
+					{
+						attackName = "UpCharge";
+					}
+					//スティックを下に傾けていたら
+					else if (input.GetStickInfo().leftStickY > GameSceneConstant::kPhysicalAttackStickPower)
+					{
+						attackName = "DownCharge";
+					}
+					//スティックを傾けていなければ
+					else
+					{
+						attackName = "MiddleCharge";
+					}
+				}
+				//Yボタンが押されていたら
+				else if (m_attackKey == "Y")
+				{
+					attackName = "EnergyCharge";
+				}
+			}
+			//チャージされていなければ
+			else
+			{
+				if (m_attackKey == "X")
+				{
+					attackName = "Low1";
+				}
+				else if(m_attackKey == "Y")
+				{
+					attackName = "Energy1";
+				}
+			}
+
+			next->SetAttack(m_attackKey, attackName);
 			//StateをAttackに変更する
 			ChangeState(next);
 			return;
@@ -132,7 +186,7 @@ void PlayerStateIdle::Update()
 				//突撃状態に移行する
 				auto next = std::make_shared<PlayerStateRush>(m_pPlayer);
 
-				next->SetMoveDir(MyEngine::Vector3(0,0,1));
+				next->SetMoveDir(MyEngine::Vector3(0.0f, 0.0f, 1.0f));
 
 				ChangeState(next);
 				return;
@@ -185,6 +239,8 @@ void PlayerStateIdle::Update()
 			return;
 		}
 
+		//重力をかけておく
+		velo.y += GameSceneConstant::kGroundGravityPower;
 
 	}
 	//空中にいるときに
@@ -212,7 +268,8 @@ void PlayerStateIdle::Update()
 		return;
 	}
 
-
+	//アイドル状態の時は移動しない
+	SetPlayerVelo(velo);
 }
 void PlayerStateIdle::Exit()
 {

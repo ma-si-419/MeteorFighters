@@ -74,6 +74,12 @@ protected:
 	/// </summary>
 	void StartMoveCamera();
 
+	/// <summary>
+	/// カメラを揺れを設定する
+	/// </summary>
+	/// <param name="time">揺らす時間</param>
+	void ShakeCamera(int time);
+
 	//プレイヤーのポインタ
 	std::shared_ptr<Player> m_pPlayer;
 

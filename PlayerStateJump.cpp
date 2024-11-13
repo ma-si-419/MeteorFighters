@@ -109,9 +109,53 @@ void PlayerStateJump::Update()
 			//チャージされていたかどうか判定
 			bool isCharge = m_attackButtonPushTime > GameSceneConstant::kChargeAttackTime;
 			//次のStateのポインタ作成
-			std::shared_ptr<PlayerStateNormalAttack> next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
+			auto next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
+
 			//何の攻撃を行うかをAttackStateに渡す
-			next->SetAttack(m_attackKey, isCharge);
+			std::string attackName = "empty";
+
+			//チャージされていて
+			if (isCharge)
+			{
+				//Xボタンが押されていて
+				if (m_attackKey == "X")
+				{
+					//スティックを上に傾けていたら
+					if (input.GetStickInfo().leftStickY < -GameSceneConstant::kPhysicalAttackStickPower)
+					{
+						attackName = "UpCharge";
+					}
+					//スティックを下に傾けていたら
+					else if (input.GetStickInfo().leftStickY > GameSceneConstant::kPhysicalAttackStickPower)
+					{
+						attackName = "DownCharge";
+					}
+					//スティックを傾けていなければ
+					else
+					{
+						attackName = "MiddleCharge";
+					}
+				}
+				//Yボタンが押されていたら
+				else if (m_attackKey == "Y")
+				{
+					attackName = "EnergyCharge";
+				}
+			}
+			//チャージされていなければ
+			else
+			{
+				if (m_attackKey == "X")
+				{
+					attackName = "Low1";
+				}
+				else if (m_attackKey == "Y")
+				{
+					attackName = "Energy1";
+				}
+			}
+
+			next->SetAttack(m_attackKey, attackName);
 			//StateをAttackに変更する
 			ChangeState(next);
 			return;

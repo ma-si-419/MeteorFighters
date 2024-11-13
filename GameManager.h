@@ -113,6 +113,13 @@ public:
 	/// </summary>
 	void StartMoveCamera();
 
+
+	/// <summary>
+	/// カメラを揺れを設定する
+	/// </summary>
+	/// <param name="time">揺らす時間</param>
+	void ShakeCamera(int time);
+
 	/// <summary>
 	/// プレイヤーの背後座標を取得する
 	/// </summary>

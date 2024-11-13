@@ -41,6 +41,8 @@ namespace
 
 	//カメラの次の座標が遠いときの移動速度の最大
 	constexpr float kFarCameraMaxMoveSpeed = 50.0f;
+	//カメラの次の座標が遠いときの移動速度の最小
+	constexpr float kFarCameraMinMoveSpeed = 5.0f;
 
 	//カメラが高速移動するときに目標座標まで行くのにかかる時間
 	constexpr int kFastMoveTime = 5;
@@ -48,13 +50,17 @@ namespace
 	//最小移動ベクトル
 	constexpr float kSmallestMoveVecLength = 2.0f;
 
+	//カメラを揺らす大きさ
+	constexpr int kShakePower = 3;
+
 }
 
 GameCamera::GameCamera() :
 	m_lightHandle(-1),
 	m_stopTime(0),
 	m_isFastMove(false),
-	m_isStop(false)
+	m_isStop(false),
+	m_shakeTime(0)
 {
 	m_lightHandle = CreateDirLightHandle(VGet(0, 0, 0));
 }
@@ -187,17 +193,36 @@ void GameCamera::Update()
 
 		//最大速度を超えないようにする
 		speed = std::fmin(speed,kFarCameraMaxMoveSpeed);
+		//最小速度も設定しておく
+		speed = std::fmax(speed,kFarCameraMinMoveSpeed);
 
 		//カメラを瞬間移動させずに速く移動させる
 		m_moveVec = toNextPos.Normalize() * speed;
 
 		if (m_moveVec.Length() > toNextPos.Length())
 		{
-			m_moveVec = m_moveVec.Normalize() * toNextPos.Length();
+			m_moveVec = toNextPos;
 			m_isFastMove = false;
 		}
 
 		m_nextCameraPos = m_localPos.ChangeWorldToLocal(m_lastCameraPos + m_moveVec);
+	}
+
+	//揺らす大きさ(基本はゼロ)
+	MyEngine::Vector3 shakeVec;
+
+	//カメラを揺らす設定がされていたら
+	if (m_shakeTime > 0)
+	{
+		m_shakeTime--;
+
+		//マイナスにもなるようにランダムからランダムの大きさの半分減らす
+		int shakePowerHalf = static_cast<int>(kShakePower* 0.5f);
+
+		//カメラのターゲット座標を揺らす
+		shakeVec.x = GetRand(kShakePower) - shakePowerHalf;
+		shakeVec.y = GetRand(kShakePower) - shakePowerHalf;
+		shakeVec.z = GetRand(kShakePower) - shakePowerHalf;
 	}
 
 	//ローカル座標の設定
@@ -206,7 +231,7 @@ void GameCamera::Update()
 	//ターゲット座標の設定
 	MyEngine::Vector3 targetPos = (m_targetPos - m_localPos.GetCenterPos()) * kCameraTargetPosRate + m_localPos.GetCenterPos();
 
-	SetCameraPositionAndTarget_UpVecY(m_localPos.GetWorldPos().CastVECTOR(), targetPos.CastVECTOR());
+	SetCameraPositionAndTarget_UpVecY((m_localPos.GetWorldPos() + shakeVec).CastVECTOR(), targetPos.CastVECTOR());
 
 	SetLightDirectionHandle(m_lightHandle, (m_localPos.GetWorldPos() - targetPos).Normalize().CastVECTOR());
 

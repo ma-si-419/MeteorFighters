@@ -14,7 +14,7 @@ void EnemyStateIdle::Enter()
 {
 	m_kind = CharacterStateKind::kIdle;
 	m_pNextState = shared_from_this();
-	m_pEnemy->ChangeAnim(CharacterBase::AnimKind::kIdle,true);
+	m_pEnemy->ChangeAnim(CharacterBase::AnimKind::kGuard,true);
 	printfDx("アイドルだよー\n");
 }
 

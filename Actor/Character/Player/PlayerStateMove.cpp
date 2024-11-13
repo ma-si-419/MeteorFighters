@@ -64,8 +64,11 @@ void PlayerStateMove::Update()
 	//移動ベクトルが0じゃなければ
 	if (leftStickDir.SqLength() > 0.001)
 	{
+
+		leftStickDir = leftStickDir.Normalize();
+
 		//移動方向
-		dir = leftStickDir.Normalize();
+		dir = leftStickDir;
 
 		//エネミーの方向に移動方向を回転させる
 		float vX = GetEnemyPos().x - m_pPlayer->GetPos().x;
@@ -85,11 +88,11 @@ void PlayerStateMove::Update()
 		MyEngine::Vector3 toTargetDir = toTarget.Normalize();
 
 		//空中にいて前入力されていたら
-		if (leftStickDir.Normalize().z > 0 && m_isFloat)
+		if (leftStickDir.z > 0 && m_isFloat)
 		{
-			float frontRate = leftStickDir.Normalize().z;
+			float frontRate = leftStickDir.z;
 
-			dir = (dir * (1.0 - frontRate)) + toTargetDir * frontRate;
+			dir = dir * (1.0 - frontRate) + toTargetDir * frontRate;
 		}
 
 		//移動速度
@@ -161,7 +164,7 @@ void PlayerStateMove::Update()
 			{
 				auto next = std::make_shared<PlayerStateDash>(m_pPlayer);
 
-				next->SetMoveDir(leftStickDir.Normalize());
+				next->SetMoveDir(leftStickDir);
 
 				ChangeState(next);
 				return;
@@ -173,7 +176,7 @@ void PlayerStateMove::Update()
 			//MPを消費せずにステップをする
 			auto next = std::make_shared<PlayerStateDash>(m_pPlayer);
 
-			next->SetMoveDir(leftStickDir.Normalize());
+			next->SetMoveDir(leftStickDir);
 
 			ChangeState(next);
 			return;
@@ -227,12 +230,10 @@ void PlayerStateMove::Update()
 		//移動していなければ
 		else
 		{
-			//プレイ中のアニメーションが地上待機でなければ
-			if (!(m_pPlayer->GetPlayAnimKind() == CharacterBase::AnimKind::kIdle))
-			{
-				//アニメーションを変更する
-				m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kIdle, true);
-			}
+			//アイドル状態に戻る
+			std::shared_ptr<PlayerStateIdle> next = std::make_shared<PlayerStateIdle>(m_pPlayer);
+
+			ChangeState(next);
 		}
 
 		//今のフレーム地上にいたかどうかを保存する
@@ -316,9 +317,53 @@ void PlayerStateMove::Update()
 			//チャージされていたかどうか判定
 			bool isCharge = m_attackButtonPushTime > GameSceneConstant::kChargeAttackTime;
 			//次のStateのポインタ作成
-			std::shared_ptr<PlayerStateNormalAttack> next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
+			auto next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
+
 			//何の攻撃を行うかをAttackStateに渡す
-			next->SetAttack(m_attackKey, isCharge);
+			std::string attackName = "empty";
+
+			//チャージされていて
+			if (isCharge)
+			{
+				//Xボタンが押されていて
+				if (m_attackKey == "X")
+				{
+					//スティックを上に傾けていたら
+					if (input.GetStickInfo().leftStickY < -GameSceneConstant::kPhysicalAttackStickPower)
+					{
+						attackName = "UpCharge";
+					}
+					//スティックを下に傾けていたら
+					else if (input.GetStickInfo().leftStickY > GameSceneConstant::kPhysicalAttackStickPower)
+					{
+						attackName = "DownCharge";
+					}
+					//スティックを傾けていなければ
+					else
+					{
+						attackName = "MiddleCharge";
+					}
+				}
+				//Yボタンが押されていたら
+				else if (m_attackKey == "Y")
+				{
+					attackName = "EnergyCharge";
+				}
+			}
+			//チャージされていなければ
+			else
+			{
+				if (m_attackKey == "X")
+				{
+					attackName = "Low1";
+				}
+				else if (m_attackKey == "Y")
+				{
+					attackName = "Energy1";
+				}
+			}
+
+			next->SetAttack(m_attackKey, attackName);
 			//StateをAttackに変更する
 			ChangeState(next);
 			return;
@@ -334,9 +379,9 @@ void PlayerStateMove::Update()
 		ChangeState(next);
 		return;
 	}
-
+	
 	//移動していなかったら
-	if (velo.SqLength() == 0)
+	if (velo.SqLength() < 0.01f)
 	{
 		//アイドル状態に戻る
 		std::shared_ptr<PlayerStateIdle> next = std::make_shared<PlayerStateIdle>(m_pPlayer);

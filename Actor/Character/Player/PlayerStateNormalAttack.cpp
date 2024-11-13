@@ -60,54 +60,16 @@ PlayerStateNormalAttack::PlayerStateNormalAttack(std::shared_ptr<Player> player)
 	m_chaseAttackNum(0)
 {
 }
-void PlayerStateNormalAttack::SetAttack(std::string key, bool isCharge)
+void PlayerStateNormalAttack::SetAttack(std::string key, std::string attackName)
 {
 	//押されたキーを保存しておく
 	m_attackKey = key;
 
-	//チャージされていた場合
-	if (isCharge)
-	{
-		//格闘攻撃ならば派生する
-		if (key == "X")
-		{
-			//上入力の場合
-			if (MyEngine::Input::GetInstance().GetStickInfo().leftStickY < -kPhysicalAttackStickPower)
-			{
-				m_nowAttackName = kUpChargeAttack;
-			}
-			//下入力の場合
-			else if (MyEngine::Input::GetInstance().GetStickInfo().leftStickY > kPhysicalAttackStickPower)
-			{
-				m_nowAttackName = kDownChargeAttack;
-			}
-			//入力なしの場合
-			else
-			{
-				m_nowAttackName = kMiddleChargeAttack;
-			}
-
-		}
-		//気弾攻撃なら派生しない
-		else if (key == "Y")
-		{
-			m_nowAttackName = kEnergyChargeAttack;
-		}
-		m_isCharge = true;
-	}
-	else
-	{
-		if (key == "X")
-		{
-			m_nowAttackName = "Low1";
-		}
-		else if (key == "Y")
-		{
-			m_nowAttackName = "Energy1";
-		}
-		m_isCharge = false;
-	}
-
+	m_nowAttackName = attackName;
+}
+void PlayerStateNormalAttack::SetAttackVelo(MyEngine::Vector3 velo)
+{
+	m_firstAttackMoveVec = velo;
 }
 void PlayerStateNormalAttack::Enter()
 {
@@ -132,6 +94,14 @@ void PlayerStateNormalAttack::Enter()
 	m_moveTargetPos = GetEnemyPos() + shiftVec;
 
 	m_pPlayer->LookTarget(true);
+
+	//最初の攻撃がチャージできるかどうかを設定する
+	if (m_nowAttackName == kUpChargeAttack ||
+		m_nowAttackName == kMiddleChargeAttack ||
+		m_nowAttackName == kDownChargeAttack)
+	{
+		m_isCharge = true;
+	}
 
 }
 
@@ -262,6 +232,8 @@ void PlayerStateNormalAttack::Update()
 			//次に行う攻撃の設定
 			m_nowAttackName = m_nextAttackName;
 			m_nextAttackName = "empty";
+			m_firstAttackMoveVec = MyEngine::Vector3(0,0,0);
+
 
 			//次の攻撃がチャージできるかどうか
 			m_isCharge = m_isNextCharge;
@@ -327,6 +299,14 @@ void PlayerStateNormalAttack::Update()
 			}
 
 			velo = dir * speed;
+
+			//もし設定された移動ベクトルがあれば
+			if (m_firstAttackMoveVec.SqLength() > 0)
+			{
+				//その移動ベクトルにする
+				velo = m_firstAttackMoveVec;
+			}
+
 		}
 	}
 	//気弾攻撃ならば

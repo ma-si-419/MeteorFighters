@@ -60,7 +60,8 @@ namespace
 		{"UpChargeAttack",CharacterBase::AnimKind::kUpChargeAttack},
 		{"MiddleChargeAttack",CharacterBase::AnimKind::kMiddleChargeAttack},
 		{"DownChargeAttack",CharacterBase::AnimKind::kDownChargeAttack},
-		{"EnergyChargeAttack",CharacterBase::AnimKind::kEnergyChargeAttack}
+		{"EnergyChargeAttack",CharacterBase::AnimKind::kEnergyChargeAttack},
+		{"DashAttack",CharacterBase::AnimKind::kDashAttack}
 	};
 }
 

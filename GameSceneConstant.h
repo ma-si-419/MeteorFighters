@@ -39,7 +39,9 @@ namespace GameSceneConstant
 	//突撃中にカメラが高速移動を始める距離
 	constexpr float kCameraMoveDistance = 200.0f;
 	//敵の背後に行くときにどれだけ離れるか
-	constexpr float kEnemyBackPosDistance = 4.0f;
+	constexpr float kEnemyBackPosDistance = 2.0f;
 	//突撃の速さ
 	constexpr float kRushSpeed = 15.0f;
+	//派生攻撃のスティックの傾き
+	constexpr int kPhysicalAttackStickPower = 500;
 }

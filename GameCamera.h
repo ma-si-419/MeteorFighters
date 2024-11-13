@@ -49,26 +49,50 @@ public:
 	/// </summary>
 	void StartFastCameraMove() { m_isFastMove = true; }
 
+	/// <summary>
+	/// カメラを揺れを設定する
+	/// </summary>
+	/// <param name="time">揺らす時間</param>
+	void ShakeCamera(int time) { m_shakeTime = time; }
 private:
 
+	//ローカル座標(プレイヤーを中心として、自身の座標を計算する)
 	LocalPos m_localPos;
 
+	//カメラのターゲット座標
 	MyEngine::Vector3 m_targetPos;
 
+	//移動ベクトル
 	MyEngine::Vector3 m_moveVec;
 
+	//次のフレームのカメラの座標
 	MyEngine::Vector3 m_nextCameraPos;
 
+	//前のフレームのカメラの座標
 	MyEngine::Vector3 m_lastCameraPos;
 
+	//プレイヤーの移動ベクトル
 	MyEngine::Vector3 m_playerVelo;
 
+	//カメラを止める時間
 	int m_stopTime;
 
-	int m_lightHandle;
-
+	//カメラを高速移動させるか
 	bool m_isFastMove;
 
+	//カメラを止めるかどうか
 	bool m_isStop;
+	
+	//揺らす時間
+	int m_shakeTime;
+
+#ifdef _DEBUG
+
+	//ライトハンドル
+	int m_lightHandle;
+
+#endif // _DEBUG
+
 };
+
 

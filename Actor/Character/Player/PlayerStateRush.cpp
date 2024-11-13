@@ -1,6 +1,7 @@
 #include "PlayerStateRush.h"
 #include "PlayerStateDash.h"
 #include "PlayerStateIdle.h"
+#include "PlayerStateNormalAttack.h"
 #include "DxLib.h"
 #include "Input.h"
 #include "Player.h"
@@ -11,21 +12,37 @@ namespace
 {
 	//スティック操作がされていないとき上下移動
 	constexpr float kMoveVerticalPower = 0.03f;
-	//スティック操作がされているときの上下移動
-	constexpr float kOnStickVerticalPower = 200.0f;
 
+	//上下移動の角度の最大
 	constexpr float kVerticalMoveMax = 0.5f;
+	//上下移動の角度の最小
 	constexpr float kVerticalMoveMin = -0.5f;
 
-	constexpr float kCurveScale = -80;
+	//1フレームでどのくらい行く方向を回転できるか
+	constexpr float kRotScaleMax = 10.0f;
 
-	//移動ベクトルがカーブする距離
+	//ドラゴンダッシュ時にカーブする距離
 	constexpr float kCurveDistance = 300.0f;
+
+	//アイドルに戻るときのアニメーションブレンドの速さ
+	constexpr float kEndAnimBlendSpeed = 0.08f;
+
+	//アイドルに戻るときのアニメーションの再生速度
+	constexpr float kEndAnimPlaySpeed = 0.5f;
+
+	//アイドルに戻るときの硬直時間
+	constexpr int kEndLandingTime = 20;
+
+	//アイドルに戻るときにカメラを揺らす時間
+	constexpr int kCameraShakeTime = 3;
 }
 
 PlayerStateRush::PlayerStateRush(std::shared_ptr<Player> player) :
 	PlayerStateBase(player),
-	m_isRushEnemy(false)
+	m_isRushEnemy(false),
+	m_isEndRush(false),
+	m_rushEndTime(0),
+	m_isAttackInput(false)
 {
 }
 
@@ -44,6 +61,18 @@ void PlayerStateRush::SetMoveDir(MyEngine::Vector3 dir)
 	MATRIX mat = rotation.GetRotationMat();
 
 	m_moveDir = dir.MatTransform(mat);
+
+	//前入力は敵に向かっていくが後ろ入力はy座標を計算に入れないのでその計算
+	if (dir.z > 0)
+	{
+		MyEngine::Vector3 toTargetDir = (GetEnemyPos() - m_pPlayer->GetPos()).Normalize();
+
+		m_moveDir = m_moveDir * (1.0 - dir.z) + toTargetDir * dir.z;
+	}
+
+	m_moveTarget.SetCenterPos(m_pPlayer->GetPos());
+	m_moveTarget.SetLocalPos(dir.MatTransform(mat));
+	m_moveTarget.SetFrontPos(GetEnemyPos());
 }
 
 void PlayerStateRush::Enter()
@@ -58,7 +87,57 @@ void PlayerStateRush::Update()
 	auto& input = MyEngine::Input::GetInstance();
 
 	//スティックの傾き
-	MyEngine::Vector3 stickDir(input.GetStickInfo().leftStickX, 0, -input.GetStickInfo().leftStickY);
+	MyEngine::Vector3 stickDir = MyEngine::Vector3(input.GetStickInfo().leftStickX, 0, -input.GetStickInfo().leftStickY);
+
+	////////
+
+	//ラッシュ終了時の処理
+	if (m_isEndRush)
+	{
+		m_rushEndTime++;
+
+		if (m_pPlayer->GetPlayAnimKind() != CharacterBase::AnimKind::kRushEnd)
+		{
+			m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kRushEnd,false,kEndAnimBlendSpeed);
+
+			m_pPlayer->SetAnimPlaySpeed(kEndAnimPlaySpeed);
+		}
+		//攻撃入力がされていたら攻撃状態に移行する
+		if (m_isAttackInput)
+		{
+			auto next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
+
+			next->SetAttack("X","DashAttack");
+
+			//敵の方向を向く
+			m_pPlayer->SetFrontPos(GetEnemyPos());
+
+			ChangeState(next);
+		}
+
+		//ラッシュが終了してから一定時間たったら
+		if (m_rushEndTime > kEndLandingTime)
+		{
+			//アイドル状態に戻る
+			auto next = std::make_shared<PlayerStateIdle>(m_pPlayer);
+
+			ChangeState(next);
+
+			return;
+		}
+
+
+		SetPlayerVelo(MyEngine::Vector3(0.0f, 0.0f, 0.0f));
+		return;//下の処理をしないために
+	}
+
+	////////
+
+
+
+	////////
+
+	//ラッシュを行うときの処理
 
 	//Aボタンが押されたときに
 	if (input.IsTrigger("A"))
@@ -88,42 +167,45 @@ void PlayerStateRush::Update()
 			//スティックが傾いていなければ
 			else
 			{
-				//アイドル状態に戻る
-				auto next = std::make_shared<PlayerStateIdle>(m_pPlayer);
+				m_isEndRush = true;
 
-				ChangeState(next);
-
-				return;
+				ShakeCamera(kCameraShakeTime);
 			}
 		}
 	}
 
+	////////
+
+
+	////////
+
+	//移動処理
 
 	float speed = m_pPlayer->GetSpeed() * GameSceneConstant::kRushMoveSpeedRate;
 
+	//行きたい方向
+	MyEngine::Vector3 dir;
+
+	//上下移動処理
+	if (input.IsPress("RB"))
+	{
+		dir.y += kMoveVerticalPower;
+		m_moveDir.y += kMoveVerticalPower * speed;
+	}
+	if (input.IsPushTrigger(true))
+	{
+		dir.y -= kMoveVerticalPower;
+		m_moveDir.y -= kMoveVerticalPower * speed;
+	}
+
+	//移動ベクトルが上にも下にも傾きすぎないようにクランプ
+	m_moveDir.y = std::fmax(m_moveDir.y, kVerticalMoveMin);
+	m_moveDir.y = std::fmin(m_moveDir.y, kVerticalMoveMax);
+
+	//スティックを傾けた時か上昇、下降ボタンを押したときのみ行きたい方向を変更する
 	if (stickDir.SqLength() > 0.001f)
 	{
-		//スティックの入力ベクトルが移動ベクトルの真反対であればステートをアイドルに戻す
-		if (-stickDir.x == m_moveDir.x && -stickDir.z == m_moveDir.z)
-		{
-			auto next = std::make_shared<PlayerStateIdle>(m_pPlayer);
-
-			ChangeState(next);
-
-			return;
-		}
-
-		//移動の方向ベクトル
-		MyEngine::Vector3 moveDir = stickDir;
-
-		if (input.IsPress("RB"))
-		{
-			moveDir.y += kOnStickVerticalPower;
-		}
-		if (input.IsPushTrigger(true))
-		{
-			moveDir.y -= kOnStickVerticalPower;
-		}
+		stickDir = stickDir.Normalize();
 
 		//エネミーの方向に移動方向を回転させる
 		float vX = GetEnemyPos().x - m_pPlayer->GetPos().x;
@@ -135,35 +217,64 @@ void PlayerStateRush::Update()
 
 		rotation = MyEngine::Vector3(0.0f, yAngle, 0.0f);
 
+		//回転行列(y成分のみ)
 		MATRIX mat = rotation.GetRotationMat();
 
+		//移動方向を設定
+		dir += stickDir.MatTransform(mat);
+
+		//前入力は敵に向かっていくが後ろ入力はy座標を計算に入れないのでその計算
 		if (stickDir.z > 0)
 		{
-			MyEngine::Vector3 toTarget;////////////////////
+			MyEngine::Vector3 toTargetDir = (GetEnemyPos() - m_pPlayer->GetPos()).Normalize();
 
-			moveDir = moveDir * (1.0 - stickDir.Normalize().z) + ;
+			dir = dir * (1.0 - stickDir.z) + toTargetDir * stickDir.z;
 		}
 
-		//MyEngine::Vector3 dir = m_moveDir.MatTransform(mat);
-		m_moveDir = moveDir.Normalize().MatTransform(mat);
-	}
-	else
-	{
-		if (input.IsPress("RB"))
-		{
-			m_moveDir.y += kMoveVerticalPower;
-		}
-		if (input.IsPushTrigger(true))
-		{
-			m_moveDir.y -= kMoveVerticalPower;
-		}
+		m_moveDir = dir.Normalize();
 	}
 
-	//上にも下にも傾きすぎないように
 
-	m_moveDir.y = std::fmax(m_moveDir.y, kVerticalMoveMin);
-	m_moveDir.y = std::fmin(m_moveDir.y, kVerticalMoveMax);
+
+	////行きたい方向を設定する
+	//m_moveTarget.SetCenterPos(m_pPlayer->GetPos());
+	//m_moveTarget.SetLocalPos(dir);
+	//m_moveTarget.SetFrontPos(GetEnemyPos());
+
+	////行きたい座標の回転度を調べる
+	//float toMoveTargetRotX = m_moveTarget.GetWorldPos().x - m_pPlayer->GetPos().x;
+	//float toMoveTargetRotY = m_moveTarget.GetWorldPos().y - m_pPlayer->GetPos().y;
+	//float toMoveTargetRotZ = m_moveTarget.GetWorldPos().z - m_pPlayer->GetPos().z;
+
+	////y回転
+	//float targetYAngle = std::atan2f(toMoveTargetRotX, toMoveTargetRotX);
+
+	////今向かっている方向の回転度を調べる
+	//float moveVecRotX = m_moveDir.x;
+	//float moveVecRotY = m_moveDir.y;
+	//float moveVecRotZ = m_moveDir.z;
+
+	//float moveYAngle = std::atan2f(moveVecRotX, moveVecRotZ);
+
+	////回転の差を求める
+	//float difY = targetYAngle - moveYAngle;
+
+	////回転する大きさを設定
+	//float rotY = std::fmin(difY, kRotScaleMax);
+
+	//MyEngine::Vector3 rotation(0.0f, rotY, 0.0f);
+
+	////回転
+	//MATRIX mat = rotation.GetRotationMat();
+
+	////移動ベクトルを回転させる
+	//m_moveDir = m_moveDir.MatTransform(mat);
+
+	//printfDx("moveY : %0.3f,tarY : % 0.3f\n", moveVecRotX, toMoveTargetRotX);
+	//printfDx("X:%.2f,Y:%.2f,Z:%.2f\n", dir.x, dir.y, dir.z);
+
 	MyEngine::Vector3 velo = m_moveDir * speed;
+
 
 	//敵の背後に向かうフラグが立っていれば
 	if (m_isRushEnemy)
@@ -186,10 +297,6 @@ void PlayerStateRush::Update()
 			//0から1の間で-1から+1にするために*2-1をする
 			curveRate = std::sinf(langeRate * 2.0f - 1.0f);
 
-			printfDx("%0.2f\n", langeRate);
-
-			float yAngle = curveRate * kCurveScale;
-
 			MyEngine::Vector3 rotation(0.0f, curveRate, 0.0f);
 
 			MATRIX mat = rotation.GetRotationMat();
@@ -203,11 +310,11 @@ void PlayerStateRush::Update()
 		}
 		else
 		{
-			velo = m_moveDir * toTarget.Length();
+			velo = toTarget;
 		}
 
 		//一定距離までは目的座標を更新し続ける
-		if ((GetEnemyBackPos(GameSceneConstant::kEnemyBackPosDistance) - m_pPlayer->GetPos()).Length() > GameSceneConstant::kCameraMoveDistance)
+ 		if ((GetEnemyBackPos(GameSceneConstant::kEnemyBackPosDistance) - m_pPlayer->GetPos()).Length() > GameSceneConstant::kCameraMoveDistance)
 		{
 			m_rushTargetPos = GetEnemyBackPos(GameSceneConstant::kEnemyBackPosDistance);
 			StopMoveCamera();
@@ -223,10 +330,6 @@ void PlayerStateRush::Update()
 			//さらに近くまで近づいたら
 			if (toTarget.Length() < GameSceneConstant::kEnemyBackPosDistance)
 			{
-				auto next = std::make_shared<PlayerStateIdle>(m_pPlayer);
-
-				ChangeState(next);
-
 				//障害物に当たるようにする
 				m_pPlayer->SetIsTrigger(false);
 
@@ -237,8 +340,40 @@ void PlayerStateRush::Update()
 
 				m_pPlayer->SetFrontPos(nextToTarget + m_pPlayer->GetPos());
 
+				ShakeCamera(kCameraShakeTime);
+
+				m_isEndRush = true;
+
 				return;
 			}
+		}
+	}
+	//通常のラッシュ時は
+	else
+	{
+		//次の移動座標がエネミーとぶつかるのならばラッシュをやめる
+		MyEngine::Vector3 nextPos = m_pPlayer->GetPos() + velo;
+
+		float lange = (GetEnemyPos() - nextPos).Length();
+
+		//キャラクターの半径二体分よりも距離が近ければ
+		if (lange < GameSceneConstant::kCharacterRadius * 2)
+		{
+			m_isEndRush = true;
+		}
+
+		//攻撃入力がされたらすぐに攻撃に移る
+		if (input.IsTrigger("X"))
+		{
+			auto next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
+
+			next->SetAttack("X", "MiddleCharge");
+			next->SetAttackVelo(m_moveDir * 3.0f);
+
+			//移動方向を見る
+			m_pPlayer->SetFrontPos(m_moveDir + m_pPlayer->GetPos());
+
+			ChangeState(next);
 		}
 	}
 
@@ -247,6 +382,8 @@ void PlayerStateRush::Update()
 	m_pPlayer->SetFrontPos(m_pPlayer->GetPos() + velo);
 
 #ifdef _DEBUG
+
+	DrawSphere3D(m_rushTargetPos.CastVECTOR(), 3, 5, GetColor(255, 0, 255), GetColor(255, 0, 255), true);
 
 	DrawString(0, 16, "PlayerState:Rush", GetColor(255, 255, 255));
 

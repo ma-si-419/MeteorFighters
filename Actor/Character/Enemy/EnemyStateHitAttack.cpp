@@ -225,7 +225,7 @@ void EnemyStateHitAttack::HitAttack(CharacterBase::HitReactionKind kind)
 	{
 		MyEngine::Vector3 frontPos;
 
-		frontPos = (m_pEnemy->GetPos() - GetPlayerPos()).Normalize() + m_pEnemy->GetPos();
+		frontPos = (m_pEnemy->GetPos() - GetPlayerPos()) + m_pEnemy->GetPos();
 
 		m_pEnemy->SetFrontPos(frontPos);
 	}

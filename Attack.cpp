@@ -4,7 +4,7 @@
 
 namespace
 {
-	constexpr float kEnergyAttackTrackRange = 2.5f;
+	constexpr float kEnergyAttackTrackRange = 20.0f;
 
 	constexpr float kAttackLange = 0.5f;
 }

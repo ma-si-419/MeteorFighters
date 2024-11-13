@@ -93,7 +93,9 @@ public:
 		kJumpStart,
 		kJumping,
 		kJumpEnd,
-		kGroundDash
+		kGroundDash,
+		kRushEnd,
+		kDashAttack
 	};
 
 	enum class CharacterKind

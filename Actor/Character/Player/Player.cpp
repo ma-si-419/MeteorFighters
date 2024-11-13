@@ -93,14 +93,22 @@ void Player::Update()
 }
 void Player::Draw()
 {
-	//キャラクターの描画
-	MV1DrawModel(m_modelHandle);
-
 	//残像の描画
 	for (auto item : m_afterImageList)
 	{
 		MV1DrawModel(item.handle);
 	}
+
+	//キャラクターの描画
+	MV1DrawModel(m_modelHandle);
+
+#ifdef _DEBUG
+
+	DrawSphere3D(GetBackPos(GameSceneConstant::kEnemyBackPosDistance).CastVECTOR(), 3, 3, GetColor(255, 0, 255), GetColor(255, 0, 255), true);;
+
+#endif // _DEBUG
+
+
 }
 
 void Player::OnCollide(std::shared_ptr<Collidable> collider)
