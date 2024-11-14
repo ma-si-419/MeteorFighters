@@ -40,6 +40,8 @@ namespace GameSceneConstant
 	constexpr float kCameraMoveDistance = 200.0f;
 	//“G‚Ì”wŒã‚És‚­‚Æ‚«‚É‚Ç‚ê‚¾‚¯—£‚ê‚é‚©
 	constexpr float kEnemyBackPosDistance = 2.0f;
+	//“G‚Ì”wŒã‚És‚­‚Ì‚ğ‚â‚ß‚Ä‚¢‚¢‚Æ”»’f‚·‚é‹——£
+	constexpr float kEndRushDistance = 15.0f;
 	//“ËŒ‚‚Ì‘¬‚³
 	constexpr float kRushSpeed = 15.0f;
 	//”h¶UŒ‚‚ÌƒXƒeƒBƒbƒN‚ÌŒX‚«

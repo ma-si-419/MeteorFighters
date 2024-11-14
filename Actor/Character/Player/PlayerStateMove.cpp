@@ -212,7 +212,7 @@ void PlayerStateMove::Update()
 		groundVelo.y = 0;
 
 		//移動していれば
-		if (groundVelo.SqLength() > 0.001f)
+		if (groundVelo.SqLength() > 0.01f)
 		{
 			//プレイ中のアニメーションが地上移動でなければ
 			if (!(m_pPlayer->GetPlayAnimKind() == CharacterBase::AnimKind::kRun))
@@ -390,7 +390,6 @@ void PlayerStateMove::Update()
 	}
 	//移動ベクトルを設定する
 	SetPlayerVelo(velo);
-
 
 #ifdef _DEBUG
 

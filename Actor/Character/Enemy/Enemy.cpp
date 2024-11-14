@@ -51,6 +51,9 @@ void Enemy::Init()
 
 void Enemy::Update()
 {
+	//ローカル座標の更新
+	m_lookPos.SetCenterPos(m_rigidbody.GetPos());
+
 	//Stateに変化があれば変化させる
 	if (m_pState != m_pState->m_pNextState)
 	{
@@ -86,6 +89,8 @@ void Enemy::Draw()
 	MV1DrawModel(m_modelHandle);
 
 #ifdef _DEBUG
+
+	DrawSphere3D(GetBackPos(GameSceneConstant::kEnemyBackPosDistance).CastVECTOR(), 3, 3, GetColor(255, 0, 255), GetColor(255, 0, 255), true);;
 
 	DrawFormatString(0, 144, GetColor(255, 255, 255), "%.0f", m_nowHp);
 

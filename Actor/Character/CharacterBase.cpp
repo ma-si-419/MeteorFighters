@@ -22,6 +22,8 @@ namespace
 
 	constexpr float kAnimPlaySpeed = 1.0f;
 
+	constexpr float kFrontPosDistance = 3.0f;
+
 	const std::map<std::string, CharacterBase::AttackHitKind> kAttackHitKindMap =
 	{
 		{"弱",CharacterBase::AttackHitKind::kLow},
@@ -343,14 +345,19 @@ CharacterBase::NormalAttackData CharacterBase::GetNormalAttackData(std::string a
 
 void CharacterBase::SetFrontPos(MyEngine::Vector3 frontPos)
 {
+	//frontPosへの方向
+	MyEngine::Vector3 dir = (frontPos - m_rigidbody.GetPos()).Normalize();
+
+	MyEngine::Vector3 pos = (dir * kFrontPosDistance) + m_rigidbody.GetPos();
+
 	//ローカル座標の前方向を修正
-	m_targetLocalPos.SetFrontPos(frontPos);
+	m_targetLocalPos.SetFrontPos(pos);
 
 	//前方向を保存する
-	m_lookPos = frontPos;
+	m_lookPos.SetLocalPos(m_lookPos.ChangeWorldToLocal(pos));
 
 	//モデルの前方向を修正する
-	MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - frontPos).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
+	MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - pos).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
 }
 
 bool CharacterBase::IsFrontTarget(bool isPlayer)
@@ -402,12 +409,12 @@ void CharacterBase::LookTarget(bool isPlayer)
 	if (isPlayer)
 	{
 		MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - m_pGameManager->GetEnemyPos()).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
-		m_lookPos = m_pGameManager->GetEnemyPos();
+		m_lookPos.SetLocalPos(m_lookPos.ChangeWorldToLocal(m_pGameManager->GetEnemyPos()));
 	}
 	else
 	{
 		MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - m_pGameManager->GetPlayerPos()).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
-		m_lookPos = m_pGameManager->GetPlayerPos();
+		m_lookPos.SetLocalPos(m_lookPos.ChangeWorldToLocal(m_pGameManager->GetPlayerPos()));
 	}
 }
 
@@ -432,7 +439,7 @@ void CharacterBase::CreateAfterImage(AfterImage afterImageInfo)
 	MyEngine::Vector3 drawPos = MV1GetPosition(m_modelHandle);
 	MV1SetScale(handle, VGet(GameSceneConstant::kModelScale, GameSceneConstant::kModelScale, GameSceneConstant::kModelScale));
 	MV1SetPosition(handle, drawPos.CastVECTOR());
-	MV1SetRotationZYAxis(handle, (m_rigidbody.GetPos() - m_lookPos).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
+	MV1SetRotationZYAxis(handle, (m_rigidbody.GetPos() - m_lookPos.GetWorldPos()).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
 
 	//アニメーションブレンドが終わっていなければ
 	if (!m_isEndAnimationBlend)
@@ -464,11 +471,16 @@ void CharacterBase::StartFastCameraMove()
 
 MyEngine::Vector3 CharacterBase::GetBackPos(float distance)
 {
-	MyEngine::Vector3 toBackPos = m_rigidbody.GetPos() - m_lookPos;
+	MyEngine::Vector3 toBackPos = m_rigidbody.GetPos() - m_lookPos.GetWorldPos();
 
 	toBackPos = toBackPos.Normalize();
 
 	MyEngine::Vector3 ans = m_rigidbody.GetPos() + (toBackPos * (distance + GameSceneConstant::kCharacterRadius));
+
+	LocalPos local;
+
+	local.SetCenterPos(m_rigidbody.GetPos());
+	MyEngine::Vector3 pos = m_rigidbody.GetPos();
 
 	return ans;
 }

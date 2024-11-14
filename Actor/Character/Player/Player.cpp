@@ -48,6 +48,10 @@ void Player::Init()
 
 void Player::Update()
 {
+	
+	//ローカル座標の更新
+	m_lookPos.SetCenterPos(m_rigidbody.GetPos());
+	
 	//Stateに変化があれば変化させる
 	if (m_pState != m_pState->m_pNextState)
 	{
@@ -86,7 +90,6 @@ void Player::Update()
 	//アニメーションの更新
 	PlayAnim();
 
-
 	//描画座標の設定
 	SetDrawPos(m_rigidbody.GetPos());
 
@@ -104,7 +107,7 @@ void Player::Draw()
 
 #ifdef _DEBUG
 
-	DrawSphere3D(GetBackPos(GameSceneConstant::kEnemyBackPosDistance).CastVECTOR(), 3, 3, GetColor(255, 0, 255), GetColor(255, 0, 255), true);;
+	//DrawSphere3D(GetBackPos(GameSceneConstant::kEnemyBackPosDistance).CastVECTOR(), 3, 3, GetColor(255, 0, 255), GetColor(255, 0, 255), true);;
 
 #endif // _DEBUG
 

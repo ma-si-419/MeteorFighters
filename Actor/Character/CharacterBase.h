@@ -94,6 +94,7 @@ public:
 		kJumping,
 		kJumpEnd,
 		kGroundDash,
+		kRushStart,
 		kRushEnd,
 		kDashAttack
 	};
@@ -485,7 +486,7 @@ protected:
 	//現在の気力
 	float m_nowMp;
 	//今向いている方向座標
-	MyEngine::Vector3 m_lookPos;
+	LocalPos m_lookPos;
 	//現在のやられ状態
 	HitReactionKind m_nowHitReaction;
 	//すべてのキャラで共通で使う通常攻撃の情報

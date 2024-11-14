@@ -35,6 +35,9 @@ namespace
 
 	//アイドルに戻るときにカメラを揺らす時間
 	constexpr int kCameraShakeTime = 3;
+
+	//最初のスタートモーションの時間
+	constexpr float kStartAnimTime = 8.0f;
 }
 
 PlayerStateRush::PlayerStateRush(std::shared_ptr<Player> player) :
@@ -79,11 +82,14 @@ void PlayerStateRush::Enter()
 {
 	m_pNextState = shared_from_this();
 	m_kind = CharacterStateKind::kRush;
-	m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kSkyDash, true);
+	m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kRushStart, true);
+	ShakeCamera(kCameraShakeTime);
 }
 
 void PlayerStateRush::Update()
 {
+	m_time++;
+
 	auto& input = MyEngine::Input::GetInstance();
 
 	//スティックの傾き
@@ -98,7 +104,7 @@ void PlayerStateRush::Update()
 
 		if (m_pPlayer->GetPlayAnimKind() != CharacterBase::AnimKind::kRushEnd)
 		{
-			m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kRushEnd,false,kEndAnimBlendSpeed);
+			m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kRushEnd, false, kEndAnimBlendSpeed);
 
 			m_pPlayer->SetAnimPlaySpeed(kEndAnimPlaySpeed);
 		}
@@ -107,7 +113,7 @@ void PlayerStateRush::Update()
 		{
 			auto next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
 
-			next->SetAttack("X","DashAttack");
+			next->SetAttack("X", "DashAttack");
 
 			//敵の方向を向く
 			m_pPlayer->SetFrontPos(GetEnemyPos());
@@ -235,6 +241,26 @@ void PlayerStateRush::Update()
 	}
 
 
+	//開始アニメーションを再生して一定時間たって
+	if (m_time > kStartAnimTime)
+	{
+		//まだ開始アニメーションを再生していたら
+		if (m_pPlayer->GetPlayAnimKind() == CharacterBase::AnimKind::kRushStart)
+		{
+			//アニメーションを変更する
+			m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kSkyDash, true);
+		}
+	}
+	//まだ開始アニメーションを再生していたら
+	else
+	{
+		//移動方向に体を向ける
+		m_pPlayer->SetFrontPos(m_moveDir + m_pPlayer->GetPos());
+		
+		//移動処理を行わない
+		return;
+	}
+
 
 	////行きたい方向を設定する
 	//m_moveTarget.SetCenterPos(m_pPlayer->GetPos());
@@ -314,7 +340,7 @@ void PlayerStateRush::Update()
 		}
 
 		//一定距離までは目的座標を更新し続ける
- 		if ((GetEnemyBackPos(GameSceneConstant::kEnemyBackPosDistance) - m_pPlayer->GetPos()).Length() > GameSceneConstant::kCameraMoveDistance)
+		if ((GetEnemyBackPos(GameSceneConstant::kEnemyBackPosDistance) - m_pPlayer->GetPos()).Length() > GameSceneConstant::kCameraMoveDistance)
 		{
 			m_rushTargetPos = GetEnemyBackPos(GameSceneConstant::kEnemyBackPosDistance);
 			StopMoveCamera();
@@ -328,7 +354,7 @@ void PlayerStateRush::Update()
 			m_pPlayer->StartFastCameraMove();
 
 			//さらに近くまで近づいたら
-			if (toTarget.Length() < GameSceneConstant::kEnemyBackPosDistance)
+			if (toTarget.Length() < GameSceneConstant::kEndRushDistance)
 			{
 				//障害物に当たるようにする
 				m_pPlayer->SetIsTrigger(false);
@@ -343,8 +369,6 @@ void PlayerStateRush::Update()
 				ShakeCamera(kCameraShakeTime);
 
 				m_isEndRush = true;
-
-				return;
 			}
 		}
 	}
@@ -378,8 +402,11 @@ void PlayerStateRush::Update()
 	}
 
 	SetPlayerVelo(velo);
-
-	m_pPlayer->SetFrontPos(m_pPlayer->GetPos() + velo);
+	//ラッシュを終わる処理をしていなければ移動方向を見る
+	if (!m_isEndRush)
+	{
+		m_pPlayer->SetFrontPos(m_pPlayer->GetPos() + velo);
+	}
 
 #ifdef _DEBUG
 
