@@ -45,52 +45,45 @@ public:
 	void SetEnemyStatus(int number, std::vector<std::string> statusData);
 
 	/// <summary>
-	/// プレイヤーのポインタを返す
+	/// 1Pのポインタを返す
 	/// </summary>
-	/// <returns>プレイヤーのポインタ</returns>
-	std::shared_ptr<Player> GetPlayerPointer() { return m_pPlayer; }
+	/// <returns>1Pのポインタ</returns>
+	std::shared_ptr<CharacterBase> GetOnePlayerPointer() { return m_pCharacters[static_cast<int>(CharacterBase::CharacterNumber::kOnePlayer)]; }
 
 	/// <summary>
-	/// エネミーのポインタを返す
+	/// 2Pのポインタを返す
 	/// </summary>
-	/// <returns>エネミーのポインタ</returns>
-	std::shared_ptr<Enemy> GetEnemyPointer() { return m_pEnemy; }
+	/// <returns>2Pのポインタ</returns>
+	std::shared_ptr<CharacterBase> GetTwoPlayerPointer() { return m_pCharacters[static_cast<int>(CharacterBase::CharacterNumber::kTwoPlayer)]; }
 
 	/// <summary>
-	/// プレイヤーの座標を取得する
+	/// 対戦相手の座標を取得する
 	/// </summary>
-	/// <returns>プレイヤーの座標</returns>
-	MyEngine::Vector3 GetPlayerPos();
+	/// <param name="character">この関数を呼んだキャラクターのポインタ</param>
+	/// <returns>対戦相手の座標</returns>
+	MyEngine::Vector3 GetTargetPos(std::shared_ptr<CharacterBase> character);
 
 	/// <summary>
-	/// エネミーの座標を取得する
+	/// 対戦相手の移動ベクトルを取得する
 	/// </summary>
-	/// <returns>エネミーの座標</returns>
-	MyEngine::Vector3 GetEnemyPos();
+	/// <param name="character">この関数を呼んだキャラクターのポインタ</param>
+	/// <returns>対戦相手の座標</returns>
+	MyEngine::Vector3 GetTargetVelo(std::shared_ptr<CharacterBase> character);
 
 	/// <summary>
-	/// プレイヤーの移動ベクトルを取得する
+	/// 対戦相手の今のやられ状態を取得する
 	/// </summary>
-	/// <returns>プレイヤーの座標</returns>
-	MyEngine::Vector3 GetPlayerVelo();
+	/// <param name="character">この関数を呼んだキャラクターのポインタ</param>
+	/// <returns>対戦相手のやられ状態</returns>
+	CharacterBase::HitReactionKind GetTargetHitReaction(std::shared_ptr<CharacterBase> character);
 
 	/// <summary>
-	/// エネミーの移動ベクトルを取得する
+	/// 対戦相手の背後座標を取得する
 	/// </summary>
-	/// <returns>エネミーの移動ベクトル</returns>
-	MyEngine::Vector3 GetEnemyVelo();
-
-	/// <summary>
-	/// プレイヤーの今のやられ状態を取得する
-	/// </summary>
-	/// <returns>プレイヤーのやられ状態</returns>
-	int GetPlayerHitReaction();
-
-	/// <summary>
-	/// エネミーの今のやられ状態を取得する
-	/// </summary>
-	/// <returns>エネミーのやられ状態</returns>
-	int GetEnemyHitReaction();
+	/// <param name="distance">背後の距離</param>
+	/// <param name="character">自身のポインタ</param>
+	/// <returns>対戦相手の背後座標</returns>
+	MyEngine::Vector3 GetTargetBackPos(float distance, std::shared_ptr<CharacterBase> character);
 
 	/// <summary>
 	/// 管理する攻撃を追加する
@@ -120,26 +113,10 @@ public:
 	/// <param name="time">揺らす時間</param>
 	void ShakeCamera(int time);
 
-	/// <summary>
-	/// プレイヤーの背後座標を取得する
-	/// </summary>
-	/// <param name="distance">背後の距離</param>
-	/// <returns>プレイヤーの背後座標</returns>
-	MyEngine::Vector3 GetPlayerBackPos(float distance);
-
-	/// <summary>
-	/// エネミーの背後座標を取得する
-	/// </summary>
-	/// <param name="distance">背後の距離</param>
-	/// <returns>エネミーの背後座標</returns>
-	MyEngine::Vector3 GetEnemyBackPos(float distance);
-
 private:
 
-	//プレイヤーのポインタ
-	std::shared_ptr<Player> m_pPlayer;
-	//エネミーのポインタ
-	std::shared_ptr<Enemy> m_pEnemy;
+	//キャラクターのポインタ
+	std::shared_ptr<CharacterBase> m_pCharacters[static_cast<int>(CharacterBase::CharacterNumber::kPlayerNum)];
 	//攻撃の情報を持っているマネージャー
 	std::vector<std::shared_ptr<Attack>> m_pAttacks;
 	//ステージクラス

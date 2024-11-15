@@ -9,6 +9,7 @@
 #include "SceneGame.h"
 #include "Game.h"
 #include "GameSceneConstant.h"
+#include "CharacterStateIdle.h"
 
 namespace
 {
@@ -95,6 +96,99 @@ CharacterBase::CharacterBase(ObjectTag tag, CharacterKind kind) :
 
 CharacterBase::~CharacterBase()
 {
+}
+
+void CharacterBase::Init()
+{
+	m_modelHandle = MV1LoadModel("data/model/Fighter.mv1");
+
+	MV1SetScale(m_modelHandle, VGet(GameSceneConstant::kModelScale, GameSceneConstant::kModelScale, GameSceneConstant::kModelScale));
+
+	Collidable::Init();
+
+	m_nowHp = m_status.hp;
+	m_nowMp = m_status.startMp;
+
+	auto thisPointer = std::dynamic_pointer_cast<CharacterBase>(shared_from_this());
+
+	m_pState = std::make_shared<CharacterStateIdle>(thisPointer);
+	m_pState->Enter();
+}
+
+void CharacterBase::Update()
+{
+	//ローカル座標の中心座標の更新
+	m_lookPos.SetCenterPos(m_rigidbody.GetPos());
+
+	//Stateが変更されていたらStateを入れ替える
+	if (m_pState != m_pState->m_pNextState)
+	{
+		m_pState = m_pState->m_pNextState;
+	}
+
+	//Stateの更新
+	m_pState->Update();
+
+
+	//残像を消す数
+	int deleteNum = 0;
+
+	for (auto& item : m_afterImageList)
+	{
+		item.nowOpacityRate -= item.DeleteSpeed;
+
+		float rate = fmin(item.maxOpacityRate, item.nowOpacityRate);
+
+		MV1SetOpacityRate(item.handle, rate);
+
+		if (item.nowOpacityRate < 0.0f)
+		{
+			MV1DeleteModel(item.handle);
+
+			deleteNum++;
+		}
+	}
+
+	for (int i = 0; i < deleteNum; i++)
+	{
+		m_afterImageList.pop_front();
+	}
+
+
+	//アニメーションの更新
+	PlayAnim();
+
+	//描画座標の設定
+	SetDrawPos(m_rigidbody.GetPos());
+
+}
+
+void CharacterBase::Draw()
+{
+	//残像の描画
+	for (auto item : m_afterImageList)
+	{
+		MV1DrawModel(item.handle);
+	}
+
+	//モデルの描画
+	MV1DrawModel(m_modelHandle);
+
+#ifdef _DEBUG
+
+	//DrawSphere3D(GetBackPos(GameSceneConstant::kEnemyBackPosDistance).CastVECTOR(), 3, 3, GetColor(255, 0, 255), GetColor(255, 0, 255), true);;
+
+#endif // _DEBUG
+
+}
+
+void CharacterBase::OnCollide(std::shared_ptr<Collidable> collider)
+{
+#ifdef _DEBUG
+
+	DrawString(0, 64, "Playerがなにかとぶつかった", GetColor(255, 255, 255));
+
+#endif // _DEBUG
 }
 
 void CharacterBase::SetGameManager(std::shared_ptr<GameManager> manager)
@@ -289,15 +383,20 @@ void CharacterBase::CreateAttack(AttackData attackData)
 	//正面方向を設定
 	MyEngine::Vector3 toTarget;
 	MyEngine::Vector3 targetPos;
-	if (attackData.isPlayer)
+
+	if (m_number == CharacterNumber::kOnePlayer)
 	{
-		targetPos = m_pGameManager->GetEnemyPos();
-		toTarget = targetPos - m_pGameManager->GetPlayerPos();
+		auto player1 = m_pGameManager->GetOnePlayerPointer();
+
+		targetPos = m_pGameManager->GetTargetPos(player1);
+		toTarget = targetPos - m_pGameManager->GetTargetPos(player1);
 	}
 	else
 	{
-		targetPos = m_pGameManager->GetPlayerPos();
-		toTarget = targetPos - m_pGameManager->GetEnemyPos();
+		auto player2 = m_pGameManager->GetTwoPlayerPointer();
+
+		targetPos = m_pGameManager->GetTargetPos(player2);
+		toTarget = targetPos - m_pGameManager->GetTargetPos(player2);
 	}
 
 	localPos.SetFrontPos(m_rigidbody.GetPos() + toTarget.Normalize());
@@ -314,7 +413,7 @@ void CharacterBase::CreateAttack(AttackData attackData)
 
 	//y座標のずれを一定値までは補正
 	float shiftY = toTarget.y;
-	
+
 	shiftY = std::fmin(shiftY, kAttackMaxShiftPosY);
 	shiftY = std::fmax(shiftY, -kAttackMaxShiftPosY);
 
@@ -360,20 +459,22 @@ void CharacterBase::SetFrontPos(MyEngine::Vector3 frontPos)
 	MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - pos).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
 }
 
-bool CharacterBase::IsFrontTarget(bool isPlayer)
+bool CharacterBase::IsFrontTarget()
 {
 
 	MyEngine::Vector3 toTargetDir;
 
 	//プレイヤーなら
-	if (isPlayer)
+	if (m_number == CharacterNumber::kOnePlayer)
 	{
-		toTargetDir = m_targetLocalPos.ChangeWorldToLocal(m_pGameManager->GetEnemyPos());
+		auto player1 = m_pGameManager->GetOnePlayerPointer();
+		toTargetDir = m_targetLocalPos.ChangeWorldToLocal(m_pGameManager->GetTargetPos(player1));
 	}
 	//2P側なら(基本CPU)
 	else
 	{
-		toTargetDir = m_targetLocalPos.ChangeWorldToLocal(m_pGameManager->GetPlayerPos());
+		auto player2 = m_pGameManager->GetTwoPlayerPointer();
+		toTargetDir = m_targetLocalPos.ChangeWorldToLocal(m_pGameManager->GetTargetPos(player2));
 	}
 
 	toTargetDir = toTargetDir.Normalize();
@@ -404,18 +505,12 @@ CharacterBase::AnimKind CharacterBase::GetAttackAnimKind(std::string animName)
 	return kAttackAnimKindMap.at(animName);
 }
 
-void CharacterBase::LookTarget(bool isPlayer)
+void CharacterBase::LookTarget()
 {
-	if (isPlayer)
-	{
-		MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - m_pGameManager->GetEnemyPos()).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
-		m_lookPos.SetLocalPos(m_lookPos.ChangeWorldToLocal(m_pGameManager->GetEnemyPos()));
-	}
-	else
-	{
-		MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - m_pGameManager->GetPlayerPos()).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
-		m_lookPos.SetLocalPos(m_lookPos.ChangeWorldToLocal(m_pGameManager->GetPlayerPos()));
-	}
+	auto pointer = std::dynamic_pointer_cast<CharacterBase>(shared_from_this());
+
+	MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - m_pGameManager->GetTargetPos(pointer)).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
+	m_lookPos.SetLocalPos(m_lookPos.ChangeWorldToLocal(m_pGameManager->GetTargetPos(pointer)));
 }
 
 void CharacterBase::CreateAfterImage()

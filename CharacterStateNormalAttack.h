@@ -1,18 +1,17 @@
 #pragma once
-#include "PlayerStateBase.h"
-#include <string>
-class PlayerStateNormalAttack : public PlayerStateBase, public std::enable_shared_from_this<PlayerStateNormalAttack>
+#include "CharacterStateBase.h"
+class CharacterStateNormalAttack : public CharacterStateBase,public std::enable_shared_from_this<CharacterStateNormalAttack>
 {
 public:
 
-	PlayerStateNormalAttack(std::shared_ptr<Player> player);
+	CharacterStateNormalAttack(std::shared_ptr<CharacterBase> character);
 
 	/// <summary>
 	/// ‚±‚ÌState‚É“ü‚é‚Æ‚«‚ÉÅ‰‚ÉŒÄ‚ÔŠÖ”
 	/// </summary>
 	/// <param name="key">‚Ç‚ÌƒL[‚ª‰Ÿ‚³‚ê‚½‚Ì‚©</param>
 	/// <param name="attackName">‰½‚ÌUŒ‚‚ğs‚¤‚Ì‚©</param>
-	void SetAttack(std::string key,std::string attackName);
+	void SetAttack(std::string key, std::string attackName);
 
 	/// <summary>
 	/// ƒ_ƒbƒVƒ…‚©‚çUŒ‚‚È‚ÇˆÚ“®‚ª•Ï‰»‚·‚éUŒ‚‚ÌÛ‚ÉŒÄ‚ÔŠÖ”
@@ -62,4 +61,3 @@ private:
 	//Ši“¬UŒ‚‚ÅˆÚ“®‚·‚éÀ•W
 	MyEngine::Vector3 m_moveTargetPos;
 };
-

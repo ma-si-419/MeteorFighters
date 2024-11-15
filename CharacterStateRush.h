@@ -1,10 +1,11 @@
 #pragma once
-#include "PlayerStateBase.h"
+#include "CharacterStateBase.h"
 #include "LocalPos.h"
-class PlayerStateRush : public PlayerStateBase, public std::enable_shared_from_this<PlayerStateRush>
+
+class CharacterStateRush : public CharacterStateBase,public std::enable_shared_from_this<CharacterStateRush>
 {
 public:
-	PlayerStateRush(std::shared_ptr<Player> player);
+	CharacterStateRush(std::shared_ptr<CharacterBase> character);
 
 	virtual void SetMoveDir(MyEngine::Vector3 dir);
 

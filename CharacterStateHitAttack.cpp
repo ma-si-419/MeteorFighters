@@ -1,8 +1,8 @@
-#include "EnemyStateHitAttack.h"
-#include "EnemyStateIdle.h"
+#include "CharacterStateHitAttack.h"
+#include "CharacterStateIdle.h"
 #include "LocalPos.h"
 #include "DxLib.h"
-#include "Enemy.h"
+#include "CharacterBase.h"
 #include "Attack.h"
 
 namespace
@@ -62,40 +62,40 @@ namespace
 	constexpr float kSlowAnimPlaySpeed = 0.3f;
 }
 
-EnemyStateHitAttack::EnemyStateHitAttack(std::shared_ptr<Enemy> enemy) :
-	EnemyStateBase(enemy),
+CharacterStateHitAttack::CharacterStateHitAttack(std::shared_ptr<CharacterBase> character) :
+	CharacterStateBase(character),
 	m_downTime(0),
 	m_moveTime(0),
 	m_isFrontHit(false)
 {
 }
 
-void EnemyStateHitAttack::Enter()
+void CharacterStateHitAttack::Enter()
 {
 	m_kind = CharacterStateKind::kHitAttack;
 	m_pNextState = shared_from_this();
 }
 
-void EnemyStateHitAttack::Update()
+void CharacterStateHitAttack::Update()
 {
 
 	m_time++;
 
 	//今受けている攻撃がスタン攻撃だったら
-	if (m_pEnemy->GetHitReaction() == CharacterBase::HitReactionKind::kBottomStan ||
-		m_pEnemy->GetHitReaction() == CharacterBase::HitReactionKind::kMiddleStan)
+	if (m_pCharacter->GetHitReaction() == CharacterBase::HitReactionKind::kBottomStan ||
+		m_pCharacter->GetHitReaction() == CharacterBase::HitReactionKind::kMiddleStan)
 	{
 		int slowAnimTime = static_cast<int>(m_downTime * kSlowAnimTimeRate);
 
 		if (m_time < slowAnimTime)
 		{
 			//再生速度をゆっくりにする
-			m_pEnemy->SetAnimPlaySpeed(kSlowAnimPlaySpeed);
+			m_pCharacter->SetAnimPlaySpeed(kSlowAnimPlaySpeed);
 		}
 		else
 		{
 			//再生速度を初期値に戻す
-			m_pEnemy->SetAnimPlaySpeed();
+			m_pCharacter->SetAnimPlaySpeed();
 		}
 	}
 
@@ -103,7 +103,7 @@ void EnemyStateHitAttack::Update()
 	if (m_downTime <= m_time)
 	{
 
-		std::shared_ptr<EnemyStateIdle> next = std::make_shared<EnemyStateIdle>(m_pEnemy);
+		std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 
 		//アイドル状態に戻る
 		ChangeState(next);
@@ -116,53 +116,55 @@ void EnemyStateHitAttack::Update()
 		//TODO : 吹っ飛び状態であれば吹っ飛び状態から通常状態に戻るアニメーションを再生する
 	}
 
-	SetEnemyVelo(m_moveVec);
+	SetCharacterVelo(m_moveVec);
 
 
 #ifdef _DEBUG
 
-	DrawString(0, 32, "EnemyState:HitAttack", GetColor(255, 255, 255));
+	DrawString(0, 32, "PlayerState:HitAttack", GetColor(255, 255, 255));
 
 #endif // _DEBUG
 }
 
-void EnemyStateHitAttack::Exit()
+void CharacterStateHitAttack::Exit()
 {
 }
 
-void EnemyStateHitAttack::HitAttack(CharacterBase::HitReactionKind kind)
+void CharacterStateHitAttack::HitAttack(int kind)
 {
+
+	CharacterBase::HitReactionKind reaction = static_cast<CharacterBase::HitReactionKind>(kind);
 
 	//コンボ中に何の攻撃を受けたかを保存しておく
 	int hitAttackKinds[static_cast<int>(CharacterBase::HitReactionKind::kKindNum)] = {};
 
 	for (auto item : m_hitReactions)
 	{
-		hitAttackKinds[static_cast<int>(item)]++;
+		hitAttackKinds[item]++;
 	}
 
 	//動けない時間を設定する
-	m_downTime = kDownTimeMap.at(kind);
+	m_downTime = kDownTimeMap.at(reaction);
 	//現在のやられ状態を設定する
-	m_pEnemy->SetHitReaction(kind);
+	m_pCharacter->SetHitReaction(reaction);
 	//動く方向を設定する
 	MyEngine::Vector3 moveDir;
 	//攻撃されたキャラクターの座標を中心としたローカル座標を作成する
 	LocalPos local;
-	local.SetCenterPos(m_pEnemy->GetPos());
+	local.SetCenterPos(m_pCharacter->GetPos());
 	//ローカル座標の前方向を攻撃したものから攻撃されたものに向ける
-	MyEngine::Vector3 centerFrontPos = (m_pEnemy->GetPos() - GetPlayerPos()).Normalize() + m_pEnemy->GetPos();
+	MyEngine::Vector3 centerFrontPos = (m_pCharacter->GetPos() - GetTargetPos()).Normalize() + m_pCharacter->GetPos();
 	local.SetFrontPos(centerFrontPos);
 
 
 	//上方向に吹っ飛ばすもの
-	if (kind == CharacterBase::HitReactionKind::kUpBurst)
+	if (reaction == CharacterBase::HitReactionKind::kUpBurst)
 	{
 		//斜め上に吹き飛ばす
 		local.SetLocalPos(MyEngine::Vector3(0, 1, 1));
 	}
 	//下方向に吹っ飛ばすもの
-	else if (kind == CharacterBase::HitReactionKind::kDownBurst)
+	else if (reaction == CharacterBase::HitReactionKind::kDownBurst)
 	{
 		//斜め下に吹き飛ばす
 		local.SetLocalPos(MyEngine::Vector3(0, -1, 1));
@@ -174,15 +176,15 @@ void EnemyStateHitAttack::HitAttack(CharacterBase::HitReactionKind kind)
 		local.SetLocalPos(MyEngine::Vector3(0, 0, 1));
 	}
 
-	moveDir = (local.GetWorldPos() - m_pEnemy->GetPos());
+	moveDir = (local.GetWorldPos() - m_pCharacter->GetPos());
 
 	//やられ状態によって移動速度を変更する
-	m_moveVec = moveDir * kMoveSpeedMap.at(kind);
+	m_moveVec = moveDir * kMoveSpeedMap.at(reaction);
 
 	//コンボとやられ状態の確認
 
 	//軽い吹き飛ばし攻撃
-	if (kind == CharacterBase::HitReactionKind::kMiddle)
+	if (reaction == CharacterBase::HitReactionKind::kMiddle)
 	{
 		//二度受けていたら
 		if (hitAttackKinds[static_cast<int>(kind)] > 0)
@@ -192,7 +194,7 @@ void EnemyStateHitAttack::HitAttack(CharacterBase::HitReactionKind kind)
 
 	}
 	//下段スタン攻撃
-	else if (kind == CharacterBase::HitReactionKind::kBottomStan)
+	else if (reaction == CharacterBase::HitReactionKind::kBottomStan)
 	{
 		//二度受けていたら
 		if (hitAttackKinds[static_cast<int>(kind)] > 0)
@@ -202,7 +204,7 @@ void EnemyStateHitAttack::HitAttack(CharacterBase::HitReactionKind kind)
 		}
 	}
 	//中段スタン攻撃
-	else if (kind == CharacterBase::HitReactionKind::kMiddleStan)
+	else if (reaction == CharacterBase::HitReactionKind::kMiddleStan)
 	{
 		//二度受けていたら
 		if (hitAttackKinds[static_cast<int>(kind)] > 0)
@@ -213,48 +215,48 @@ void EnemyStateHitAttack::HitAttack(CharacterBase::HitReactionKind kind)
 	}
 
 	//前方から殴られたかどうかを取得する
-	m_isFrontHit = m_pEnemy->IsFrontTarget(false);
+	m_isFrontHit = m_pCharacter->IsFrontTarget();
 
 	//前方から殴られていたらプレイヤーの方向を向く
 	if (m_isFrontHit)
 	{
-		m_pEnemy->SetFrontPos(GetPlayerPos());
+		m_pCharacter->LookTarget();
 	}
 	//後方から殴られていたらプレイヤーとは逆の方向を向く
 	else
 	{
 		MyEngine::Vector3 frontPos;
 
-		frontPos = (m_pEnemy->GetPos() - GetPlayerPos()) + m_pEnemy->GetPos();
+		frontPos = (m_pCharacter->GetPos() - GetTargetPos()) + m_pCharacter->GetPos();
 
-		m_pEnemy->SetFrontPos(frontPos);
+		m_pCharacter->SetFrontPos(frontPos);
 	}
 
 	//アニメーションの変更
-	m_pEnemy->ChangeAnim(static_cast<CharacterBase::AnimKind>(GetNextAnimKind(kind)), false);
+	m_pCharacter->ChangeAnim(static_cast<CharacterBase::AnimKind>(GetNextAnimKind(kind)), false);
 
 	//前からの吹っ飛びアニメーションの場合
-	if (m_pEnemy->GetPlayAnimKind() == CharacterBase::AnimKind::kFrontBurst)
+	if (m_pCharacter->GetPlayAnimKind() == CharacterBase::AnimKind::kFrontBurst)
 	{
 		//動いている方向と逆の方向を向く
-		MyEngine::Vector3 frontPos = m_pEnemy->GetPos() - m_moveVec;
+		MyEngine::Vector3 frontPos = m_pCharacter->GetPos() - m_moveVec;
 
-		m_pEnemy->SetFrontPos(frontPos);
+		m_pCharacter->SetFrontPos(frontPos);
 	}
 	//後ろからの場合
-	else if (m_pEnemy->GetPlayAnimKind() == CharacterBase::AnimKind::kBackBurst)
+	else if (m_pCharacter->GetPlayAnimKind() == CharacterBase::AnimKind::kBackBurst)
 	{
 		//動いている方向を向く
-		MyEngine::Vector3 frontPos = m_pEnemy->GetPos() + m_moveVec;
+		MyEngine::Vector3 frontPos = m_pCharacter->GetPos() + m_moveVec;
 
-		m_pEnemy->SetFrontPos(frontPos);
+		m_pCharacter->SetFrontPos(frontPos);
 	}
-	
+
 	//今まで受けた攻撃を保存しておく
 	m_hitReactions.push_back(kind);
 }
 
-void EnemyStateHitAttack::OnCollide(std::shared_ptr<Collidable> collider)
+void CharacterStateHitAttack::OnCollide(std::shared_ptr<Collidable> collider)
 {
 	if (collider->GetTag() == ObjectTag::kPlayerAttack)
 	{
@@ -262,27 +264,29 @@ void EnemyStateHitAttack::OnCollide(std::shared_ptr<Collidable> collider)
 
 		auto status = attack->GetStatus();
 
-		EnemyStateBase::HitAttack(attack, GetKind());
+		CharacterStateBase::HitAttack(attack, GetKind());
 		printfDx("Hit\n");
 	}
 }
 
-int EnemyStateHitAttack::GetNextAnimKind(CharacterBase::HitReactionKind kind)
+int CharacterStateHitAttack::GetNextAnimKind(int kind)
 {
 
 	CharacterBase::AnimKind ans = CharacterBase::AnimKind::kLowHit1;
 
-	CharacterBase::AnimKind animKind = m_pEnemy->GetPlayAnimKind();
+	CharacterBase::AnimKind animKind = m_pCharacter->GetPlayAnimKind();
+
+	CharacterBase::HitReactionKind reaction = static_cast<CharacterBase::HitReactionKind>(kind);
 
 	//正面から攻撃を受けている場合
 	if (m_isFrontHit)
 	{
-		ans = kFrontHitReactionMap.at(kind);
+		ans = kFrontHitReactionMap.at(reaction);
 	}
 	//後ろから攻撃を受けている場合
 	else
 	{
-		ans = kBackHitReactionMap.at(kind);
+		ans = kBackHitReactionMap.at(reaction);
 	}
 
 	//弱攻撃を受けた場合、順番にアニメーションをさせる

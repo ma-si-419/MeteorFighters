@@ -1,14 +1,15 @@
-#include "PlayerStateMove.h"
-#include "PlayerStateIdle.h"
-#include "PlayerStateJump.h"
-#include "PlayerStateDash.h"
-#include "PlayerStateRush.h"
-#include "PlayerStateNormalAttack.h"
-#include "PlayerStateCharge.h"
+#include "CharacterStateMove.h"
+#include "CharacterStateIdle.h"
+#include "CharacterStateDash.h"
+#include "CharacterStateRush.h"
+#include "CharacterStateJump.h"
+#include "CharacterStateCharge.h"
+#include "CharacterStateNormalAttack.h"
+#include "CharacterStateJump.h"
 #include "GameSceneConstant.h"
 #include "DxLib.h"
 #include "Input.h"
-#include "Player.h"
+#include "CharacterBase.h"
 #include <cmath>
 
 namespace
@@ -19,22 +20,22 @@ namespace
 	constexpr float kNearestLange = 10.0f;
 }
 
-PlayerStateMove::PlayerStateMove(std::shared_ptr<Player> player) :
-	PlayerStateBase(player),
+CharacterStateMove::CharacterStateMove(std::shared_ptr<CharacterBase> character) :
+	CharacterStateBase(character),
 	m_attackButtonPushTime(0.0f),
 	m_attackKey("empty"),
 	m_isFloat(false),
 	m_gravityPower(0.0f),
 	m_isLastGround(false)
 {
-	m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kSkyIdle, true);
+	m_pCharacter->ChangeAnim(CharacterBase::AnimKind::kSkyIdle, true);
 }
 
-void PlayerStateMove::Enter()
+void CharacterStateMove::Enter()
 {
 	m_pNextState = shared_from_this();
 	m_kind = CharacterStateKind::kMove;
-	if (m_pPlayer->IsGround())
+	if (m_pCharacter->IsGround())
 	{
 		m_isFloat = false;
 	}
@@ -44,10 +45,10 @@ void PlayerStateMove::Enter()
 	}
 }
 
-void PlayerStateMove::Update()
+void CharacterStateMove::Update()
 {
 	//プレイヤーからエネミーへのベクトル
-	MyEngine::Vector3 playerToTarget = GetEnemyPos() - m_pPlayer->GetPos();
+	MyEngine::Vector3 playerToTarget = GetTargetPos() - m_pCharacter->GetPos();
 
 	//インプットを管理しているクラスの参照
 	MyEngine::Input& input = MyEngine::Input::GetInstance();
@@ -56,23 +57,28 @@ void PlayerStateMove::Update()
 	//移動方向ベクトル
 	MyEngine::Vector3 dir;
 
-	//スティックの情報取得
-	MyEngine::Input::StickInfo stick = input.GetStickInfo();
+	MyEngine::Vector3 inputDir;
 
-	//左スティックの傾き取得
-	MyEngine::Vector3 leftStickDir(stick.leftStickX, 0, -stick.leftStickY);
+	if (m_isPlayer)
+	{
+		//スティックの情報取得
+		MyEngine::Input::StickInfo stick = input.GetStickInfo();
+
+		//左スティックの傾き取得
+		inputDir = MyEngine::Vector3(stick.leftStickX, 0, -stick.leftStickY);
+	}
 	//移動ベクトルが0じゃなければ
-	if (leftStickDir.SqLength() > 0.001)
+	if (inputDir.SqLength() > 0.001)
 	{
 
-		leftStickDir = leftStickDir.Normalize();
+		inputDir = inputDir.Normalize();
 
 		//移動方向
-		dir = leftStickDir;
+		dir = inputDir;
 
 		//エネミーの方向に移動方向を回転させる
-		float vX = GetEnemyPos().x - m_pPlayer->GetPos().x;
-		float vZ = GetEnemyPos().z - m_pPlayer->GetPos().z;
+		float vX = GetTargetPos().x - m_pCharacter->GetPos().x;
+		float vZ = GetTargetPos().z - m_pCharacter->GetPos().z;
 
 		float yAngle = std::atan2f(vX, vZ);
 
@@ -84,13 +90,13 @@ void PlayerStateMove::Update()
 
 		dir = dir.MatTransform(mat);
 
-		MyEngine::Vector3 toTarget = (GetEnemyPos() - m_pPlayer->GetPos());
+		MyEngine::Vector3 toTarget = (GetTargetPos() - m_pCharacter->GetPos());
 		MyEngine::Vector3 toTargetDir = toTarget.Normalize();
 
 		//空中にいて前入力されていたら
-		if (leftStickDir.z > 0 && m_isFloat)
+		if (inputDir.z > 0 && m_isFloat)
 		{
-			float frontRate = leftStickDir.z;
+			float frontRate = inputDir.z;
 
 			dir = dir * (1.0 - frontRate) + toTargetDir * frontRate;
 		}
@@ -106,8 +112,6 @@ void PlayerStateMove::Update()
 
 		//移動方向にスピードをかける
 		velo = dir * speed;
-
-
 	}
 
 	//宙に浮いていない場合
@@ -123,31 +127,31 @@ void PlayerStateMove::Update()
 		velo.y += m_gravityPower;
 
 		//地上にいなく
-		if (!m_pPlayer->IsGround())
+		if (!m_pCharacter->IsGround())
 		{
 
 			//プレイ中のアニメーションがジャンプ中でなければ
-			if (!(m_pPlayer->GetPlayAnimKind() == CharacterBase::AnimKind::kJumping))
+			if (!(m_pCharacter->GetPlayAnimKind() == CharacterBase::AnimKind::kJumping))
 			{
 				//アニメーションを変更する
-				m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kJumping, true);
+				m_pCharacter->ChangeAnim(CharacterBase::AnimKind::kJumping, true);
 			}
 		}
 	}
 
 	//ダッシュボタンが押されたら
-	if (input.IsTrigger("A"))
+	if (m_isPlayer && input.IsTrigger("A"))
 	{
 		//一緒にレフトショルダーも押されていたら
-		if (input.IsPushTrigger(false))
+		if (m_isPlayer && input.IsPushTrigger(false))
 		{
 			//ダッシュのコストがあれば
-			if (m_pPlayer->SubMp(GameSceneConstant::kDashCost))
+			if (m_pCharacter->SubMp(GameSceneConstant::kDashCost))
 			{
 				//突撃状態に移行する
-				auto next = std::make_shared<PlayerStateRush>(m_pPlayer);
+				auto next = std::make_shared<CharacterStateRush>(m_pCharacter);
 
-				next->SetMoveDir(leftStickDir);
+				next->SetMoveDir(inputDir);
 
 				ChangeState(next);
 				return;
@@ -157,14 +161,14 @@ void PlayerStateMove::Update()
 		//敵との距離からダッシュかステップか判断する
 		//(ステップかダッシュかの判定はDashStateの中でも行う)
 		//(ここではMPを消費するかしないか、DashStateにはいるかどうかを判断する)
-		if ((GetEnemyPos() - m_pPlayer->GetPos()).Length() > GameSceneConstant::kNearLange)
+		if ((GetTargetPos() - m_pCharacter->GetPos()).Length() > GameSceneConstant::kNearLange)
 		{
 			//遠かった場合Mpを消費してダッシュする
-			if (m_pPlayer->SubMp(GameSceneConstant::kDashCost))
+			if (m_pCharacter->SubMp(GameSceneConstant::kDashCost))
 			{
-				auto next = std::make_shared<PlayerStateDash>(m_pPlayer);
+				auto next = std::make_shared<CharacterStateDash>(m_pCharacter);
 
-				next->SetMoveDir(leftStickDir);
+				next->SetMoveDir(inputDir);
 
 				ChangeState(next);
 				return;
@@ -174,9 +178,9 @@ void PlayerStateMove::Update()
 		else
 		{
 			//MPを消費せずにステップをする
-			auto next = std::make_shared<PlayerStateDash>(m_pPlayer);
+			auto next = std::make_shared<CharacterStateDash>(m_pCharacter);
 
-			next->SetMoveDir(leftStickDir);
+			next->SetMoveDir(inputDir);
 
 			ChangeState(next);
 			return;
@@ -185,14 +189,14 @@ void PlayerStateMove::Update()
 
 
 	//地上で
-	if (m_pPlayer->IsGround())
+	if (m_pCharacter->IsGround())
 	{
 
 		//ジャンプボタンが押されたら
-		if (input.IsTrigger("RB"))
+		if (m_isPlayer && input.IsTrigger("RB"))
 		{
 			//ジャンプStateに移行する
-			auto next = std::make_shared<PlayerStateJump>(m_pPlayer);
+			auto next = std::make_shared<CharacterStateJump>(m_pCharacter);
 
 			//今の移動ベクトルを渡す
 			next->StartJump(velo);
@@ -215,23 +219,23 @@ void PlayerStateMove::Update()
 		if (groundVelo.SqLength() > 0.01f)
 		{
 			//プレイ中のアニメーションが地上移動でなければ
-			if (!(m_pPlayer->GetPlayAnimKind() == CharacterBase::AnimKind::kRun))
+			if (!(m_pCharacter->GetPlayAnimKind() == CharacterBase::AnimKind::kRun))
 			{
 				//アニメーションを変更する
-				m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kRun, true);
+				m_pCharacter->ChangeAnim(CharacterBase::AnimKind::kRun, true);
 			}
 
-			auto frontPos = m_pPlayer->GetPos() + groundVelo;
+			auto frontPos = m_pCharacter->GetPos() + groundVelo;
 
-			frontPos.y = m_pPlayer->GetPos().y;
+			frontPos.y = m_pCharacter->GetPos().y;
 
-			m_pPlayer->SetFrontPos(frontPos);
+			m_pCharacter->SetFrontPos(frontPos);
 		}
 		//移動していなければ
 		else
 		{
 			//アイドル状態に戻る
-			std::shared_ptr<PlayerStateIdle> next = std::make_shared<PlayerStateIdle>(m_pPlayer);
+			std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 
 			ChangeState(next);
 		}
@@ -245,21 +249,21 @@ void PlayerStateMove::Update()
 	{
 
 		//上昇ボタンが押されたら
-		if (input.IsPress("RB"))
+		if (m_isPlayer && input.IsPress("RB"))
 		{
 			velo.y = GetSpeed();
 			m_isFloat = true;
 		}
 		//下降ボタンが押されたら
-		else if (input.IsPushTrigger(true))
+		else if (m_isPlayer && input.IsPushTrigger(true))
 		{
 			velo.y = -GetSpeed();
 
 			//プレイ中のアニメーションがジャンプ中でなければ
-			if (!(m_pPlayer->GetPlayAnimKind() == CharacterBase::AnimKind::kJumping))
+			if (!(m_pCharacter->GetPlayAnimKind() == CharacterBase::AnimKind::kJumping))
 			{
 				//アニメーションを変更する
-				m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kJumping, true);
+				m_pCharacter->ChangeAnim(CharacterBase::AnimKind::kJumping, true);
 			}
 
 		}
@@ -268,20 +272,20 @@ void PlayerStateMove::Update()
 		if (!m_isLastGround)
 		{
 			//敵の方向を向く(Y座標はプレイヤーと同じ座標にする)
-			auto frontPos = GetEnemyPos();
+			auto frontPos = GetTargetPos();
 
-			frontPos.y = m_pPlayer->GetPos().y;
+			frontPos.y = m_pCharacter->GetPos().y;
 
-			m_pPlayer->SetFrontPos(frontPos);
+			m_pCharacter->SetFrontPos(frontPos);
 
 			//上昇しているか上下移動をしていない場合
 			if (velo.y >= 0)
 			{
 				//プレイ中のアニメーションが空中待機でなければ
-				if (!(m_pPlayer->GetPlayAnimKind() == CharacterBase::AnimKind::kSkyIdle))
+				if (!(m_pCharacter->GetPlayAnimKind() == CharacterBase::AnimKind::kSkyIdle))
 				{
 					//アニメーションを変更する
-					m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kSkyIdle, true);
+					m_pCharacter->ChangeAnim(CharacterBase::AnimKind::kSkyIdle, true);
 				}
 			}
 		}
@@ -295,11 +299,11 @@ void PlayerStateMove::Update()
 	if (m_attackKey == "empty")
 	{
 		//格闘ボタンが押された時
-		if (input.IsPress("X"))
+		if (m_isPlayer && input.IsPress("X"))
 		{
 			m_attackKey = "X";
 		}
-		else if (input.IsPress("Y"))
+		else if (m_isPlayer && input.IsPress("Y"))
 		{
 			m_attackKey = "Y";
 		}
@@ -311,13 +315,13 @@ void PlayerStateMove::Update()
 		m_attackButtonPushTime++;
 
 		//押していたボタンが離されたら
-		if (input.IsRelease(m_attackKey) ||
+		if (m_isPlayer && input.IsRelease(m_attackKey) ||
 			m_attackButtonPushTime > GameSceneConstant::kChargeAttackTime)
 		{
 			//チャージされていたかどうか判定
 			bool isCharge = m_attackButtonPushTime > GameSceneConstant::kChargeAttackTime;
 			//次のStateのポインタ作成
-			auto next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
+			auto next = std::make_shared<CharacterStateNormalAttack>(m_pCharacter);
 
 			//何の攻撃を行うかをAttackStateに渡す
 			std::string attackName = "empty";
@@ -329,12 +333,12 @@ void PlayerStateMove::Update()
 				if (m_attackKey == "X")
 				{
 					//スティックを上に傾けていたら
-					if (input.GetStickInfo().leftStickY < -GameSceneConstant::kPhysicalAttackStickPower)
+					if (m_isPlayer && input.GetStickInfo().leftStickY < -GameSceneConstant::kPhysicalAttackStickPower)
 					{
 						attackName = "UpCharge";
 					}
 					//スティックを下に傾けていたら
-					else if (input.GetStickInfo().leftStickY > GameSceneConstant::kPhysicalAttackStickPower)
+					else if (m_isPlayer && input.GetStickInfo().leftStickY > GameSceneConstant::kPhysicalAttackStickPower)
 					{
 						attackName = "DownCharge";
 					}
@@ -371,25 +375,25 @@ void PlayerStateMove::Update()
 	}
 
 	//一定時間レフトショルダーボタンが押されたら
-	if (input.GetPushTriggerTime(false) > GameSceneConstant::kChargeStateChangeTime)
+	if (m_isPlayer && input.GetPushTriggerTime(false) > GameSceneConstant::kChargeStateChangeTime)
 	{
 		//次のStateのポインタ作成
-		auto next = std::make_shared<PlayerStateCharge>(m_pPlayer);
+		auto next = std::make_shared<CharacterStateCharge>(m_pCharacter);
 		//StateをChargeに変更する
 		ChangeState(next);
 		return;
 	}
-	
+
 	//移動していなかったら
 	if (velo.SqLength() < 0.01f)
 	{
 		//アイドル状態に戻る
-		std::shared_ptr<PlayerStateIdle> next = std::make_shared<PlayerStateIdle>(m_pPlayer);
+		std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 
 		ChangeState(next);
 	}
 	//移動ベクトルを設定する
-	SetPlayerVelo(velo);
+	SetCharacterVelo(velo);
 
 #ifdef _DEBUG
 
@@ -398,10 +402,10 @@ void PlayerStateMove::Update()
 #endif // _DEBUG
 
 }
-void PlayerStateMove::Exit()
+void CharacterStateMove::Exit()
 {
 }
 
-void PlayerStateMove::OnCollide(std::shared_ptr<Collidable> collider)
+void CharacterStateMove::OnCollide(std::shared_ptr<Collidable> collider)
 {
 }

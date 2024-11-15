@@ -1,9 +1,10 @@
 #pragma once
-#include "PlayerStateBase.h"
-class PlayerStateMove : public PlayerStateBase, public std::enable_shared_from_this<PlayerStateMove>
+#include "CharacterStateBase.h"
+
+class CharacterStateMove : public CharacterStateBase, public std::enable_shared_from_this<CharacterStateMove>
 {
 public:
-	PlayerStateMove(std::shared_ptr<Player> player);
+	CharacterStateMove(std::shared_ptr<CharacterBase> character);
 
 	virtual void Enter() override;
 

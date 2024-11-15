@@ -1,7 +1,6 @@
 #include "SceneGame.h"
 #include "DxLib.h"
-#include "Player.h"
-#include "Enemy.h"
+#include "CharacterBase.h"
 #include "GameManager.h"
 #include "Physics.h"
 #include "LoadCsv.h"
@@ -30,9 +29,9 @@ SceneGame::~SceneGame()
 
 void SceneGame::Init()
 {
-	m_pActors.push_back(m_pGameManager->GetPlayerPointer());
-	m_pActors.push_back(m_pGameManager->GetEnemyPointer());
-
+	m_pActors.push_back(m_pGameManager->GetOnePlayerPointer());
+	m_pActors.push_back(m_pGameManager->GetTwoPlayerPointer());
+	
 	m_pGameManager->Init();
 
 	for (auto& actor : m_pActors)

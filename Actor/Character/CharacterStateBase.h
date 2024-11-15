@@ -1,7 +1,11 @@
 #pragma once
 #include "StateBase.h"
+#include "Vector3.h"
 #include <string>
+class CharacterBase;
 class Collidable;
+class Attack;
+class Input;
 class CharacterStateBase : public StateBase
 {
 public:
@@ -16,12 +20,13 @@ public:
 		kRush,//突撃状態
 		kHitAttack,//攻撃を受けた時
 		kButtonBashing,//敵との押し合い
-		kEnergyAttack,//気弾攻撃
 		kCharge,//チャージ状態
 		kStateKindNum//Stateの数
 	};
 
 public:
+
+	CharacterStateBase(std::shared_ptr<CharacterBase> character);
 
 	virtual void OnCollide(std::shared_ptr<Collidable> collider) abstract;
 
@@ -34,10 +39,94 @@ protected:
 
 	virtual void ChangeState(std::shared_ptr<CharacterStateBase> nextState);
 
+	/// <summary>
+	/// 対戦相手の座標を取得する
+	/// </summary>
+	/// <returns>対戦相手の座標</returns>
+	MyEngine::Vector3 GetTargetPos();
+
+	/// <summary>
+	/// 対戦相手の移動ベクトルを取得する
+	/// </summary>
+	/// <returns>対戦相手の移動ベクトル</returns>
+	MyEngine::Vector3 GetTargetVelo();
+
+	/// <summary>
+	/// 対戦相手のやられ状態を取得する
+	/// </summary>
+	/// <returns>対戦相手のやられ状態</returns>
+	int GetTargetHitReaction();
+
+	/// <summary>
+	/// プレイヤーの移動ベクトルを設定する
+	/// </summary>
+	/// <param name="velo">移動ベクトル</param>
+	void SetCharacterVelo(MyEngine::Vector3 velo);
+
+	/// <summary>
+	/// プレイヤーの座標を設定する
+	/// </summary>
+	/// <param name="pos">ワールド座標</param>
+	void SetCharacterPos(MyEngine::Vector3 pos);
+
+	/// <summary>
+	/// 対戦相手の背後座標を取得する
+	/// </summary>
+	/// <param name="distance">距離</param>
+	/// <returns>対戦相手の背後座標</returns>
+	MyEngine::Vector3 GetTargetBackPos(float distance);
+
+	/// <summary>
+	/// プレイヤーの残像を作成する
+	/// </summary>
+	void CreateAfterImage();
+
+	/// <summary>
+	/// アニメーション番号を取得する
+	/// </summary>
+	/// <param name="animName">アニメーションの名前</param>
+	/// <returns>アニメーション番号</returns>
+	int GetAttackAnimKind(std::string animName);
+
+	/// <summary>
+	/// キャラクターの移動速度を取得する
+	/// </summary>
+	/// <returns>使用しているキャラクターの移動速度</returns>
+	float GetSpeed();
+
+	/// <summary>
+	/// カメラの移動を止める
+	/// </summary>
+	void StopMoveCamera();
+
+	/// <summary>
+	/// カメラの移動を始める
+	/// </summary>
+	void StartMoveCamera();
+
+	/// <summary>
+	/// カメラを揺れを設定する
+	/// </summary>
+	/// <param name="time">揺らす時間</param>
+	void ShakeCamera(int time);
+
+	/// <summary>
+	/// 攻撃を受けた時に呼ぶ関数
+	/// </summary>
+	/// <param name="attack">受けた攻撃のクラス</param>
+	/// <param name="stateKind">現在のState</param>
+	void HitAttack(std::shared_ptr<Attack> attack, CharacterStateBase::CharacterStateKind stateKind);
+
 	//現在の状態
 	CharacterStateKind m_kind = CharacterStateKind::kIdle;
 
 	//Stateに入って何フレーム立ったか
 	float m_time = 0.0f;
+
+	//自分のキャラクターのポインタ
+	std::shared_ptr<CharacterBase> m_pCharacter;
+
+	//自分が人によって操作されているか
+	bool m_isPlayer;
 };
 

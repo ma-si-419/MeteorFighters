@@ -1,18 +1,18 @@
-#include "PlayerStateIdle.h"
-#include "PlayerStateNormalAttack.h"
-#include "PlayerStateMove.h"
-#include "PlayerStateJump.h"
-#include "PlayerStateDash.h"
-#include "PlayerStateRush.h"
-#include "PlayerStateGuard.h"
-#include "PlayerStateCharge.h"
+#include "CharacterStateIdle.h"
+#include "CharacterStateMove.h"
+#include "CharacterStateNormalAttack.h"
+#include "CharacterStateCharge.h"
+#include "CharacterStateDash.h"
+#include "CharacterStateRush.h"
+#include "CharacterStateJump.h"
+#include "CharacterStateGuard.h"
+#include "CharacterBase.h"
 #include "DxLib.h"
 #include "Input.h"
-#include "Player.h"
 #include "GameSceneConstant.h"
 
-PlayerStateIdle::PlayerStateIdle(std::shared_ptr<Player> player) :
-	PlayerStateBase(player),
+CharacterStateIdle::CharacterStateIdle(std::shared_ptr<CharacterBase> character) :
+	CharacterStateBase(character),
 	m_attackKey("empty"),
 	m_attackButtonPushTime(0),
 	m_isPlayEndAnim(false),
@@ -20,27 +20,27 @@ PlayerStateIdle::PlayerStateIdle(std::shared_ptr<Player> player) :
 {
 }
 
-void PlayerStateIdle::SetEndAnim(int kind, int time)
+void CharacterStateIdle::SetEndAnim(int kind, int time)
 {
-	m_pPlayer->ChangeAnim(static_cast<CharacterBase::AnimKind>(kind), false);
+	m_pCharacter->ChangeAnim(static_cast<CharacterBase::AnimKind>(kind), false);
 	m_endAnimTime = time;
 	m_isPlayEndAnim = true;
 }
 
-void PlayerStateIdle::SetEndAnim(int kind, int time, float blendSpeed)
+void CharacterStateIdle::SetEndAnim(int kind, int time, float blendSpeed)
 {
-	m_pPlayer->ChangeAnim(static_cast<CharacterBase::AnimKind>(kind), false, blendSpeed);
+	m_pCharacter->ChangeAnim(static_cast<CharacterBase::AnimKind>(kind), false, blendSpeed);
 	m_endAnimTime = time;
 	m_isPlayEndAnim = true;
 }
 
-void PlayerStateIdle::Enter()
+void CharacterStateIdle::Enter()
 {
 	m_pNextState = shared_from_this();
 	m_kind = CharacterStateKind::kIdle;
 }
 
-void PlayerStateIdle::Update()
+void CharacterStateIdle::Update()
 {
 
 #ifdef _DEBUG
@@ -60,12 +60,12 @@ void PlayerStateIdle::Update()
 	{
 		m_isPlayEndAnim = false;
 		//アイドルアニメーションでなければ
-		if (m_pPlayer->GetPlayAnimKind() != CharacterBase::AnimKind::kIdle)
+		if (m_pCharacter->GetPlayAnimKind() != CharacterBase::AnimKind::kIdle)
 		{
 			//アイドルアニメーションに変える
-			m_pPlayer->ChangeAnim(CharacterBase::AnimKind::kIdle, true);
+			m_pCharacter->ChangeAnim(CharacterBase::AnimKind::kIdle, true);
 			//一応再生速度をリセットしておく
-			m_pPlayer->SetAnimPlaySpeed();
+			m_pCharacter->SetAnimPlaySpeed();
 		}
 	}
 
@@ -78,11 +78,11 @@ void PlayerStateIdle::Update()
 	if (m_attackKey == "empty")
 	{
 		//格闘ボタンが押された時
-		if (input.IsPress("X"))
+		if (m_isPlayer && input.IsPress("X"))
 		{
 			m_attackKey = "X";
 		}
-		else if (input.IsPress("Y"))
+		else if (m_isPlayer && input.IsPress("Y"))
 		{
 			m_attackKey = "Y";
 		}
@@ -94,13 +94,13 @@ void PlayerStateIdle::Update()
 		m_attackButtonPushTime++;
 
 		//押していたボタンが離されたら
-		if (input.IsRelease(m_attackKey) ||
+		if (m_isPlayer && input.IsRelease(m_attackKey) ||
 			m_attackButtonPushTime > GameSceneConstant::kChargeAttackTime)
 		{
 			//チャージされていたかどうか判定
 			bool isCharge = m_attackButtonPushTime > GameSceneConstant::kChargeAttackTime;
 			//次のStateのポインタ作成
-			auto next = std::make_shared<PlayerStateNormalAttack>(m_pPlayer);
+			auto next = std::make_shared<CharacterStateNormalAttack>(m_pCharacter);
 
 			//何の攻撃を行うかをAttackStateに渡す
 			std::string attackName = "empty";
@@ -140,7 +140,7 @@ void PlayerStateIdle::Update()
 				{
 					attackName = "Low1";
 				}
-				else if(m_attackKey == "Y")
+				else if (m_attackKey == "Y")
 				{
 					attackName = "Energy1";
 				}
@@ -154,37 +154,37 @@ void PlayerStateIdle::Update()
 	}
 
 	//移動入力がされていたら
-	if (input.GetStickInfo().leftStickX != 0 ||
-		input.GetStickInfo().leftStickY != 0)
+	if (m_isPlayer && input.GetStickInfo().leftStickX != 0 ||
+		m_isPlayer && input.GetStickInfo().leftStickY != 0)
 	{
 		//次のStateのポインタ作成
-		auto next = std::make_shared<PlayerStateMove>(m_pPlayer);
+		auto next = std::make_shared<CharacterStateMove>(m_pCharacter);
 		//StateをMoveに変更する
 		ChangeState(next);
 		return;
 	}
 
 	//一定時間レフトショルダーボタンが押されたら
-	if (input.GetPushTriggerTime(false) > GameSceneConstant::kChargeStateChangeTime)
+	if (m_isPlayer && input.GetPushTriggerTime(false) > GameSceneConstant::kChargeStateChangeTime)
 	{
 		//次のStateのポインタ作成
-		auto next = std::make_shared<PlayerStateCharge>(m_pPlayer);
+		auto next = std::make_shared<CharacterStateCharge>(m_pCharacter);
 		//StateをChargeに変更する
 		ChangeState(next);
 		return;
 	}
 
 	//ダッシュボタンが押された時
-	if (input.IsTrigger("A"))
+	if (m_isPlayer && input.IsTrigger("A"))
 	{
 		//一緒にレフトショルダーも押されていたら
-		if (input.IsPushTrigger(false))
+		if (m_isPlayer && input.IsPushTrigger(false))
 		{
 			//ダッシュのコストがあれば
-			if (m_pPlayer->SubMp(GameSceneConstant::kDashCost))
+			if (m_pCharacter->SubMp(GameSceneConstant::kDashCost))
 			{
 				//突撃状態に移行する
-				auto next = std::make_shared<PlayerStateRush>(m_pPlayer);
+				auto next = std::make_shared<CharacterStateRush>(m_pCharacter);
 
 				next->SetMoveDir(MyEngine::Vector3(0.0f, 0.0f, 1.0f));
 
@@ -196,12 +196,12 @@ void PlayerStateIdle::Update()
 		//敵との距離からダッシュかステップか判断する
 		//(ステップかダッシュかの判定はDashStateの中でも行う)
 		//(ここではMPを消費するかしないか、DashStateにはいるかどうかを判断する)
-		if ((GetEnemyPos() - m_pPlayer->GetPos()).Length() > GameSceneConstant::kNearLange)
+		if ((GetTargetPos() - m_pCharacter->GetPos()).Length() > GameSceneConstant::kNearLange)
 		{
 			//遠かった場合Mpを消費してダッシュする
-			if (m_pPlayer->SubMp(GameSceneConstant::kDashCost))
+			if (m_pCharacter->SubMp(GameSceneConstant::kDashCost))
 			{
-				auto next = std::make_shared<PlayerStateDash>(m_pPlayer);
+				auto next = std::make_shared<CharacterStateDash>(m_pCharacter);
 
 				next->SetMoveDir(MyEngine::Vector3(0.0f, 0.0f, 1.0f));
 
@@ -213,7 +213,7 @@ void PlayerStateIdle::Update()
 		else
 		{
 			//MPを消費せずにステップをする
-			auto next = std::make_shared<PlayerStateDash>(m_pPlayer);
+			auto next = std::make_shared<CharacterStateDash>(m_pCharacter);
 
 			next->SetMoveDir(MyEngine::Vector3(0.0f, 0.0f, 1.0f));
 
@@ -224,13 +224,13 @@ void PlayerStateIdle::Update()
 
 
 	//地上にいるときに
-	if (m_pPlayer->IsGround())
+	if (m_pCharacter->IsGround())
 	{
 		//ジャンプボタンが押されたら
-		if (input.IsPress("RB"))
+		if (m_isPlayer && input.IsPress("RB"))
 		{
 			//ジャンプState作成
-			auto next = std::make_shared<PlayerStateJump>(m_pPlayer);
+			auto next = std::make_shared<CharacterStateJump>(m_pCharacter);
 
 			next->StartJump();
 
@@ -247,11 +247,11 @@ void PlayerStateIdle::Update()
 	else
 	{
 		//上昇ボタンか下降ボタンが押されたら
-		if (input.IsPress("RB") ||
-			input.IsPushTrigger(true))
+		if (m_isPlayer && input.IsPress("RB") ||
+			m_isPlayer && input.IsPushTrigger(true))
 		{
 			//次のStateのポインタ作成
-			auto next = std::make_shared<PlayerStateMove>(m_pPlayer);
+			auto next = std::make_shared<CharacterStateMove>(m_pCharacter);
 			//StateをMoveに変更する
 			ChangeState(next);
 			return;
@@ -259,23 +259,23 @@ void PlayerStateIdle::Update()
 	}
 
 	//ガード入力がされていたら
-	if (input.IsPress("B"))
+	if (m_isPlayer && input.IsPress("B"))
 	{
 		//次のStateのポインタ作成
-		auto next = std::make_shared<PlayerStateGuard>(m_pPlayer);
+		auto next = std::make_shared<CharacterStateGuard>(m_pCharacter);
 		//StateをMoveに変更する
 		ChangeState(next);
 		return;
 	}
 
 	//アイドル状態の時は移動しない
-	SetPlayerVelo(velo);
+	SetCharacterVelo(velo);
 }
-void PlayerStateIdle::Exit()
+void CharacterStateIdle::Exit()
 {
 
 }
 
-void PlayerStateIdle::OnCollide(std::shared_ptr<Collidable> collider)
+void CharacterStateIdle::OnCollide(std::shared_ptr<Collidable> collider)
 {
 }

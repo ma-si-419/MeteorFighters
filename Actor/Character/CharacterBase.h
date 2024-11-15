@@ -144,6 +144,16 @@ public:
 	};
 
 	/// <summary>
+	/// どのキャラクターか
+	/// </summary>
+	enum class CharacterNumber
+	{
+		kOnePlayer,
+		kTwoPlayer,
+		kPlayerNum
+	};
+
+	/// <summary>
 	/// 通常攻撃の情報
 	/// </summary>
 	struct NormalAttackData
@@ -222,6 +232,14 @@ public:
 
 	CharacterBase(ObjectTag tag, CharacterKind kind);
 	~CharacterBase();
+
+	void Init() override;
+
+	void Update() override;
+
+	void Draw() override;
+
+	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
 
 	/// <summary>
 	/// 敵の座標などを取得するためにゲームマネージャーのポインタをセットする
@@ -373,9 +391,8 @@ public:
 	/// <summary>
 	/// 前方にターゲットがいるかどうかを取得
 	/// </summary>
-	/// <param name="isPlayer">プレイヤーならtrueを入れる</param>
 	/// <returns>前方にいるならtrue</returns>
-	bool IsFrontTarget(bool isPlayer);
+	bool IsFrontTarget();
 
 	/// <summary>
 	/// 描画する座標を設定する(MV1SetPositionの代わり)
@@ -411,8 +428,7 @@ public:
 	/// <summary>
 	/// ターゲットの方向を向くようにする
 	/// </summary>
-	/// <param name="isPlayer">プレイヤーならtrue</param>
-	void LookTarget(bool isPlayer);
+	void LookTarget();
 
 	/// <summary>
 	/// 残像を作成する
@@ -443,6 +459,11 @@ public:
 	/// <param name="flag">ぶつかるかどうか</param>
 	void SetIsTrigger(bool flag);
 
+	/// <summary>
+	/// キャラクターの番号を設定
+	/// </summary>
+	/// <param name="num">1Pか2Pかを設定する</param>
+	void SetCharacterNumber(CharacterNumber num) { m_number = num; }
 protected:
 
 	/// <summary>
@@ -466,7 +487,8 @@ protected:
 	};
 
 	
-
+	//自身がどちら側のキャラクターか
+	CharacterNumber m_number;
 	//モデルハンドル
 	int m_modelHandle;
 	//シーンのポインタ
@@ -517,4 +539,6 @@ protected:
 	int m_lastAnim;
 	//アニメーションブレンドが終わったかどうか
 	bool m_isEndAnimationBlend;
+
+	friend CharacterStateBase;
 };

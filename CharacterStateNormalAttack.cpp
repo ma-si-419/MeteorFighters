@@ -1,8 +1,8 @@
-#include "PlayerStateNormalAttack.h"
-#include "PlayerStateIdle.h"
+#include "CharacterStateNormalAttack.h"
+#include "CharacterStateIdle.h"
 #include "DxLib.h"
 #include "Input.h"
-#include "Player.h"
+#include "CharacterBase.h"
 #include <cmath>
 
 namespace
@@ -47,8 +47,8 @@ namespace
 	const std::string kTeleportationAttack = "Teleportation";
 }
 
-PlayerStateNormalAttack::PlayerStateNormalAttack(std::shared_ptr<Player> player) :
-	PlayerStateBase(player),
+CharacterStateNormalAttack::CharacterStateNormalAttack(std::shared_ptr<CharacterBase> character) :
+	CharacterStateBase(character),
 	m_nowAttackName("empty"),
 	m_nextAttackName("empty"),
 	m_isNextAttack(false),
@@ -60,40 +60,40 @@ PlayerStateNormalAttack::PlayerStateNormalAttack(std::shared_ptr<Player> player)
 	m_chaseAttackNum(0)
 {
 }
-void PlayerStateNormalAttack::SetAttack(std::string key, std::string attackName)
+void CharacterStateNormalAttack::SetAttack(std::string key, std::string attackName)
 {
 	//押されたキーを保存しておく
 	m_attackKey = key;
 
 	m_nowAttackName = attackName;
 }
-void PlayerStateNormalAttack::SetAttackVelo(MyEngine::Vector3 velo)
+void CharacterStateNormalAttack::SetAttackVelo(MyEngine::Vector3 velo)
 {
 	m_firstAttackMoveVec = velo;
 }
-void PlayerStateNormalAttack::Enter()
+void CharacterStateNormalAttack::Enter()
 {
 	m_pNextState = shared_from_this();
 	m_kind = CharacterStateKind::kNormalAttack;
 
 	//設定された攻撃のアニメーション取得
-	std::string animName = m_pPlayer->GetNormalAttackData(m_nowAttackName).animationName;
+	std::string animName = m_pCharacter->GetNormalAttackData(m_nowAttackName).animationName;
 
 	CharacterBase::AnimKind anim = static_cast<CharacterBase::AnimKind>(GetAttackAnimKind(animName));
 
 	//アニメーションの変更
-	m_pPlayer->ChangeAnim(anim, false);
+	m_pCharacter->ChangeAnim(anim, false);
 
 	//向かう方向の設定
-	MyEngine::Vector3 shiftVec = (GetEnemyPos() - m_pPlayer->GetPos()).Normalize();
+	MyEngine::Vector3 shiftVec = (GetTargetPos() - m_pCharacter->GetPos()).Normalize();
 
 	shiftVec *= kPhysicalAttackNearLange;
 
 	shiftVec.y = 0;
 
-	m_moveTargetPos = GetEnemyPos() + shiftVec;
+	m_moveTargetPos = GetTargetPos() + shiftVec;
 
-	m_pPlayer->LookTarget(true);
+	m_pCharacter->LookTarget();
 
 	//最初の攻撃がチャージできるかどうかを設定する
 	if (m_nowAttackName == kUpChargeAttack ||
@@ -105,7 +105,7 @@ void PlayerStateNormalAttack::Enter()
 
 }
 
-void PlayerStateNormalAttack::Update()
+void CharacterStateNormalAttack::Update()
 {
 	//チャージ中はフレームを数える速度を変える
 	if (m_isCharge)
@@ -119,7 +119,7 @@ void PlayerStateNormalAttack::Update()
 			m_isCharge = false;
 		}
 		//アニメーションの再生速度も変える
-		m_pPlayer->SetAnimPlaySpeed(kOnChargeAnimPlaySpeed);
+		m_pCharacter->SetAnimPlaySpeed(kOnChargeAnimPlaySpeed);
 	}
 	//チャージしていない状態
 	else
@@ -127,7 +127,7 @@ void PlayerStateNormalAttack::Update()
 		//Stateにいるフレーム数を数えておく
 		m_time++;
 		//アニメーションの再生速度を通常にする
-		m_pPlayer->SetAnimPlaySpeed();
+		m_pCharacter->SetAnimPlaySpeed();
 	}
 
 	//ボタンを押している間はチャージを続ける
@@ -140,7 +140,7 @@ void PlayerStateNormalAttack::Update()
 		}
 	}
 
-	auto attackData = m_pPlayer->GetNormalAttackData(m_nowAttackName);
+	auto attackData = m_pCharacter->GetNormalAttackData(m_nowAttackName);
 
 	MyEngine::Vector3 velo;
 
@@ -150,7 +150,7 @@ void PlayerStateNormalAttack::Update()
 	if (m_time >= attackData.totalFrame)
 	{
 		//アイドル状態に戻る
-		std::shared_ptr<PlayerStateIdle> next = std::make_shared<PlayerStateIdle>(m_pPlayer);
+		std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 
 		ChangeState(next);
 		return;
@@ -166,10 +166,10 @@ void PlayerStateNormalAttack::Update()
 			if (m_nextAttackName == "None") return;
 
 			//次の攻撃の情報
-			CharacterBase::NormalAttackData nextAttack = m_pPlayer->GetNormalAttackData(m_nextAttackName);
+			CharacterBase::NormalAttackData nextAttack = m_pCharacter->GetNormalAttackData(m_nextAttackName);
 
 			//次の攻撃を出す条件に敵の状態があれば今の敵のやられ状態と照らし合わせる
-			CharacterBase::HitReactionKind enemyHitReaction = static_cast<CharacterBase::HitReactionKind>(GetEnemyHitReaction());
+			CharacterBase::HitReactionKind enemyHitReaction = static_cast<CharacterBase::HitReactionKind>(GetTargetHitReaction());
 
 			if (nextAttack.targetHitReaction == "中")
 			{
@@ -206,15 +206,15 @@ void PlayerStateNormalAttack::Update()
 				if (m_attackKey == "Y")
 				{
 					//これ以上追撃できなければ
-					if (m_chaseAttackNum >= m_pPlayer->GetChaseNum()) return;
+					if (m_chaseAttackNum >= m_pCharacter->GetChaseNum()) return;
 					//追撃できるのなら追撃した回数を増やす
 					m_chaseAttackNum++;
 				}
 
 				//次の攻撃発生フレーム時に敵がいる場所を計算する
-				MyEngine::Vector3 teleportationPos = GetEnemyPos() + (GetEnemyVelo() * (nextAttack.attackFrame));
+				MyEngine::Vector3 teleportationPos = GetTargetPos() + (GetTargetVelo() * (nextAttack.attackFrame));
 				//瞬間移動先に攻撃の攻撃範囲分だけずれを足す
-				MyEngine::Vector3 attackShiftVec = GetEnemyVelo();
+				MyEngine::Vector3 attackShiftVec = GetTargetVelo();
 
 				teleportationPos += attackShiftVec.Normalize() * (kTeleportationShiftLange);
 
@@ -222,7 +222,7 @@ void PlayerStateNormalAttack::Update()
 
 				teleportationPos += attackShiftVec.Normalize() * (kPhysicalAttackRadius);
 
-				SetPlayerPos(teleportationPos);
+				SetCharacterPos(teleportationPos);
 			}
 
 			//時間のリセット
@@ -232,7 +232,7 @@ void PlayerStateNormalAttack::Update()
 			//次に行う攻撃の設定
 			m_nowAttackName = m_nextAttackName;
 			m_nextAttackName = "empty";
-			m_firstAttackMoveVec = MyEngine::Vector3(0,0,0);
+			m_firstAttackMoveVec = MyEngine::Vector3(0, 0, 0);
 
 
 			//次の攻撃がチャージできるかどうか
@@ -243,26 +243,26 @@ void PlayerStateNormalAttack::Update()
 			LocalPos attackPos;
 
 			//ローカル座標の中心を設定
-			attackPos.SetCenterPos(GetEnemyPos());
+			attackPos.SetCenterPos(GetTargetPos());
 			//ローカル座標の正面座標を設定
-			attackPos.SetFrontPos(GetEnemyPos() + (m_pPlayer->GetPos() - GetEnemyPos()).Normalize());
+			attackPos.SetFrontPos(GetTargetPos() + (m_pCharacter->GetPos() - GetTargetPos()).Normalize());
 			//ローカル座標を設定
 			attackPos.SetLocalPos(MyEngine::Vector3(0.0f, 0.0f, kPhysicalAttackRadius));
 
-			MyEngine::Vector3 shiftVec = (attackPos.GetWorldPos() - m_pPlayer->GetPos()).Normalize();
+			MyEngine::Vector3 shiftVec = (attackPos.GetWorldPos() - m_pCharacter->GetPos()).Normalize();
 
 			shiftVec *= kPhysicalAttackNearLange;
 
 			shiftVec.y = 0;
 
-			m_moveTargetPos = GetEnemyPos() + shiftVec;
+			m_moveTargetPos = GetTargetPos() + shiftVec;
 			CharacterBase::AnimKind anim = static_cast<CharacterBase::AnimKind>(GetAttackAnimKind(nextAttack.animationName));
 
-			m_pPlayer->ChangeAnim(anim, false);
+			m_pCharacter->ChangeAnim(anim, false);
 
 			m_isNextAttack = false;
 
-			m_pPlayer->LookTarget(true);
+			m_pCharacter->LookTarget();
 
 			//攻撃情報の更新
 			attackData = nextAttack;
@@ -279,7 +279,7 @@ void PlayerStateNormalAttack::Update()
 
 			MyEngine::Vector3 dir;
 
-			dir = (m_moveTargetPos - m_pPlayer->GetPos()).Normalize();
+			dir = (m_moveTargetPos - m_pCharacter->GetPos()).Normalize();
 
 			//プレイヤーの移動速度
 			float speed = attackData.moveSpeed;
@@ -292,10 +292,10 @@ void PlayerStateNormalAttack::Update()
 			}
 
 			//移動距離が行きたい座標までの距離よりも長ければ
-			if ((m_moveTargetPos - m_pPlayer->GetPos()).Length() < speed * attackData.attackFrame)
+			if ((m_moveTargetPos - m_pCharacter->GetPos()).Length() < speed * attackData.attackFrame)
 			{
 				//移動距離を補正する
-				speed = (m_moveTargetPos - m_pPlayer->GetPos()).Length() / attackData.attackFrame;
+				speed = (m_moveTargetPos - m_pCharacter->GetPos()).Length() / attackData.attackFrame;
 			}
 
 			velo = dir * speed;
@@ -317,11 +317,16 @@ void PlayerStateNormalAttack::Update()
 		//移動方向ベクトル
 		MyEngine::Vector3 dir;
 
-		//スティックの情報取得
-		MyEngine::Input::StickInfo stick = input.GetStickInfo();
+		MyEngine::Vector3 leftStickDir;
 
-		//左スティックの傾き取得
-		MyEngine::Vector3 leftStickDir(stick.leftStickX, 0, -stick.leftStickY);
+		if (m_isPlayer)
+		{
+			//スティックの情報取得
+			MyEngine::Input::StickInfo stick = input.GetStickInfo();
+
+			//左スティックの傾き取得
+			leftStickDir = MyEngine::Vector3(stick.leftStickX, 0, -stick.leftStickY);
+		}
 		//移動ベクトルが0じゃなければ
 		if (leftStickDir.SqLength() > 0.001)
 		{
@@ -329,8 +334,8 @@ void PlayerStateNormalAttack::Update()
 			dir = leftStickDir.Normalize();
 
 			//エネミーの方向に移動方向を回転させる
-			float vX = GetEnemyPos().x - m_pPlayer->GetPos().x;
-			float vZ = GetEnemyPos().z - m_pPlayer->GetPos().z;
+			float vX = GetTargetPos().x - m_pCharacter->GetPos().x;
+			float vZ = GetTargetPos().z - m_pCharacter->GetPos().z;
 
 			float angle = std::atan2f(vX, vZ);
 
@@ -344,12 +349,12 @@ void PlayerStateNormalAttack::Update()
 			velo = dir * GetSpeed();
 		}
 		//ジャンプボタンが押されたら
-		if (input.IsPress("RB"))
+		if (m_isPlayer && input.IsPress("RB"))
 		{
 			velo.y = GetSpeed();
 		}
 		//下降ボタンが押されたら
-		else if (input.IsPushTrigger(true))
+		else if (m_isPlayer && input.IsPushTrigger(true))
 		{
 			velo.y = -GetSpeed();
 		}
@@ -367,12 +372,12 @@ void PlayerStateNormalAttack::Update()
 		if (m_chargeTime > 0.0f)
 		{
 			//チャージした時間によってダメージを上昇させる
-			attack.damage = static_cast<int>((attackData.damageRate + m_chargeTime) * m_pPlayer->GetPower());
+			attack.damage = static_cast<int>((attackData.damageRate + m_chargeTime) * m_pCharacter->GetPower());
 		}
 		//チャージされていないときのダメージ
 		else
 		{
-			attack.damage = static_cast<int>(attackData.damageRate * m_pPlayer->GetPower());
+			attack.damage = static_cast<int>(attackData.damageRate * m_pCharacter->GetPower());
 		}
 
 		attack.attackHitKind = attackData.attackHitKind;
@@ -393,7 +398,7 @@ void PlayerStateNormalAttack::Update()
 		}
 
 		//攻撃を作成
-		m_pPlayer->CreateAttack(attack);
+		m_pCharacter->CreateAttack(attack);
 	}
 
 	//次の攻撃を行うか判定する
@@ -434,7 +439,7 @@ void PlayerStateNormalAttack::Update()
 					m_isNextAttack = true;
 				}
 				//敵が吹っ飛び状態の時に派生攻撃をしていたら
-				CharacterBase::HitReactionKind kind = static_cast<CharacterBase::HitReactionKind>(GetEnemyHitReaction());
+				CharacterBase::HitReactionKind kind = static_cast<CharacterBase::HitReactionKind>(GetTargetHitReaction());
 				if (kind == CharacterBase::HitReactionKind::kUpBurst ||
 					kind == CharacterBase::HitReactionKind::kFarBurst ||
 					kind == CharacterBase::HitReactionKind::kDownBurst)
@@ -459,7 +464,7 @@ void PlayerStateNormalAttack::Update()
 		}
 	}
 
-	SetPlayerVelo(velo);
+	SetCharacterVelo(velo);
 
 #ifdef _DEBUG
 
@@ -468,10 +473,10 @@ void PlayerStateNormalAttack::Update()
 #endif // _DEBUG
 }
 
-void PlayerStateNormalAttack::Exit()
+void CharacterStateNormalAttack::Exit()
 {
 }
 
-void PlayerStateNormalAttack::OnCollide(std::shared_ptr<Collidable> collider)
+void CharacterStateNormalAttack::OnCollide(std::shared_ptr<Collidable> collider)
 {
 }

@@ -81,7 +81,7 @@ void Attack::OnCollide(std::shared_ptr<Collidable> collider)
 	if (GetTag() == ObjectTag::kPlayerAttack)
 	{
 		//エネミーにぶつかったら
-		if (collider->GetTag() == ObjectTag::kEnemy)
+		if (collider->GetTag() == ObjectTag::kTwoPlayer)
 		{
 			m_isExist = false;
 			//printfDx("ぶつかった");
@@ -91,7 +91,7 @@ void Attack::OnCollide(std::shared_ptr<Collidable> collider)
 	else if (GetTag() == ObjectTag::kEnemyAttack)
 	{
 		//プレイヤーにぶつかったら
-		if (collider->GetTag() == ObjectTag::kPlayer)
+		if (collider->GetTag() == ObjectTag::kOnePlayer)
 		{
 			m_isExist = false;
 		}

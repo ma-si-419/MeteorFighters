@@ -1,13 +1,11 @@
 #pragma once
-#include "EnemyStateBase.h"
-#include "Vector3.h"
-#include "CharacterBase.h"
+#include "CharacterStateBase.h"
 #include <list>
-class EnemyStateHitAttack : public EnemyStateBase, public std::enable_shared_from_this<EnemyStateHitAttack>
+class CharacterStateHitAttack : public CharacterStateBase,std::enable_shared_from_this<CharacterStateHitAttack>
 {
 public:
 
-	EnemyStateHitAttack(std::shared_ptr<Enemy> enemy);
+	CharacterStateHitAttack(std::shared_ptr<CharacterBase> character);
 
 	virtual void Enter() override;
 
@@ -19,8 +17,8 @@ public:
 	/// UŒ‚‚ğó‚¯‚½‚ÉŒÄ‚ÔŠÖ”
 	/// </summary>
 	/// <param name="reaction">UŒ‚‚ğó‚¯‚½‚Ì”½‰</param>
-	void HitAttack(CharacterBase::HitReactionKind reaction);
-	
+	void HitAttack(int reaction);
+
 	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
 
 	/// <summary>
@@ -28,7 +26,7 @@ public:
 	/// </summary>
 	/// <param name="kind">ó‚¯‚½UŒ‚‚Ìí—Ş</param>
 	/// <returns>Ÿ‚ÉÄ¶‚·‚éƒAƒjƒ[ƒVƒ‡ƒ“</returns>
-	int GetNextAnimKind(CharacterBase::HitReactionKind kind);
+	int GetNextAnimKind(int kind);
 
 private:
 
@@ -42,8 +40,9 @@ private:
 	MyEngine::Vector3 m_moveVec;
 
 	//¡‚Ü‚Åó‚¯‚½UŒ‚
-	std::list<CharacterBase::HitReactionKind> m_hitReactions;
-	
+	std::list<int> m_hitReactions;
+
 	//‘O•û‚©‚ç‰£‚ç‚ê‚½‚©‚Ç‚¤‚©
 	bool m_isFrontHit;
 };
+
