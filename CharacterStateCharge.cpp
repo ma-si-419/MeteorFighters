@@ -93,7 +93,3 @@ void CharacterStateCharge::Update()
 void CharacterStateCharge::Exit()
 {
 }
-
-void CharacterStateCharge::OnCollide(std::shared_ptr<Collidable> collider)
-{
-}

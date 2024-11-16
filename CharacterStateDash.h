@@ -13,8 +13,6 @@ public:
 
 	virtual void Exit() override;
 
-	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
-
 private:
 	MyEngine::Vector3 m_moveDir;
 

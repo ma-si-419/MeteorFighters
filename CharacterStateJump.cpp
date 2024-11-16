@@ -232,7 +232,3 @@ void CharacterStateJump::Update()
 void CharacterStateJump::Exit()
 {
 }
-
-void CharacterStateJump::OnCollide(std::shared_ptr<Collidable> collider)
-{
-}

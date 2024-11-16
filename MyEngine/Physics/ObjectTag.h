@@ -3,9 +3,9 @@
 // 当たったものの判別を行うためのタグ
 enum class ObjectTag
 {
-	kOnePlayer,			//プレイヤー
-	kTwoPlayer,			//敵
-	kPlayerAttack,		//プレイヤーの攻撃
-	kEnemyAttack,		//エネミーの攻撃
+	kOnePlayer,			//1P
+	kTwoPlayer,			//2P
+	kOnePlayerAttack,	//1Pの攻撃
+	kTwoPlayerAttack,	//2Pの攻撃
 	kStage				//ステージ
 };

@@ -78,7 +78,7 @@ void Attack::Final()
 void Attack::OnCollide(std::shared_ptr<Collidable> collider)
 {
 	//自身がプレイヤーの攻撃で
-	if (GetTag() == ObjectTag::kPlayerAttack)
+	if (GetTag() == ObjectTag::kOnePlayerAttack)
 	{
 		//エネミーにぶつかったら
 		if (collider->GetTag() == ObjectTag::kTwoPlayer)
@@ -88,7 +88,7 @@ void Attack::OnCollide(std::shared_ptr<Collidable> collider)
 		}
 	}
 	//自身がエネミーの攻撃で
-	else if (GetTag() == ObjectTag::kEnemyAttack)
+	else if (GetTag() == ObjectTag::kTwoPlayerAttack)
 	{
 		//プレイヤーにぶつかったら
 		if (collider->GetTag() == ObjectTag::kOnePlayer)

@@ -381,7 +381,14 @@ void CharacterStateNormalAttack::Update()
 		}
 
 		attack.attackHitKind = attackData.attackHitKind;
-		attack.isPlayer = true;
+		if (m_pCharacter->GetTag() == ObjectTag::kOnePlayer)
+		{
+			attack.isPlayer = true;
+		}
+		else if (m_pCharacter->GetTag() == ObjectTag::kTwoPlayer)
+		{
+			attack.isPlayer = false;
+		}
 		attack.speed = attackData.attackMoveSpeed;
 
 		//äiì¨çUåÇÇ»ÇÁ
@@ -474,9 +481,5 @@ void CharacterStateNormalAttack::Update()
 }
 
 void CharacterStateNormalAttack::Exit()
-{
-}
-
-void CharacterStateNormalAttack::OnCollide(std::shared_ptr<Collidable> collider)
 {
 }

@@ -10,7 +10,5 @@ public:
 	virtual void Update() override;
 
 	virtual void Exit() override;
-
-	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
 };
 

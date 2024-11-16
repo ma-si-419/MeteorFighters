@@ -146,7 +146,7 @@ public:
 	/// <summary>
 	/// どのキャラクターか
 	/// </summary>
-	enum class CharacterNumber
+	enum class PlayerNumber
 	{
 		kOnePlayer,
 		kTwoPlayer,
@@ -463,7 +463,7 @@ public:
 	/// キャラクターの番号を設定
 	/// </summary>
 	/// <param name="num">1Pか2Pかを設定する</param>
-	void SetCharacterNumber(CharacterNumber num) { m_number = num; }
+	void SetCharacterNumber(PlayerNumber num) { m_playerNumber = num; }
 protected:
 
 	/// <summary>
@@ -488,7 +488,7 @@ protected:
 
 	
 	//自身がどちら側のキャラクターか
-	CharacterNumber m_number;
+	PlayerNumber m_playerNumber;
 	//モデルハンドル
 	int m_modelHandle;
 	//シーンのポインタ

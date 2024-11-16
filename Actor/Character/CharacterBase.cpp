@@ -13,18 +13,24 @@
 
 namespace
 {
+	//キャラクターの身長の高さ
 	constexpr float kCharacterHeight = 4.5f;
-
+	//攻撃を発生させる座標
 	constexpr float kAttackPopPos = GameSceneConstant::kCharacterRadius * 3.0f;
-
+	//攻撃を上下に補正する際にどこまで補正するか
 	constexpr float kAttackMaxShiftPosY = kCharacterHeight * 1.5f;
-
+	//基本的なアニメーションブレンドの速さ
 	constexpr float kAnimBlendSpeed = 0.08f;
-
+	//アニメーションの再生速度
 	constexpr float kAnimPlaySpeed = 1.0f;
-
+	//向いている方向を設定する際に使用する定数
 	constexpr float kFrontPosDistance = 3.0f;
+	//1P側のキャラクターの初期座標
+	const MyEngine::Vector3 kOnePlayerInitPos(-50, 0, -50);
+	//2P側のキャラクターの初期座標
+	const MyEngine::Vector3 kTwoPlayerInitPos(50, 0, 50);
 
+	//攻撃の種類を外部ファイルの文字列から内部のAttackHitKindに変換する際に使用する
 	const std::map<std::string, CharacterBase::AttackHitKind> kAttackHitKindMap =
 	{
 		{"弱",CharacterBase::AttackHitKind::kLow},
@@ -36,6 +42,7 @@ namespace
 		{"下スタン",CharacterBase::AttackHitKind::kBottomStan}
 	};
 
+	//必殺技の種類を外部ファイルの文字列から内部のAttackKindに変換する際に使用する
 	const std::map<std::string, CharacterBase::AttackKind> kSpecialAttackKindMap =
 	{
 		{"ビーム",CharacterBase::AttackKind::kBeam},
@@ -45,6 +52,8 @@ namespace
 		{"体当たり",CharacterBase::AttackKind::kAssault}
 	};
 
+
+	//攻撃のアニメーションを外部ファイルの文字列から内部のAnimKindに変換する際に使用する
 	const std::map<std::string, CharacterBase::AnimKind> kAttackAnimKindMap =
 	{
 		{"LowAttack1",CharacterBase::AnimKind::kLowAttack1},
@@ -111,6 +120,21 @@ void CharacterBase::Init()
 
 	auto thisPointer = std::dynamic_pointer_cast<CharacterBase>(shared_from_this());
 
+	//初期座標の決定
+	if (m_playerNumber == PlayerNumber::kOnePlayer)
+	{
+		m_rigidbody.SetPos(kOnePlayerInitPos);
+		m_lookPos.SetCenterPos(kOnePlayerInitPos);
+		SetFrontPos(kTwoPlayerInitPos);
+	}
+	else if (m_playerNumber == PlayerNumber::kTwoPlayer)
+	{
+		m_rigidbody.SetPos(kTwoPlayerInitPos);
+		m_lookPos.SetCenterPos(kTwoPlayerInitPos);
+		SetFrontPos(kOnePlayerInitPos);
+	}
+
+	//初期ステートの設定
 	m_pState = std::make_shared<CharacterStateIdle>(thisPointer);
 	m_pState->Enter();
 }
@@ -176,7 +200,7 @@ void CharacterBase::Draw()
 
 #ifdef _DEBUG
 
-	//DrawSphere3D(GetBackPos(GameSceneConstant::kEnemyBackPosDistance).CastVECTOR(), 3, 3, GetColor(255, 0, 255), GetColor(255, 0, 255), true);;
+	DrawSphere3D(GetBackPos(GameSceneConstant::kEnemyBackPosDistance).CastVECTOR(), 3, 3, GetColor(255, 0, 255), GetColor(255, 0, 255), true);;
 
 #endif // _DEBUG
 
@@ -184,9 +208,18 @@ void CharacterBase::Draw()
 
 void CharacterBase::OnCollide(std::shared_ptr<Collidable> collider)
 {
+	m_pState->OnCollide(collider);
+
 #ifdef _DEBUG
 
-	DrawString(0, 64, "Playerがなにかとぶつかった", GetColor(255, 255, 255));
+	if (m_playerNumber == PlayerNumber::kOnePlayer)
+	{
+		DrawString(0, 64, "1Pがなにかとぶつかった", GetColor(255, 255, 255));
+	}
+	else
+	{
+		DrawString(0, 80, "2Pがなにかとぶつかった", GetColor(255, 255, 255));
+	}
 
 #endif // _DEBUG
 }
@@ -365,11 +398,11 @@ void CharacterBase::CreateAttack(AttackData attackData)
 	//プレイヤーとエネミーどちらの攻撃か判断
 	if (attackData.isPlayer)
 	{
-		tag = ObjectTag::kPlayerAttack;
+		tag = ObjectTag::kOnePlayerAttack;
 	}
 	else
 	{
-		tag = ObjectTag::kEnemyAttack;
+		tag = ObjectTag::kTwoPlayerAttack;
 	}
 	//攻撃座標の設定
 	MyEngine::Vector3 attackPos;
@@ -384,19 +417,19 @@ void CharacterBase::CreateAttack(AttackData attackData)
 	MyEngine::Vector3 toTarget;
 	MyEngine::Vector3 targetPos;
 
-	if (m_number == CharacterNumber::kOnePlayer)
+	if (m_playerNumber == PlayerNumber::kOnePlayer)
 	{
 		auto player1 = m_pGameManager->GetOnePlayerPointer();
 
 		targetPos = m_pGameManager->GetTargetPos(player1);
-		toTarget = targetPos - m_pGameManager->GetTargetPos(player1);
+		toTarget = targetPos - m_rigidbody.GetPos();
 	}
 	else
 	{
 		auto player2 = m_pGameManager->GetTwoPlayerPointer();
 
 		targetPos = m_pGameManager->GetTargetPos(player2);
-		toTarget = targetPos - m_pGameManager->GetTargetPos(player2);
+		toTarget = targetPos - m_rigidbody.GetPos();
 	}
 
 	localPos.SetFrontPos(m_rigidbody.GetPos() + toTarget.Normalize());
@@ -465,7 +498,7 @@ bool CharacterBase::IsFrontTarget()
 	MyEngine::Vector3 toTargetDir;
 
 	//プレイヤーなら
-	if (m_number == CharacterNumber::kOnePlayer)
+	if (m_playerNumber == PlayerNumber::kOnePlayer)
 	{
 		auto player1 = m_pGameManager->GetOnePlayerPointer();
 		toTargetDir = m_targetLocalPos.ChangeWorldToLocal(m_pGameManager->GetTargetPos(player1));

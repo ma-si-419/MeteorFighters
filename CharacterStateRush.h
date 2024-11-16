@@ -15,8 +15,6 @@ public:
 
 	virtual void Exit() override;
 
-	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
-
 private:
 
 	//ˆÚ“®•ûŒü‚É‚ ‚éƒxƒNƒgƒ‹(‚±‚±‚ÉŒü‚©‚Á‚ÄˆÚ“®‚ð‚µ‚æ‚¤‚Æ‚·‚é)

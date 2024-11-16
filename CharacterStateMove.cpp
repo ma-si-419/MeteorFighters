@@ -405,7 +405,3 @@ void CharacterStateMove::Update()
 void CharacterStateMove::Exit()
 {
 }
-
-void CharacterStateMove::OnCollide(std::shared_ptr<Collidable> collider)
-{
-}

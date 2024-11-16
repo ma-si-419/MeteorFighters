@@ -35,6 +35,36 @@ CharacterStateBase::CharacterStateBase(std::shared_ptr<CharacterBase> character)
 	}
 }
 
+void CharacterStateBase::OnCollide(std::shared_ptr<Collidable> collider)
+{
+	//1P‘¤‚Ìˆ—
+	if (m_pCharacter->GetTag() == ObjectTag::kOnePlayer)
+	{
+		//2P‚ÌUŒ‚‚É“–‚½‚Á‚½‚ç
+		if (collider->GetTag() == ObjectTag::kTwoPlayerAttack)
+		{
+			auto attack = std::static_pointer_cast<Attack>(collider);
+
+			auto status = attack->GetStatus();
+
+			CharacterStateBase::HitAttack(attack, GetKind());
+		}
+	}
+	//2P‘¤‚Ìˆ—
+	else if (m_pCharacter->GetTag() == ObjectTag::kTwoPlayer)
+	{
+		//2P‚ÌUŒ‚‚É“–‚½‚Á‚½‚ç
+		if (collider->GetTag() == ObjectTag::kOnePlayerAttack)
+		{
+			auto attack = std::static_pointer_cast<Attack>(collider);
+
+			auto status = attack->GetStatus();
+
+			CharacterStateBase::HitAttack(attack, GetKind());
+		}
+	}
+}
+
 void CharacterStateBase::ChangeState(std::shared_ptr<CharacterStateBase> nextState)
 {
 	//I—¹ˆ—

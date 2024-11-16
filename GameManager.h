@@ -48,13 +48,13 @@ public:
 	/// 1Pのポインタを返す
 	/// </summary>
 	/// <returns>1Pのポインタ</returns>
-	std::shared_ptr<CharacterBase> GetOnePlayerPointer() { return m_pCharacters[static_cast<int>(CharacterBase::CharacterNumber::kOnePlayer)]; }
+	std::shared_ptr<CharacterBase> GetOnePlayerPointer() { return m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]; }
 
 	/// <summary>
 	/// 2Pのポインタを返す
 	/// </summary>
 	/// <returns>2Pのポインタ</returns>
-	std::shared_ptr<CharacterBase> GetTwoPlayerPointer() { return m_pCharacters[static_cast<int>(CharacterBase::CharacterNumber::kTwoPlayer)]; }
+	std::shared_ptr<CharacterBase> GetTwoPlayerPointer() { return m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)]; }
 
 	/// <summary>
 	/// 対戦相手の座標を取得する
@@ -116,7 +116,7 @@ public:
 private:
 
 	//キャラクターのポインタ
-	std::shared_ptr<CharacterBase> m_pCharacters[static_cast<int>(CharacterBase::CharacterNumber::kPlayerNum)];
+	std::shared_ptr<CharacterBase> m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kPlayerNum)];
 	//攻撃の情報を持っているマネージャー
 	std::vector<std::shared_ptr<Attack>> m_pAttacks;
 	//ステージクラス

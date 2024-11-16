@@ -46,7 +46,3 @@ void CharacterStateGuard::Update()
 void CharacterStateGuard::Exit()
 {
 }
-
-void CharacterStateGuard::OnCollide(std::shared_ptr<Collidable> collider)
-{
-}

@@ -181,7 +181,3 @@ void CharacterStateDash::Exit()
 {
 	m_pCharacter->SetAnimPlaySpeed();
 }
-
-void CharacterStateDash::OnCollide(std::shared_ptr<Collidable> collider)
-{
-}

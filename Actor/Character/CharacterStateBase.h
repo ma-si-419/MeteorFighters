@@ -28,7 +28,7 @@ public:
 
 	CharacterStateBase(std::shared_ptr<CharacterBase> character);
 
-	virtual void OnCollide(std::shared_ptr<Collidable> collider) abstract;
+	virtual void OnCollide(std::shared_ptr<Collidable> collider);
 
 	CharacterStateKind GetKind() { return m_kind; }
 

@@ -275,7 +275,3 @@ void CharacterStateIdle::Exit()
 {
 
 }
-
-void CharacterStateIdle::OnCollide(std::shared_ptr<Collidable> collider)
-{
-}

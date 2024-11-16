@@ -32,7 +32,3 @@ void CharacterStateButtonBashing::Update()
 void CharacterStateButtonBashing::Exit()
 {
 }
-
-void CharacterStateButtonBashing::OnCollide(std::shared_ptr<Collidable> collider)
-{
-}

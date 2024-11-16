@@ -256,19 +256,6 @@ void CharacterStateHitAttack::HitAttack(int kind)
 	m_hitReactions.push_back(kind);
 }
 
-void CharacterStateHitAttack::OnCollide(std::shared_ptr<Collidable> collider)
-{
-	if (collider->GetTag() == ObjectTag::kPlayerAttack)
-	{
-		auto attack = std::static_pointer_cast<Attack>(collider);
-
-		auto status = attack->GetStatus();
-
-		CharacterStateBase::HitAttack(attack, GetKind());
-		printfDx("Hit\n");
-	}
-}
-
 int CharacterStateHitAttack::GetNextAnimKind(int kind)
 {
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "CharacterStateBase.h"
 #include <list>
-class CharacterStateHitAttack : public CharacterStateBase,std::enable_shared_from_this<CharacterStateHitAttack>
+class CharacterStateHitAttack : public CharacterStateBase,public std::enable_shared_from_this<CharacterStateHitAttack>
 {
 public:
 
@@ -18,8 +18,6 @@ public:
 	/// </summary>
 	/// <param name="reaction">攻撃を受けた時の反応</param>
 	void HitAttack(int reaction);
-
-	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
 
 	/// <summary>
 	/// 今再生しているアニメーションと受けた攻撃から次に再生するアニメーションを考えて返す

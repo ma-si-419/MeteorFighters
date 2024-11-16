@@ -427,7 +427,3 @@ void CharacterStateRush::Update()
 void CharacterStateRush::Exit()
 {
 }
-
-void CharacterStateRush::OnCollide(std::shared_ptr<Collidable> collider)
-{
-}
