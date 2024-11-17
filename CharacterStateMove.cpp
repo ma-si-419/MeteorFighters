@@ -22,7 +22,7 @@ namespace
 
 CharacterStateMove::CharacterStateMove(std::shared_ptr<CharacterBase> character) :
 	CharacterStateBase(character),
-	m_attackButtonPushTime(0.0f),
+	m_attackButtonPushTime(0),
 	m_attackKey("empty"),
 	m_isFloat(false),
 	m_gravityPower(0.0f),
@@ -98,7 +98,7 @@ void CharacterStateMove::Update()
 		{
 			float frontRate = inputDir.z;
 
-			dir = dir * (1.0 - frontRate) + toTargetDir * frontRate;
+			dir = dir * (1.0f - frontRate) + toTargetDir * frontRate;
 		}
 
 		//ˆÚ“®‘¬“x

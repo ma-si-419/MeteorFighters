@@ -150,7 +150,7 @@ void CharacterStateHitAttack::HitAttack(int kind)
 	//動く方向を設定する
 	MyEngine::Vector3 moveDir;
 	//攻撃されたキャラクターの座標を中心としたローカル座標を作成する
-	LocalPos local;
+	MyEngine::LocalPos local;
 	local.SetCenterPos(m_pCharacter->GetPos());
 	//ローカル座標の前方向を攻撃したものから攻撃されたものに向ける
 	MyEngine::Vector3 centerFrontPos = (m_pCharacter->GetPos() - GetTargetPos()).Normalize() + m_pCharacter->GetPos();

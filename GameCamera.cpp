@@ -25,7 +25,7 @@ namespace
 	constexpr float kLocalInitPosZ = -30.0f;
 
 	//プレイヤーとターゲットの間でどの当たりにカメラの焦点を合わせるか
-	constexpr float kCameraTargetPosRate = 0.4;
+	constexpr float kCameraTargetPosRate = 0.4f;
 
 	//ローカル座標の補正にかける時間
 	constexpr int kLocalPosMoveTime = 12;
@@ -220,9 +220,9 @@ void GameCamera::Update()
 		int shakePowerHalf = static_cast<int>(kShakePower* 0.5f);
 
 		//カメラのターゲット座標を揺らす
-		shakeVec.x = GetRand(kShakePower) - shakePowerHalf;
-		shakeVec.y = GetRand(kShakePower) - shakePowerHalf;
-		shakeVec.z = GetRand(kShakePower) - shakePowerHalf;
+		shakeVec.x = static_cast<float>(GetRand(kShakePower) - shakePowerHalf);
+		shakeVec.y = static_cast<float>(GetRand(kShakePower) - shakePowerHalf);
+		shakeVec.z = static_cast<float>(GetRand(kShakePower) - shakePowerHalf);
 	}
 
 	//ローカル座標の設定

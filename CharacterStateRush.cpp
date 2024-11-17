@@ -70,7 +70,7 @@ void CharacterStateRush::SetMoveDir(MyEngine::Vector3 dir)
 	{
 		MyEngine::Vector3 toTargetDir = (GetTargetPos() - m_pCharacter->GetPos()).Normalize();
 
-		m_moveDir = m_moveDir * (1.0 - dir.z) + toTargetDir * dir.z;
+		m_moveDir = m_moveDir * (1.0f - dir.z) + toTargetDir * dir.z;
 	}
 
 	m_moveTarget.SetCenterPos(m_pCharacter->GetPos());
@@ -238,7 +238,7 @@ void CharacterStateRush::Update()
 		{
 			MyEngine::Vector3 toTargetDir = (GetTargetPos() - m_pCharacter->GetPos()).Normalize();
 
-			dir = dir * (1.0 - stickDir.z) + toTargetDir * stickDir.z;
+			dir = dir * (1.0f - stickDir.z) + toTargetDir * stickDir.z;
 		}
 
 		m_moveDir = dir.Normalize();

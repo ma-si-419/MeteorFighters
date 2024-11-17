@@ -1,6 +1,8 @@
 #include "LocalPos.h"
 #include <cmath>
 
+using namespace MyEngine;
+
 LocalPos::LocalPos()
 {
 }

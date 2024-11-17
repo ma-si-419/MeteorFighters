@@ -508,13 +508,13 @@ protected:
 	//現在の気力
 	float m_nowMp;
 	//今向いている方向座標
-	LocalPos m_lookPos;
+	MyEngine::LocalPos m_lookPos;
 	//現在のやられ状態
 	HitReactionKind m_nowHitReaction;
 	//すべてのキャラで共通で使う通常攻撃の情報
 	std::map<std::string, NormalAttackData> m_normalAttackData;
 	//自身の向いている方向などを保存するためにローカル座標を持っておく
-	LocalPos m_targetLocalPos;
+	MyEngine::LocalPos m_targetLocalPos;
 	//今再生しているアニメ
 	int m_attachAnim;
 	//今再生しているアニメの種類

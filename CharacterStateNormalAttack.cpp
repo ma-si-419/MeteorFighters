@@ -212,7 +212,7 @@ void CharacterStateNormalAttack::Update()
 				}
 
 				//Ÿ‚ÌUŒ‚”­¶ƒtƒŒ[ƒ€‚É“G‚ª‚¢‚éêŠ‚ğŒvZ‚·‚é
-				MyEngine::Vector3 teleportationPos = GetTargetPos() + (GetTargetVelo() * (nextAttack.attackFrame));
+				MyEngine::Vector3 teleportationPos = GetTargetPos() + (GetTargetVelo() * (static_cast<float>(nextAttack.attackFrame)));
 				//uŠÔˆÚ“®æ‚ÉUŒ‚‚ÌUŒ‚”ÍˆÍ•ª‚¾‚¯‚¸‚ê‚ğ‘«‚·
 				MyEngine::Vector3 attackShiftVec = GetTargetVelo();
 
@@ -240,7 +240,7 @@ void CharacterStateNormalAttack::Update()
 			m_isNextCharge = false;
 
 			//UŒ‚‚ğs‚¤•ûŒü‚ğİ’è‚·‚é
-			LocalPos attackPos;
+			MyEngine::LocalPos attackPos;
 
 			//ƒ[ƒJƒ‹À•W‚Ì’†S‚ğİ’è
 			attackPos.SetCenterPos(GetTargetPos());

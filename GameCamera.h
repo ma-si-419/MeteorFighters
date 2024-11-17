@@ -57,7 +57,7 @@ public:
 private:
 
 	//ローカル座標(プレイヤーを中心として、自身の座標を計算する)
-	LocalPos m_localPos;
+	MyEngine::LocalPos m_localPos;
 
 	//カメラのターゲット座標
 	MyEngine::Vector3 m_targetPos;

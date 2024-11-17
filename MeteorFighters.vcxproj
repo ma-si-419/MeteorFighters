@@ -153,6 +153,8 @@
     <ClCompile Include="CharacterStateNormalAttack.cpp" />
     <ClCompile Include="CharacterStateRush.cpp" />
     <ClCompile Include="ChracterStateIdle.cpp" />
+    <ClCompile Include="Effect.cpp" />
+    <ClCompile Include="EffectManager.cpp" />
     <ClCompile Include="GameCamera.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="GraphManager.cpp" />
@@ -192,6 +194,8 @@
     <ClInclude Include="CharacterStateMove.h" />
     <ClInclude Include="CharacterStateNormalAttack.h" />
     <ClInclude Include="CharacterStateRush.h" />
+    <ClInclude Include="Effect.h" />
+    <ClInclude Include="EffectManager.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameCamera.h" />
     <ClInclude Include="GameManager.h" />

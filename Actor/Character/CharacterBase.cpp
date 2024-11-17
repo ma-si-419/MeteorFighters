@@ -408,7 +408,7 @@ void CharacterBase::CreateAttack(AttackData attackData)
 	MyEngine::Vector3 attackPos;
 
 	//キャラクターの正面方向に攻撃を出す
-	LocalPos localPos;
+	MyEngine::LocalPos localPos;
 
 	//自身を中心とするローカル座標を作成
 	localPos.SetCenterPos(m_rigidbody.GetPos());
@@ -574,7 +574,7 @@ void CharacterBase::CreateAfterImage(AfterImage afterImageInfo)
 	{
 		MV1AttachAnim(handle, MV1GetAttachAnim(m_modelHandle, m_lastAnim));
 		MV1SetAttachAnimTime(handle, m_lastAnim, m_lastPlayAnimTime);
-		MV1SetAttachAnimBlendRate(handle, m_lastAnim, 1.0 - m_animBlendRate);
+		MV1SetAttachAnimBlendRate(handle, m_lastAnim, 1.0f - m_animBlendRate);
 	}
 
 	int anim = MV1AttachAnim(handle, MV1GetAttachAnim(m_modelHandle, m_attachAnim));
@@ -605,7 +605,7 @@ MyEngine::Vector3 CharacterBase::GetBackPos(float distance)
 
 	MyEngine::Vector3 ans = m_rigidbody.GetPos() + (toBackPos * (distance + GameSceneConstant::kCharacterRadius));
 
-	LocalPos local;
+	MyEngine::LocalPos local;
 
 	local.SetCenterPos(m_rigidbody.GetPos());
 	MyEngine::Vector3 pos = m_rigidbody.GetPos();

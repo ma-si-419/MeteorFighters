@@ -100,7 +100,7 @@ void CharacterStateDash::Update()
 	{
 		float frontRate = m_moveDir.z;
 
-		LocalPos enemyLocal;
+		MyEngine::LocalPos enemyLocal;
 
 		enemyLocal.SetCenterPos(GetTargetPos());
 
@@ -112,7 +112,7 @@ void CharacterStateDash::Update()
 
 		MyEngine::Vector3 toTarget = (GetTargetPos() - m_pCharacter->GetPos()).Normalize();
 
-		dir = (dir * (1.0 - frontRate)) + toTarget * frontRate;
+		dir = (dir * (1.0f - frontRate)) + toTarget * frontRate;
 	}
 
 	MyEngine::Vector3 velo;

@@ -8,8 +8,8 @@ public:
 		kCapsule
 	};
 
-	ColliderData(Kind kind) { m_kind = kind; m_isTrigger = false; }
-	virtual ~ColliderData(){}
+	ColliderData(Kind kind) { m_kind = kind; m_isTrigger = false; m_isGround = false; }
+	virtual ~ColliderData() {}
 
 	/// <summary>
 	/// •¨—‹““®‚ğ‚µ‚È‚¢‚©‚Ç‚¤‚©
