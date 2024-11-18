@@ -6,6 +6,7 @@ class CharacterBase;
 class Collidable;
 class Attack;
 class Input;
+class Effect;
 class CharacterStateBase : public StateBase
 {
 public:
@@ -117,6 +118,18 @@ protected:
 	/// <param name="stateKind">現在のState</param>
 	void HitAttack(std::shared_ptr<Attack> attack, CharacterStateBase::CharacterStateKind stateKind);
 
+	/// <summary>
+	/// エフェクトを登録する
+	/// </summary>
+	/// <param name="effect">登録したいエフェクトのポインタ</param>
+	void EntryEffect(std::shared_ptr<Effect> effect);
+
+	/// <summary>
+	/// エフェクトを削除する
+	/// </summary>
+	/// <param name="effect">削除したいエフェクトのポインタ</param>
+	void ExitEffect(std::shared_ptr<Effect> effect);
+
 	//現在の状態
 	CharacterStateKind m_kind = CharacterStateKind::kIdle;
 
@@ -128,5 +141,8 @@ protected:
 
 	//自分が人によって操作されているか
 	bool m_isPlayer;
+
+	//自分についているエフェクト(基本的に1つだけ再生するようにする)
+	std::shared_ptr<Effect> m_pEffect;
 };
 

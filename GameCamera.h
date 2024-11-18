@@ -86,12 +86,9 @@ private:
 	//揺らす時間
 	int m_shakeTime;
 
-#ifdef _DEBUG
-
 	//ライトハンドル
 	int m_lightHandle;
 
-#endif // _DEBUG
 
 };
 

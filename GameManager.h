@@ -10,6 +10,8 @@ class Enemy;
 class GameCamera;
 class Attack;
 class Stage;
+class EffectManager;
+class Effect;
 class GameManager : public std::enable_shared_from_this<GameManager>
 {
 public:
@@ -113,6 +115,17 @@ public:
 	/// <param name="time">揺らす時間</param>
 	void ShakeCamera(int time);
 
+	/// <summary>
+	/// エフェクトを登録する
+	/// </summary>
+	/// <param name="effect">登録したいエフェクトのポインタ</param>
+	void EntryEffect(std::shared_ptr<Effect> effect);
+
+	/// <summary>
+	/// エフェクトを削除する
+	/// </summary>
+	/// <param name="effect">削除したいエフェクト</param>
+	void ExitEffect(std::shared_ptr<Effect> effect);
 private:
 
 	//キャラクターのポインタ
@@ -123,5 +136,7 @@ private:
 	std::shared_ptr<Stage> m_pStage;
 	//カメラクラス
 	std::shared_ptr<GameCamera> m_pCamera;
+	//エフェクト管理クラス
+	std::shared_ptr<EffectManager> m_pEffectManager;
 	
 };

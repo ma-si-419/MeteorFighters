@@ -4,12 +4,16 @@
 #include "Stage.h"
 #include "GameCamera.h"
 #include "CharacterBase.h"
+#include "Effectmanager.h"
+#include "Effect.h"
 
 GameManager::GameManager(std::shared_ptr<GameCamera> camera)
 {
 	m_pStage = std::make_shared<Stage>();
 	m_pStage->Init();
 	m_pCamera = camera;
+
+	m_pEffectManager = std::make_shared<EffectManager>();
 }
 
 GameManager::~GameManager()
@@ -57,9 +61,10 @@ void GameManager::Update()
 	//カメラの更新
 	m_pCamera->Update();
 
+	//攻撃クラスの更新を行う
 	for (auto& item : m_pAttacks)
 	{
-		//攻撃の更新
+		//攻撃のUpdate
 		item->Update();
 	}
 
@@ -76,6 +81,10 @@ void GameManager::Update()
 	return false;
 		});
 	m_pAttacks.erase(iterator, m_pAttacks.end());
+
+	//エフェクトの更新
+	m_pEffectManager->Update();
+
 }
 
 void GameManager::Draw()
@@ -88,6 +97,10 @@ void GameManager::Draw()
 
 	//ステージの描画
 	m_pStage->Draw();
+	
+	//エフェクトの描画
+	m_pEffectManager->Draw();
+
 
 }
 
@@ -240,6 +253,16 @@ void GameManager::StartMoveCamera()
 void GameManager::ShakeCamera(int time)
 {
 	m_pCamera->ShakeCamera(time);
+}
+
+void GameManager::EntryEffect(std::shared_ptr<Effect> effect)
+{
+	m_pEffectManager->Entry(effect,effect->GetPos());
+}
+
+void GameManager::ExitEffect(std::shared_ptr<Effect> effect)
+{
+	m_pEffectManager->Exit(effect);
 }
 
 MyEngine::Vector3 GameManager::GetTargetBackPos(float distance, std::shared_ptr<CharacterBase> character)

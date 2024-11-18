@@ -464,6 +464,7 @@ public:
 	/// </summary>
 	/// <param name="num">1P‚©2P‚©‚ğİ’è‚·‚é</param>
 	void SetCharacterNumber(PlayerNumber num) { m_playerNumber = num; }
+
 protected:
 
 	/// <summary>

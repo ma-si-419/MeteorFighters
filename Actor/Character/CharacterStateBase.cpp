@@ -4,6 +4,7 @@
 #include "GameManager.h"
 #include "Attack.h"
 #include "Input.h"
+#include "Effect.h"
 
 namespace
 {
@@ -186,4 +187,14 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack, CharacterStat
 	m_pCharacter->SubHp(damage);
 
 	ChangeState(nextState);
+}
+
+void CharacterStateBase::EntryEffect(std::shared_ptr<Effect> effect)
+{
+	m_pCharacter->m_pGameManager->EntryEffect(effect);
+}
+
+void CharacterStateBase::ExitEffect(std::shared_ptr<Effect> effect)
+{
+	m_pCharacter->m_pGameManager->ExitEffect(effect);
 }

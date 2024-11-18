@@ -52,7 +52,6 @@ void SceneGame::Update()
 
 void SceneGame::Draw()
 {
-	m_pGameManager->Draw();
 
 #ifdef _DEBUG
 
@@ -66,6 +65,7 @@ void SceneGame::Draw()
 	{
 		actor->Draw();
 	}
+	m_pGameManager->Draw();
 }
 
 void SceneGame::End()

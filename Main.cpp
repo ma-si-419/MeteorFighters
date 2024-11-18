@@ -4,8 +4,12 @@
 #include "Physics.h"
 #include "Input.h"
 #include "Game.h"
-//#include "EffekseerForDXLib.h"
+#include "EffekseerForDXLib.h"
 
+namespace
+{
+	constexpr int kParticleMax = 8000;
+}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -30,6 +34,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return -1;			// エラーが起きたら直ちに終了
 	}
 
+
+	SetUseDirect3DVersion(DX_DIRECT3D_11);
+	Effekseer_Init(kParticleMax);
+	//Effekseer_InitDistortion();
+	Effekseer_SetGraphicsDeviceLostCallbackFunctions();
+	Effekseer_Sync3DSetting();
 
 	SetDrawScreen(DX_SCREEN_BACK);
 
@@ -113,6 +123,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			// 16.66ミリ秒(16667マイクロ秒)経過するまで待つ
 		}
 	}
+
+	Effkseer_End();
 
 	DxLib_End();				// ＤＸライブラリ使用の終了処理
 

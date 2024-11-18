@@ -1,6 +1,8 @@
 #pragma once
 #include <list>
+#include <map>
 #include <memory>
+#include <string>
 #include "Vector3.h"
 
 class Effect;
@@ -22,8 +24,19 @@ public:
 	/// <param name="effect">削除するエフェクトのポインタ</param>
 	void Exit(std::shared_ptr<Effect> effect);
 
+	/// <summary>
+	/// エフェクトの更新を行う
+	/// </summary>
+	void Update();
+
+	/// <summary>
+	/// エフェクトの描画を行う
+	/// </summary>
+	void Draw();
 private:
 
 	std::list<std::shared_ptr<Effect>> m_effects;
+
+	std::map<std::string, int> m_handles;
 };
 

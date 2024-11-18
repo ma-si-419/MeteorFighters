@@ -123,12 +123,12 @@ void SceneMenu::Update()
 
 void SceneMenu::Draw()
 {
+#ifdef _DEBUG 
 	//‘I‘ğˆ‚ğ•\¦‚·‚é
 	for (auto item : m_showUi)
 	{
-#ifdef _DEBUG
 		//•`‰æˆ—
-		DrawString(item.showPosX,item.showPosY,item.showString.c_str(),kWhiteColor);
+		DrawString(item.showPosX, item.showPosY, item.showString.c_str(), kWhiteColor);
 
 	}
 

@@ -4,11 +4,24 @@
 #include "CharacterBase.h"
 #include "Input.h"
 #include "DxLib.h"
+#include "Effect.h"
 
 namespace
 {
 	//チャージ終了アニメーションの時間
 	constexpr int kEndChargeTime = 10;
+
+	//チャージ始めのアニメーションの再生速度
+	constexpr float kStartAnimSpeed = 2.0f;
+
+	//チャージ初めのカメラを揺らす時間
+	constexpr int kCameraShakeTime = 5;
+
+	//エフェクトのループスタートフレーム
+	constexpr int kEffectStartFrame = 30;
+
+	//エフェクトのループエンドフレーム
+	constexpr int kEffectEndFrame = 33;
 }
 
 CharacterStateCharge::CharacterStateCharge(std::shared_ptr<CharacterBase> character) :
@@ -18,9 +31,22 @@ CharacterStateCharge::CharacterStateCharge(std::shared_ptr<CharacterBase> charac
 
 void CharacterStateCharge::Enter()
 {
+	//次のStateのポインタを自身に設定しておく
 	m_pNextState = shared_from_this();
+	//StateKindを設定
 	m_kind = CharacterStateKind::kCharge;
+	//アニメーションを設定
 	m_pCharacter->ChangeAnim(CharacterBase::AnimKind::kStartCharge, false);
+	//アニメーションの再生速度を設定
+	m_pCharacter->SetAnimPlaySpeed(kStartAnimSpeed);
+	//エフェクトのポインタ作成
+	m_pEffect = std::make_shared<Effect>(Effect::EffectKind::kCharge);
+	//エフェクトの座標設定
+	m_pEffect->SetPos(m_pCharacter->GetPos());
+	//エフェクトのループ設定
+	m_pEffect->SetLoop(kEffectStartFrame, kEffectEndFrame);
+	//エフェクトをマネージャーに登録
+	EntryEffect(m_pEffect);
 }
 
 void CharacterStateCharge::Update()
@@ -37,6 +63,8 @@ void CharacterStateCharge::Update()
 		if (m_pCharacter->IsEndAnim())
 		{
 			m_pCharacter->ChangeAnim(CharacterBase::AnimKind::kInCharge, true);
+			m_pCharacter->SetAnimPlaySpeed();
+			ShakeCamera(kCameraShakeTime);
 		}
 	}
 
@@ -80,6 +108,9 @@ void CharacterStateCharge::Update()
 
 	}
 
+	//エフェクトの座標を設定する
+	m_pEffect->SetPos(m_pCharacter->GetPos());
+
 	SetCharacterVelo(MyEngine::Vector3(0, 0, 0));
 
 
@@ -92,4 +123,6 @@ void CharacterStateCharge::Update()
 
 void CharacterStateCharge::Exit()
 {
+	//エフェクトを削除する
+	ExitEffect(m_pEffect);
 }

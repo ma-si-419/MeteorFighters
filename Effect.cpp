@@ -11,22 +11,61 @@ namespace
 	};
 }
 
-Effect::Effect(EffectKind kind):
+Effect::Effect(EffectKind kind) :
 	m_handle(-1),
-	m_path("empty")
+	m_path("empty"),
+	m_time(0),
+	m_loopStartTime(0),
+	m_loopEndTime(0)
+
 {
-	std::string path = "data/effekseer/" + kEffectPathMap.at(kind) + ".efk";
+	m_path = "data/effekseer/" + kEffectPathMap.at(kind) + ".efk";
 }
 
 void Effect::Init(std::shared_ptr<EffectManager> manager, MyEngine::Vector3 pos)
 {
 	m_pos = pos;
 
-	manager->Entry(shared_from_this(),pos);
+	manager->Entry(shared_from_this(), pos);
+}
 
+void Effect::Update()
+{
+	m_time++;
 }
 
 void Effect::End()
 {
-	
+
+}
+
+void Effect::SetLoop(int loopStart, int loopEnd)
+{
+	m_loopStartTime = loopStart;
+
+	m_loopEndTime = loopEnd;
+}
+
+bool Effect::IsEndLoop()
+{
+	//ループすると設定していたら
+	if (m_loopEndTime > 0)
+	{
+		//今の再生フレームと比べて
+		if (m_time > m_loopEndTime)
+		{
+			//ループする
+			return true;
+		}
+		else
+		{
+			//ループしない
+			return false;
+		}
+	}
+	//そもそもループの設定がされていない場合
+	else
+	{
+		return false;
+	}
 }
