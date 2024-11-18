@@ -2,6 +2,7 @@
 #include "DxLib.h"
 #include "CharacterBase.h"
 #include "GameManager.h"
+#include "GraphManager.h"
 #include "Physics.h"
 #include "LoadCsv.h"
 #include "Game.h"
@@ -15,20 +16,18 @@ namespace
 SceneGame::SceneGame(SceneManager& sceneManager) :
 	SceneBase(sceneManager)
 {
-	m_gameManagerScreenHandle = MakeScreen(Game::kWindowWidth, Game::kWindowHeight, true);
-
-	SetCreateGraphChannelBitDepth(32);
-	SetCreateDrawValidGraphChannelNum(1);
-	m_depthScreenHandle = MakeScreen(Game::kWindowWidth, Game::kWindowHeight, false);
+	
 }
 
 SceneGame::~SceneGame()
 {
-	DeleteGraph(m_gameManagerScreenHandle);
 }
 
 void SceneGame::Init()
 {
+	//‰æ‘œ‚Ìƒ[ƒh
+	GraphManager::GetInstance().LoadSceneGraph("Game");
+
 	m_pActors.push_back(m_pGameManager->GetOnePlayerPointer());
 	m_pActors.push_back(m_pGameManager->GetTwoPlayerPointer());
 	
