@@ -6,6 +6,7 @@
 #include "CharacterBase.h"
 #include "Effectmanager.h"
 #include "Effect.h"
+#include "GameUi.h"
 
 GameManager::GameManager(std::shared_ptr<GameCamera> camera)
 {
@@ -14,6 +15,7 @@ GameManager::GameManager(std::shared_ptr<GameCamera> camera)
 	m_pCamera = camera;
 
 	m_pEffectManager = std::make_shared<EffectManager>();
+	m_pGameUi = std::make_shared<GameUi>();
 }
 
 GameManager::~GameManager()
@@ -100,6 +102,11 @@ void GameManager::Draw()
 	
 	//ƒGƒtƒFƒNƒg‚Ì•`‰æ
 	m_pEffectManager->Draw();
+
+	//1P‚Ì‘Ì—Í‚ð•`‰æ‚·‚é
+	m_pGameUi->DrawHpBar(m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetHp(),true);
+	//2P‚Ì‘Ì—Í‚ð•`‰æ‚·‚é
+	m_pGameUi->DrawHpBar(m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)]->GetHp(),false);
 
 
 }
@@ -263,6 +270,11 @@ void GameManager::EntryEffect(std::shared_ptr<Effect> effect)
 void GameManager::ExitEffect(std::shared_ptr<Effect> effect)
 {
 	m_pEffectManager->Exit(effect);
+}
+
+int GameManager::GetGraphHandle(std::string graphName)
+{
+	return 0;
 }
 
 MyEngine::Vector3 GameManager::GetTargetBackPos(float distance, std::shared_ptr<CharacterBase> character)

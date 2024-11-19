@@ -8,7 +8,8 @@ class Effect : public std::enable_shared_from_this<Effect>
 public:
 	enum class EffectKind
 	{
-		kCharge
+		kCharge,
+		kDash
 	};
 
 public:
@@ -89,6 +90,13 @@ public:
 	/// ループの時間をリセットする
 	/// </summary>
 	void ResetLoop() { m_time = m_loopStartTime; }
+
+	/// <summary>
+	/// 回転と座標を設定する
+	/// </summary>
+	/// <param name="rotation">回転ベクトル</param>
+	/// <param name="pos">座標</param>
+	void SetRotationAndPos(MyEngine::Vector3 rotation,MyEngine::Vector3 pos);
 private:
 
 	int m_handle;

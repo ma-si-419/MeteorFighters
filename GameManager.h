@@ -12,6 +12,7 @@ class Attack;
 class Stage;
 class EffectManager;
 class Effect;
+class GameUi;
 class GameManager : public std::enable_shared_from_this<GameManager>
 {
 public:
@@ -126,6 +127,13 @@ public:
 	/// </summary>
 	/// <param name="effect">削除したいエフェクト</param>
 	void ExitEffect(std::shared_ptr<Effect> effect);
+
+	/// <summary>
+	/// 画像のハンドルを返す
+	/// </summary>
+	/// <param name="graphName">画像の名前</param>
+	/// <returns>画像のハンドル</returns>
+	int GetGraphHandle(std::string graphName);
 private:
 
 	//キャラクターのポインタ
@@ -138,5 +146,6 @@ private:
 	std::shared_ptr<GameCamera> m_pCamera;
 	//エフェクト管理クラス
 	std::shared_ptr<EffectManager> m_pEffectManager;
-	
+	//UI管理クラス
+	std::shared_ptr<GameUi> m_pGameUi;
 };

@@ -1,3 +1,4 @@
 画像の名前,パス,使うシーン
 TitleLogo,TitleLogo,Title
 HpBar,HpBar,Game
+HpBarNum,HpBarNumBox,Game

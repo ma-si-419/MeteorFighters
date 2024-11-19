@@ -222,7 +222,6 @@ void CharacterStateIdle::Update()
 		}
 	}
 
-
 	//’nã‚É‚¢‚é‚Æ‚«‚É
 	if (m_pCharacter->IsGround())
 	{

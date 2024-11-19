@@ -6,6 +6,7 @@
 #include "Input.h"
 #include "CharacterBase.h"
 #include "GameSceneConstant.h"
+#include "Effect.h"
 #include <cmath>
 
 namespace
@@ -83,6 +84,10 @@ void CharacterStateRush::Enter()
 	m_pNextState = shared_from_this();
 	m_kind = CharacterStateKind::kRush;
 	m_pCharacter->ChangeAnim(CharacterBase::AnimKind::kRushStart, true);
+	m_pEffect = std::make_shared<Effect>(Effect::EffectKind::kDash);
+	m_pEffect->SetPos(m_pCharacter->GetPos());
+	m_pEffect->SetLoop(30,32);
+	EntryEffect(m_pEffect);
 }
 
 void CharacterStateRush::Update()
@@ -408,6 +413,23 @@ void CharacterStateRush::Update()
 		}
 	}
 
+	//エフェクトに回転行列と座標を設定する
+	MyEngine::Vector3 rotation;
+
+	MyEngine::Vector3 nextPos = m_pCharacter->GetPos() + velo;
+	MyEngine::Vector3 pos = m_pCharacter->GetPos();
+
+	float vX = nextPos.x - pos.x;
+	float vY = nextPos.y - pos.y;
+	float vZ = nextPos.z - pos.z;
+
+	//rotation.x = std::atan2f(vZ,vY);
+	rotation.y = std::atan2f(vX,vZ);
+	//rotation.z = std::atan2f(vY,vX);
+
+	//m_pEffect->SetPos(pos);
+	m_pEffect->SetRotationAndPos(rotation, pos);
+
 	SetCharacterVelo(velo);
 	//ラッシュを終わる処理をしていなければ移動方向を見る
 	if (!m_isEndRush)
@@ -426,4 +448,5 @@ void CharacterStateRush::Update()
 }
 void CharacterStateRush::Exit()
 {
+	ExitEffect(m_pEffect);
 }

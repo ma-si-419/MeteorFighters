@@ -27,7 +27,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	SetChangeScreenModeGraphicsSystemResetFlag(false);
 
-	SetWindowText("メテオファイターズ");
+	SetWindowText("デカヘッド");
 
 	if (DxLib_Init() == -1)		// ＤＸライブラリ初期化処理
 	{

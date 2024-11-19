@@ -41,6 +41,7 @@ std::vector<std::string> LoadCsv::Split(const std::string& str, const char cutCh
 	//0‚©‚ç‚Ç‚±‚Ü‚Å‹æØ‚é‚Ì‚©
 	int last = static_cast<int>(str.find_first_of(cutChar));
 
+	//‹æØ‚èŠJnˆÊ’u‚ª•¶š—ñ‚Ì‘å‚«‚³‚æ‚è‚à¬‚³‚¢ŠÔ‘±‚¯‚é
 	while (first < str.size())
 	{
 		//‹æØ‚Á‚½‚à‚Ì‚ğŒ‹‰Ê‚É“ü‚ê‚Ä‚¢‚­

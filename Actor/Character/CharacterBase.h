@@ -266,6 +266,12 @@ public:
 	void SetStatus(CharacterStatus status) { m_status = status; }
 
 	/// <summary>
+	/// Œ»İ‚Ì‘Ì—Í‚ğæ“¾‚·‚é
+	/// </summary>
+	/// <returns>Œ»İ‚Ì‘Ì—Í</returns>
+	float GetHp() { return m_nowHp; }
+
+	/// <summary>
 	/// ‘Ì—Í‚ğŒ¸‚ç‚·
 	/// </summary>
 	/// <param name="subHp">Œ¸­—Ê</param>

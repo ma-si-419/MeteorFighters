@@ -144,8 +144,6 @@ void CharacterStateNormalAttack::Update()
 
 	MyEngine::Vector3 velo;
 
-
-
 	//UŒ‚‚Ì‡ŒvƒtƒŒ[ƒ€‚ð’´‚¦‚½‚ç
 	if (m_time >= attackData.totalFrame)
 	{

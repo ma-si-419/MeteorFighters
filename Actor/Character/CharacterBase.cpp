@@ -178,6 +178,7 @@ void CharacterBase::Update()
 		m_afterImageList.pop_front();
 	}
 
+	//m_nowHp -= 150;
 
 	//アニメーションの更新
 	PlayAnim();

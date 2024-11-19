@@ -2,6 +2,7 @@
 #include "CharacterStateBase.h"
 #include "LocalPos.h"
 
+class Effect;
 class CharacterStateRush : public CharacterStateBase,public std::enable_shared_from_this<CharacterStateRush>
 {
 public:

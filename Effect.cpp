@@ -8,6 +8,7 @@ namespace
 	std::map<Effect::EffectKind, std::string> kEffectPathMap =
 	{
 		{Effect::EffectKind::kCharge,"EnergyCharge"},
+		{Effect::EffectKind::kDash,"Dash"},
 	};
 }
 
@@ -68,4 +69,27 @@ bool Effect::IsEndLoop()
 	{
 		return false;
 	}
+}
+
+void Effect::SetRotationAndPos(MyEngine::Vector3 rotation, MyEngine::Vector3 pos)
+{
+	MATRIX mat;
+
+	MATRIX rotMat = rotation.GetRotationMat();
+
+	MATRIX posMat = MGetTranslate(pos.CastVECTOR());
+
+	mat = MMult(rotMat, posMat);
+
+	Effekseer::Matrix43 effMat;
+
+	for (int y = 0; y < 4; ++y)
+	{
+		for (int x = 0; x < 3; ++x)
+		{
+			effMat.Value[y][x] = mat.m[y][x];
+		}
+	}
+
+	GetEffekseer3DManager()->SetBaseMatrix(m_handle,effMat);
 }

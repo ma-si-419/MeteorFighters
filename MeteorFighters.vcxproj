@@ -178,7 +178,7 @@
     <ClCompile Include="Scene\SceneTitle.cpp" />
     <ClCompile Include="Actor\StateBase.cpp" />
     <ClCompile Include="Stage.cpp" />
-    <ClCompile Include="Ui.cpp" />
+    <ClCompile Include="GameUi.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor\Actor.h" />
@@ -226,7 +226,7 @@
     <ClInclude Include="Scene\SceneTitle.h" />
     <ClInclude Include="Actor\StateBase.h" />
     <ClInclude Include="Stage.h" />
-    <ClInclude Include="Ui.h" />
+    <ClInclude Include="GameUi.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MeteorFighters.rc" />
