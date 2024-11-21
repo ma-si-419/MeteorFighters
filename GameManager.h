@@ -60,6 +60,12 @@ public:
 	std::shared_ptr<CharacterBase> GetTwoPlayerPointer() { return m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)]; }
 
 	/// <summary>
+	/// エフェクトマネージャーのポインタを返す
+	/// </summary>
+	/// <returns>エフェクト管理クラスのポインタ</returns>
+	std::shared_ptr<EffectManager> GetEffectManagerPointer() { return m_pEffectManager; }
+
+	/// <summary>
 	/// 対戦相手の座標を取得する
 	/// </summary>
 	/// <param name="character">この関数を呼んだキャラクターのポインタ</param>

@@ -207,27 +207,31 @@ void CharacterStateRush::Update()
 			m_isRushEnemy = true;
 			m_rushTargetPos = GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance);
 		}
-		//押されていなければ
+		//押されていないとき
 		else
 		{
-			//スティックの傾きを見る
-			if (stickDir.SqLength() > 0.001f)
+			//敵の近くまで向かう突撃状態でなければ
+			if (!m_isRushEnemy)
 			{
-				//ダッシュ状態に移行する
-				auto next = std::make_shared<CharacterStateDash>(m_pCharacter);
+				//スティックの傾きを見る
+				if (stickDir.SqLength() > 0.001f)
+				{
+					//ダッシュ状態に移行する
+					auto next = std::make_shared<CharacterStateDash>(m_pCharacter);
 
-				next->SetMoveDir(stickDir.Normalize());
+					next->SetMoveDir(stickDir.Normalize());
 
-				ChangeState(next);
+					ChangeState(next);
 
-				return;
-			}
-			//スティックが傾いていなければ
-			else
-			{
-				m_isEndRush = true;
+					return;
+				}
+				//スティックが傾いていなければ
+				else
+				{
+					m_isEndRush = true;
 
-				ShakeCamera(kCameraShakeTime);
+					ShakeCamera(kCameraShakeTime);
+				}
 			}
 		}
 	}

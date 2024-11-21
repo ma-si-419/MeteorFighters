@@ -401,6 +401,7 @@ void CharacterStateNormalAttack::Update()
 			attack.lifeTime = kEnergyAttackLifeTime;
 			attack.radius = kEnergyAttackRadius;
 		}
+		attack.attackKind = attackData.attackKind;
 
 		//UŒ‚‚ğì¬
 		m_pCharacter->CreateAttack(attack);

@@ -10,6 +10,7 @@ namespace
 		{Effect::EffectKind::kCharge,"EnergyCharge"},
 		{Effect::EffectKind::kDash,"Dash"},
 		{Effect::EffectKind::kDashEnd,"DashEnd"},
+		{Effect::EffectKind::kEnergy,"Energy"},
 	};
 }
 

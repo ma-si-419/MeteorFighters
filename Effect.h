@@ -10,7 +10,8 @@ public:
 	{
 		kCharge,
 		kDash,
-		kDashEnd
+		kDashEnd,
+		kEnergy
 	};
 
 public:

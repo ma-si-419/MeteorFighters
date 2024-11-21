@@ -466,7 +466,12 @@ void CharacterBase::CreateAttack(AttackData attackData)
 	status.attackHitKind = attackData.attackHitKind;
 	status.attackKind = attackData.attackKind;
 
-	ans->Init(status);
+	if (status.attackKind == AttackKind::kEnergy)
+	{
+		printfDx("energy");
+	}
+
+	ans->Init(status, m_pGameManager->GetEffectManagerPointer());
 
 	m_pGameManager->AddAttack(ans);
 }
