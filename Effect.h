@@ -9,7 +9,8 @@ public:
 	enum class EffectKind
 	{
 		kCharge,
-		kDash
+		kDash,
+		kDashEnd
 	};
 
 public:
@@ -49,7 +50,6 @@ public:
 	/// <param name="handle">ハンドル</param>
 	void SetHandle(int handle) { m_handle = handle; }
 
-
 	/// <summary>
 	/// ハンドルを取得する
 	/// </summary>
@@ -69,10 +69,15 @@ public:
 	void SetPos(MyEngine::Vector3 pos) { m_pos = pos; }
 
 	/// <summary>
-	/// ループする場合設定する
+	/// ループの設定をする
 	/// </summary>
 	/// <param name="time">ループする時間</param>
 	void SetLoop(int loopStart,int loopEnd);
+
+	/// <summary>
+	/// ループをしない時に呼ぶ(エフェクトを変更した後などに使用)
+	/// </summary>
+	void SetLoop();
 
 	/// <summary>
 	/// ループの終了フレームになったかを取得する(ループしないものはfalseを返す)
@@ -92,11 +97,18 @@ public:
 	void ResetLoop() { m_time = m_loopStartTime; }
 
 	/// <summary>
-	/// 回転と座標を設定する
+	/// 回転を設定する
 	/// </summary>
-	/// <param name="rotation">回転ベクトル</param>
-	/// <param name="pos">座標</param>
-	void SetRotationAndPos(MyEngine::Vector3 rotation,MyEngine::Vector3 pos);
+	/// <param name="rotation">設定したい回転ベクトル</param>
+	void SetRotation(MyEngine::Vector3 rotation) { m_rotation = rotation; }
+	
+
+	/// <summary>
+	/// 回転を取得する
+	/// </summary>
+	/// <returns>回転ベクトル</returns>
+	MyEngine::Vector3 GetRotation() { return m_rotation; }
+
 private:
 
 	int m_handle;
@@ -104,6 +116,8 @@ private:
 	std::string m_path;
 
 	MyEngine::Vector3 m_pos;
+
+	MyEngine::Vector3 m_rotation;
 
 	int m_time;
 

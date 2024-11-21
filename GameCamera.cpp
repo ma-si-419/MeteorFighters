@@ -51,7 +51,13 @@ namespace
 	constexpr float kSmallestMoveVecLength = 2.0f;
 
 	//カメラを揺らす大きさ
-	constexpr int kShakePower = 3;
+	constexpr int kShakePower = 10;
+
+	//ゆるやかにカメラを揺らす時の大きさ
+	constexpr float kSwayPower = 0.6f;
+
+	//緩やかにカメラを揺らす時の揺れの速さ
+	constexpr float kSwaySpeed = 0.5f;
 
 }
 
@@ -60,7 +66,9 @@ GameCamera::GameCamera() :
 	m_stopTime(0),
 	m_isFastMove(false),
 	m_isStop(false),
-	m_shakeTime(0)
+	m_shakeTime(0),
+	m_isSway(false),
+	m_swayTime(0.0f)
 {
 	m_lightHandle = CreateDirLightHandle(VGet(0, 0, 0));
 }
@@ -225,13 +233,26 @@ void GameCamera::Update()
 		shakeVec.z = static_cast<float>(GetRand(kShakePower) - shakePowerHalf);
 	}
 
-	//ローカル座標の設定
-	m_localPos.SetLocalPos(m_nextCameraPos);
+
 
 	//ターゲット座標の設定
 	MyEngine::Vector3 targetPos = (m_targetPos - m_localPos.GetCenterPos()) * kCameraTargetPosRate + m_localPos.GetCenterPos();
+	
+	//カメラを緩やかに揺らす設定がされていたら
+	if (m_isSway)
+	{
+		m_swayTime += kSwaySpeed;
 
-	SetCameraPositionAndTarget_UpVecY((m_localPos.GetWorldPos() + shakeVec).CastVECTOR(), targetPos.CastVECTOR());
+		//ターゲット座標を揺らす
+		targetPos.y += sinf(m_swayTime) * kSwayPower;
+	}
+
+	//ローカル座標の設定
+	m_localPos.SetLocalPos(m_nextCameraPos);
+	//緩やかに揺らすのをやめる設定を毎フレームする
+	m_isSway = false;
+
+	SetCameraPositionAndTarget_UpVecY(m_localPos.GetWorldPos().CastVECTOR(), (targetPos + shakeVec).CastVECTOR());
 
 	SetLightDirectionHandle(m_lightHandle, (m_localPos.GetWorldPos() - targetPos).Normalize().CastVECTOR());
 

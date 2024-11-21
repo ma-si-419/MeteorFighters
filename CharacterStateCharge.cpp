@@ -83,7 +83,7 @@ void CharacterStateCharge::Update()
 	//レフトショルダーを押しながらAボタンが押されたら
 	if (m_isPlayer && input.IsTrigger("A"))
 	{
-		MyEngine::Vector3 moveDir(input.GetStickInfo().leftStickX, 0, input.GetStickInfo().leftStickY);
+		MyEngine::Vector3 moveDir(input.GetStickInfo().leftStickX, 0, -input.GetStickInfo().leftStickY);
 
 		//突撃Stateに移行する
 		auto next = std::make_shared<CharacterStateRush>(m_pCharacter);

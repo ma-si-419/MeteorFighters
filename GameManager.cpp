@@ -262,6 +262,11 @@ void GameManager::ShakeCamera(int time)
 	m_pCamera->ShakeCamera(time);
 }
 
+void GameManager::SwayCamera()
+{
+	m_pCamera->SwayCamera();
+}
+
 void GameManager::EntryEffect(std::shared_ptr<Effect> effect)
 {
 	m_pEffectManager->Entry(effect,effect->GetPos());

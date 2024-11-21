@@ -138,6 +138,11 @@ void CharacterStateBase::ShakeCamera(int time)
 	m_pCharacter->m_pGameManager->ShakeCamera(time);
 }
 
+void CharacterStateBase::SwayCamera()
+{
+	m_pCharacter->m_pGameManager->SwayCamera();
+}
+
 void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack, CharacterStateBase::CharacterStateKind stateKind)
 {
 	std::shared_ptr<CharacterStateHitAttack> nextState = std::make_shared<CharacterStateHitAttack>(m_pCharacter);

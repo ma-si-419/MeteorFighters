@@ -9,6 +9,7 @@ namespace
 	{
 		{Effect::EffectKind::kCharge,"EnergyCharge"},
 		{Effect::EffectKind::kDash,"Dash"},
+		{Effect::EffectKind::kDashEnd,"DashEnd"},
 	};
 }
 
@@ -47,6 +48,12 @@ void Effect::SetLoop(int loopStart, int loopEnd)
 	m_loopEndTime = loopEnd;
 }
 
+void Effect::SetLoop()
+{
+	m_loopStartTime = 0;
+	m_loopEndTime = 0;
+}
+
 bool Effect::IsEndLoop()
 {
 	//ÉãÅ[ÉvÇ∑ÇÈÇ∆ê›íËÇµÇƒÇ¢ÇΩÇÁ
@@ -69,27 +76,4 @@ bool Effect::IsEndLoop()
 	{
 		return false;
 	}
-}
-
-void Effect::SetRotationAndPos(MyEngine::Vector3 rotation, MyEngine::Vector3 pos)
-{
-	MATRIX mat;
-
-	MATRIX rotMat = rotation.GetRotationMat();
-
-	MATRIX posMat = MGetTranslate(pos.CastVECTOR());
-
-	mat = MMult(rotMat, posMat);
-
-	Effekseer::Matrix43 effMat;
-
-	for (int y = 0; y < 4; ++y)
-	{
-		for (int x = 0; x < 3; ++x)
-		{
-			effMat.Value[y][x] = mat.m[y][x];
-		}
-	}
-
-	GetEffekseer3DManager()->SetBaseMatrix(m_handle,effMat);
 }

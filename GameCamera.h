@@ -50,10 +50,15 @@ public:
 	void StartFastCameraMove() { m_isFastMove = true; }
 
 	/// <summary>
-	/// カメラを揺れを設定する
+	/// 強くカメラを揺らす
 	/// </summary>
 	/// <param name="time">揺らす時間</param>
 	void ShakeCamera(int time) { m_shakeTime = time; }
+
+	/// <summary>
+	/// この関数を呼んでいる間緩やかにカメラを揺らす
+	/// </summary>
+	void SwayCamera() { m_isSway = true;}
 private:
 
 	//ローカル座標(プレイヤーを中心として、自身の座標を計算する)
@@ -85,6 +90,12 @@ private:
 	
 	//揺らす時間
 	int m_shakeTime;
+
+	//カメラを揺らすかどうか
+	bool m_isSway;
+
+	//カメラを緩やかに揺らす時間
+	float m_swayTime;
 
 	//ライトハンドル
 	int m_lightHandle;

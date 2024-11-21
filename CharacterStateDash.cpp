@@ -10,7 +10,7 @@ namespace
 
 	constexpr float kDashSpeed = 4.0f;
 
-	constexpr float kDodgeSpeed = 1.5f;
+	constexpr float kDodgeSpeed = 2.5f;
 
 	constexpr int kDashTime = 15;
 

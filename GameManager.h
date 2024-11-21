@@ -117,6 +117,11 @@ public:
 	void ShakeCamera(int time);
 
 	/// <summary>
+	/// カメラを緩やかに揺らす
+	/// </summary>
+	void SwayCamera();
+
+	/// <summary>
 	/// エフェクトを登録する
 	/// </summary>
 	/// <param name="effect">登録したいエフェクトのポインタ</param>

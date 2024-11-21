@@ -208,15 +208,15 @@ void Physics::DebugDraw()
 		}
 	}
 
-	//’n–Ê‚Ìü‚Ì•`‰æ
-	for (int x = 0; x < 20; x++)
-	{
-		for (int z = 0; z < 20; z++)
-		{
-			DrawLine3D(VGet(x * 10.0f - 50.0f, 0.0f, -1000.0f), VGet(x * 10.0f - 50.0f, 0.0f, 1000.0f), GetColor(255, 0, 0));
-			DrawLine3D(VGet(-1000.0f, 0.0f, z * 10.0f - 50.0f), VGet(1000.0f, 0.0f, z * 10 - 50.0f), GetColor(255, 255, 0));
-		}
-	}
+	////’n–Ê‚Ìü‚Ì•`‰æ
+	//for (int x = 0; x < 20; x++)
+	//{
+	//	for (int z = 0; z < 20; z++)
+	//	{
+	//		DrawLine3D(VGet(x * 10.0f - 50.0f, 0.0f, -1000.0f), VGet(x * 10.0f - 50.0f, 0.0f, 1000.0f), GetColor(255, 0, 0));
+	//		DrawLine3D(VGet(-1000.0f, 0.0f, z * 10.0f - 50.0f), VGet(1000.0f, 0.0f, z * 10 - 50.0f), GetColor(255, 255, 0));
+	//	}
+	//}
 
 }
 

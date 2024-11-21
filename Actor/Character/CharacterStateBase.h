@@ -112,6 +112,11 @@ protected:
 	void ShakeCamera(int time);
 
 	/// <summary>
+	/// ƒJƒƒ‰‚ğŠÉ‚â‚©‚É—h‚ç‚·
+	/// </summary>
+	void SwayCamera();
+
+	/// <summary>
 	/// UŒ‚‚ğó‚¯‚½‚ÉŒÄ‚ÔŠÖ”
 	/// </summary>
 	/// <param name="attack">ó‚¯‚½UŒ‚‚ÌƒNƒ‰ƒX</param>

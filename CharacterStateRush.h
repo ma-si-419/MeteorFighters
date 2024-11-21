@@ -19,7 +19,7 @@ public:
 private:
 
 	//移動方向にあるベクトル(ここに向かって移動をしようとする)
-	MyEngine::LocalPos m_moveTarget;
+	MyEngine::Vector3 m_moveTarget;
 
 	//移動方向ベクトル
 	MyEngine::Vector3 m_moveDir;

@@ -493,6 +493,11 @@ void CharacterBase::SetFrontPos(MyEngine::Vector3 frontPos)
 	MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - pos).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
 }
 
+MyEngine::Vector3 CharacterBase::GetFrontPos()
+{
+	return m_lookPos.GetWorldPos();
+}
+
 bool CharacterBase::IsFrontTarget()
 {
 

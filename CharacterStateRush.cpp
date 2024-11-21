@@ -12,7 +12,7 @@
 namespace
 {
 	//スティック操作がされていないとき上下移動
-	constexpr float kMoveVerticalPower = 0.03f;
+	constexpr float kMoveVerticalPower = 0.05f;
 
 	//上下移動の角度の最大
 	constexpr float kVerticalMoveMax = 0.5f;
@@ -29,7 +29,7 @@ namespace
 	constexpr float kEndAnimBlendSpeed = 0.08f;
 
 	//アイドルに戻るときのアニメーションの再生速度
-	constexpr float kEndAnimPlaySpeed = 0.5f;
+	constexpr float kEndAnimPlaySpeed = 0.6f;
 
 	//アイドルに戻るときの硬直時間
 	constexpr int kEndLandingTime = 20;
@@ -39,6 +39,15 @@ namespace
 
 	//最初のスタートモーションの時間
 	constexpr float kStartAnimTime = 8.0f;
+
+	//線形補間の速さ
+	constexpr float kEasingSpeed = 0.08f;
+
+	//突撃を行う最低時間
+	constexpr int kRushTime = 20;
+
+	//移動中に真反対を入力されたと判断するベクトルの差の大きさ
+	constexpr float kReverseVecScale = 1.999f;
 }
 
 CharacterStateRush::CharacterStateRush(std::shared_ptr<CharacterBase> character) :
@@ -74,9 +83,6 @@ void CharacterStateRush::SetMoveDir(MyEngine::Vector3 dir)
 		m_moveDir = m_moveDir * (1.0f - dir.z) + toTargetDir * dir.z;
 	}
 
-	m_moveTarget.SetCenterPos(m_pCharacter->GetPos());
-	m_moveTarget.SetLocalPos(dir.MatTransform(mat));
-	m_moveTarget.SetFrontPos(GetTargetPos());
 }
 
 void CharacterStateRush::Enter()
@@ -84,10 +90,6 @@ void CharacterStateRush::Enter()
 	m_pNextState = shared_from_this();
 	m_kind = CharacterStateKind::kRush;
 	m_pCharacter->ChangeAnim(CharacterBase::AnimKind::kRushStart, true);
-	m_pEffect = std::make_shared<Effect>(Effect::EffectKind::kDash);
-	m_pEffect->SetPos(m_pCharacter->GetPos());
-	m_pEffect->SetLoop(30,32);
-	EntryEffect(m_pEffect);
 }
 
 void CharacterStateRush::Update()
@@ -111,11 +113,52 @@ void CharacterStateRush::Update()
 	{
 		m_rushEndTime++;
 
+		//ラッシュ終了アニメーションになっていなければ
 		if (m_pCharacter->GetPlayAnimKind() != CharacterBase::AnimKind::kRushEnd)
 		{
+			//ラッシュ終了アニメーションになる
 			m_pCharacter->ChangeAnim(CharacterBase::AnimKind::kRushEnd, false, kEndAnimBlendSpeed);
 
+			//アニメーションの再生速度を変更する
 			m_pCharacter->SetAnimPlaySpeed(kEndAnimPlaySpeed);
+
+			//エフェクトを変更する
+			ExitEffect(m_pEffect);
+
+			m_pEffect = std::make_shared<Effect>(Effect::EffectKind::kDashEnd);
+
+			m_pEffect->SetPos(m_pCharacter->GetFrontPos());
+
+			//回転を設定する
+			MyEngine::Vector3 rotation;
+
+			//敵に向かう入力がされていた時
+			if (m_isRushEnemy)
+			{
+				MyEngine::Vector3 targetPos = GetTargetPos();
+				MyEngine::Vector3 pos = m_pCharacter->GetPos();
+
+				float vX = targetPos.x - pos.x;
+				float vZ = targetPos.z - pos.z;
+
+				rotation.y = std::atan2f(vX, vZ);
+			}
+			//敵に向かう入力がされていなかったとき
+			else
+			{
+				MyEngine::Vector3 nextPos = m_pCharacter->GetPos() + m_moveDir;
+				MyEngine::Vector3 pos = m_pCharacter->GetPos();
+
+				float vX = nextPos.x - pos.x;
+				float vZ = nextPos.z - pos.z;
+
+				rotation.y = std::atan2f(vX, vZ);
+			}
+
+			m_pEffect->SetRotation(rotation);
+
+			EntryEffect(m_pEffect);
+
 		}
 		//攻撃入力がされていたら攻撃状態に移行する
 		if (m_isAttackInput)
@@ -204,24 +247,17 @@ void CharacterStateRush::Update()
 	//上下移動処理
 	if (m_isPlayer && input.IsPress("RB"))
 	{
-		dir.y += kMoveVerticalPower;
-		m_moveDir.y += kMoveVerticalPower * speed;
+		dir.y += kMoveVerticalPower * speed;
 	}
 	if (m_isPlayer && input.IsPushTrigger(true))
 	{
-		dir.y -= kMoveVerticalPower;
-		m_moveDir.y -= kMoveVerticalPower * speed;
+		dir.y -= kMoveVerticalPower * speed;
 	}
-
-	//移動ベクトルが上にも下にも傾きすぎないようにクランプ
-	m_moveDir.y = std::fmax(m_moveDir.y, kVerticalMoveMin);
-	m_moveDir.y = std::fmin(m_moveDir.y, kVerticalMoveMax);
 
 	//スティックを傾けた時か上昇、下降ボタンを押したときのみ行きたい方向を変更する
 	if (stickDir.SqLength() > 0.001f)
 	{
 		stickDir = stickDir.Normalize();
-
 		//エネミーの方向に移動方向を回転させる
 		float vX = GetTargetPos().x - m_pCharacter->GetPos().x;
 		float vZ = GetTargetPos().z - m_pCharacter->GetPos().z;
@@ -245,10 +281,11 @@ void CharacterStateRush::Update()
 
 			dir = dir * (1.0f - stickDir.z) + toTargetDir * stickDir.z;
 		}
-
-		m_moveDir = dir.Normalize();
 	}
-
+	if (dir.SqLength() > 0.1f)
+	{
+		m_moveTarget = dir.Normalize();
+	}
 
 	//開始アニメーションを再生して一定時間たって
 	if (m_time > kStartAnimTime)
@@ -259,6 +296,11 @@ void CharacterStateRush::Update()
 			ShakeCamera(kCameraShakeTime);
 			//アニメーションを変更する
 			m_pCharacter->ChangeAnim(CharacterBase::AnimKind::kSkyDash, true);
+			//エフェクトを再生する
+			m_pEffect = std::make_shared<Effect>(Effect::EffectKind::kDash);
+			m_pEffect->SetPos(m_pCharacter->GetPos());
+			m_pEffect->SetLoop(30, 32);
+			EntryEffect(m_pEffect);
 		}
 	}
 	//まだ開始アニメーションを再生していたら
@@ -267,49 +309,42 @@ void CharacterStateRush::Update()
 		//移動しようとしている方向に体を向ける
 		m_pCharacter->SetFrontPos(m_moveDir + m_pCharacter->GetPos());
 
-		SetCharacterVelo(MyEngine::Vector3(0,0,0));
+		SetCharacterVelo(MyEngine::Vector3(0, 0, 0));
 
 		//移動処理を行わない
 		return;
 	}
 
+	//少しずつスティックを傾けている方向に移動方向を変更する
+	if (m_moveDir.SqLength() > 0.1f && m_moveTarget.SqLength() > 0.1f)
+	{
+		m_moveDir = m_moveDir * (1.0 - kEasingSpeed) + m_moveTarget * kEasingSpeed;
 
-	////行きたい方向を設定する
-	//m_moveTarget.SetCenterPos(m_pCharacter->GetPos());
-	//m_moveTarget.SetLocalPos(dir);
-	//m_moveTarget.SetFrontPos(GetTargetPos());
+		MyEngine::Vector3 checkVecA = m_moveDir;
+		checkVecA.y = 0;
+		checkVecA = checkVecA.Normalize();
 
-	////行きたい座標の回転度を調べる
-	//float toMoveTargetRotX = m_moveTarget.GetWorldPos().x - m_pCharacter->GetPos().x;
-	//float toMoveTargetRotY = m_moveTarget.GetWorldPos().y - m_pCharacter->GetPos().y;
-	//float toMoveTargetRotZ = m_moveTarget.GetWorldPos().z - m_pCharacter->GetPos().z;
+		MyEngine::Vector3 checkVecB = m_moveTarget;
+		checkVecB.y = 0;
+		checkVecB = checkVecB.Normalize();
 
-	////y回転
-	//float targetYAngle = std::atan2f(toMoveTargetRotX, toMoveTargetRotX);
 
-	////今向かっている方向の回転度を調べる
-	//float moveVecRotX = m_moveDir.x;
-	//float moveVecRotY = m_moveDir.y;
-	//float moveVecRotZ = m_moveDir.z;
+		if (std::fabs((checkVecA - checkVecB).Length()) > kReverseVecScale && m_time > kRushTime)
+		{
+			//敵に自動で向かっていく処理をしていなければ
+			if (!m_isRushEnemy)
+			{
+				m_isEndRush = true;
+			}
+		}
+		m_moveDir = m_moveDir.Normalize();
+	}
+	else if (m_moveTarget.SqLength() > 0.1f)
+	{
+		m_moveDir = m_moveTarget.Normalize();
+	}
 
-	//float moveYAngle = std::atan2f(moveVecRotX, moveVecRotZ);
 
-	////回転の差を求める
-	//float difY = targetYAngle - moveYAngle;
-
-	////回転する大きさを設定
-	//float rotY = std::fmin(difY, kRotScaleMax);
-
-	//MyEngine::Vector3 rotation(0.0f, rotY, 0.0f);
-
-	////回転
-	//MATRIX mat = rotation.GetRotationMat();
-
-	////移動ベクトルを回転させる
-	//m_moveDir = m_moveDir.MatTransform(mat);
-
-	//printfDx("moveY : %0.3f,tarY : % 0.3f\n", moveVecRotX, toMoveTargetRotX);
-	//printfDx("X:%.2f,Y:%.2f,Z:%.2f\n", dir.x, dir.y, dir.z);
 
 	MyEngine::Vector3 velo = m_moveDir * speed;
 
@@ -413,27 +448,28 @@ void CharacterStateRush::Update()
 		}
 	}
 
-	//エフェクトに回転行列と座標を設定する
+	//エフェクトに回転と座標を設定する
 	MyEngine::Vector3 rotation;
 
 	MyEngine::Vector3 nextPos = m_pCharacter->GetPos() + velo;
 	MyEngine::Vector3 pos = m_pCharacter->GetPos();
 
 	float vX = nextPos.x - pos.x;
-	float vY = nextPos.y - pos.y;
 	float vZ = nextPos.z - pos.z;
 
-	//rotation.x = std::atan2f(vZ,vY);
-	rotation.y = std::atan2f(vX,vZ);
-	//rotation.z = std::atan2f(vY,vX);
+	rotation.y = std::atan2f(vX, vZ);
 
-	//m_pEffect->SetPos(pos);
-	m_pEffect->SetRotationAndPos(rotation, pos);
+	m_pEffect->SetPos(pos);
+	m_pEffect->SetRotation(rotation);
 
 	SetCharacterVelo(velo);
-	//ラッシュを終わる処理をしていなければ移動方向を見る
+	//ラッシュを終わる処理をしていなければ
 	if (!m_isEndRush)
 	{
+		//カメラを少し揺らす
+		SwayCamera();
+
+		//移動方向を見る
 		m_pCharacter->SetFrontPos(m_pCharacter->GetPos() + velo);
 	}
 

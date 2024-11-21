@@ -395,6 +395,12 @@ public:
 	void SetFrontPos(MyEngine::Vector3 frontPos);
 
 	/// <summary>
+	/// 自身の向いている方向を取得する
+	/// </summary>
+	/// <returns>自身の前方の座標</returns>
+	MyEngine::Vector3 GetFrontPos();
+
+	/// <summary>
 	/// 前方にターゲットがいるかどうかを取得
 	/// </summary>
 	/// <returns>前方にいるならtrue</returns>

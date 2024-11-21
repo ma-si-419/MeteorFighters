@@ -84,6 +84,9 @@ void EffectManager::Update()
 
 		//エフェクトの座標を設定
 		SetPosPlayingEffekseer3DEffect(item->GetHandle(), pos.x, pos.y, pos.z);
+		//エフェクトの回転を設定
+		MyEngine::Vector3 rot = item->GetRotation();
+		SetRotationPlayingEffekseer3DEffect(item->GetHandle(), rot.x, rot.y, rot.z);
 	}
 }
 
