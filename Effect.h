@@ -11,7 +11,10 @@ public:
 		kCharge,
 		kDash,
 		kDashEnd,
-		kEnergy
+		kEnergy,
+		kLowHit,
+		kEnergyHit,
+		kTeleportaion
 	};
 
 public:
@@ -110,6 +113,17 @@ public:
 	/// <returns>回転ベクトル</returns>
 	MyEngine::Vector3 GetRotation() { return m_rotation; }
 
+	/// <summary>
+	/// ライフタイムを設定する
+	/// </summary>
+	/// <param name="time">自動で消すまでの時間</param>
+	void SetLifeTime(int time) { m_lifeTime = time; }
+
+	/// <summary>
+	/// 生存時間が終了したかどうかを返す(設定されていなければfalseを返す)
+	/// </summary>
+	/// <returns>終了していればtrueを返す</returns>
+	bool IsEndLifeTime();
 private:
 
 	int m_handle;
@@ -121,6 +135,8 @@ private:
 	MyEngine::Vector3 m_rotation;
 
 	int m_time;
+
+	int m_lifeTime;
 
 	int m_loopStartTime;
 	

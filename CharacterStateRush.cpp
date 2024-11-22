@@ -394,12 +394,12 @@ void CharacterStateRush::Update()
 		if ((GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance) - m_pCharacter->GetPos()).Length() > GameSceneConstant::kCameraMoveDistance)
 		{
 			m_rushTargetPos = GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance);
-			StopMoveCamera();
+			StopCameraCorrection();
 		}
 		//ˆê’è‹——£‚Ü‚Å‹ß‚Ã‚¢‚½‚ç
 		else
 		{
-			StartMoveCamera();
+			StartCameraCorrection();
 
 			//ƒJƒƒ‰‚ð‚‘¬ˆÚ“®‚³‚¹‚é
 			m_pCharacter->StartFastCameraMove();

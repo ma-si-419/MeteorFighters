@@ -96,14 +96,20 @@ protected:
 	float GetSpeed();
 
 	/// <summary>
-	/// カメラの移動を止める
+	/// カメラの補正を止める
 	/// </summary>
-	void StopMoveCamera();
+	void StopCameraCorrection();
 
 	/// <summary>
-	/// カメラの移動を始める
+	/// カメラの移動を止める(時間指定)
 	/// </summary>
-	void StartMoveCamera();
+	/// <param name="time">カメラを止める時間</param>
+	void StopCamera(int time);
+
+	/// <summary>
+	/// カメラの補正を始める
+	/// </summary>
+	void StartCameraCorrection();
 
 	/// <summary>
 	/// カメラを揺れを設定する

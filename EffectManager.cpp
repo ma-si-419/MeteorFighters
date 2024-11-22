@@ -48,7 +48,6 @@ void EffectManager::Exit(std::shared_ptr<Effect> effect)
 	//登録されていた場合
 	if (find)
 	{
-
 		StopEffekseer3DEffect(effect->GetHandle());
 
 		m_effects.remove(effect);
@@ -59,6 +58,7 @@ void EffectManager::Update()
 {
 	UpdateEffekseer3D();
 
+	std::vector<std::shared_ptr<Effect>> deleteEffects;
 	for (auto& item : m_effects)
 	{
 		//エフェクトの更新
@@ -87,7 +87,19 @@ void EffectManager::Update()
 		//エフェクトの回転を設定
 		MyEngine::Vector3 rot = item->GetRotation();
 		SetRotationPlayingEffekseer3DEffect(item->GetHandle(), rot.x, rot.y, rot.z);
+
+		//ライフタイムが終了しているエフェクトがあれば
+		if (item->IsEndLifeTime())
+		{
+			deleteEffects.push_back(item);
+		}
 	}
+	for (auto& item : deleteEffects)
+	{
+		Exit(item);
+	}
+
+
 }
 
 void EffectManager::Draw()

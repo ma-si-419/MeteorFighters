@@ -10,7 +10,10 @@ namespace
 		{Effect::EffectKind::kCharge,"EnergyCharge"},
 		{Effect::EffectKind::kDash,"Dash"},
 		{Effect::EffectKind::kDashEnd,"DashEnd"},
-		{Effect::EffectKind::kEnergy,"Energy"},
+		{Effect::EffectKind::kEnergy,"SpecialEnergy"},
+		{Effect::EffectKind::kLowHit,"LowHit"},
+		{Effect::EffectKind::kEnergyHit,"EnergyHit"},
+		{Effect::EffectKind::kTeleportaion,"Teleportation"},
 	};
 }
 
@@ -19,7 +22,8 @@ Effect::Effect(EffectKind kind) :
 	m_path("empty"),
 	m_time(0),
 	m_loopStartTime(0),
-	m_loopEndTime(0)
+	m_loopEndTime(0),
+	m_lifeTime(0)
 
 {
 	m_path = "data/effekseer/" + kEffectPathMap.at(kind) + ".efk";
@@ -77,4 +81,19 @@ bool Effect::IsEndLoop()
 	{
 		return false;
 	}
+}
+
+bool Effect::IsEndLifeTime()
+{
+	//Ý’è‚³‚ê‚Ä‚¢‚È‚¯‚ê‚Îfalse‚ð•Ô‚·
+	if (m_lifeTime == 0) return false;
+
+	//’´‚¦‚Ä‚¢‚½‚çtrue‚ð•Ô‚·
+	if (m_time > m_lifeTime)
+	{
+		return true;
+	}
+
+	//‚±‚±‚Ü‚Å—ˆ‚½‚çfalse
+	return false;
 }

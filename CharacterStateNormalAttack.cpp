@@ -4,6 +4,7 @@
 #include "Input.h"
 #include "CharacterBase.h"
 #include <cmath>
+#include "Effect.h"
 
 namespace
 {
@@ -29,6 +30,10 @@ namespace
 	constexpr float kOnChargeAnimPlaySpeed = 0.1f;
 	//ため攻撃の貯められるマックスのフレーム数
 	constexpr float kChargeMaxTime = kOnChargeStateTimeCountSpeed * 40;
+	//瞬間移動のエフェクトを表示する時間
+	constexpr int kTeleportationEffectTime = 20;
+	//瞬間移動時にカメラを止める時間
+	constexpr int kTeleportationCameraStopTime = 18;
 	//上入力の強攻撃
 	const std::string kUpperAttackName = "Upper";
 	//中入力の強攻撃
@@ -208,6 +213,18 @@ void CharacterStateNormalAttack::Update()
 					//追撃できるのなら追撃した回数を増やす
 					m_chaseAttackNum++;
 				}
+
+				//移動前に瞬間移動のエフェクトを設定する
+				std::shared_ptr<Effect> effect =  std::make_shared<Effect>(Effect::EffectKind::kTeleportaion);
+
+				effect->SetPos(m_pCharacter->GetPos());
+
+				effect->SetLifeTime(kTeleportationEffectTime);
+
+				EntryEffect(effect);
+
+				//カメラを少しだけ止める
+				StopCamera(kTeleportationCameraStopTime);
 
 				//次の攻撃発生フレーム時に敵がいる場所を計算する
 				MyEngine::Vector3 teleportationPos = GetTargetPos() + (GetTargetVelo() * (static_cast<float>(nextAttack.attackFrame)));

@@ -106,14 +106,21 @@ public:
 	void StartFastCameraMove();
 
 	/// <summary>
-	/// カメラの移動を止める
+	/// カメラの補正を止める
 	/// </summary>
-	void StopMoveCamera();
+	void StopCameraCorrection();
 
 	/// <summary>
-	/// カメラの移動を始める
+	/// カメラの動きを止める
 	/// </summary>
-	void StartMoveCamera();
+	/// <param name="time">止める時間</param>
+	void StopCamera(int time);
+
+	/// <summary>
+	/// カメラの補正を始める
+	/// </summary>
+	void StartCameraCorrection();
+
 
 
 	/// <summary>

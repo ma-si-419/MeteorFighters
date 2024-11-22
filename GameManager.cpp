@@ -247,12 +247,17 @@ void GameManager::StartFastCameraMove()
 	m_pCamera->StartFastCameraMove();
 }
 
-void GameManager::StopMoveCamera()
+void GameManager::StopCameraCorrection()
 {
 	m_pCamera->StopCamera();
 }
 
-void GameManager::StartMoveCamera()
+void GameManager::StopCamera(int time)
+{
+	m_pCamera->StopCamera(time);
+}
+
+void GameManager::StartCameraCorrection()
 {
 	m_pCamera->StartMoveCamera();
 }

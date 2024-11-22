@@ -40,6 +40,12 @@ public:
 	void StopCamera() { m_isStop = true; }
 
 	/// <summary>
+	/// カメラを止める(時間指定)
+	/// </summary>
+	/// <param name="stopTime">カメラを止める時間を設定する</param>
+	void StopCamera(int stopTime) { m_stopTime = stopTime; m_isStop = true; }
+
+	/// <summary>
 	/// カメラの移動を始める
 	/// </summary>
 	void StartMoveCamera() { m_isStop = false; }
@@ -78,6 +84,9 @@ private:
 
 	//プレイヤーの移動ベクトル
 	MyEngine::Vector3 m_playerVelo;
+
+	//カメラの補正を止める時間
+	int m_stopCorrectTime;
 
 	//カメラを止める時間
 	int m_stopTime;

@@ -5,6 +5,8 @@
 #include "Attack.h"
 #include "Input.h"
 #include "Effect.h"
+#include "EffectManager.h"
+#include <cmath>
 
 namespace
 {
@@ -20,6 +22,8 @@ namespace
 		{CharacterBase::AttackHitKind::kBottomStan,CharacterBase::HitReactionKind::kBottomStan},
 		{CharacterBase::AttackHitKind::kMiddleStan,CharacterBase::HitReactionKind::kMiddleStan}
 	};
+
+	constexpr int kHitEffectLifeTime = 30;
 }
 
 CharacterStateBase::CharacterStateBase(std::shared_ptr<CharacterBase> character)
@@ -123,14 +127,19 @@ float CharacterStateBase::GetSpeed()
 	return m_pCharacter->GetSpeed();
 }
 
-void CharacterStateBase::StopMoveCamera()
+void CharacterStateBase::StopCameraCorrection()
 {
-	m_pCharacter->m_pGameManager->StopMoveCamera();
+	m_pCharacter->m_pGameManager->StopCameraCorrection();
 }
 
-void CharacterStateBase::StartMoveCamera()
+void CharacterStateBase::StopCamera(int time)
 {
-	m_pCharacter->m_pGameManager->StartMoveCamera();
+	m_pCharacter->m_pGameManager->StopCamera(time);
+}
+
+void CharacterStateBase::StartCameraCorrection()
+{
+	m_pCharacter->m_pGameManager->StartCameraCorrection();
 }
 
 void CharacterStateBase::ShakeCamera(int time)
@@ -185,6 +194,22 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack, CharacterStat
 			//ƒK[ƒhŠÖŒW‚È‚­ó‘Ô‘JˆÚ‚·‚é
 			kind = static_cast<CharacterBase::HitReactionKind>(status.attackHitKind);
 		}
+	}
+	//ƒK[ƒh‚Å‚È‚¯‚ê‚Î
+	else
+	{
+		std::shared_ptr<Effect> hitEffect = std::make_shared<Effect>(Effect::EffectKind::kEnergyHit);
+		hitEffect->SetLifeTime(kHitEffectLifeTime);
+		m_pCharacter->m_pGameManager->GetEffectManagerPointer()->Entry(hitEffect, m_pCharacter->GetPos());
+		
+		MyEngine::Vector3 rotation;
+
+		float vX = attack->GetPos().x - m_pCharacter->GetPos().x;
+		float vZ = attack->GetPos().z - m_pCharacter->GetPos().z;
+
+		rotation.y = std::atan2f(vX,vZ);
+
+		hitEffect->SetRotation(rotation);
 	}
 	nextState->HitAttack(static_cast<int>(kind));
 

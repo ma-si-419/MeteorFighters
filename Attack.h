@@ -59,6 +59,12 @@ public:
 	AttackStatus GetStatus() { return m_status; }
 
 	/// <summary>
+	/// 攻撃の座標を返す
+	/// </summary>
+	/// <returns>攻撃の中心座標</returns>
+	MyEngine::Vector3 GetPos() { return m_rigidbody.GetPos(); }
+
+	/// <summary>
 	/// 自身以外のCollidableとぶつかった時の処理を書く
 	/// </summary>
 	/// <param name="collider">ぶつかった相手側のコライダー</param>

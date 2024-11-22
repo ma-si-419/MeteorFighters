@@ -63,7 +63,7 @@ namespace
 
 GameCamera::GameCamera() :
 	m_lightHandle(-1),
-	m_stopTime(0),
+	m_stopCorrectTime(0),
 	m_isFastMove(false),
 	m_isStop(false),
 	m_shakeTime(0),
@@ -88,6 +88,17 @@ void GameCamera::Init(MyEngine::Vector3 centerPos)
 
 void GameCamera::Update()
 {
+	//動かない時間が設定されていたら
+	if (m_stopTime > 0)
+	{
+		m_stopTime--;
+		if (m_stopTime <= 0)
+		{
+			m_isStop = false;
+		}
+	}
+
+
 	//動かないと設定されていたらリターン
 	if (m_isStop)return;
 
@@ -134,10 +145,10 @@ void GameCamera::Update()
 	if (m_playerVelo.SqLength() < 0.001f)
 	{
 		//移動していない時間を計る
-		m_stopTime++;
+		m_stopCorrectTime++;
 
 		//移動していない時間が一定時間たったら
-		if (m_stopTime > kLocalPosMoveStartTime)
+		if (m_stopCorrectTime > kLocalPosMoveStartTime)
 		{
 			//一定時間かけてローカル座標を既定の座標に近づけていく
 			MyEngine::Vector3 initPos(m_nextCameraPos.x, m_nextCameraPos.y, kLocalInitPosZ);
@@ -184,7 +195,7 @@ void GameCamera::Update()
 	{
 		//動くたびにリセット
 		m_moveVec = MyEngine::Vector3(0.0f, 0.0f, 0.0f);
-		m_stopTime = 0;
+		m_stopCorrectTime = 0;
 	}
 
 
