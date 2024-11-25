@@ -101,6 +101,8 @@ CharacterBase::CharacterBase(ObjectTag tag, CharacterKind kind) :
 	std::vector<std::vector<std::string>> data = load.LoadFile("data/csv/normalAttackData.csv");
 
 	SetNormalAttackData(data);
+
+	m_playAnimKind = AnimKind::kSkyIdle;
 }
 
 CharacterBase::~CharacterBase()
@@ -479,6 +481,26 @@ void CharacterBase::CreateAttack(AttackData attackData)
 CharacterBase::NormalAttackData CharacterBase::GetNormalAttackData(std::string attackName)
 {
 	return m_normalAttackData[attackName];
+}
+
+CharacterBase::SpecialAttackData CharacterBase::GetSpecialAttackData(int specialNumber)
+{
+
+	//ˆê‚Â–Ú‚Ì•KŽE‹Z‚ðŽæ“¾‚·‚é
+	if (specialNumber == 1)
+	{
+		return m_status.firstSpecialAttackData;
+	}
+	//“ñ‚Â–Ú‚Ì•KŽE‹Z‚ðŽæ“¾‚·‚é
+	else if(specialNumber == 2)
+	{
+		return m_status.secondSpecialAttackData;
+	}
+
+	//‚±‚±‚Ü‚Å—ˆ‚½‚çŽ~‚ß‚é
+	assert(false);
+
+	return SpecialAttackData();
 }
 
 void CharacterBase::SetFrontPos(MyEngine::Vector3 frontPos)

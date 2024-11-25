@@ -15,9 +15,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 {
 	bool isWindow = false;
 
+	isWindow = true;
 #ifdef _DEBUG
 
-	isWindow = true;
 
 #endif // _DEBUG
 

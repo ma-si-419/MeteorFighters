@@ -10,7 +10,7 @@ namespace
 		{Effect::EffectKind::kCharge,"EnergyCharge"},
 		{Effect::EffectKind::kDash,"Dash"},
 		{Effect::EffectKind::kDashEnd,"DashEnd"},
-		{Effect::EffectKind::kEnergy,"SpecialEnergy"},
+		{Effect::EffectKind::kEnergy,"Energy"},
 		{Effect::EffectKind::kLowHit,"LowHit"},
 		{Effect::EffectKind::kEnergyHit,"EnergyHit"},
 		{Effect::EffectKind::kTeleportaion,"Teleportation"},

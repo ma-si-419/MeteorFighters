@@ -198,7 +198,18 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack, CharacterStat
 	//ガード時でなければ
 	else
 	{
-		std::shared_ptr<Effect> hitEffect = std::make_shared<Effect>(Effect::EffectKind::kEnergyHit);
+		//ヒットエフェクトを再生する
+		Effect::EffectKind effectKind = Effect::EffectKind::kEnergyHit;
+		if (status.attackKind == CharacterBase::AttackKind::kEnergy)
+		{
+			effectKind = Effect::EffectKind::kEnergyHit;
+		}
+		else if (status.attackKind == CharacterBase::AttackKind::kPhysical)
+		{
+			effectKind = Effect::EffectKind::kLowHit;
+		}
+
+		std::shared_ptr<Effect> hitEffect = std::make_shared<Effect>(effectKind);
 		hitEffect->SetLifeTime(kHitEffectLifeTime);
 		m_pCharacter->m_pGameManager->GetEffectManagerPointer()->Entry(hitEffect, m_pCharacter->GetPos());
 		

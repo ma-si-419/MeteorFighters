@@ -96,7 +96,9 @@ public:
 		kGroundDash,
 		kRushStart,
 		kRushEnd,
-		kDashAttack
+		kDashAttack,
+		kFirstSpecialAttack,
+		kSecondSpecialAttack
 	};
 
 	enum class CharacterKind
@@ -369,6 +371,13 @@ public:
 	/// <param name="attackName">取得したい通常攻撃の名前</param>
 	/// <returns>通常攻撃を生成する際の情報</returns>
 	NormalAttackData GetNormalAttackData(std::string attackName);
+
+	/// <summary>
+	/// 必殺技の情報を取得する
+	/// </summary>
+	/// <param name="specialAttackName">取得したい必殺技の番号(1か2)</param>
+	/// <returns>設定されている必殺技の情報</returns>
+	SpecialAttackData GetSpecialAttackData(int specialNumber);
 
 	/// <summary>
 	/// アニメーションブレンドが終了したかどうかを取得する

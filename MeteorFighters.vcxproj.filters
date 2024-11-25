@@ -55,6 +55,12 @@
     <Filter Include="ヘッダー ファイル\Actor\Character\State">
       <UniqueIdentifier>{a8945192-fcc4-4653-94c2-8afe1d8b1150}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\Singleton">
+      <UniqueIdentifier>{71593332-d338-4e54-b6d8-d4aa7615a3c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Singleton">
+      <UniqueIdentifier>{ef7c8d77-1e01-4a4a-ae19-ef24bc5f8bc1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -66,17 +72,11 @@
     <ClCompile Include="MyEngine\Physics\Collidable.cpp">
       <Filter>ソース ファイル\MyEngine\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="MyEngine\Physics\Physics.cpp">
-      <Filter>ソース ファイル\MyEngine\Physics</Filter>
-    </ClCompile>
     <ClCompile Include="MyEngine\Physics\Rigidbody.cpp">
       <Filter>ソース ファイル\MyEngine\Physics</Filter>
     </ClCompile>
     <ClCompile Include="MyEngine\Physics\SphereColliderData.cpp">
       <Filter>ソース ファイル\MyEngine\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="MyEngine\Utility\Input.cpp">
-      <Filter>ソース ファイル\MyEngine\Utility</Filter>
     </ClCompile>
     <ClCompile Include="MyEngine\Utility\LoadCsv.cpp">
       <Filter>ソース ファイル\MyEngine\Utility</Filter>
@@ -104,9 +104,6 @@
     </ClCompile>
     <ClCompile Include="Scene\SceneSelect.cpp">
       <Filter>ソース ファイル\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphManager.cpp">
-      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="MyEngine\Utility\Matrix.cpp">
       <Filter>ソース ファイル\MyEngine\Utility</Filter>
@@ -177,6 +174,18 @@
     <ClCompile Include="GameUi.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="GraphManager.cpp">
+      <Filter>ソース ファイル\Singleton</Filter>
+    </ClCompile>
+    <ClCompile Include="MyEngine\Physics\Physics.cpp">
+      <Filter>ソース ファイル\Singleton</Filter>
+    </ClCompile>
+    <ClCompile Include="MyEngine\Utility\Input.cpp">
+      <Filter>ソース ファイル\Singleton</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterStateSpecialAttack.cpp">
+      <Filter>ソース ファイル\Actor\Character\State</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -200,9 +209,6 @@
     <ClInclude Include="Scene\SceneSelect.h">
       <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="GraphManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="MyEngine\Physics\CapsuleColliderData.h">
       <Filter>ヘッダー ファイル\MyEngine\Physics</Filter>
     </ClInclude>
@@ -215,17 +221,11 @@
     <ClInclude Include="MyEngine\Physics\ObjectTag.h">
       <Filter>ヘッダー ファイル\MyEngine\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="MyEngine\Physics\Physics.h">
-      <Filter>ヘッダー ファイル\MyEngine\Physics</Filter>
-    </ClInclude>
     <ClInclude Include="MyEngine\Physics\Rigidbody.h">
       <Filter>ヘッダー ファイル\MyEngine\Physics</Filter>
     </ClInclude>
     <ClInclude Include="MyEngine\Physics\SphereColliderData.h">
       <Filter>ヘッダー ファイル\MyEngine\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="MyEngine\Utility\Input.h">
-      <Filter>ヘッダー ファイル\MyEngine\Utility</Filter>
     </ClInclude>
     <ClInclude Include="MyEngine\Utility\LoadCsv.h">
       <Filter>ヘッダー ファイル\MyEngine\Utility</Filter>
@@ -315,6 +315,18 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="GameUi.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphManager.h">
+      <Filter>ヘッダー ファイル\Singleton</Filter>
+    </ClInclude>
+    <ClInclude Include="MyEngine\Physics\Physics.h">
+      <Filter>ヘッダー ファイル\Singleton</Filter>
+    </ClInclude>
+    <ClInclude Include="MyEngine\Utility\Input.h">
+      <Filter>ヘッダー ファイル\Singleton</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterStateSpecialAttack.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

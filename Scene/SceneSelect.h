@@ -6,13 +6,13 @@ public:
 	SceneSelect(SceneManager& sceneManager);
 	virtual ~SceneSelect();
 	//‰Šú‰»ˆ—
-	virtual void Init();
+	virtual void Init() override;
 	//XVˆ—
-	virtual void Update();
+	virtual void Update() override;
 	//•`‰æˆ—
-	virtual void Draw();
+	virtual void Draw() override;
 	//I—¹ˆ—
-	virtual void End();
+	virtual void End() override;
 
 private:
 

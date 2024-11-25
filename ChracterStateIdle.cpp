@@ -174,11 +174,6 @@ void CharacterStateIdle::Update()
 		return;
 	}
 
-	if (input.IsPress("A") && !m_isPlayer)
-	{
-		m_pCharacter->SubHp(150);
-	}
-
 	//ダッシュボタンが押された時
 	if (m_isPlayer && input.IsTrigger("A"))
 	{

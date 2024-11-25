@@ -10,6 +10,8 @@ namespace
 	constexpr float kEnergyAttackTrackRange = 20.0f;
 
 	constexpr float kAttackLange = 0.5f;
+
+	constexpr int kEnergyHitEffectTime = 30;
 }
 
 Attack::Attack(ObjectTag tag, MyEngine::Vector3 pos) :
@@ -87,6 +89,7 @@ void Attack::Draw()
 void Attack::Final()
 {
 	Collidable::Final();
+	//自身の攻撃エフェクトの再生をやめる
 	m_pEffectManager->Exit(m_pEffect);
 }
 

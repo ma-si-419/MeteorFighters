@@ -6,9 +6,9 @@ class SceneMenu : public SceneBase
 public:
 	enum class ItemKind
 	{
-		k1PVsCPU,
-		k1PVs2P,
-		kCPUVsCPU,
+		k1PvsCPU,
+		k1Pvs2P,
+		kCPUvsCPU,
 		kOption,
 		kExit,
 		kSelectEnd = kExit,
@@ -18,13 +18,13 @@ public:
 	SceneMenu(SceneManager& sceneManager);
 	virtual ~SceneMenu();
 	//‰Šú‰»ˆ—
-	virtual void Init();
+	virtual void Init() override;
 	//XVˆ—
-	virtual void Update();
+	virtual void Update() override;
 	//•`‰æˆ—
-	virtual void Draw();
+	virtual void Draw() override;
 	//I—¹ˆ—
-	virtual void End();
+	virtual void End() override;
 private:
 
 
