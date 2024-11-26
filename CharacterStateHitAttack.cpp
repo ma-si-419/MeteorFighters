@@ -11,6 +11,7 @@ namespace
 	{
 		{CharacterBase::HitReactionKind::kLow,40},
 		{CharacterBase::HitReactionKind::kMiddle,40},
+		{CharacterBase::HitReactionKind::kWeakUpBurst,60},
 		{CharacterBase::HitReactionKind::kUpBurst,120},
 		{CharacterBase::HitReactionKind::kFarBurst,120},
 		{CharacterBase::HitReactionKind::kDownBurst,120},
@@ -22,6 +23,7 @@ namespace
 	{
 		{CharacterBase::HitReactionKind::kLow,0.4f},
 		{CharacterBase::HitReactionKind::kMiddle,0.8f},
+		{CharacterBase::HitReactionKind::kWeakUpBurst,1.2f},
 		{CharacterBase::HitReactionKind::kUpBurst,2.0f},
 		{CharacterBase::HitReactionKind::kFarBurst,2.0f},
 		{CharacterBase::HitReactionKind::kDownBurst,2.0f},
@@ -34,6 +36,7 @@ namespace
 	{
 		{CharacterBase::HitReactionKind::kLow,CharacterBase::AnimKind::kLowHit1},
 		{CharacterBase::HitReactionKind::kMiddle,CharacterBase::AnimKind::kMiddleHit},
+		{CharacterBase::HitReactionKind::kWeakUpBurst,CharacterBase::AnimKind::kFrontBurst},
 		{CharacterBase::HitReactionKind::kUpBurst,CharacterBase::AnimKind::kFrontBurst},
 		{CharacterBase::HitReactionKind::kDownBurst,CharacterBase::AnimKind::kFrontBurst},
 		{CharacterBase::HitReactionKind::kFarBurst,CharacterBase::AnimKind::kFrontBurst},
@@ -46,6 +49,7 @@ namespace
 	{
 		{CharacterBase::HitReactionKind::kLow,CharacterBase::AnimKind::kBackLowHit1},
 		{CharacterBase::HitReactionKind::kMiddle,CharacterBase::AnimKind::kBackMiddleHit},
+		{CharacterBase::HitReactionKind::kWeakUpBurst,CharacterBase::AnimKind::kBackBurst},
 		{CharacterBase::HitReactionKind::kUpBurst,CharacterBase::AnimKind::kBackBurst},
 		{CharacterBase::HitReactionKind::kDownBurst,CharacterBase::AnimKind::kBackBurst},
 		{CharacterBase::HitReactionKind::kFarBurst,CharacterBase::AnimKind::kBackBurst},

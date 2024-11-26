@@ -322,7 +322,7 @@ void CharacterStateRush::Update()
 	//少しずつスティックを傾けている方向に移動方向を変更する
 	if (m_moveDir.SqLength() > 0.1f && m_moveTarget.SqLength() > 0.1f)
 	{
-		m_moveDir = m_moveDir * (1.0 - kEasingSpeed) + m_moveTarget * kEasingSpeed;
+		m_moveDir = m_moveDir * (1.0f - kEasingSpeed) + m_moveTarget * kEasingSpeed;
 
 		MyEngine::Vector3 checkVecA = m_moveDir;
 		checkVecA.y = 0;

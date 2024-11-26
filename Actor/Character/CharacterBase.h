@@ -20,6 +20,7 @@ public:
 	{
 		kLow,//ã
 		kMiddle,//’†
+		kWeakUpBurst,//ã‚Éã‚Á”ò‚Ñ
 		kUpBurst,//ã‚Á”ò‚Ñ
 		kDownBurst,//‰º‚Á”ò‚Ñ
 		kFarBurst,//‰œ‚Á”ò‚Ñ
@@ -36,6 +37,7 @@ public:
 		kNone,//‚È‚É‚à‚³‚ê‚Ä‚¢‚È‚¢ó‘Ô
 		kLow,//ã
 		kMiddle,//’†
+		kWeakUpBurst,//ã‚Éã‚Á”ò‚Ñ
 		kUpBurst,//ã‚Á”ò‚Ñ
 		kDownBurst,//‰º‚Á”ò‚Ñ
 		kFarBurst,//‰œ‚Á”ò‚Ñ
@@ -97,8 +99,12 @@ public:
 		kRushStart,
 		kRushEnd,
 		kDashAttack,
-		kFirstSpecialAttack,
-		kSecondSpecialAttack
+		kStartFirstSpecialAttack,
+		kOnFirstSpecialAttack,
+		kEndFirstSpecialAttack,
+		kStartSecondSpecialAttack,
+		kOnSecondSpecialAttack,
+		kEndSecondSpecialAttack
 	};
 
 	enum class CharacterKind
@@ -119,14 +125,18 @@ public:
 		kChargeSpd,
 		kChaseNum,
 		kFirstSpecialName,
+		kFirstSpecialEffectName,
 		kFirstSpecialCost,
 		kFirstSpecialDamageRate,
+		kFirstSpecialRadius,
 		kFirstSpecialKind,
 		kFirstSpecialStartFrame,
 		kFirstSpecialEndFrame,
 		kSecondSpecialName,
+		kSecondSpecialEffectName,
 		kSecondSpecialCost,
 		kSecondSpecialDamageRate,
+		kSecondSpecialRadius,
 		kSecondSpecialKind,
 		kSecondSpecialStartFrame,
 		kSecondSpecialEndFrame
@@ -180,9 +190,11 @@ public:
 	struct SpecialAttackData
 	{
 		std::string name = "empty";
+		std::string path = "empty";
 		AttackKind kind = AttackKind::kBeam;//•KE‹Z‚Ìí—Ş‚É‚æ‚Á‚Ä‚«”ò‚Î‚µ•û‚È‚Ç‚ğ”»•Ê‚·‚é
 		int cost = -1;
 		float damageRate = -1;
+		float radius = -1;
 		int startFrame = -1;//”­¶ƒtƒŒ[ƒ€
 		//UŒ‚‚ğŒp‘±‚·‚éŠÔ‚Í•KE‹Z‚Ìí—Ş‚©‚çæ“¾‚·‚é
 		int endFrame = -1;//UŒ‚I—¹Œã‚Ìd’¼ƒtƒŒ[ƒ€
@@ -363,7 +375,8 @@ public:
 	/// UŒ‚‚ğì¬‚µ‚ÄƒV[ƒ“ã‚Éo‚·
 	/// </summary>
 	/// <param name="attackData">UŒ‚‚Ìî•ñ</param>
-	void CreateAttack(AttackData attackData);
+	/// <returns>ì¬‚µ‚½UŒ‚‚Ìƒ|ƒCƒ“ƒ^</returns>
+	std::shared_ptr<Attack> CreateAttack(AttackData attackData);
 
 	/// <summary>
 	/// ’ÊíUŒ‚‚Ìî•ñ‚ğæ“¾‚·‚é

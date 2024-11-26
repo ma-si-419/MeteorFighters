@@ -267,6 +267,13 @@ void CharacterStateIdle::Update()
 		return;
 	}
 
+	if (!m_isPlayer)
+	{
+		a += 0.1f;
+
+		//velo.y = sin(a) * m_pCharacter->GetSpeed() * 2;
+	}
+
 	//ƒAƒCƒhƒ‹ó‘Ô‚Ì‚ÍˆÚ“®‚µ‚È‚¢
 	SetCharacterVelo(velo);
 }

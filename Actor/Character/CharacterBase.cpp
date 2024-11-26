@@ -390,7 +390,7 @@ void CharacterBase::SetNormalAttackData(std::vector<std::vector<std::string>> no
 	}
 }
 
-void CharacterBase::CreateAttack(AttackData attackData)
+std::shared_ptr<Attack> CharacterBase::CreateAttack(AttackData attackData)
 {
 	//UŒ‚ƒNƒ‰ƒX
 	std::shared_ptr<Attack> ans;
@@ -468,14 +468,11 @@ void CharacterBase::CreateAttack(AttackData attackData)
 	status.attackHitKind = attackData.attackHitKind;
 	status.attackKind = attackData.attackKind;
 
-	if (status.attackKind == AttackKind::kEnergy)
-	{
-		printfDx("energy");
-	}
-
 	ans->Init(status, m_pGameManager->GetEffectManagerPointer());
 
 	m_pGameManager->AddAttack(ans);
+
+	return ans;
 }
 
 CharacterBase::NormalAttackData CharacterBase::GetNormalAttackData(std::string attackName)

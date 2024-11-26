@@ -1,6 +1,7 @@
 #include "CharacterStateCharge.h"
 #include "CharacterStateIdle.h"
 #include "CharacterStateRush.h"
+#include "CharacterStateSpecialAttack.h"
 #include "CharacterBase.h"
 #include "Input.h"
 #include "DxLib.h"
@@ -80,7 +81,7 @@ void CharacterStateCharge::Update()
 		return;
 	}
 
-	//レフトショルダーを押しながらAボタンが押されたら
+	//Aボタンが押されたら
 	if (m_isPlayer && input.IsTrigger("A"))
 	{
 		MyEngine::Vector3 moveDir(input.GetStickInfo().leftStickX, 0, -input.GetStickInfo().leftStickY);
@@ -105,8 +106,18 @@ void CharacterStateCharge::Update()
 		ChangeState(next);
 
 		return;
-
 	}
+
+	//Yボタンが押されたら
+	if (m_isPlayer && input.IsTrigger("Y"))
+	{
+		auto next = std::make_shared<CharacterStateSpecialAttack>(m_pCharacter);
+
+		next->SetSpecialAttackNumber(1);
+
+		ChangeState(next);
+	}
+
 
 	//エフェクトの座標を設定する
 	m_pEffect->SetPos(m_pCharacter->GetPos());

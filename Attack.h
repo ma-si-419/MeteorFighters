@@ -69,6 +69,7 @@ public:
 	/// </summary>
 	/// <param name="collider">ぶつかった相手側のコライダー</param>
 	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
+
 private:
 
 	//攻撃のステータス

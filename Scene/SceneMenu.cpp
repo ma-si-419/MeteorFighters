@@ -99,15 +99,15 @@ void SceneMenu::Update()
 
 	if (MyEngine::Input::GetInstance().IsTrigger("A"))
 	{
-		if (m_selectKind == static_cast<int>(ItemKind::k1PVsCPU))
+		if (m_selectKind == static_cast<int>(ItemKind::k1PvsCPU))
 		{
 			m_sceneManager.ChangeScene(std::make_shared<SceneSelect>(m_sceneManager));
 		}
-		else if (m_selectKind == static_cast<int>(ItemKind::k1PVs2P))
+		else if (m_selectKind == static_cast<int>(ItemKind::k1Pvs2P))
 		{
 			m_sceneManager.ChangeScene(std::make_shared<SceneSelect>(m_sceneManager));
 		}
-		else if (m_selectKind == static_cast<int>(ItemKind::kCPUVsCPU))
+		else if (m_selectKind == static_cast<int>(ItemKind::kCPUvsCPU))
 		{
 			m_sceneManager.ChangeScene(std::make_shared<SceneSelect>(m_sceneManager));
 		}

@@ -5,7 +5,7 @@ using namespace MyEngine;
 namespace
 {
 	//トリガーを押していると判定する強さ
-	constexpr float kTriggerPower = 128;
+	constexpr int kTriggerPower = 128;
 	//何フレーム前の入力まで残すか
 	constexpr int kLastInputSaveNum = 30;
 }

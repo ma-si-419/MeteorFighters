@@ -16,6 +16,7 @@ namespace
 	{
 		{CharacterBase::AttackHitKind::kLow,CharacterBase::HitReactionKind::kLow},
 		{CharacterBase::AttackHitKind::kMiddle,CharacterBase::HitReactionKind::kMiddle},
+		{CharacterBase::AttackHitKind::kWeakUpBurst,CharacterBase::HitReactionKind::kWeakUpBurst},
 		{CharacterBase::AttackHitKind::kUpBurst,CharacterBase::HitReactionKind::kUpBurst},
 		{CharacterBase::AttackHitKind::kDownBurst,CharacterBase::HitReactionKind::kDownBurst},
 		{CharacterBase::AttackHitKind::kFarBurst,CharacterBase::HitReactionKind::kFarBurst},

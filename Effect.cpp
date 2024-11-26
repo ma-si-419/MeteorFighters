@@ -29,6 +29,17 @@ Effect::Effect(EffectKind kind) :
 	m_path = "data/effekseer/" + kEffectPathMap.at(kind) + ".efk";
 }
 
+Effect::Effect(std::string string) :
+	m_handle(-1),
+	m_path("empty"),
+	m_time(0),
+	m_loopStartTime(0),
+	m_loopEndTime(0),
+	m_lifeTime(0)
+{
+	m_path = "data/effekseer/" + string + ".efk";
+}
+
 void Effect::Init(std::shared_ptr<EffectManager> manager, MyEngine::Vector3 pos)
 {
 	m_pos = pos;

@@ -41,9 +41,9 @@ void Attack::Init(AttackStatus status, std::shared_ptr<EffectManager> manager)
 
 	//	if (status.attackKind == CharacterBase::AttackKind::kEnergy)
 	//	{
-	m_pEffect = std::make_shared<Effect>(Effect::EffectKind::kEnergy);
+			m_pEffect = std::make_shared<Effect>(Effect::EffectKind::kEnergy);
 
-	manager->Entry(m_pEffect, m_rigidbody.GetPos());
+			manager->Entry(m_pEffect, m_rigidbody.GetPos());
 	//	}
 
 	m_dir = (m_status.targetPos - m_rigidbody.GetPos()).Normalize();

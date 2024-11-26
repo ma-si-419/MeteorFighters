@@ -35,5 +35,7 @@ private:
 	bool m_isPlayEndAnim;
 
 	int m_endAnimTime;
+
+	float a = 0.0f;
 };
 

@@ -1,6 +1,8 @@
 #pragma once
 #include "CharacterStateBase.h"
-class CharacterStateSpecialAttack : public CharacterStateBase
+class Effect;
+class Attack;
+class CharacterStateSpecialAttack : public CharacterStateBase,public std::enable_shared_from_this<CharacterStateSpecialAttack>
 {
 public:
 	CharacterStateSpecialAttack(std::shared_ptr<CharacterBase> character);
@@ -25,4 +27,15 @@ private:
 	//技を出している時間(後隙の時間は技ごとに設定)
 	int m_attackTime;
 
+	//敵の状態が何になったら技を出すのをやめるか
+	int m_endHitReaction;
+
+	//攻撃を出したかどうか
+	bool m_isAttacked;
+
+	//攻撃のエフェクト
+	std::shared_ptr<Effect> m_pEffect;
+
+	//出した攻撃のポインタ
+	std::shared_ptr<Attack> m_pAttack;
 };

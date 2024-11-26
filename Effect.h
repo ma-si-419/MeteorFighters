@@ -26,6 +26,12 @@ public:
 	Effect(EffectKind kind);
 
 	/// <summary>
+	/// エフェクトのパスを指定して設定
+	/// </summary>
+	/// <param name="string">エフェクトのパス</param>
+	Effect(std::string string);
+
+	/// <summary>
 	/// エフェクトの座標などを設定し、マネージャーにエフェクトを登録する
 	/// </summary>
 	/// <param name="manager">マネージャーのポインタ</param>

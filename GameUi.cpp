@@ -45,7 +45,7 @@ namespace
 	constexpr int kHpBarShakeScale = 10;
 
 	//Hpバーの色の種類
-	const int kHpBarColor[kHpBarMaxNum] =
+	const unsigned int kHpBarColor[kHpBarMaxNum] =
 	{
 		GetColor(255,255,24),//1本
 		GetColor(0,255,136),//2本
@@ -110,8 +110,8 @@ void GameUi::DrawHpBar(float hp, bool isLeft)
 		if (m_lastHp[0] > hp)
 		{
 			//Hpバーを揺らす
-			m_shakePos[0].x = GetRand(kHpBarShakeScale);
-			m_shakePos[0].y = GetRand(kHpBarShakeScale);
+			m_shakePos[0].x = static_cast<float>(GetRand(kHpBarShakeScale));
+			m_shakePos[0].y = static_cast<float>(GetRand(kHpBarShakeScale));
 			if (m_hitDamageTime[0] < 0)
 			{
 				m_onHitDamageHp[0] = m_lastHp[0];
@@ -126,12 +126,13 @@ void GameUi::DrawHpBar(float hp, bool isLeft)
 		}
 
 		//後ろの黒いボックス描画
-		DrawBox(kHpBarPosX[0] - kBackBoxHalfWidth + m_shakePos[0].x, kHpBarPosY - kBackBoxHalfHeight + m_shakePos[0].y,//始点
-			kHpBarPosX[0] + kBackBoxHalfWidth + m_shakePos[0].x, kHpBarPosY + kBackBoxHalfHeight + m_shakePos[0].y, kBackBoxColor, true);
+		DrawBox(static_cast<int>(kHpBarPosX[0] - kBackBoxHalfWidth + m_shakePos[0].x), static_cast<int>(kHpBarPosY - kBackBoxHalfHeight + m_shakePos[0].y),//始点
+			static_cast<int>(kHpBarPosX[0] + kBackBoxHalfWidth + m_shakePos[0].x), static_cast<int>(kHpBarPosY + kBackBoxHalfHeight + m_shakePos[0].y),//終点
+			kBackBoxColor, true);
 
 		//現在の体力を1万で区切る
 		int nowHp = static_cast<int>(hp) % kMaxHp;
-		int hpBarNum = hp / kMaxHp;
+		int hpBarNum = static_cast<int>(hp / kMaxHp);
 
 		//体力がちょうど10000で割り切れた場合の処理
 		if (hp > 0 && nowHp == 0)
@@ -154,7 +155,7 @@ void GameUi::DrawHpBar(float hp, bool isLeft)
 
 
 		//Hpバーの数を保存しておく
-		m_lastHpBarNum[0] = hpBarNum;
+		m_lastHpBarNum[0] = static_cast<float>(hpBarNum);
 
 		//Hpバーの色
 		int barColor = kHpBarColor[hpBarNum];
@@ -163,7 +164,7 @@ void GameUi::DrawHpBar(float hp, bool isLeft)
 		float hpRate = nowHp / static_cast<float>(kMaxHp);
 
 		//0以下にならないように
-		hpRate = std::fmax(hpRate, 0);
+		hpRate = std::fmax(hpRate, 0.0f);
 
 		//Hpバーの終点
 		int hpBarEndPos = static_cast<int>((kHpBarEndPosX[0] - kHpBarStartPosX[0]) * hpRate) + kHpBarStartPosX[0];
@@ -176,11 +177,13 @@ void GameUi::DrawHpBar(float hp, bool isLeft)
 			int backBarColor = kHpBarColor[hpBarNum - 1];
 
 			//一つ下のHpバーを表示しておく
-			DrawBox(kHpBarStartPosX[0] + m_shakePos[0].x, kSmallHpBarPosY + m_shakePos[0].y,//始点
-				kHpBarEndPosX[0] + m_shakePos[0].x, kSmallHpBarPosY + kSmallHpBoxHeight + m_shakePos[0].y, backBarColor, true);
+			DrawBox(static_cast<int>(kHpBarStartPosX[0] + m_shakePos[0].x), static_cast<int>(kSmallHpBarPosY + m_shakePos[0].y),//始点
+				static_cast<int>(kHpBarEndPosX[0] + m_shakePos[0].x), static_cast<int>(kSmallHpBarPosY + kSmallHpBoxHeight + m_shakePos[0].y),//終点
+				backBarColor, true);
 
-			DrawBox(kBigHpBarStartPosX[0] + m_shakePos[0].x, kBigHpBarPosY + m_shakePos[0].y,//始点
-				kHpBarEndPosX[0] + m_shakePos[0].x, kBigHpBarPosY + kBigHpBoxHeight + m_shakePos[0].y, backBarColor, true);
+			DrawBox(static_cast<int>(kBigHpBarStartPosX[0] + m_shakePos[0].x), static_cast<int>(kBigHpBarPosY + m_shakePos[0].y),//始点
+				static_cast<int>(kHpBarEndPosX[0] + m_shakePos[0].x), static_cast<int>(kBigHpBarPosY + kBigHpBoxHeight + m_shakePos[0].y),//終点
+				backBarColor, true);
 		}
 
 
@@ -202,15 +205,17 @@ void GameUi::DrawHpBar(float hp, bool isLeft)
 		int damageBarEndPos = static_cast<int>((kHpBarEndPosX[0] - kHpBarStartPosX[0]) * redBarRate) + kHpBarStartPosX[0];
 
 		//小さいほうのゲージの表示
-		DrawBox(hpBarEndPos + m_shakePos[0].x, kSmallHpBarPosY + m_shakePos[0].y,//始点
-			damageBarEndPos + m_shakePos[0].x, kSmallHpBarPosY + kSmallHpBoxHeight + m_shakePos[0].y, kRedBarColor, true);
+		DrawBox(static_cast<int>(hpBarEndPos + m_shakePos[0].x), static_cast<int>(kSmallHpBarPosY + m_shakePos[0].y),//始点
+			static_cast<int>(damageBarEndPos + m_shakePos[0].x), static_cast<int>(kSmallHpBarPosY + kSmallHpBoxHeight + m_shakePos[0].y),
+			kRedBarColor, true);
 
 		//終点が始点よりも左側にあれば
 		if (damageBarEndPos > kBigHpBarStartPosX[0])
 		{
 			//大きいほうのゲージの表示
-			DrawBox(kBigHpBarStartPosX[0] + m_shakePos[0].x, kBigHpBarPosY + m_shakePos[0].y,//始点
-				damageBarEndPos + m_shakePos[0].x, kBigHpBarPosY + kBigHpBoxHeight + m_shakePos[0].y, kRedBarColor, true);
+			DrawBox(static_cast<int>(kBigHpBarStartPosX[0] + m_shakePos[0].x), static_cast<int>(kBigHpBarPosY + m_shakePos[0].y),//始点
+				static_cast<int>(damageBarEndPos + m_shakePos[0].x), static_cast<int>(kBigHpBarPosY + kBigHpBoxHeight + m_shakePos[0].y),//終点
+				kRedBarColor, true);
 		}
 
 		//ダメージを受けてから一定時間たったら
@@ -221,27 +226,30 @@ void GameUi::DrawHpBar(float hp, bool isLeft)
 		}
 
 		//小さいほうの体力の表示
-		DrawBox(kHpBarStartPosX[0] + m_shakePos[0].x, kSmallHpBarPosY + m_shakePos[0].y,//始点
-			hpBarEndPos + m_shakePos[0].x, kSmallHpBarPosY + kSmallHpBoxHeight + m_shakePos[0].y, barColor, true);
+		DrawBox(static_cast<int>(kHpBarStartPosX[0] + m_shakePos[0].x), static_cast<int>(kSmallHpBarPosY + m_shakePos[0].y),//始点
+			static_cast<int>(hpBarEndPos + m_shakePos[0].x), static_cast<int>(kSmallHpBarPosY + kSmallHpBoxHeight + m_shakePos[0].y),//終点
+			barColor, true);
 
 		//終点が始点よりも左側にあれば
 		if (hpBarEndPos > kBigHpBarStartPosX[0])
 		{
 			//大きいほうの体力の表示
-			DrawBox(kBigHpBarStartPosX[0] + m_shakePos[0].x, kBigHpBarPosY + m_shakePos[0].y,//始点
-				hpBarEndPos + m_shakePos[0].x, kBigHpBarPosY + kBigHpBoxHeight + m_shakePos[0].y, barColor, true);
+			DrawBox(static_cast<int>(kBigHpBarStartPosX[0] + m_shakePos[0].x), static_cast<int>(kBigHpBarPosY + m_shakePos[0].y),//始点
+				static_cast<int>(hpBarEndPos + m_shakePos[0].x), static_cast<int>(kBigHpBarPosY + kBigHpBoxHeight + m_shakePos[0].y),//終点
+				barColor, true);
 		}
 
 		//残っている体力の本数を表示する
 		for (int i = 0; i <= hpBarNum; i++)
 		{
-			DrawBox(kRightHpBarNumBoxPosX[i] + m_shakePos[0].x, kHpBarNumBoxPosY + m_shakePos[0].y,
-				kRightHpBarNumBoxPosX[i] + kHpBarNumBoxWidth + m_shakePos[0].x, kHpBarNumBoxPosY + kHpBarNumBoxHeight + m_shakePos[0].y, GetColor(32, 255, 32), true);
+			DrawBox(static_cast<int>(kRightHpBarNumBoxPosX[i] + m_shakePos[0].x), static_cast<int>(kHpBarNumBoxPosY + m_shakePos[0].y),
+				static_cast<int>(kRightHpBarNumBoxPosX[i] + kHpBarNumBoxWidth + m_shakePos[0].x), static_cast<int>(kHpBarNumBoxPosY + kHpBarNumBoxHeight + m_shakePos[0].y),//終点
+				GetColor(32, 255, 32), true);
 		}
 
 
 		//枠の表示
-		DrawRotaGraph(kHpBarPosX[0] + m_shakePos[0].x, kHpBarPosY + m_shakePos[0].y, 1.0, 0.0, barGraphHandle, true, false);
+		DrawRotaGraph(static_cast<int>(kHpBarPosX[0] + m_shakePos[0].x), static_cast<int>(kHpBarPosY + m_shakePos[0].y), 1.0, 0.0, barGraphHandle, true, false);
 
 		m_lastHp[0] = hp;
 	}
@@ -259,8 +267,8 @@ void GameUi::DrawHpBar(float hp, bool isLeft)
 		if (m_lastHp[1] > hp)
 		{
 			//Hpバーを揺らす
-			m_shakePos[1].x = GetRand(kHpBarShakeScale);
-			m_shakePos[1].y = GetRand(kHpBarShakeScale);
+			m_shakePos[1].x = static_cast<float>(GetRand(kHpBarShakeScale));
+			m_shakePos[1].y = static_cast<float>(GetRand(kHpBarShakeScale));
 			if (m_hitDamageTime[1] < 0)
 			{
 				m_onHitDamageHp[1] = m_lastHp[1];
@@ -275,12 +283,13 @@ void GameUi::DrawHpBar(float hp, bool isLeft)
 		}
 
 		//後ろの黒いボックス描画
-		DrawBox(kHpBarPosX[1] + kBackBoxHalfWidth + m_shakePos[1].x, kHpBarPosY - kBackBoxHalfHeight + m_shakePos[1].y,//始点
-			kHpBarPosX[1] - kBackBoxHalfWidth + m_shakePos[1].x, kHpBarPosY + kBackBoxHalfHeight + m_shakePos[1].y, kBackBoxColor, true);
+		DrawBox(static_cast<int>(kHpBarPosX[1] + kBackBoxHalfWidth + m_shakePos[1].x), static_cast<int>(kHpBarPosY - kBackBoxHalfHeight + m_shakePos[1].y),//始点
+			static_cast<int>(kHpBarPosX[1] - kBackBoxHalfWidth + m_shakePos[1].x), static_cast<int>(kHpBarPosY + kBackBoxHalfHeight + m_shakePos[1].y),//終点
+			kBackBoxColor, true);
 
 		//現在の体力を1万で区切る
 		int nowHp = static_cast<int>(hp) % kMaxHp;
-		int hpBarNum = hp / kMaxHp;
+		int hpBarNum = static_cast<int>(hp / kMaxHp);
 
 		//体力がちょうど10000で割り切れた場合の処理
 		if (hp > 0 && nowHp == 0)
@@ -303,7 +312,7 @@ void GameUi::DrawHpBar(float hp, bool isLeft)
 
 
 		//Hpバーの数を保存しておく
-		m_lastHpBarNum[1] = hpBarNum;
+		m_lastHpBarNum[1] = static_cast<float>(hpBarNum);
 
 		//Hpバーの色
 		int barColor = kHpBarColor[hpBarNum];
@@ -312,7 +321,7 @@ void GameUi::DrawHpBar(float hp, bool isLeft)
 		float hpRate = nowHp / static_cast<float>(kMaxHp);
 
 		//0以下にならないように
-		hpRate = std::fmax(hpRate, 0);
+		hpRate = std::fmax(hpRate, 0.0f);
 
 		//Hpバーの終点
 		int hpBarEndPos = kHpBarStartPosX[1] - static_cast<int>((kHpBarStartPosX[1] - kHpBarEndPosX[1]) * hpRate);
@@ -325,11 +334,13 @@ void GameUi::DrawHpBar(float hp, bool isLeft)
 			int backBarColor = kHpBarColor[hpBarNum - 1];
 
 			//一つ下のHpバーを表示しておく
-			DrawBox(kHpBarStartPosX[1] + m_shakePos[1].x, kSmallHpBarPosY + m_shakePos[1].y,//始点
-				kHpBarEndPosX[1] + m_shakePos[1].x, kSmallHpBarPosY + kSmallHpBoxHeight + m_shakePos[1].y, backBarColor, true);
+			DrawBox(static_cast<int>(kHpBarStartPosX[1] + m_shakePos[1].x), static_cast<int>(kSmallHpBarPosY + m_shakePos[1].y),//始点
+				static_cast<int>(kHpBarEndPosX[1] + m_shakePos[1].x), static_cast<int>(kSmallHpBarPosY + kSmallHpBoxHeight + m_shakePos[1].y),//終点
+				backBarColor, true);
 
-			DrawBox(kBigHpBarStartPosX[1] + m_shakePos[1].x, kBigHpBarPosY + m_shakePos[1].y,//始点
-				kHpBarEndPosX[1] + m_shakePos[1].x, kBigHpBarPosY + kBigHpBoxHeight + m_shakePos[1].y, backBarColor, true);
+			DrawBox(static_cast<int>(kBigHpBarStartPosX[1] + m_shakePos[1].x), static_cast<int>(kBigHpBarPosY + m_shakePos[1].y),//始点
+				static_cast<int>(kHpBarEndPosX[1] + m_shakePos[1].x), static_cast<int>(kBigHpBarPosY + kBigHpBoxHeight + m_shakePos[1].y),//終点
+				backBarColor, true);
 		}
 
 
@@ -351,15 +362,17 @@ void GameUi::DrawHpBar(float hp, bool isLeft)
 		int damageBarEndPos = kHpBarStartPosX[1] - static_cast<int>((kHpBarStartPosX[1] - kHpBarEndPosX[1]) * redBarRate);
 
 		//小さいほうのゲージの表示
-		DrawBox(hpBarEndPos + m_shakePos[1].x, kSmallHpBarPosY + m_shakePos[1].y,//始点
-			damageBarEndPos + m_shakePos[1].x, kSmallHpBarPosY + kSmallHpBoxHeight + m_shakePos[1].y, kRedBarColor, true);
+		DrawBox(static_cast<int>(hpBarEndPos + m_shakePos[1].x), static_cast<int>(kSmallHpBarPosY + m_shakePos[1].y),//始点
+			static_cast<int>(damageBarEndPos + m_shakePos[1].x), static_cast<int>(kSmallHpBarPosY + kSmallHpBoxHeight + m_shakePos[1].y),//終点
+			kRedBarColor, true);
 
 		//終点が始点よりも左側にあれば
 		if (damageBarEndPos < kBigHpBarStartPosX[1])
 		{
 			//大きいほうのゲージの表示
-			DrawBox(kBigHpBarStartPosX[1] + m_shakePos[1].x, kBigHpBarPosY + m_shakePos[1].y,//始点
-				damageBarEndPos + m_shakePos[1].x, kBigHpBarPosY + kBigHpBoxHeight + m_shakePos[1].y, kRedBarColor, true);
+			DrawBox(static_cast<int>(kBigHpBarStartPosX[1] + m_shakePos[1].x), static_cast<int>(kBigHpBarPosY + m_shakePos[1].y),//始点
+				static_cast<int>(damageBarEndPos + m_shakePos[1].x), static_cast<int>(kBigHpBarPosY + kBigHpBoxHeight + m_shakePos[1].y),//終点
+				kRedBarColor, true);
 		}
 
 		//ダメージを受けてから一定時間たったら
@@ -370,27 +383,30 @@ void GameUi::DrawHpBar(float hp, bool isLeft)
 		}
 
 		//小さいほうの体力の表示
-		DrawBox(kHpBarStartPosX[1] + m_shakePos[1].x, kSmallHpBarPosY + m_shakePos[1].y,//始点
-			hpBarEndPos + m_shakePos[1].x, kSmallHpBarPosY + kSmallHpBoxHeight + m_shakePos[1].y, barColor, true);
+		DrawBox(static_cast<int>(kHpBarStartPosX[1] + m_shakePos[1].x), static_cast<int>(kSmallHpBarPosY + m_shakePos[1].y),//始点
+			static_cast<int>(hpBarEndPos + m_shakePos[1].x), static_cast<int>(kSmallHpBarPosY + kSmallHpBoxHeight + m_shakePos[1].y),//終点
+			barColor, true);
 
 		//終点が始点よりも右側にあれば
 		if (hpBarEndPos < kBigHpBarStartPosX[1])
 		{
 			//大きいほうの体力の表示
-			DrawBox(kBigHpBarStartPosX[1] + m_shakePos[1].x, kBigHpBarPosY + m_shakePos[1].y,//始点
-				hpBarEndPos + m_shakePos[1].x, kBigHpBarPosY + kBigHpBoxHeight + m_shakePos[1].y, barColor, true);
+			DrawBox(static_cast<int>(kBigHpBarStartPosX[1] + m_shakePos[1].x), static_cast<int>(kBigHpBarPosY + m_shakePos[1].y),//始点
+				static_cast<int>(hpBarEndPos + m_shakePos[1].x), static_cast<int>(kBigHpBarPosY + kBigHpBoxHeight + m_shakePos[1].y),//終点
+				barColor, true);
 		}
 
 		//残っている体力の本数を表示する
 		for (int i = 0; i <= hpBarNum; i++)
 		{
-			DrawBox(kLeftHpBarNumBoxPosX[i] + m_shakePos[1].x, kHpBarNumBoxPosY + m_shakePos[1].y,
-				kLeftHpBarNumBoxPosX[i] - kHpBarNumBoxWidth + m_shakePos[1].x, kHpBarNumBoxPosY + kHpBarNumBoxHeight + m_shakePos[1].y, GetColor(32, 255, 32), true);
+			DrawBox(static_cast<int>(kLeftHpBarNumBoxPosX[i] + m_shakePos[1].x), static_cast<int>(kHpBarNumBoxPosY + m_shakePos[1].y),//始点
+				static_cast<int>(kLeftHpBarNumBoxPosX[i] - kHpBarNumBoxWidth + m_shakePos[1].x), static_cast<int>(kHpBarNumBoxPosY + kHpBarNumBoxHeight + m_shakePos[1].y),//終点
+				GetColor(32, 255, 32), true);
 		}
 
 
 		//枠の表示
-		DrawRotaGraph(kHpBarPosX[1] + m_shakePos[1].x, kHpBarPosY + m_shakePos[1].y, 1.0, 0.0, barGraphHandle, true, true);
+		DrawRotaGraph(static_cast<int>(kHpBarPosX[1] + m_shakePos[1].x), static_cast<int>(kHpBarPosY + m_shakePos[1].y), 1.0, 0.0, barGraphHandle, true, true);
 
 		m_lastHp[1] = hp;
 	}
