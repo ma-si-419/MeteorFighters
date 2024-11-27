@@ -15,6 +15,8 @@ namespace
 		{Effect::EffectKind::kEnergyHit,"EnergyHit"},
 		{Effect::EffectKind::kTeleportaion,"Teleportation"},
 	};
+
+	constexpr float kDefaultPlaySpeed = 1.0f;
 }
 
 Effect::Effect(EffectKind kind) :
@@ -23,8 +25,8 @@ Effect::Effect(EffectKind kind) :
 	m_time(0),
 	m_loopStartTime(0),
 	m_loopEndTime(0),
-	m_lifeTime(0)
-
+	m_lifeTime(0),
+	m_playSpeed(kDefaultPlaySpeed)
 {
 	m_path = "data/effekseer/" + kEffectPathMap.at(kind) + ".efk";
 }
@@ -35,7 +37,8 @@ Effect::Effect(std::string string) :
 	m_time(0),
 	m_loopStartTime(0),
 	m_loopEndTime(0),
-	m_lifeTime(0)
+	m_lifeTime(0),
+	m_playSpeed(kDefaultPlaySpeed)
 {
 	m_path = "data/effekseer/" + string + ".efk";
 }
@@ -49,7 +52,7 @@ void Effect::Init(std::shared_ptr<EffectManager> manager, MyEngine::Vector3 pos)
 
 void Effect::Update()
 {
-	m_time++;
+	m_time += m_playSpeed;
 }
 
 void Effect::End()
@@ -92,6 +95,11 @@ bool Effect::IsEndLoop()
 	{
 		return false;
 	}
+}
+
+void Effect::SetPlaySpeed()
+{
+	m_playSpeed = kDefaultPlaySpeed;
 }
 
 bool Effect::IsEndLifeTime()

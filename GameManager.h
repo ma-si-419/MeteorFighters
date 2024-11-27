@@ -17,6 +17,16 @@ class GameManager : public std::enable_shared_from_this<GameManager>
 {
 public:
 
+	enum class Situation
+	{
+		kStart,
+		kBattle,
+		kKnockOut,
+		kResult
+	};
+
+public:
+
 	GameManager(std::shared_ptr<GameCamera> camera);
 	~GameManager();
 
@@ -147,11 +157,10 @@ public:
 	void ExitEffect(std::shared_ptr<Effect> effect);
 
 	/// <summary>
-	/// 画像のハンドルを返す
+	/// 今の状況を取得する
 	/// </summary>
-	/// <param name="graphName">画像の名前</param>
-	/// <returns>画像のハンドル</returns>
-	int GetGraphHandle(std::string graphName);
+	/// <returns>現在ゲームシーンで何が行われているかを返す</returns>
+	Situation GetNowSituation() { return m_situation; }
 private:
 
 	//キャラクターのポインタ
@@ -166,4 +175,7 @@ private:
 	std::shared_ptr<EffectManager> m_pEffectManager;
 	//UI管理クラス
 	std::shared_ptr<GameUi> m_pGameUi;
+	//ゲームの状況
+	Situation m_situation;
+
 };

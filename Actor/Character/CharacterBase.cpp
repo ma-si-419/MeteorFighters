@@ -152,8 +152,27 @@ void CharacterBase::Update()
 		m_pState = m_pState->m_pNextState;
 	}
 
-	//Stateの更新
-	m_pState->Update();
+	//バトル中の処理
+	if (m_pGameManager->GetNowSituation() == GameManager::Situation::kBattle)
+	{
+		//Stateの更新
+		m_pState->Update();
+	}
+	//ノックアウトをした瞬間の場合
+	else if (m_pGameManager->GetNowSituation() == GameManager::Situation::kKnockOut)
+	{
+		//移動ベクトルが設定されていなければ
+		if (m_knockOutVelo.SqLength() < 0.01f)
+		{
+			//移動ベクトルを設定する
+			m_knockOutVelo = m_rigidbody.GetVelo();
+		}
+
+		//移動をめちゃくちゃ遅くする
+		m_rigidbody.SetVelo(m_knockOutVelo * 0.1f);
+		//アニメーションもゆっくり再生する
+		SetAnimPlaySpeed(0.1f);
+	}
 
 
 	//残像を消す数
@@ -180,8 +199,6 @@ void CharacterBase::Update()
 		m_afterImageList.pop_front();
 	}
 
-	//m_nowHp -= 150;
-
 	//アニメーションの更新
 	PlayAnim();
 
@@ -203,7 +220,7 @@ void CharacterBase::Draw()
 
 #ifdef _DEBUG
 
-	DrawSphere3D(GetBackPos(GameSceneConstant::kEnemyBackPosDistance).CastVECTOR(), 3, 3, GetColor(255, 0, 255), GetColor(255, 0, 255), true);;
+	//DrawSphere3D(GetBackPos(GameSceneConstant::kEnemyBackPosDistance).CastVECTOR(), 3, 3, GetColor(255, 0, 255), GetColor(255, 0, 255), true);;
 
 #endif // _DEBUG
 
@@ -489,7 +506,7 @@ CharacterBase::SpecialAttackData CharacterBase::GetSpecialAttackData(int special
 		return m_status.firstSpecialAttackData;
 	}
 	//二つ目の必殺技を取得する
-	else if(specialNumber == 2)
+	else if (specialNumber == 2)
 	{
 		return m_status.secondSpecialAttackData;
 	}

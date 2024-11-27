@@ -62,6 +62,7 @@ namespace
 }
 
 GameCamera::GameCamera() :
+	m_updateFunc(nullptr),
 	m_lightHandle(-1),
 	m_stopCorrectTime(0),
 	m_isFastMove(false),
@@ -80,6 +81,7 @@ GameCamera::~GameCamera()
 
 void GameCamera::Init(MyEngine::Vector3 centerPos)
 {
+	m_updateFunc = &GameCamera::NormalUpdate;
 	m_localPos.SetCenterPos(centerPos);
 	m_localPos.SetLocalPos(kPlayerToCameraInitVec);
 	SetCameraNearFar(kCameraNear, kCameraFar);
@@ -87,6 +89,27 @@ void GameCamera::Init(MyEngine::Vector3 centerPos)
 }
 
 void GameCamera::Update()
+{
+	(this->*m_updateFunc)();
+}
+
+void GameCamera::SetCenterPosAndTarget(MyEngine::Vector3 player, MyEngine::Vector3 target)
+{
+	m_localPos.SetCenterPos(player);
+	m_targetPos = target;
+}
+
+void GameCamera::SetFrontPos(MyEngine::Vector3 pos)
+{
+	m_localPos.SetFrontPos(pos);
+}
+
+void GameCamera::SetPlayerVelo(MyEngine::Vector3 velo)
+{
+	m_playerVelo = velo;
+}
+
+void GameCamera::NormalUpdate()
 {
 	//動かない時間が設定されていたら
 	if (m_stopTime > 0)
@@ -211,9 +234,9 @@ void GameCamera::Update()
 		float speed = toNextPos.Length() / kFastMoveTime;
 
 		//最大速度を超えないようにする
-		speed = std::fmin(speed,kFarCameraMaxMoveSpeed);
+		speed = std::fmin(speed, kFarCameraMaxMoveSpeed);
 		//最小速度も設定しておく
-		speed = std::fmax(speed,kFarCameraMinMoveSpeed);
+		speed = std::fmax(speed, kFarCameraMinMoveSpeed);
 
 		//カメラを瞬間移動させずに速く移動させる
 		m_moveVec = toNextPos.Normalize() * speed;
@@ -236,7 +259,7 @@ void GameCamera::Update()
 		m_shakeTime--;
 
 		//マイナスにもなるようにランダムからランダムの大きさの半分減らす
-		int shakePowerHalf = static_cast<int>(kShakePower* 0.5f);
+		int shakePowerHalf = static_cast<int>(kShakePower * 0.5f);
 
 		//カメラのターゲット座標を揺らす
 		shakeVec.x = static_cast<float>(GetRand(kShakePower) - shakePowerHalf);
@@ -248,7 +271,7 @@ void GameCamera::Update()
 
 	//ターゲット座標の設定
 	MyEngine::Vector3 targetPos = (m_targetPos - m_localPos.GetCenterPos()) * kCameraTargetPosRate + m_localPos.GetCenterPos();
-	
+
 	//カメラを緩やかに揺らす設定がされていたら
 	if (m_isSway)
 	{
@@ -270,28 +293,11 @@ void GameCamera::Update()
 	m_lastCameraPos = m_localPos.GetWorldPos();
 }
 
-void GameCamera::SetPlayerPosAndTarget(MyEngine::Vector3 player, MyEngine::Vector3 target)
+void GameCamera::KnockOutUpdate()
 {
-	m_localPos.SetCenterPos(player);
-	m_targetPos = target;
+	
 }
 
-void GameCamera::SetPlayerFrontPos(MyEngine::Vector3 pos)
+void GameCamera::ResultUpdate()
 {
-	m_localPos.SetFrontPos(pos);
-}
-
-void GameCamera::SetPlayerVelo(MyEngine::Vector3 velo)
-{
-	m_playerVelo = velo;
-}
-
-void GameCamera::SetCamera()
-{
-	SetCameraNearFar(kCameraNear, kCameraFar);
-
-	MyEngine::Vector3 cameraPos = m_localPos.GetWorldPos();
-	SetCameraPositionAndTarget_UpVecY(cameraPos.CastVECTOR(), m_targetPos.CastVECTOR());
-
-	SetLightDirectionHandle(m_lightHandle, (cameraPos - m_targetPos).Normalize().CastVECTOR());
 }

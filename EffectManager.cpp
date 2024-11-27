@@ -3,6 +3,17 @@
 #include "EffekseerForDXLib.h"
 #include "Effekseer.h"
 
+
+namespace
+{
+	constexpr float kDefaultPlaySpeed = 0.1f;
+}
+
+EffectManager::EffectManager() :
+	m_playSpeed(kDefaultPlaySpeed)
+{
+}
+
 void EffectManager::Entry(std::shared_ptr<Effect> effect, MyEngine::Vector3 pos)
 {
 	int handle = -1;
@@ -37,7 +48,7 @@ void EffectManager::Entry(std::shared_ptr<Effect> effect, MyEngine::Vector3 pos)
 
 	SetPosPlayingEffekseer3DEffect(playHandle, pos.x, pos.y, pos.z);
 
-	effect->SetHandle(playHandle);
+	effect->SetPlayHandle(playHandle);
 
 	m_effects.push_back(effect);
 }
@@ -48,7 +59,7 @@ void EffectManager::Exit(std::shared_ptr<Effect> effect)
 	//登録されていた場合
 	if (find)
 	{
-		StopEffekseer3DEffect(effect->GetHandle());
+		StopEffekseer3DEffect(effect->GetPlayHandle());
 
 		m_effects.remove(effect);
 	}
@@ -56,7 +67,9 @@ void EffectManager::Exit(std::shared_ptr<Effect> effect)
 
 void EffectManager::Update()
 {
+
 	UpdateEffekseer3D();
+
 
 	std::vector<std::shared_ptr<Effect>> deleteEffects;
 	for (auto& item : m_effects)
@@ -77,22 +90,23 @@ void EffectManager::Update()
 			pos.X = item->GetPos().x;
 			pos.Y = item->GetPos().y;
 			pos.Z = item->GetPos().z;
-			StopEffekseer3DEffect(item->GetHandle());
-			item->SetHandle(manager->Play(ref, pos, item->GetLoopStartFrame()));
+			StopEffekseer3DEffect(item->GetPlayHandle());
+			item->SetPlayHandle(manager->Play(ref, pos, item->GetLoopStartFrame()));
 			item->ResetLoop();
 		}
 
 		//エフェクトの座標を設定
-		SetPosPlayingEffekseer3DEffect(item->GetHandle(), pos.x, pos.y, pos.z);
+		SetPosPlayingEffekseer3DEffect(item->GetPlayHandle(), pos.x, pos.y, pos.z);
 		//エフェクトの回転を設定
 		MyEngine::Vector3 rot = item->GetRotation();
-		SetRotationPlayingEffekseer3DEffect(item->GetHandle(), rot.x, rot.y, rot.z);
+		SetRotationPlayingEffekseer3DEffect(item->GetPlayHandle(), rot.x, rot.y, rot.z);
 
 		//ライフタイムが終了しているエフェクトがあれば
 		if (item->IsEndLifeTime())
 		{
 			deleteEffects.push_back(item);
 		}
+
 	}
 	for (auto& item : deleteEffects)
 	{
@@ -107,4 +121,22 @@ void EffectManager::Draw()
 	Effekseer_Sync3DSetting();
 
 	DrawEffekseer3D();
+}
+
+void EffectManager::SetEffectPlaySpeed(float playSpeed)
+{
+	for (auto& item : m_effects)
+	{
+		SetSpeedPlayingEffekseer3DEffect(item->GetPlayHandle(), playSpeed);
+		item->SetPlaySpeed(playSpeed);
+	}
+}
+
+void EffectManager::SetEffectPlaySpeed()
+{
+	for (auto& item : m_effects)
+	{
+		SetSpeedPlayingEffekseer3DEffect(item->GetPlayHandle(), kDefaultPlaySpeed);
+		item->SetPlaySpeed(kDefaultPlaySpeed);
+	}
 }

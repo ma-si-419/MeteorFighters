@@ -58,13 +58,13 @@ public:
 	/// ハンドルを設定する
 	/// </summary>
 	/// <param name="handle">ハンドル</param>
-	void SetHandle(int handle) { m_handle = handle; }
+	void SetPlayHandle(int handle) { m_handle = handle; }
 
 	/// <summary>
 	/// ハンドルを取得する
 	/// </summary>
 	/// <returns>ハンドル</returns>
-	int GetHandle() {return m_handle; }
+	int GetPlayHandle() {return m_handle; }
 
 	/// <summary>
 	/// 現在の座標を取得する
@@ -123,7 +123,18 @@ public:
 	/// ライフタイムを設定する
 	/// </summary>
 	/// <param name="time">自動で消すまでの時間</param>
-	void SetLifeTime(int time) { m_lifeTime = time; }
+	void SetLifeTime(float time) { m_lifeTime = time; }
+
+	/// <summary>
+	/// 再生速度に合わせて生存時間も伸ばす
+	/// </summary>
+	/// <param name="speed">再生速度</param>
+	void SetPlaySpeed(float speed) { m_playSpeed = speed; }
+
+	/// <summary>
+	/// 再生速度をデフォルトに戻す
+	/// </summary>
+	void SetPlaySpeed();
 
 	/// <summary>
 	/// 生存時間が終了したかどうかを返す(設定されていなければfalseを返す)
@@ -140,9 +151,11 @@ private:
 
 	MyEngine::Vector3 m_rotation;
 
-	int m_time;
+	float m_time;
 
-	int m_lifeTime;
+	float m_lifeTime;
+
+	float m_playSpeed;
 
 	int m_loopStartTime;
 	

@@ -10,6 +10,7 @@ class EffectManager
 {
 public:
 
+	EffectManager();
 
 	/// <summary>
 	/// エフェクトを登録する
@@ -33,10 +34,24 @@ public:
 	/// エフェクトの描画を行う
 	/// </summary>
 	void Draw();
+
+	/// <summary>
+	/// エフェクトの再生速度を設定する
+	/// </summary>
+	/// <param name="playSpeed"></param>
+	void SetEffectPlaySpeed(float playSpeed);
+	
+	/// <summary>
+	/// エフェクトの再生速度をデフォルトに戻す
+	/// </summary>
+	void SetEffectPlaySpeed();
+
 private:
 
 	std::list<std::shared_ptr<Effect>> m_effects;
 
 	std::map<std::string, int> m_handles;
+
+	int m_playSpeed;
 };
 

@@ -15,13 +15,13 @@ public:
 	/// </summary>
 	/// <param name="player">プレイヤーの座標</param>
 	/// <param name="target">カメラのターゲットの座標</param>
-	void SetPlayerPosAndTarget(MyEngine::Vector3 player, MyEngine::Vector3 target);
+	void SetCenterPosAndTarget(MyEngine::Vector3 player, MyEngine::Vector3 target);
 
 	/// <summary>
 	/// プレイヤーの向いている方向を設定する
 	/// </summary>
 	/// <param name="pos">プレイヤーの前方向とする座標</param>
-	void SetPlayerFrontPos(MyEngine::Vector3 pos);
+	void SetFrontPos(MyEngine::Vector3 pos);
 
 	/// <summary>
 	/// プレイヤーのベロシティを設定する
@@ -30,9 +30,10 @@ public:
 	void SetPlayerVelo(MyEngine::Vector3 velo);
 
 	/// <summary>
-	/// スクリーンなどを変更した時にカメラの座標などを設定する
+	/// カメラのローカル座標を設定する
 	/// </summary>
-	void SetCamera();
+	/// <param name="pos">カメラから見てどこにいるか<param>
+	void SetCameraLocalPos(MyEngine::Vector3 pos) { m_localPos.SetLocalPos(pos); }
 
 	/// <summary>
 	/// カメラを止める
@@ -65,7 +66,19 @@ public:
 	/// この関数を呼んでいる間緩やかにカメラを揺らす
 	/// </summary>
 	void SwayCamera() { m_isSway = true;}
+
 private:
+	//バトル時のカメラ
+	void NormalUpdate();
+	//どちらかが倒れた時のカメラ
+	void KnockOutUpdate();
+	//勝敗を示す時のカメラ
+	void ResultUpdate();
+
+private:
+
+	using UpdateFunc = void (GameCamera::*)();
+	UpdateFunc m_updateFunc;
 
 	//ローカル座標(プレイヤーを中心として、自身の座標を計算する)
 	MyEngine::LocalPos m_localPos;

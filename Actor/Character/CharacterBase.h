@@ -574,6 +574,8 @@ protected:
 	int m_lastAnim;
 	//アニメーションブレンドが終わったかどうか
 	bool m_isEndAnimationBlend;
+	//ノックアウト時のベロシティ
+	MyEngine::Vector3 m_knockOutVelo;
 
 	friend CharacterStateBase;
 };

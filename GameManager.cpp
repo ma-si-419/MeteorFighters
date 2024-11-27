@@ -8,6 +8,15 @@
 #include "Effect.h"
 #include "GameUi.h"
 
+namespace
+{
+	//ノックアウトした時のカメラの座標(ローカル)
+	const MyEngine::Vector3 kKnockOutCameraPos(-15.0f, -5.0f, -20.0f);
+
+	//ノックアウト時のカメラターゲットを中心からどれだけ離すか
+	constexpr float kKnockOutCameraTargetDistance = 10.0f;
+}
+
 GameManager::GameManager(std::shared_ptr<GameCamera> camera)
 {
 	m_pStage = std::make_shared<Stage>();
@@ -25,6 +34,7 @@ GameManager::~GameManager()
 void GameManager::Init()
 {
 	m_pCamera->Init(m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetPos());
+	m_situation = Situation::kBattle;
 }
 
 void GameManager::Update()
@@ -41,6 +51,55 @@ void GameManager::Update()
 
 #endif // _DEBUG
 
+	//キャラクターどちらかの体力が0になっていたらゲームを終了するフラグを立てる
+	for (auto item : m_pCharacters)
+	{
+		if (m_situation == Situation::kKnockOut) break;
+
+		if (item->GetHp() <= 0)
+		{
+			m_situation = Situation::kKnockOut;
+
+			//カメラの設定をここで一度だけ行う
+
+			//ローカル座標を設定する
+			m_pCamera->SetCameraLocalPos(kKnockOutCameraPos);
+
+			//中心座標
+			MyEngine::Vector3 centerPos;
+			//負けたキャラクターから勝ったキャラクターへのベクトル
+			MyEngine::Vector3 loserToWinnerVec;
+			//カメラの正面方向とする座標
+			MyEngine::Vector3 frontPos;
+
+			int onePlayer = static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer);
+			int twoPlayer = static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer);
+
+			//負けている方を中心とする
+			if (m_pCharacters[onePlayer]->GetHp() <= 0)
+			{
+				centerPos = m_pCharacters[onePlayer]->GetPos();
+				loserToWinnerVec = m_pCharacters[twoPlayer]->GetPos() - m_pCharacters[onePlayer]->GetPos();
+				frontPos = m_pCharacters[twoPlayer]->GetPos();
+			}
+			else
+			{
+				centerPos = m_pCharacters[twoPlayer]->GetPos();
+				loserToWinnerVec = m_pCharacters[onePlayer]->GetPos() - m_pCharacters[twoPlayer]->GetPos();
+				frontPos = m_pCharacters[onePlayer]->GetPos();
+			}
+
+			//ターゲット座標
+			MyEngine::Vector3 targetPos = (loserToWinnerVec.Normalize() * kKnockOutCameraTargetDistance) + centerPos;
+
+			//中心座標とカメラのターゲット座標を設定
+			m_pCamera->SetCenterPosAndTarget(centerPos, targetPos);
+
+			//正面座標を設定
+			m_pCamera->SetFrontPos(frontPos);
+		}
+	}
+
 	//カメラの更新
 	MyEngine::Vector3 onePlayerPos = m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetPos();
 	MyEngine::Vector3 twoPlayerPos = m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)]->GetPos();
@@ -49,16 +108,38 @@ void GameManager::Update()
 
 	cameraTargetPos.y = twoPlayerPos.y;
 
-	m_pCamera->SetPlayerPosAndTarget(onePlayerPos, cameraTargetPos);
+	//状況によってカメラに渡す情報を変化させる
+	
+	//バトル開始前
+	if (m_situation == GameManager::Situation::kStart)
+	{
 
-	//1Pから2Pへのベクトル
-	MyEngine::Vector3 playerToTarget = (twoPlayerPos - onePlayerPos).Normalize();
+	}
+	//バトル時
+	else if (m_situation == GameManager::Situation::kBattle)
+	{
+		m_pCamera->SetCenterPosAndTarget(onePlayerPos, cameraTargetPos);
 
-	//カメラの正面方向を設定
-	m_pCamera->SetPlayerFrontPos(onePlayerPos + playerToTarget);
+		//1Pから2Pへのベクトル
+		MyEngine::Vector3 playerToTarget = (twoPlayerPos - onePlayerPos).Normalize();
 
-	//カメラにプレイヤーのベロシティを設定する
-	m_pCamera->SetPlayerVelo(m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetVelo());
+		//カメラの正面方向を設定
+		m_pCamera->SetFrontPos(onePlayerPos + playerToTarget);
+
+		//カメラにプレイヤーのベロシティを設定する
+		m_pCamera->SetPlayerVelo(m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetVelo());
+	}
+	//ノックアウト時
+	else if (m_situation == GameManager::Situation::kKnockOut)
+	{
+		m_pEffectManager->SetEffectPlaySpeed(0.1f);
+
+	}
+	//リザルト表示
+	else if (m_situation == GameManager::Situation::kResult)
+	{
+
+	}
 
 	//カメラの更新
 	m_pCamera->Update();
@@ -99,14 +180,14 @@ void GameManager::Draw()
 
 	//ステージの描画
 	m_pStage->Draw();
-	
+
 	//エフェクトの描画
 	m_pEffectManager->Draw();
 
 	//1Pの体力を描画する
-	m_pGameUi->DrawHpBar(m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetHp(),true);
+	m_pGameUi->DrawHpBar(m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetHp(), true);
 	//2Pの体力を描画する
-	m_pGameUi->DrawHpBar(m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)]->GetHp(),false);
+	m_pGameUi->DrawHpBar(m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)]->GetHp(), false);
 
 
 }
@@ -114,7 +195,7 @@ void GameManager::Draw()
 void GameManager::SetPlayerStatus(int number, std::vector<std::string> statusData)
 {
 	//プレイヤー作成
-	m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)] = std::make_shared<CharacterBase>(ObjectTag::kOnePlayer,static_cast<CharacterBase::CharacterKind>(number));
+	m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)] = std::make_shared<CharacterBase>(ObjectTag::kOnePlayer, static_cast<CharacterBase::CharacterKind>(number));
 	//プレイヤーに自分のポインターを渡しておく
 	m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->SetGameManager(shared_from_this());
 
@@ -158,7 +239,7 @@ void GameManager::SetPlayerStatus(int number, std::vector<std::string> statusDat
 void GameManager::SetEnemyStatus(int number, std::vector<std::string> statusData)
 {
 	//エネミー作成
-	m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)] = std::make_shared<CharacterBase>(ObjectTag::kTwoPlayer,static_cast<CharacterBase::CharacterKind>(number));
+	m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)] = std::make_shared<CharacterBase>(ObjectTag::kTwoPlayer, static_cast<CharacterBase::CharacterKind>(number));
 	//エネミーに自分のポインターを渡しておく
 	m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)]->SetGameManager(shared_from_this());
 	CharacterBase::CharacterStatus status;
@@ -199,13 +280,13 @@ MyEngine::Vector3 GameManager::GetTargetPos(std::shared_ptr<CharacterBase> chara
 	{
 		return m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)]->GetPos();
 	}
-	else if(character == m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)])
+	else if (character == m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)])
 	{
 		return m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetPos();
 	}
 	else
 	{
-		return MyEngine::Vector3(0,0,0);
+		return MyEngine::Vector3(0, 0, 0);
 	}
 }
 
@@ -278,17 +359,12 @@ void GameManager::SwayCamera()
 
 void GameManager::EntryEffect(std::shared_ptr<Effect> effect)
 {
-	m_pEffectManager->Entry(effect,effect->GetPos());
+	m_pEffectManager->Entry(effect, effect->GetPos());
 }
 
 void GameManager::ExitEffect(std::shared_ptr<Effect> effect)
 {
 	m_pEffectManager->Exit(effect);
-}
-
-int GameManager::GetGraphHandle(std::string graphName)
-{
-	return 0;
 }
 
 MyEngine::Vector3 GameManager::GetTargetBackPos(float distance, std::shared_ptr<CharacterBase> character)
@@ -303,6 +379,6 @@ MyEngine::Vector3 GameManager::GetTargetBackPos(float distance, std::shared_ptr<
 	}
 	else
 	{
-		return MyEngine::Vector3(0,0,0);
+		return MyEngine::Vector3(0, 0, 0);
 	}
 }

@@ -41,6 +41,7 @@ void SceneGame::Init()
 
 void SceneGame::Update()
 {
+
 	for (auto& actor : m_pActors)
 	{
 		actor->Update();
