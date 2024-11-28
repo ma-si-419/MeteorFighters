@@ -46,6 +46,11 @@ public:
 	/// </summary>
 	void SetEffectPlaySpeed();
 
+	/// <summary>
+	/// エフェクトをすべて削除する
+	/// </summary>
+	void DeletePlayEffect();
+
 private:
 
 	std::list<std::shared_ptr<Effect>> m_effects;

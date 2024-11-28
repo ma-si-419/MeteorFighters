@@ -104,7 +104,10 @@ public:
 		kEndFirstSpecialAttack,
 		kStartSecondSpecialAttack,
 		kOnSecondSpecialAttack,
-		kEndSecondSpecialAttack
+		kEndSecondSpecialAttack,
+		kStartPose,
+		kWinPose,
+		kLosePose
 	};
 
 	enum class CharacterKind
@@ -576,6 +579,7 @@ protected:
 	bool m_isEndAnimationBlend;
 	//ノックアウト時のベロシティ
 	MyEngine::Vector3 m_knockOutVelo;
+	
 
 	friend CharacterStateBase;
 };

@@ -140,3 +140,14 @@ void EffectManager::SetEffectPlaySpeed()
 		item->SetPlaySpeed(kDefaultPlaySpeed);
 	}
 }
+
+void EffectManager::DeletePlayEffect()
+{
+
+	auto deleteEffect = m_effects;
+
+	for (auto& item : deleteEffect)
+	{
+		Exit(item);
+	}
+}

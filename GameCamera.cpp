@@ -5,8 +5,8 @@ namespace
 {
 	const MyEngine::Vector3 kPlayerToCameraInitVec(-17, 15, -30);
 
-	constexpr float kCameraNear = 1.0f;
-	constexpr float kCameraFar = 500.0f;
+	constexpr float kCameraNear = 3.0f;
+	constexpr float kCameraFar = 1000.0f;
 
 	constexpr float kCameraToPlayerLange = 50.0f;
 
@@ -69,8 +69,10 @@ GameCamera::GameCamera() :
 	m_isStop(false),
 	m_shakeTime(0),
 	m_isSway(false),
-	m_swayTime(0.0f)
+	m_swayTime(0.0f),
+	m_stopTime(0)
 {
+	//‰¼ƒ‰ƒCƒg
 	m_lightHandle = CreateDirLightHandle(VGet(0, 0, 0));
 }
 
@@ -79,21 +81,25 @@ GameCamera::~GameCamera()
 	DeleteLightHandle(m_lightHandle);
 }
 
-void GameCamera::Init(MyEngine::Vector3 centerPos)
+void GameCamera::SetPoseCamera()
 {
-	m_updateFunc = &GameCamera::NormalUpdate;
-	m_localPos.SetCenterPos(centerPos);
-	m_localPos.SetLocalPos(kPlayerToCameraInitVec);
-	SetCameraNearFar(kCameraNear, kCameraFar);
-	m_nextCameraPos = m_localPos.GetWorldPos();
+	m_updateFunc = &GameCamera::PoseUpdate;
 }
 
 void GameCamera::Update()
 {
 	(this->*m_updateFunc)();
+	SetCameraNearFar(kCameraNear, kCameraFar);
 }
 
-void GameCamera::SetCenterPosAndTarget(MyEngine::Vector3 player, MyEngine::Vector3 target)
+void GameCamera::SetBattleCamera()
+{
+	m_updateFunc = &GameCamera::NormalUpdate;
+	m_localPos.SetLocalPos(kPlayerToCameraInitVec);
+	m_nextCameraPos = m_localPos.GetWorldPos();
+}
+
+void GameCamera::SetCenterAndTarget(MyEngine::Vector3 player, MyEngine::Vector3 target)
 {
 	m_localPos.SetCenterPos(player);
 	m_targetPos = target;
@@ -107,6 +113,13 @@ void GameCamera::SetFrontPos(MyEngine::Vector3 pos)
 void GameCamera::SetPlayerVelo(MyEngine::Vector3 velo)
 {
 	m_playerVelo = velo;
+}
+
+void GameCamera::PoseUpdate()
+{
+	SetCameraPositionAndTarget_UpVecY(m_localPos.GetWorldPos().CastVECTOR(), m_targetPos.CastVECTOR());
+
+	SetLightDirectionHandle(m_lightHandle, (m_localPos.GetWorldPos() - m_targetPos).Normalize().CastVECTOR());
 }
 
 void GameCamera::NormalUpdate()

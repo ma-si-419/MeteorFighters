@@ -19,7 +19,8 @@ public:
 
 	enum class Situation
 	{
-		kStart,
+		kStart1P,
+		kStart2P,
 		kBattle,
 		kKnockOut,
 		kResult
@@ -44,6 +45,9 @@ public:
 	/// 攻撃の描画などを行う
 	/// </summary>
 	void Draw();
+
+	void UpdateSituation();
+
 
 	/// <summary>
 	/// プレイヤーが操作するキャラクターを設定する
@@ -131,8 +135,6 @@ public:
 	/// </summary>
 	void StartCameraCorrection();
 
-
-
 	/// <summary>
 	/// カメラを揺れを設定する
 	/// </summary>
@@ -161,7 +163,45 @@ public:
 	/// </summary>
 	/// <returns>現在ゲームシーンで何が行われているかを返す</returns>
 	Situation GetNowSituation() { return m_situation; }
+
+	/// <summary>
+	/// セレクトシーンに移動する
+	/// </summary>
+	void ChangeSelectScene() { m_isChangeScene = true; }
+
+	/// <summary>
+	/// セレクトシーンに戻るときにtrueを返す
+	/// </summary>
+	/// <returns>セレクトシーンに戻る時にtrueになる</returns>
+	bool IsChangeScene() { return m_isChangeScene; }
+
 private:
+
+	/// <summary>
+	/// 開始時の演出中のアップデート
+	/// </summary>
+	void UpdateStart();
+	
+	/// <summary>
+	/// バトル時アップデート
+	/// </summary>
+	void UpdateBattle();
+	
+	/// <summary>
+	/// ノックアウト時のアップデート
+	/// </summary>
+	void UpdateKnockOut();
+
+	/// <summary>
+	/// リザルト時のアップデート
+	/// </summary>
+	void UpdateResult();
+
+private:
+
+	using UpdateSituationFunc = void (GameManager::*)();
+
+	UpdateSituationFunc m_updateSituationFunc;
 
 	//キャラクターのポインタ
 	std::shared_ptr<CharacterBase> m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kPlayerNum)];
@@ -177,5 +217,12 @@ private:
 	std::shared_ptr<GameUi> m_pGameUi;
 	//ゲームの状況
 	Situation m_situation;
-
+	//時間を計る際に使用する変数
+	int m_time;
+	//演出時のカメラ座標
+	MyEngine::Vector3 m_poseCameraPos;
+	//フェードを行うときの変数
+	int m_alpha;
+	//シーンをセレクトシーンに戻す時にtrueにする
+	bool m_isChangeScene;
 };

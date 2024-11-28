@@ -152,13 +152,31 @@ void CharacterBase::Update()
 		m_pState = m_pState->m_pNextState;
 	}
 
+
+	//1Pであり、1Pのバトル開始演出中の処理
+	if (m_pGameManager->GetNowSituation() == GameManager::Situation::kStart1P && m_playerNumber == PlayerNumber::kOnePlayer)
+	{
+		//アニメーションを変更していなければ変更する
+		if (m_playAnimKind != AnimKind::kStartPose)
+		{
+			ChangeAnim(AnimKind::kStartPose, false);
+		}
+	}
+	else if (m_pGameManager->GetNowSituation() == GameManager::Situation::kStart2P && m_playerNumber == PlayerNumber::kTwoPlayer)
+	{
+		//アニメーションを変更していなければ変更する
+		if (m_playAnimKind != AnimKind::kStartPose)
+		{
+			ChangeAnim(AnimKind::kStartPose, false);
+		}
+	}
 	//バトル中の処理
-	if (m_pGameManager->GetNowSituation() == GameManager::Situation::kBattle)
+	else if (m_pGameManager->GetNowSituation() == GameManager::Situation::kBattle)
 	{
 		//Stateの更新
 		m_pState->Update();
 	}
-	//ノックアウトをした瞬間の場合
+	//ノックアウトの演出の間
 	else if (m_pGameManager->GetNowSituation() == GameManager::Situation::kKnockOut)
 	{
 		//移動ベクトルが設定されていなければ
@@ -173,7 +191,47 @@ void CharacterBase::Update()
 		//アニメーションもゆっくり再生する
 		SetAnimPlaySpeed(0.1f);
 	}
+	else if (m_pGameManager->GetNowSituation() == GameManager::Situation::kResult)
+	{
+		//移動速度を元に戻す
+		m_rigidbody.SetVelo(m_knockOutVelo);
 
+		//アニメーションの再生速度をリセットする
+		SetAnimPlaySpeed();
+
+
+		//アニメーションを変更していなければ変更する
+		if (m_nowHp > 0)
+		{
+			if (m_playAnimKind != AnimKind::kWinPose)
+			{
+				ChangeAnim(AnimKind::kWinPose, true);
+				//アニメーションを変更するタイミングで正面方向も変更する
+				auto thisPointer = std::dynamic_pointer_cast<CharacterBase>(shared_from_this());
+
+				MyEngine::Vector3 frontPos = m_pGameManager->GetTargetPos(thisPointer);
+
+				frontPos.y = m_rigidbody.GetPos().y;
+
+				SetFrontPos(frontPos);
+			}
+		}
+		else
+		{
+			if (m_playAnimKind != AnimKind::kLosePose)
+			{
+				ChangeAnim(AnimKind::kLosePose, true);
+				//アニメーションを変更するタイミングで正面方向も変更する
+				auto thisPointer = std::dynamic_pointer_cast<CharacterBase>(shared_from_this());
+
+				MyEngine::Vector3 frontPos = m_pGameManager->GetTargetPos(thisPointer);
+
+				frontPos.y = m_rigidbody.GetPos().y;
+
+				SetFrontPos(frontPos);
+			}
+		}
+	}
 
 	//残像を消す数
 	int deleteNum = 0;
@@ -209,6 +267,12 @@ void CharacterBase::Update()
 
 void CharacterBase::Draw()
 {
+	//リザルト時に2P側を消す
+	if (m_pGameManager->GetNowSituation() == GameManager::Situation::kResult)
+	{
+		if (m_playerNumber == PlayerNumber::kTwoPlayer) return;
+	}
+
 	//残像の描画
 	for (auto item : m_afterImageList)
 	{

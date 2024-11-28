@@ -3,6 +3,7 @@
 #include "DxLib.h"
 #include <cmath>
 #include "Game.h"
+#include "Input.h"
 
 namespace
 {
@@ -410,4 +411,45 @@ void GameUi::DrawHpBar(float hp, bool isLeft)
 
 		m_lastHp[1] = hp;
 	}
+}
+
+void GameUi::DrawFade(int color, int alpha)
+{
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA,alpha);
+	DrawBox(0,0,Game::kWindowWidth,Game::kWindowHeight,color,true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND,0);
+}
+
+int GameUi::UpdateResult()
+{
+	auto& input = MyEngine::Input::GetInstance();
+
+	//Aボタンを押したときに選択されている項目を実行する
+	if (input.IsTrigger("A"))
+	{
+		return m_selectItem;
+	}
+	//上下入力を受け取る
+	if (input.IsTrigger("Up"))
+	{
+		m_selectItem++;
+
+		m_selectItem = min(m_selectItem,static_cast<int>(SelectItem::kItemNum));
+	}
+	else if (input.IsTrigger("Down"))
+	{
+		m_selectItem--;
+		
+		m_selectItem = max(m_selectItem,0);
+	}
+
+	return -1;
+
+}
+
+void GameUi::DrawResult(bool isWin)
+{
+	DrawString(50,300,"もう一度たたかう",GetColor(255,255,255));
+	DrawString(50,350,"キャラクターセレクトに戻る",GetColor(255,255,255));
+	DrawString(50,400,"タイトルに戻る",GetColor(255,255,255));
 }

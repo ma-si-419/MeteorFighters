@@ -7,15 +7,17 @@ public:
 	GameCamera();
 	~GameCamera();
 
-	void Init(MyEngine::Vector3 centerPos);
+	void SetPoseCamera();
 	void Update();
+
+	void SetBattleCamera();
 
 	/// <summary>
 	/// プレイヤーの座標とカメラのターゲット座標を設定する
 	/// </summary>
 	/// <param name="player">プレイヤーの座標</param>
 	/// <param name="target">カメラのターゲットの座標</param>
-	void SetCenterPosAndTarget(MyEngine::Vector3 player, MyEngine::Vector3 target);
+	void SetCenterAndTarget(MyEngine::Vector3 player, MyEngine::Vector3 target);
 
 	/// <summary>
 	/// プレイヤーの向いている方向を設定する
@@ -33,7 +35,7 @@ public:
 	/// カメラのローカル座標を設定する
 	/// </summary>
 	/// <param name="pos">カメラから見てどこにいるか<param>
-	void SetCameraLocalPos(MyEngine::Vector3 pos) { m_localPos.SetLocalPos(pos); }
+	void SetLocalPos(MyEngine::Vector3 pos) { m_localPos.SetLocalPos(pos); }
 
 	/// <summary>
 	/// カメラを止める
@@ -68,6 +70,8 @@ public:
 	void SwayCamera() { m_isSway = true;}
 
 private:
+	//演出時のカメラ
+	void PoseUpdate();
 	//バトル時のカメラ
 	void NormalUpdate();
 	//どちらかが倒れた時のカメラ
