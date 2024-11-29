@@ -111,7 +111,14 @@ CharacterBase::~CharacterBase()
 
 void CharacterBase::Init()
 {
-	m_modelHandle = MV1LoadModel("data/model/Fighter.mv1");
+	if (m_playerNumber == PlayerNumber::kOnePlayer)
+	{
+		m_modelHandle = MV1LoadModel("data/model/Fighter.mv1");
+	}
+	else if (m_playerNumber == PlayerNumber::kTwoPlayer)
+	{
+		m_modelHandle = MV1LoadModel("data/model/Fighter2.mv1");
+	}
 
 	MV1SetScale(m_modelHandle, VGet(GameSceneConstant::kModelScale, GameSceneConstant::kModelScale, GameSceneConstant::kModelScale));
 

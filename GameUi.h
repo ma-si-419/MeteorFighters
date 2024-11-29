@@ -14,6 +14,8 @@ public:
 
 public:
 
+	GameUi();
+
 	/// <summary>
 	/// 体力バーを表示する
 	/// </summary>
@@ -45,18 +47,28 @@ private:
 	MyEngine::Vector2 m_shakePos[2];
 
 	//1Pと2Pの前のフレームのHpを保存しておく
-	float m_lastHp[2] = {-1,-1};
+	float m_lastHp[2];
 
 	//1Pと2Pの前のフレームのHpバーの数を保存しておく
-	float m_lastHpBarNum[2] = {-1,-1};
+	float m_lastHpBarNum[2];
 
 	//赤いダメージバーを表示するためにダメージを受けた時のHPを表示する
-	float m_onHitDamageHp[2] = { 0,0 };
+	float m_onHitDamageHp[2];
 
 	//攻撃を受けてからのフレームを保存する
-	int m_hitDamageTime[2] = {0,0};
+	int m_hitDamageTime[2];
 
-	int m_selectItem = 0;
+	int m_selectItem;
 
+	//リザルト画面の描画を始めてからの時間を計測する
+	int m_resultTime;
 
+	//リザルト画面のロゴのアルファ値
+	int m_resultLogoAlpha;
+
+	//リザルト画面のロゴの拡大率
+	double m_resultLogoScale;
+
+	//何フレーム揺らしたか
+	int m_shakeTime;
 };

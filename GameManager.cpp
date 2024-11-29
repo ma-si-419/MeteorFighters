@@ -374,24 +374,30 @@ void GameManager::UpdateStart()
 		{
 			m_time = 0;
 			m_situation = Situation::kStart2P;
-			m_poseCameraPos = kStartCameraStartPos;
+			//X座標だけ反転したものをカメラの開始位置にする
+			MyEngine::Vector3 pos = kStartCameraStartPos;
+			pos.x *= -1;
+			m_poseCameraPos = pos;
 		}
 	}
 	//2Pの演出中
 	else if (m_situation == Situation::kStart2P)
 	{
+		MyEngine::Vector3 startPos = kStartCameraEndPos;
+		startPos.x *= -1;
+
 		//カメラを遠目から少しずつ寄せていく
-		MyEngine::Vector3 cameraVelo = kStartCameraEndPos - m_poseCameraPos;
+		MyEngine::Vector3 cameraVelo = startPos - m_poseCameraPos;
 
 		//カメラの現在の座標とカメラの終点の座標の距離が一定以上あれば
-		if ((kStartCameraEndPos - m_poseCameraPos).Length() > kStartCameraMoveSpeed)
+		if ((startPos - m_poseCameraPos).Length() > kStartCameraMoveSpeed)
 		{
 			cameraVelo = cameraVelo.Normalize() * kStartCameraMoveSpeed;
 		}
 		//一定距離よりも近ければ
 		else
 		{
-			cameraVelo = cameraVelo.Normalize() * (kStartCameraEndPos - m_poseCameraPos).Length();
+			cameraVelo = cameraVelo.Normalize() * (startPos - m_poseCameraPos).Length();
 		}
 
 		//座標を更新する
@@ -471,6 +477,7 @@ void GameManager::UpdateBattle()
 
 			m_updateSituationFunc = &GameManager::UpdateKnockOut;
 			m_situation = Situation::kKnockOut;
+			return;
 		}
 	}
 
@@ -517,14 +524,6 @@ void GameManager::UpdateKnockOut()
 		m_situation = Situation::kResult;
 		//時間計測をリセット
 		m_time = 0;
-		//カメラの座標をリザルトの初期座標に変更
-		m_poseCameraPos = kResultCameraStartPos;
-		//カメラに座標設定
-		m_pCamera->SetLocalPos(m_poseCameraPos);
-		//1Pの座標
-		MyEngine::Vector3 onePlayerPos = m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetPos();
-		//カメラの中心座標とターゲット座標を設定
-		m_pCamera->SetCenterAndTarget(onePlayerPos,onePlayerPos);
 		//カメラのアップデートを変更
 		m_pCamera->SetPoseCamera();
 	}
@@ -538,10 +537,26 @@ void GameManager::UpdateResult()
 	{
 		m_alpha -= kFadeSpeed;
 		m_pEffectManager->DeletePlayEffect();
+
+		//カメラの座標をリザルトの初期座標に変更
+		m_poseCameraPos = kResultCameraStartPos;
+		//カメラに座標設定
+		m_pCamera->SetLocalPos(m_poseCameraPos);
+		//1Pの座標
+		MyEngine::Vector3 onePlayerPos = m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetPos();
+		//カメラの中心座標とターゲット座標を設定
+		m_pCamera->SetCenterAndTarget(onePlayerPos, onePlayerPos);
+		//正面座標
+		MyEngine::Vector3 frontPos = m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetFrontPos();
+		//正面座標の高さをプレイヤーの高さに合わせる
+		frontPos.y = onePlayerPos.y;
+		//カメラの正面座標を設定
+		m_pCamera->SetFrontPos(frontPos);
 	}
 	//フェードアウトが終わったら
 	else
 	{
+
 		//カメラを寄せていく
 		MyEngine::Vector3 cameraVelo = kResultCameraEndPos - m_poseCameraPos;
 
@@ -567,6 +582,21 @@ void GameManager::UpdateResult()
 		m_poseCameraPos += cameraVelo;
 
 		m_pCamera->SetLocalPos(m_poseCameraPos);
+	}
+
+	int selectNum = m_pGameUi->UpdateResult();
+
+	if (selectNum == static_cast<int>(GameUi::SelectItem::kRetry))
+	{
+		//リトライ処理を作成する
+	}
+	else if (selectNum == static_cast<int>(GameUi::SelectItem::kCharacterSelect))
+	{
+		m_isChangeScene = true;
+	}
+	else if (selectNum == static_cast<int>(GameUi::SelectItem::kTitle))
+	{
+
 	}
 
 

@@ -2,3 +2,5 @@
 TitleLogo,TitleLogo,Title
 HpBar,HpBar,Game
 HpBarNum,HpBarNumBox,Game
+Winner,Winner,Game
+Loser,Loser,Game

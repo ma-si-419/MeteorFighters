@@ -34,6 +34,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return -1;			// エラーが起きたら直ちに終了
 	}
 
+	SetUseLighting(true);
+	SetUseZBuffer3D(true);
+	SetWriteZBuffer3D(true);
+	SetLightEnable(true);
 
 	SetUseDirect3DVersion(DX_DIRECT3D_11);
 	Effekseer_Init(kParticleMax);

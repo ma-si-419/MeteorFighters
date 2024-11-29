@@ -90,6 +90,43 @@ namespace
 	//赤いゲージを減らす速さ
 	constexpr float kRedBarSubSpeed = 250;
 
+	//リザルトのwinとloseを表示する座標
+	constexpr int kResultLogoPosX = Game::kWindowWidth / 2;
+	constexpr int kResultLogoPosY = 700;
+
+	//リザルトのロゴを表示するまでの時間
+	constexpr int kResultDisplayStartTime = 90;
+
+	//リザルトのロゴの最初の拡大率
+	constexpr double kResultLogoDefaultScale = 3.0;
+
+	//リザルトのロゴの最後の拡大率
+	constexpr double kResultLogoFinalScale = 1.0;
+
+	//リザルトのロゴの縮小速度
+	constexpr double kResultLogoScallingSpeed = 0.12;
+
+	//リザルトのロゴを揺らす時間
+	constexpr int kResultLogoShakeTime = 6;
+
+	//リザルトのロゴを揺らす大きさ
+	constexpr int kResultLogoShakeScale = 18;
+
+	//リザルトのロゴのフェードの速さ
+	constexpr int kResultRogoFadeSpeed = 2;
+}
+
+GameUi::GameUi():
+	m_lastHp(),
+	m_lastHpBarNum(),
+	m_onHitDamageHp(),
+	m_hitDamageTime(),
+	m_selectItem(0),
+	m_resultTime(0),
+	m_resultLogoAlpha(255),
+	m_resultLogoScale(kResultLogoDefaultScale),
+	m_shakeTime(0)
+{
 }
 
 void GameUi::DrawHpBar(float hp, bool isLeft)
@@ -415,9 +452,9 @@ void GameUi::DrawHpBar(float hp, bool isLeft)
 
 void GameUi::DrawFade(int color, int alpha)
 {
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA,alpha);
-	DrawBox(0,0,Game::kWindowWidth,Game::kWindowHeight,color,true);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND,0);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
+	DrawBox(0, 0, Game::kWindowWidth, Game::kWindowHeight, color, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
 int GameUi::UpdateResult()
@@ -430,17 +467,17 @@ int GameUi::UpdateResult()
 		return m_selectItem;
 	}
 	//上下入力を受け取る
-	if (input.IsTrigger("Up"))
+	if (input.IsTrigger("Down"))
 	{
 		m_selectItem++;
 
-		m_selectItem = min(m_selectItem,static_cast<int>(SelectItem::kItemNum));
+		m_selectItem = min(m_selectItem, static_cast<int>(SelectItem::kItemNum));
 	}
-	else if (input.IsTrigger("Down"))
+	else if (input.IsTrigger("Up"))
 	{
 		m_selectItem--;
-		
-		m_selectItem = max(m_selectItem,0);
+
+		m_selectItem = max(m_selectItem, 0);
 	}
 
 	return -1;
@@ -449,7 +486,67 @@ int GameUi::UpdateResult()
 
 void GameUi::DrawResult(bool isWin)
 {
-	DrawString(50,300,"もう一度たたかう",GetColor(255,255,255));
-	DrawString(50,350,"キャラクターセレクトに戻る",GetColor(255,255,255));
-	DrawString(50,400,"タイトルに戻る",GetColor(255,255,255));
+	m_resultTime++;
+
+	DrawString(50, 300, "もう一度たたかう", GetColor(255, 255, 255));
+	DrawString(50, 350, "キャラクターセレクトに戻る", GetColor(255, 255, 255));
+	DrawString(50, 400, "タイトルに戻る", GetColor(255, 255, 255));
+
+	int posY = 0;
+
+	if (m_selectItem == static_cast<int>(SelectItem::kRetry))
+	{
+		posY = 300;
+	}
+	else if (m_selectItem == static_cast<int>(SelectItem::kCharacterSelect))
+	{
+		posY = 350;
+	}
+	else if (m_selectItem == static_cast<int>(SelectItem::kTitle))
+	{
+		posY = 400;
+	}
+
+	DrawString(30, posY, "→", GetColor(255, 255, 255));
+
+	//リザルト画面になって一定時間たったら
+	if (m_resultTime > kResultDisplayStartTime)
+	{
+		//ロゴの大きさを小さくしていく
+		m_resultLogoScale -= kResultLogoScallingSpeed;
+
+		//一定以上小さくならないようにする
+		m_resultLogoScale = max(m_resultLogoScale, kResultLogoFinalScale);
+
+		int logoPosX = kResultLogoPosX;
+		int logoPosY = kResultLogoPosY;
+
+		//一定以上小さくなったら少し揺らす
+		if (m_resultLogoScale == kResultLogoFinalScale)
+		{
+			if (m_shakeTime < kResultLogoShakeTime)
+			{
+				//ロゴの座標を揺らす(ランダムがプラスしか出ないので半分減らす)
+				logoPosX += GetRand(kResultLogoShakeScale) + (kResultLogoShakeScale * 0.5);
+				logoPosY += GetRand(kResultLogoShakeScale) + (kResultLogoShakeScale * 0.5);
+			}
+			m_shakeTime++;
+		}
+
+
+		//アルファ値をあげていく
+		m_resultLogoAlpha += kResultRogoFadeSpeed;
+
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA,m_resultLogoAlpha);
+		if (isWin)
+		{
+			DrawRotaGraph(logoPosX, logoPosY, m_resultLogoScale, 0.0, GraphManager::GetInstance().GetHandle("Winner"), true);
+		}
+		else
+		{
+			DrawRotaGraph(logoPosX, logoPosY, m_resultLogoScale, 0.0, GraphManager::GetInstance().GetHandle("Loser"), true);
+		}
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND,0);
+	}
+
 }

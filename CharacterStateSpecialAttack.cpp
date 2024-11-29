@@ -86,6 +86,9 @@ void CharacterStateSpecialAttack::Enter()
 	//‹Z‚ðo‚µ‚Ä‚¢‚éŽžŠÔ‚ðÝ’è‚·‚é
 	m_attackTime = kAttackTimeMap.at(kind);
 
+	//“G‚Ì•ûŒü‚ðŒü‚­
+	m_pCharacter->LookTarget();
+
 }
 
 void CharacterStateSpecialAttack::Update()

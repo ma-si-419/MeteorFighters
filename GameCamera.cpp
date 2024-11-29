@@ -74,6 +74,7 @@ GameCamera::GameCamera() :
 {
 	//仮ライト
 	m_lightHandle = CreateDirLightHandle(VGet(0, 0, 0));
+	SetCameraNearFar(kCameraNear, kCameraFar);
 }
 
 GameCamera::~GameCamera()
@@ -89,7 +90,10 @@ void GameCamera::SetPoseCamera()
 void GameCamera::Update()
 {
 	(this->*m_updateFunc)();
-	SetCameraNearFar(kCameraNear, kCameraFar);
+
+	//ライトの座標をずっと更新し続ける
+	SetLightPositionHandle(m_lightHandle, (m_localPos.GetWorldPos()).CastVECTOR());
+
 }
 
 void GameCamera::SetBattleCamera()
@@ -145,10 +149,10 @@ void GameCamera::NormalUpdate()
 	}
 
 	//今のカメラのワールド座標
-	MyEngine::Vector3 cameraWorldPos = m_localPos.GetWorldPos();
 	//プレイヤーの次の座標
 	MyEngine::Vector3 playerPos = m_localPos.GetCenterPos() + m_playerVelo;
 	//中心座標の更新
+	MyEngine::Vector3 cameraWorldPos = m_localPos.GetWorldPos();
 	m_localPos.SetCenterPos(playerPos);
 	//プレイヤーからカメラへの次の座標に対するベクトル
 	MyEngine::Vector3 playerToCamera = cameraWorldPos - playerPos;
