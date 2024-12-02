@@ -289,6 +289,12 @@ public:
 	float GetHp() { return m_nowHp; }
 
 	/// <summary>
+	/// Œ»İ‚Ì‹C—Í‚ğæ“¾‚·‚é
+	/// </summary>
+	/// <returns>Œ»İ‚Ì‹C—Í</returns>
+	float GetMp() { return m_nowMp; }
+	
+	/// <summary>
 	/// ‘Ì—Í‚ğŒ¸‚ç‚·
 	/// </summary>
 	/// <param name="subHp">Œ¸­—Ê</param>

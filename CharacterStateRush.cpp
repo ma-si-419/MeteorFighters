@@ -332,7 +332,6 @@ void CharacterStateRush::Update()
 		checkVecB.y = 0;
 		checkVecB = checkVecB.Normalize();
 
-
 		if (std::fabs((checkVecA - checkVecB).Length()) > kReverseVecScale && m_time > kRushTime)
 		{
 			//“G‚ÉŽ©“®‚ÅŒü‚©‚Á‚Ä‚¢‚­ˆ—‚ð‚µ‚Ä‚¢‚È‚¯‚ê‚Î

@@ -142,6 +142,10 @@ void GameManager::Draw()
 	m_pGameUi->DrawHpBar(m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetHp(), true);
 	//2Pの体力を描画する
 	m_pGameUi->DrawHpBar(m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)]->GetHp(), false);
+	//1Pの気力を描画する
+	m_pGameUi->DrawMpBar(m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetMp(), true);
+	//2Pの気力を描画する
+	m_pGameUi->DrawMpBar(m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)]->GetMp(), false);
 
 	//フェードのアルファ値が0よりも高いの場合表示する
 	if (m_alpha > 0)

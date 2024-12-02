@@ -24,6 +24,13 @@ public:
 	void DrawHpBar(float hp, bool isLeft);
 
 	/// <summary>
+	/// 気力バーを表示する
+	/// </summary>
+	/// <param name="mp">気力量</param>
+	/// <param name="isLeft">右と左どちらに表示するか</param>
+	void DrawMpBar(float mp, bool isLeft);
+
+	/// <summary>
 	/// 画面全体のフェードを表示する
 	/// </summary>
 	/// <param name="color">色</param>
@@ -41,6 +48,7 @@ public:
 	/// </summary>
 	/// <param name="isWin">1Pが勝ったかどうか</param>
 	void DrawResult(bool isWin);
+
 private:
 
 	//1Pと2Pの二つのHpバーがあるので二つ持っておく

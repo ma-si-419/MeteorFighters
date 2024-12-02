@@ -90,6 +90,28 @@ namespace
 	//赤いゲージを減らす速さ
 	constexpr float kRedBarSubSpeed = 250;
 
+	//Mpのマックス量
+	constexpr float kMpMax = 50000;
+
+	//Mpバーの色
+	const COLOR_U8 kMpBarColor = GetColorU8(255, 255, 0, 255);
+
+	//Mpバーの画像を表示する座標
+	constexpr int kMpBarGraphPosX[2] = { 350,Game::kWindowWidth - 350 };
+	constexpr int kMpBarGraphPosY = 150;
+
+	//Mpバーの開始座標
+	constexpr int kMpBarStartPosX = 200;
+	constexpr int kMpBarUpPosY = 200;
+	constexpr int kMpBarUnderPosY = 300;
+
+	//Mpバーの長さ
+	constexpr int kMpBarMaxLength = 500;
+
+	//Mpバーの上と下のX座標のずれ
+	constexpr int kMpBarGapX = 50;
+
+
 	//リザルトのwinとloseを表示する座標
 	constexpr int kResultLogoPosX = Game::kWindowWidth / 2;
 	constexpr int kResultLogoPosY = 700;
@@ -116,7 +138,7 @@ namespace
 	constexpr int kResultRogoFadeSpeed = 2;
 }
 
-GameUi::GameUi():
+GameUi::GameUi() :
 	m_lastHp(),
 	m_lastHpBarNum(),
 	m_onHitDamageHp(),
@@ -450,6 +472,66 @@ void GameUi::DrawHpBar(float hp, bool isLeft)
 	}
 }
 
+void GameUi::DrawMpBar(float mp, bool isLeft)
+{
+	int barGraphHandle = GraphManager::GetInstance().GetHandle("MpBar");
+
+	if (isLeft)
+	{
+		//Mpバーの長さ
+		float mpBarLength = kMpBarMaxLength * (mp / kMpMax);
+
+		printfDx("%.5f\n",mp);
+
+		VERTEX2D vertex[6];
+
+		//左上のポリゴン
+		vertex[0].pos = VGet(kMpBarStartPosX + kMpBarGapX, kMpBarUnderPosY, 0);
+		vertex[0].dif = kMpBarColor;
+		vertex[0].rhw = 1.0f;
+		vertex[0].u = 0.0f;
+		vertex[0].v = 0.0f;
+
+		//右上
+		vertex[1].pos = VGet(kMpBarStartPosX + kMpBarGapX + mpBarLength, kMpBarUpPosY, 0);
+		vertex[1].dif = kMpBarColor;
+		vertex[1].rhw = 1.0f;
+		vertex[1].u = 0.0f;
+		vertex[1].v = 0.0f;
+
+		//左下
+		vertex[2].pos = VGet(kMpBarStartPosX, kMpBarUnderPosY, 0);
+		vertex[2].dif = kMpBarColor;
+		vertex[2].rhw = 1.0f;
+		vertex[2].u = 0.0f;
+		vertex[2].v = 0.0f;
+
+
+		//右下
+		vertex[3].pos = VGet(kMpBarStartPosX + mpBarLength, kMpBarUnderPosY, 0);
+		vertex[3].dif = kMpBarColor;
+		vertex[3].rhw = 1.0f;
+		vertex[3].u = 0.0f;
+		vertex[3].v = 0.0f;
+
+		//2個目の三角形の第2頂点は左下の頂点なのでコピー
+		vertex[4] = vertex[2];
+
+		//2ポリゴン目の第3頂点は右上の頂点なのでコピー
+		vertex[5] = vertex[1];
+
+
+		DrawPolygon2D(vertex,2,DX_NONE_GRAPH,true);
+
+		DrawRotaGraph(kMpBarGraphPosX[0], kMpBarGraphPosY, 1.0, 0.0, barGraphHandle, false);
+	}
+	else
+	{
+		DrawRotaGraph(kMpBarGraphPosX[1], kMpBarGraphPosY, 1.0, 0.0, barGraphHandle, false, true);
+	}
+
+}
+
 void GameUi::DrawFade(int color, int alpha)
 {
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
@@ -537,7 +619,7 @@ void GameUi::DrawResult(bool isWin)
 		//アルファ値をあげていく
 		m_resultLogoAlpha += kResultRogoFadeSpeed;
 
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA,m_resultLogoAlpha);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_resultLogoAlpha);
 		if (isWin)
 		{
 			DrawRotaGraph(logoPosX, logoPosY, m_resultLogoScale, 0.0, GraphManager::GetInstance().GetHandle("Winner"), true);
@@ -546,7 +628,7 @@ void GameUi::DrawResult(bool isWin)
 		{
 			DrawRotaGraph(logoPosX, logoPosY, m_resultLogoScale, 0.0, GraphManager::GetInstance().GetHandle("Loser"), true);
 		}
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND,0);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 
 }
