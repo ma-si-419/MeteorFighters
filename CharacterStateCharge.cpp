@@ -111,11 +111,17 @@ void CharacterStateCharge::Update()
 	//Yボタンが押されたら
 	if (m_isPlayer && input.IsTrigger("Y"))
 	{
-		auto next = std::make_shared<CharacterStateSpecialAttack>(m_pCharacter);
+		int cost = m_pCharacter->GetSpecialAttackData(1).cost;
 
-		next->SetSpecialAttackNumber(1);
+		//気力が足りなかったら実行しない
+		if (m_pCharacter->SubMp(cost))
+		{
+			auto next = std::make_shared<CharacterStateSpecialAttack>(m_pCharacter);
 
-		ChangeState(next);
+			next->SetSpecialAttackNumber(1);
+
+			ChangeState(next);
+		}
 	}
 
 

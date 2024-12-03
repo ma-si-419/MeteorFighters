@@ -270,6 +270,7 @@ void CharacterBase::Update()
 	//•`‰æÀ•W‚Ìİ’è
 	SetDrawPos(m_rigidbody.GetPos());
 
+	if (m_playerNumber == PlayerNumber::kOnePlayer) printfDx("%.0f\n", m_nowMp);
 }
 
 void CharacterBase::Draw()
@@ -332,7 +333,7 @@ MyEngine::Vector3 CharacterBase::GetVelo()
 
 bool CharacterBase::SubMp(int subMp)
 {
-	if (m_nowMp > subMp)
+	if (m_nowMp >= subMp)
 	{
 		m_nowMp -= subMp;
 		return true;
@@ -347,6 +348,9 @@ bool CharacterBase::SubMp(int subMp)
 void CharacterBase::ChargeMp()
 {
 	m_nowMp += m_status.chargeSpd;
+
+	//Å‘å‚ğ’´‚¦‚È‚¢‚æ‚¤‚ÉƒNƒ‰ƒ“ƒv
+	m_nowMp = std::fmin(m_nowMp,GameSceneConstant::kMaxMp);
 }
 
 void CharacterBase::ChangeAnim(AnimKind animKind, bool loop)

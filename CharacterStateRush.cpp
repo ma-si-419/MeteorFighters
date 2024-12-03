@@ -25,6 +25,12 @@ namespace
 	//ドラゴンダッシュ時にカーブする距離
 	constexpr float kCurveDistance = 300.0f;
 
+	//エネミーに向かっていくダッシュで使用する気力量
+	constexpr float kEnemyRushCost = 10000.0f;
+
+	//移動中にどのくらい気力を使用するか
+	constexpr float kRushCost = 20.0f;
+
 	//アイドルに戻るときのアニメーションブレンドの速さ
 	constexpr float kEndAnimBlendSpeed = 0.08f;
 
@@ -95,6 +101,13 @@ void CharacterStateRush::Enter()
 void CharacterStateRush::Update()
 {
 	m_time++;
+
+	//通常時で気力が足りなければ
+	if (!m_pCharacter->SubMp(kRushCost) && !m_isRushEnemy)
+	{
+		//ラッシュを終了する
+		m_isEndRush = true;
+	}
 
 	auto& input = MyEngine::Input::GetInstance();
 
@@ -203,9 +216,13 @@ void CharacterStateRush::Update()
 		//レフトショルダーも押されていたら
 		if (m_isPlayer && input.IsPushTrigger(false))
 		{
-			//敵の近くまで向かう突撃状態になる
-			m_isRushEnemy = true;
-			m_rushTargetPos = GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance);
+			//気力が足りた場合のみ
+			if (m_pCharacter->SubMp(kEnemyRushCost))
+			{
+				//敵の近くまで向かう突撃状態になる
+				m_isRushEnemy = true;
+				m_rushTargetPos = GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance);
+			}
 		}
 		//押されていないとき
 		else

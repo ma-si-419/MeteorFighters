@@ -560,7 +560,6 @@ void GameManager::UpdateResult()
 	//フェードアウトが終わったら
 	else
 	{
-
 		//カメラを寄せていく
 		MyEngine::Vector3 cameraVelo = kResultCameraEndPos - m_poseCameraPos;
 

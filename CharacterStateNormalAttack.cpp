@@ -5,6 +5,7 @@
 #include "CharacterBase.h"
 #include <cmath>
 #include "Effect.h"
+#include "GameSceneConstant.h"
 
 namespace
 {
@@ -173,6 +174,13 @@ void CharacterStateNormalAttack::Update()
 
 			//Ÿ‚ÌUŒ‚‚ğo‚·ğŒ‚É“G‚Ìó‘Ô‚ª‚ ‚ê‚Î¡‚Ì“G‚Ì‚â‚ç‚êó‘Ô‚ÆÆ‚ç‚µ‡‚í‚¹‚é
 			CharacterBase::HitReactionKind enemyHitReaction = static_cast<CharacterBase::HitReactionKind>(GetTargetHitReaction());
+
+			//Ÿ‚ÌUŒ‚‚ª‹C—ÍUŒ‚‚Å‚ ‚ê‚Î
+			if (nextAttack.attackKind == CharacterBase::AttackKind::kEnergy)
+			{
+				//‹C—Í‚ª‘«‚è‚È‚¯‚ê‚ÎUŒ‚‚ğs‚í‚È‚¢
+				if (!m_pCharacter->SubMp(GameSceneConstant::kEnergyAttackCost)) return;
+			}
 
 			if (nextAttack.targetHitReaction == "’†")
 			{

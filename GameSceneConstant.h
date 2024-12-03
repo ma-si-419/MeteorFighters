@@ -17,7 +17,9 @@ namespace GameSceneConstant
 	//チャージ攻撃と判定する長押しの時間
 	constexpr int kChargeAttackTime = 15;
 	//ダッシュに使う気力
-	constexpr int kDashCost = 20;
+	constexpr int kDashCost = 2000;
+	//キャラクターの貯められる最大の気力
+	constexpr float kMaxMp = 50000.0f;
 	//敵との距離が近いと判定する距離
 	constexpr float kNearLange = 75.0f;
 	//モデルの大きさ
@@ -46,4 +48,6 @@ namespace GameSceneConstant
 	constexpr float kRushSpeed = 15.0f;
 	//派生攻撃のスティックの傾き
 	constexpr int kPhysicalAttackStickPower = 500;
+	//気弾攻撃で減る気力量
+	constexpr int kEnergyAttackCost = 1200;
 }

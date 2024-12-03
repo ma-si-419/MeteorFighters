@@ -63,6 +63,9 @@ private:
 	//赤いダメージバーを表示するためにダメージを受けた時のHPを表示する
 	float m_onHitDamageHp[2];
 
+	//赤いMpバーを表示するために気力を消費した際のMpを保存する
+	float m_onSubMp[2];
+
 	//攻撃を受けてからのフレームを保存する
 	int m_hitDamageTime[2];
 

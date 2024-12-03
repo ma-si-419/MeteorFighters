@@ -155,10 +155,28 @@ void CharacterStateJump::Update()
 				}
 			}
 
-			next->SetAttack(m_attackKey, attackName);
-			//StateをAttackに変更する
-			ChangeState(next);
-			return;
+			//気弾攻撃ならば気力を減らす
+			if (attackName == "Energy1" || attackName == "EnergyCharge")
+			{
+				//減らせなければ攻撃をセットしない
+				if (m_pCharacter->SubMp(GameSceneConstant::kEnergyAttackCost))
+				{
+					next->SetAttack(m_attackKey, attackName);
+
+					//StateをAttackに変更する
+					ChangeState(next);
+					return;
+				}
+			}
+			else
+			{
+				next->SetAttack(m_attackKey, attackName);
+
+
+				//StateをAttackに変更する
+				ChangeState(next);
+				return;
+			}
 		}
 	}
 
