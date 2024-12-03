@@ -150,6 +150,8 @@ void CharacterBase::Init()
 
 void CharacterBase::Update()
 {
+	
+
 	//ローカル座標の中心座標の更新
 	m_lookPos.SetCenterPos(m_rigidbody.GetPos());
 
@@ -314,6 +316,34 @@ void CharacterBase::OnCollide(std::shared_ptr<Collidable> collider)
 	}
 
 #endif // _DEBUG
+}
+
+void CharacterBase::RetryInit()
+{
+	m_nowHp = m_status.hp;
+	m_nowMp = m_status.startMp;
+
+	auto thisPointer = std::dynamic_pointer_cast<CharacterBase>(shared_from_this());
+
+	//初期座標の決定
+	if (m_playerNumber == PlayerNumber::kOnePlayer)
+	{
+		m_rigidbody.SetPos(kOnePlayerInitPos);
+		m_lookPos.SetCenterPos(kOnePlayerInitPos);
+		SetFrontPos(kTwoPlayerInitPos);
+	}
+	else if (m_playerNumber == PlayerNumber::kTwoPlayer)
+	{
+		m_rigidbody.SetPos(kTwoPlayerInitPos);
+		m_lookPos.SetCenterPos(kTwoPlayerInitPos);
+		SetFrontPos(kOnePlayerInitPos);
+	}
+
+	m_rigidbody.SetVelo(MyEngine::Vector3(0,0,0));
+
+	//初期ステートの設定
+	m_pState = std::make_shared<CharacterStateIdle>(thisPointer);
+	m_pState->Enter();
 }
 
 void CharacterBase::SetGameManager(std::shared_ptr<GameManager> manager)

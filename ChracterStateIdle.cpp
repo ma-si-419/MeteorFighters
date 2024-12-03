@@ -50,6 +50,14 @@ void CharacterStateIdle::Update()
 #endif // _DEBUG
 
 
+	if (m_isPlayer)
+	{
+		if (MyEngine::Input::GetInstance().IsPress("A"))
+		{
+			m_pCharacter->SubHp(100);
+		}
+	}
+
 	//State‚É‚¢‚éŠÔ‚ğŒv‘ª‚·‚é
 	m_time++;
 

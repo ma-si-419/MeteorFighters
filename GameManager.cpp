@@ -40,8 +40,8 @@ namespace
 	constexpr int kFadeSpeed = 5;
 
 	//バトル終了時の演出のカメラスタート座標
-	const MyEngine::Vector3 kResultCameraStartPos(0.0f,50.0f,50.0f);
-	const MyEngine::Vector3 kResultCameraEndPos(0.0f,8.0f,18.0f);
+	const MyEngine::Vector3 kResultCameraStartPos(0.0f, 50.0f, 50.0f);
+	const MyEngine::Vector3 kResultCameraEndPos(0.0f, 8.0f, 18.0f);
 
 	//バトル終了時のカメラの移動速度
 	constexpr float kResultCameraMoveSpeed = 1.0f;
@@ -69,12 +69,21 @@ void GameManager::Init()
 	m_situation = Situation::kStart1P;
 	m_updateSituationFunc = &GameManager::UpdateStart;
 #ifdef _DEBUG
-//	m_situation = Situation::kBattle;
-//	m_updateSituationFunc = &GameManager::UpdateBattle;
+	//	m_situation = Situation::kBattle;
+	//	m_updateSituationFunc = &GameManager::UpdateBattle;
 #endif // _DEBUG
 
 
 	m_poseCameraPos = kStartCameraStartPos;
+}
+
+void GameManager::RetryInit()
+{
+	m_pCharacters[0]->RetryInit();
+	m_pCharacters[1]->RetryInit();
+
+	m_situation = Situation::kStart1P;
+	m_updateSituationFunc = &GameManager::UpdateStart;
 }
 
 void GameManager::Update()
@@ -155,7 +164,14 @@ void GameManager::Draw()
 
 	if (m_situation == Situation::kResult)
 	{
-		m_pGameUi->DrawResult(true);
+		if (m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetHp() > 0)
+		{
+			m_pGameUi->DrawResult(true);
+		}
+		else
+		{
+			m_pGameUi->DrawResult(false);
+		}
 	}
 
 
@@ -592,14 +608,17 @@ void GameManager::UpdateResult()
 	if (selectNum == static_cast<int>(GameUi::SelectItem::kRetry))
 	{
 		//リトライ処理を作成する
+		printfDx("リトライ\n");
+		RetryInit();
 	}
 	else if (selectNum == static_cast<int>(GameUi::SelectItem::kCharacterSelect))
 	{
 		m_isChangeScene = true;
+		printfDx("セレクト\n");
 	}
 	else if (selectNum == static_cast<int>(GameUi::SelectItem::kTitle))
 	{
-
+		printfDx("タイトル\n");
 	}
 
 

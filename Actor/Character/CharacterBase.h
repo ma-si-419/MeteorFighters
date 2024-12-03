@@ -259,6 +259,11 @@ public:
 	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
 
 	/// <summary>
+	/// もう一度バトルを行う際に使用する関数
+	/// </summary>
+	void RetryInit();
+
+	/// <summary>
 	/// 敵の座標などを取得するためにゲームマネージャーのポインタをセットする
 	/// </summary>
 	/// <param name="manager">ゲームマネージャーのポインタ</param>
