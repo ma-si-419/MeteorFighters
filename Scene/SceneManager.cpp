@@ -6,7 +6,7 @@
 
 namespace
 {
-	constexpr int kFadeSpeed = 15;
+	constexpr int kKnockOutFadeSpeed = 15;
 	const int kBlack = GetColor(0,0,0);
 }
 
@@ -37,7 +37,7 @@ void SceneManager::Update()
 		//フェードアウトする
 		if (m_isFadeOut)
 		{
-			m_fadeAlpha += kFadeSpeed;
+			m_fadeAlpha += kKnockOutFadeSpeed;
 			if (m_fadeAlpha > 255)
 			{
 				m_pScene->End();
@@ -49,7 +49,7 @@ void SceneManager::Update()
 		//フェードインする
 		else
 		{
-			m_fadeAlpha -= kFadeSpeed;
+			m_fadeAlpha -= kKnockOutFadeSpeed;
 			if (m_fadeAlpha < 0)
 			{
 				m_fadeAlpha = 0;

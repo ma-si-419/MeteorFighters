@@ -60,7 +60,7 @@ void Effect::End()
 
 }
 
-void Effect::SetLoop(int loopStart, int loopEnd)
+void Effect::SetLoop(float loopStart, float loopEnd)
 {
 	m_loopStartTime = loopStart;
 

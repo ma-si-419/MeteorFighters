@@ -4,6 +4,7 @@
 #include <string>
 #include "Vector3.h"
 #include "CharacterBase.h"
+#include "Game.h"
 
 class Player;
 class Enemy;
@@ -19,6 +20,7 @@ public:
 
 	enum class Situation
 	{
+		kRetry,
 		kStart1P,
 		kStart2P,
 		kBattle,
@@ -51,20 +53,22 @@ public:
 	/// </summary>
 	void Draw();
 
-	void UpdateSituation();
-
+	/// <summary>
+	/// シーンから抜けるときなどに使用
+	/// </summary>
+	void Final();
 
 	/// <summary>
 	/// プレイヤーが操作するキャラクターを設定する
 	/// </summary>
 	/// <param name="number">プレイヤーが使うキャラクターの番号</param>
-	void SetPlayerStatus(int number, std::vector<std::string> statusData);
+	void SetOnePlayerStatus(int number, std::vector<std::string> statusData);
 
 	/// <summary>
 	/// エネミーが操作するキャラクターを設定する
 	/// </summary>
 	/// <param name="number">エネミーが使うキャラクターの番号</param>
-	void SetEnemyStatus(int number, std::vector<std::string> statusData);
+	void SetTwoPlayerStatus(int number, std::vector<std::string> statusData);
 
 	/// <summary>
 	/// 1Pのポインタを返す
@@ -170,15 +174,10 @@ public:
 	Situation GetNowSituation() { return m_situation; }
 
 	/// <summary>
-	/// セレクトシーンに移動する
-	/// </summary>
-	void ChangeSelectScene() { m_isChangeScene = true; }
-
-	/// <summary>
 	/// セレクトシーンに戻るときにtrueを返す
 	/// </summary>
 	/// <returns>セレクトシーンに戻る時にtrueになる</returns>
-	bool IsChangeScene() { return m_isChangeScene; }
+	Game::Scene GetNextScene() { return m_nextScene; }
 
 private:
 
@@ -201,6 +200,24 @@ private:
 	/// リザルト時のアップデート
 	/// </summary>
 	void UpdateResult();
+
+	/// <summary>
+	/// リトライ時のアップデート
+	/// </summary>
+	void UpdateRetry();
+	
+	/// <summary>
+	/// 状況を変化させる
+	/// </summary>
+	/// <param name="situation">変更後の状況</param>
+	void ChangeSituation(Situation situation);
+
+	/// <summary>
+	/// 文字列のステータスをCharacterStatusに変換する
+	/// </summary>
+	/// <param name="statusData">ステータスの情報を持った文字列</param>
+	/// <returns>CharacterStatus型のステータス情報</returns>
+	CharacterBase::CharacterStatus GetCharacterStatus(std::vector<std::string> statusData);
 
 private:
 
@@ -229,5 +246,5 @@ private:
 	//フェードを行うときの変数
 	int m_alpha;
 	//シーンをセレクトシーンに戻す時にtrueにする
-	bool m_isChangeScene;
+	Game::Scene m_nextScene;
 };

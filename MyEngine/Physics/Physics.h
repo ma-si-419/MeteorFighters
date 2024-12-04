@@ -56,6 +56,11 @@ public:
 	void SetStage(int stageHandle);
 
 	/// <summary>
+	/// 当たり判定を行うステージモデルを削除する
+	/// </summary>
+	void DeleteStage() { m_stageHandle = -1; }
+
+	/// <summary>
 	/// 当たり判定の表示を行う
 	/// </summary>
 	void DebugDraw();

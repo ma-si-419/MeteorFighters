@@ -146,102 +146,107 @@ void CharacterBase::Init()
 	//初期ステートの設定
 	m_pState = std::make_shared<CharacterStateIdle>(thisPointer);
 	m_pState->Enter();
+
 }
 
 void CharacterBase::Update()
 {
-	
-
-	//ローカル座標の中心座標の更新
-	m_lookPos.SetCenterPos(m_rigidbody.GetPos());
-
 	//Stateが変更されていたらStateを入れ替える
 	if (m_pState != m_pState->m_pNextState)
 	{
 		m_pState = m_pState->m_pNextState;
 	}
+	
+	//状況によって変化するアップデート
+	(this->*m_updateSituationFunc)();
+
+	//ローカル座標の中心座標の更新
+	m_lookPos.SetCenterPos(m_rigidbody.GetPos());
 
 
-	//1Pであり、1Pのバトル開始演出中の処理
-	if (m_pGameManager->GetNowSituation() == GameManager::Situation::kStart1P && m_playerNumber == PlayerNumber::kOnePlayer)
+	//描画座標の設定
+	SetDrawPos(m_rigidbody.GetPos());
+}
+
+void CharacterBase::Draw()
+{
+	//リザルト時に2P側を消す
+	if (m_pGameManager->GetNowSituation() == GameManager::Situation::kResult ||
+		m_pGameManager->GetNowSituation() == GameManager::Situation::kRetry)
 	{
-		//アニメーションを変更していなければ変更する
-		if (m_playAnimKind != AnimKind::kStartPose)
-		{
-			ChangeAnim(AnimKind::kStartPose, false);
-		}
-	}
-	else if (m_pGameManager->GetNowSituation() == GameManager::Situation::kStart2P && m_playerNumber == PlayerNumber::kTwoPlayer)
-	{
-		//アニメーションを変更していなければ変更する
-		if (m_playAnimKind != AnimKind::kStartPose)
-		{
-			ChangeAnim(AnimKind::kStartPose, false);
-		}
-	}
-	//バトル中の処理
-	else if (m_pGameManager->GetNowSituation() == GameManager::Situation::kBattle)
-	{
-		//Stateの更新
-		m_pState->Update();
-	}
-	//ノックアウトの演出の間
-	else if (m_pGameManager->GetNowSituation() == GameManager::Situation::kKnockOut)
-	{
-		//移動ベクトルが設定されていなければ
-		if (m_knockOutVelo.SqLength() < 0.01f)
-		{
-			//移動ベクトルを設定する
-			m_knockOutVelo = m_rigidbody.GetVelo();
-		}
-
-		//移動をめちゃくちゃ遅くする
-		m_rigidbody.SetVelo(m_knockOutVelo * 0.1f);
-		//アニメーションもゆっくり再生する
-		SetAnimPlaySpeed(0.1f);
-	}
-	else if (m_pGameManager->GetNowSituation() == GameManager::Situation::kResult)
-	{
-		//移動速度を元に戻す
-		m_rigidbody.SetVelo(m_knockOutVelo);
-
-		//アニメーションの再生速度をリセットする
-		SetAnimPlaySpeed();
-
-
-		//アニメーションを変更していなければ変更する
-		if (m_nowHp > 0)
-		{
-			if (m_playAnimKind != AnimKind::kWinPose)
-			{
-				ChangeAnim(AnimKind::kWinPose, true);
-				//アニメーションを変更するタイミングで正面方向も変更する
-				auto thisPointer = std::dynamic_pointer_cast<CharacterBase>(shared_from_this());
-
-				MyEngine::Vector3 frontPos = m_pGameManager->GetTargetPos(thisPointer);
-
-				frontPos.y = m_rigidbody.GetPos().y;
-
-				SetFrontPos(frontPos);
-			}
-		}
-		else
-		{
-			if (m_playAnimKind != AnimKind::kLosePose)
-			{
-				ChangeAnim(AnimKind::kLosePose, true);
-				//アニメーションを変更するタイミングで正面方向も変更する
-				auto thisPointer = std::dynamic_pointer_cast<CharacterBase>(shared_from_this());
-
-				MyEngine::Vector3 frontPos = m_pGameManager->GetTargetPos(thisPointer);
-
-				frontPos.y = m_rigidbody.GetPos().y;
-
-				SetFrontPos(frontPos);
-			}
-		}
+		if (m_playerNumber == PlayerNumber::kTwoPlayer) return;
 	}
 
+	//残像の描画
+	for (auto item : m_afterImageList)
+	{
+		MV1DrawModel(item.handle);
+	}
+
+	//モデルの描画
+	MV1DrawModel(m_modelHandle);
+}
+
+void CharacterBase::OnCollide(std::shared_ptr<Collidable> collider)
+{
+	m_pState->OnCollide(collider);
+
+#ifdef _DEBUG
+
+	if (m_playerNumber == PlayerNumber::kOnePlayer)
+	{
+		DrawString(0, 64, "1Pがなにかとぶつかった", GetColor(255, 255, 255));
+	}
+	else
+	{
+		DrawString(0, 80, "2Pがなにかとぶつかった", GetColor(255, 255, 255));
+	}
+
+#endif // _DEBUG
+}
+
+void CharacterBase::Final()
+{
+	Collidable::Final();
+	MV1DeleteModel(m_modelHandle);
+	for (auto& item : m_afterImageList)
+	{
+		MV1DeleteModel(item.handle);
+	}
+}
+
+void CharacterBase::RetryInit()
+{
+	m_nowHp = m_status.hp;
+	m_nowMp = m_status.startMp;
+
+	m_knockOutVelo = MyEngine::Vector3();
+
+	auto thisPointer = std::dynamic_pointer_cast<CharacterBase>(shared_from_this());
+
+	//初期座標の決定
+	if (m_playerNumber == PlayerNumber::kOnePlayer)
+	{
+		m_rigidbody.SetPos(kOnePlayerInitPos);
+		m_lookPos.SetCenterPos(kOnePlayerInitPos);
+		SetFrontPos(kTwoPlayerInitPos);
+	}
+	else if (m_playerNumber == PlayerNumber::kTwoPlayer)
+	{
+		m_rigidbody.SetPos(kTwoPlayerInitPos);
+		m_lookPos.SetCenterPos(kTwoPlayerInitPos);
+		SetFrontPos(kOnePlayerInitPos);
+	}
+
+	m_rigidbody.SetVelo(MyEngine::Vector3(0, 0, 0));
+
+	//初期ステートの設定
+	m_pState = std::make_shared<CharacterStateIdle>(thisPointer);
+	m_pState->Enter();
+}
+
+void CharacterBase::UpdateAfterImage()
+{
 	//残像を消す数
 	int deleteNum = 0;
 
@@ -265,85 +270,6 @@ void CharacterBase::Update()
 	{
 		m_afterImageList.pop_front();
 	}
-
-	//アニメーションの更新
-	PlayAnim();
-
-	//描画座標の設定
-	SetDrawPos(m_rigidbody.GetPos());
-
-	if (m_playerNumber == PlayerNumber::kOnePlayer) printfDx("%.0f\n", m_nowMp);
-}
-
-void CharacterBase::Draw()
-{
-	//リザルト時に2P側を消す
-	if (m_pGameManager->GetNowSituation() == GameManager::Situation::kResult)
-	{
-		if (m_playerNumber == PlayerNumber::kTwoPlayer) return;
-	}
-
-	//残像の描画
-	for (auto item : m_afterImageList)
-	{
-		MV1DrawModel(item.handle);
-	}
-
-	//モデルの描画
-	MV1DrawModel(m_modelHandle);
-
-#ifdef _DEBUG
-
-	//DrawSphere3D(GetBackPos(GameSceneConstant::kEnemyBackPosDistance).CastVECTOR(), 3, 3, GetColor(255, 0, 255), GetColor(255, 0, 255), true);;
-
-#endif // _DEBUG
-
-}
-
-void CharacterBase::OnCollide(std::shared_ptr<Collidable> collider)
-{
-	m_pState->OnCollide(collider);
-
-#ifdef _DEBUG
-
-	if (m_playerNumber == PlayerNumber::kOnePlayer)
-	{
-		DrawString(0, 64, "1Pがなにかとぶつかった", GetColor(255, 255, 255));
-	}
-	else
-	{
-		DrawString(0, 80, "2Pがなにかとぶつかった", GetColor(255, 255, 255));
-	}
-
-#endif // _DEBUG
-}
-
-void CharacterBase::RetryInit()
-{
-	m_nowHp = m_status.hp;
-	m_nowMp = m_status.startMp;
-
-	auto thisPointer = std::dynamic_pointer_cast<CharacterBase>(shared_from_this());
-
-	//初期座標の決定
-	if (m_playerNumber == PlayerNumber::kOnePlayer)
-	{
-		m_rigidbody.SetPos(kOnePlayerInitPos);
-		m_lookPos.SetCenterPos(kOnePlayerInitPos);
-		SetFrontPos(kTwoPlayerInitPos);
-	}
-	else if (m_playerNumber == PlayerNumber::kTwoPlayer)
-	{
-		m_rigidbody.SetPos(kTwoPlayerInitPos);
-		m_lookPos.SetCenterPos(kTwoPlayerInitPos);
-		SetFrontPos(kOnePlayerInitPos);
-	}
-
-	m_rigidbody.SetVelo(MyEngine::Vector3(0,0,0));
-
-	//初期ステートの設定
-	m_pState = std::make_shared<CharacterStateIdle>(thisPointer);
-	m_pState->Enter();
 }
 
 void CharacterBase::SetGameManager(std::shared_ptr<GameManager> manager)
@@ -361,7 +287,7 @@ MyEngine::Vector3 CharacterBase::GetVelo()
 	return m_rigidbody.GetVelo();
 }
 
-bool CharacterBase::SubMp(int subMp)
+bool CharacterBase::SubMp(float subMp)
 {
 	if (m_nowMp >= subMp)
 	{
@@ -380,7 +306,7 @@ void CharacterBase::ChargeMp()
 	m_nowMp += m_status.chargeSpd;
 
 	//最大を超えないようにクランプ
-	m_nowMp = std::fmin(m_nowMp,GameSceneConstant::kMaxMp);
+	m_nowMp = std::fmin(m_nowMp, GameSceneConstant::kMaxMp);
 }
 
 void CharacterBase::ChangeAnim(AnimKind animKind, bool loop)
@@ -715,6 +641,7 @@ void CharacterBase::CreateAfterImage(AfterImage afterImageInfo)
 {
 	CharacterBase::AfterImage ans;
 
+	//モデルをコピーしスケールや座標を設定する
 	int handle = MV1DuplicateModel(m_modelHandle);
 	MyEngine::Vector3 drawPos = MV1GetPosition(m_modelHandle);
 	MV1SetScale(handle, VGet(GameSceneConstant::kModelScale, GameSceneConstant::kModelScale, GameSceneConstant::kModelScale));
@@ -729,10 +656,12 @@ void CharacterBase::CreateAfterImage(AfterImage afterImageInfo)
 		MV1SetAttachAnimBlendRate(handle, m_lastAnim, 1.0f - m_animBlendRate);
 	}
 
+	//アニメーションを設定する
 	int anim = MV1AttachAnim(handle, MV1GetAttachAnim(m_modelHandle, m_attachAnim));
 	MV1SetAttachAnimTime(handle, anim, m_nowPlayAnimTime);
 	MV1SetAttachAnimBlendRate(handle, anim, m_animBlendRate);
 
+	//残像の情報を設定
 	ans.handle = handle;
 
 	ans.nowOpacityRate = afterImageInfo.nowOpacityRate;
@@ -741,6 +670,7 @@ void CharacterBase::CreateAfterImage(AfterImage afterImageInfo)
 
 	ans.DeleteSpeed = afterImageInfo.DeleteSpeed;
 
+	//残像リストに登録
 	m_afterImageList.push_back(ans);
 }
 
@@ -768,4 +698,155 @@ MyEngine::Vector3 CharacterBase::GetBackPos(float distance)
 void CharacterBase::SetIsTrigger(bool flag)
 {
 	m_pColData->SetIsTrigger(flag);
+}
+
+void CharacterBase::ChangeSituationUpdate(int situation)
+{
+	auto sit = static_cast<GameManager::Situation>(situation);
+
+	//リトライが押されたとき
+	if (sit == GameManager::Situation::kRetry)
+	{
+		//アニメーションを止める
+		m_updateSituationFunc = &CharacterBase::UpdateNone;
+	}
+	//1Pの開始演出をしているとき
+	else if (sit == GameManager::Situation::kStart1P)
+	{
+		
+		if (m_playerNumber == PlayerNumber::kOnePlayer)
+		{
+			//1P側はスタート処理を行う
+			m_updateSituationFunc = &CharacterBase::UpdateStart;
+		}
+		else
+		{
+			//2P側は何もしないように設定する
+			m_updateSituationFunc = &CharacterBase::UpdateNone;
+		}
+	}
+	//2Pの開始演出をしているとき
+	else if (sit == GameManager::Situation::kStart2P)
+	{
+		if (m_playerNumber == PlayerNumber::kTwoPlayer)
+		{
+			//2P側はスタート処理を行う
+			m_updateSituationFunc = &CharacterBase::UpdateStart;
+		}
+		else
+		{
+			//1P側は何もしないように設定する
+			m_updateSituationFunc = &CharacterBase::UpdateNone;
+		}
+	}
+	//バトル時
+	else if (sit == GameManager::Situation::kBattle)
+	{
+		m_updateSituationFunc = &CharacterBase::UpdateBattle;
+	}
+	//ノックアウトの演出時
+	else if (sit == GameManager::Situation::kKnockOut)
+	{
+		m_updateSituationFunc = &CharacterBase::UpdateKnockOut;
+	}
+	//リザルト時
+	else if (sit == GameManager::Situation::kResult)
+	{
+		m_updateSituationFunc = &CharacterBase::UpdateResult;
+	}
+}
+
+void CharacterBase::UpdateStart()
+{
+	//アニメーションを変更していなければ変更する
+	if (m_playAnimKind != AnimKind::kStartPose)
+	{
+		ChangeAnim(AnimKind::kStartPose, false);
+	}
+	PlayAnim();
+}
+
+void CharacterBase::UpdateBattle()
+{
+	//Stateの更新
+	m_pState->Update();
+
+	//残像の更新を行う
+	UpdateAfterImage();
+	
+	//アニメーションの更新
+	PlayAnim();
+
+}
+
+void CharacterBase::UpdateKnockOut()
+{
+	//移動ベクトルが設定されていなければ
+	if (m_knockOutVelo.SqLength() < 0.01f)
+	{
+		//移動ベクトルを設定する
+		m_knockOutVelo = m_rigidbody.GetVelo();
+	}
+
+	//移動を遅くする
+	m_rigidbody.SetVelo(m_knockOutVelo * 0.1f);
+	//アニメーションもゆっくり再生する
+	SetAnimPlaySpeed(0.1f);
+
+	//残像の更新を行う
+	UpdateAfterImage();
+	
+	//アニメーションの更新
+	PlayAnim();
+}
+
+void CharacterBase::UpdateResult()
+{
+	//移動をしないようにする
+	m_rigidbody.SetVelo(MyEngine::Vector3(0,0,0));
+
+	//アニメーションの再生速度をリセットする
+	SetAnimPlaySpeed();
+
+	//残像の更新を行う
+	UpdateAfterImage();
+
+	//アニメーションを変更していなければ変更する
+	if (m_nowHp > 0)
+	{
+		if (m_playAnimKind != AnimKind::kWinPose)
+		{
+			ChangeAnim(AnimKind::kWinPose, true);
+			//アニメーションを変更するタイミングで正面方向も変更する
+			auto thisPointer = std::dynamic_pointer_cast<CharacterBase>(shared_from_this());
+
+			MyEngine::Vector3 frontPos = m_pGameManager->GetTargetPos(thisPointer);
+
+			frontPos.y = m_rigidbody.GetPos().y;
+
+			SetFrontPos(frontPos);
+		}
+	}
+	else
+	{
+		if (m_playAnimKind != AnimKind::kLosePose)
+		{
+			ChangeAnim(AnimKind::kLosePose, true);
+			//アニメーションを変更するタイミングで正面方向も変更する
+			auto thisPointer = std::dynamic_pointer_cast<CharacterBase>(shared_from_this());
+
+			MyEngine::Vector3 frontPos = m_pGameManager->GetTargetPos(thisPointer);
+
+			frontPos.y = m_rigidbody.GetPos().y;
+
+			SetFrontPos(frontPos);
+		}
+	}
+
+	PlayAnim();
+}
+
+void CharacterBase::UpdateNone()
+{
+	//何も更新しない
 }

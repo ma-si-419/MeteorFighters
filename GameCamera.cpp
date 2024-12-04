@@ -79,7 +79,6 @@ GameCamera::GameCamera() :
 
 GameCamera::~GameCamera()
 {
-	DeleteLightHandle(m_lightHandle);
 }
 
 void GameCamera::SetPoseCamera()
@@ -94,6 +93,11 @@ void GameCamera::Update()
 	//ライトの座標をずっと更新し続ける
 	SetLightPositionHandle(m_lightHandle, (m_localPos.GetWorldPos()).CastVECTOR());
 
+}
+
+void GameCamera::Final()
+{
+	DeleteLightHandle(m_lightHandle);
 }
 
 void GameCamera::SetBattleCamera()

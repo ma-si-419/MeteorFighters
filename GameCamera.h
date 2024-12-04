@@ -10,6 +10,11 @@ public:
 	void SetPoseCamera();
 	void Update();
 
+	/// <summary>
+	/// このクラスを削除するときに使用する関数
+	/// </summary>
+	void Final();
+
 	void SetBattleCamera();
 
 	/// <summary>

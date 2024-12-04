@@ -26,6 +26,11 @@ public:
 	void Exit(std::shared_ptr<Effect> effect);
 
 	/// <summary>
+	/// このクラスを削除するときに使用する関数
+	/// </summary>
+	void Final();
+
+	/// <summary>
 	/// エフェクトの更新を行う
 	/// </summary>
 	void Update();
@@ -56,7 +61,5 @@ private:
 	std::list<std::shared_ptr<Effect>> m_effects;
 
 	std::map<std::string, int> m_handles;
-
-	int m_playSpeed;
 };
 

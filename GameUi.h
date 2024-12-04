@@ -8,13 +8,18 @@ public:
 	{
 		kRetry,
 		kCharacterSelect,
-		kTitle,
-		kItemNum = kTitle
+		kMenu,
+		kItemNum = kMenu
 	};
 
 public:
 
 	GameUi();
+
+	/// <summary>
+	/// リトライする際の初期化を行う
+	/// </summary>
+	void RetryInit();
 
 	/// <summary>
 	/// 体力バーを表示する
@@ -73,9 +78,6 @@ private:
 
 	//リザルト画面の描画を始めてからの時間を計測する
 	int m_resultTime;
-
-	//リザルト画面のロゴのアルファ値
-	int m_resultLogoAlpha;
 
 	//リザルト画面のロゴの拡大率
 	double m_resultLogoScale;

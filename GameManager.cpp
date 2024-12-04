@@ -37,7 +37,10 @@ namespace
 	constexpr int kKnockOutTime = 60;
 
 	//フェードの速度
-	constexpr int kFadeSpeed = 5;
+	constexpr int kKnockOutFadeSpeed = 5;
+
+	//リトライ時のフェードの速度
+	constexpr int kRetryFadeSpeed = 25;
 
 	//バトル終了時の演出のカメラスタート座標
 	const MyEngine::Vector3 kResultCameraStartPos(0.0f, 50.0f, 50.0f);
@@ -49,7 +52,8 @@ namespace
 
 GameManager::GameManager(std::shared_ptr<GameCamera> camera) :
 	m_time(0),
-	m_alpha(0)
+	m_alpha(0),
+	m_nextScene(Game::Scene::kGame)
 {
 	m_pStage = std::make_shared<Stage>();
 	m_pStage->Init();
@@ -66,15 +70,12 @@ GameManager::~GameManager()
 void GameManager::Init()
 {
 	m_pCamera->SetPoseCamera();
-	m_situation = Situation::kStart1P;
-	m_updateSituationFunc = &GameManager::UpdateStart;
+	m_poseCameraPos = kStartCameraStartPos;
+	ChangeSituation(Situation::kStart1P);
 #ifdef _DEBUG
 	//	m_situation = Situation::kBattle;
 	//	m_updateSituationFunc = &GameManager::UpdateBattle;
 #endif // _DEBUG
-
-
-	m_poseCameraPos = kStartCameraStartPos;
 }
 
 void GameManager::RetryInit()
@@ -82,8 +83,20 @@ void GameManager::RetryInit()
 	m_pCharacters[0]->RetryInit();
 	m_pCharacters[1]->RetryInit();
 
-	m_situation = Situation::kStart1P;
-	m_updateSituationFunc = &GameManager::UpdateStart;
+	m_pCamera->SetPoseCamera();
+	m_poseCameraPos = kStartCameraStartPos;
+
+	//カメラの座標設定
+	MyEngine::Vector3 onePlayerPos = m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetPos();
+	MyEngine::Vector3 twoPlayerPos = m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)]->GetPos();
+	//1Pを中心に1Pをターゲットにする
+	m_pCamera->SetCenterAndTarget(onePlayerPos, onePlayerPos);
+
+	m_pCamera->SetLocalPos(m_poseCameraPos);
+
+	m_pCamera->SetFrontPos(twoPlayerPos);
+
+	m_pGameUi->RetryInit();
 }
 
 void GameManager::Update()
@@ -133,6 +146,42 @@ void GameManager::Update()
 
 }
 
+void GameManager::ChangeSituation(Situation situation)
+{
+	//状況を変更
+	m_situation = situation;
+
+	//プレイヤーの状況を変更
+	for (auto& player : m_pCharacters) player->ChangeSituationUpdate(static_cast<int>(situation));
+
+	//リトライ時
+	if (situation == Situation::kRetry)
+	{
+		m_updateSituationFunc = &GameManager::UpdateRetry;
+	}
+	//開始時
+	else if (situation == Situation::kStart1P || situation == Situation::kStart2P)
+	{
+		m_updateSituationFunc = &GameManager::UpdateStart;
+	}
+	//バトル時
+	else if (situation == Situation::kBattle)
+	{
+		m_updateSituationFunc = &GameManager::UpdateBattle;
+	}
+	//ノックアウト時
+	else if (situation == Situation::kKnockOut)
+	{
+		m_updateSituationFunc = &GameManager::UpdateKnockOut;
+	}
+	//リザルト時
+	else if (situation == Situation::kResult)
+	{
+		m_updateSituationFunc = &GameManager::UpdateResult;
+	}
+
+}
+
 void GameManager::Draw()
 {
 	for (auto& item : m_pAttacks)
@@ -156,7 +205,7 @@ void GameManager::Draw()
 	//2Pの気力を描画する
 	m_pGameUi->DrawMpBar(m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)]->GetMp(), false);
 
-	//フェードのアルファ値が0よりも高いの場合表示する
+	//フェードのアルファ値が0よりも高い場合表示する
 	if (m_alpha > 0)
 	{
 		m_pGameUi->DrawFade(GetColor(255, 255, 255), m_alpha);
@@ -173,47 +222,32 @@ void GameManager::Draw()
 			m_pGameUi->DrawResult(false);
 		}
 	}
-
-
 }
 
-void GameManager::SetPlayerStatus(int number, std::vector<std::string> statusData)
+void GameManager::Final()
+{
+	for (auto& character : m_pCharacters)
+	{
+		character->Final();
+	}
+	for (auto& attack : m_pAttacks)
+	{
+		attack->Final();
+	}
+	m_pStage->Final();
+	m_pCamera->Final();
+	m_pEffectManager->Final();
+}
+
+void GameManager::SetOnePlayerStatus(int number, std::vector<std::string> statusData)
 {
 	//プレイヤー作成
 	m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)] = std::make_shared<CharacterBase>(ObjectTag::kOnePlayer, static_cast<CharacterBase::CharacterKind>(number));
 	//プレイヤーに自分のポインターを渡しておく
 	m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->SetGameManager(shared_from_this());
 
-	CharacterBase::CharacterStatus status;
-
-	status.name = statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kName)];
-	status.hp = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kHp)]);
-	status.startMp = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kStartMp)]);
-	status.atk = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kAtk)]);
-	status.def = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kDef)]);
-	status.spd = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSpd)]);
-	status.chargeSpd = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kChargeSpd)]);
-	status.chaseAttackNum = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kChaseNum)]);
-
-	//一つ目の必殺技の情報設定
-	status.firstSpecialAttackData.name = statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialName)];
-	status.firstSpecialAttackData.path = statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialEffectName)];
-	status.firstSpecialAttackData.cost = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialCost)]);
-	status.firstSpecialAttackData.damageRate = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialDamageRate)]);
-	status.firstSpecialAttackData.radius = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialRadius)]);
-	status.firstSpecialAttackData.startFrame = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialStartFrame)]);
-	status.firstSpecialAttackData.endFrame = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialEndFrame)]);
-	status.firstSpecialAttackData.kind = m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetSpecialAttackKind(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialKind)]);
-
-	//二つ目の必殺技の情報設定
-	status.secondSpecialAttackData.name = statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialName)];
-	status.secondSpecialAttackData.path = statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialEffectName)];
-	status.secondSpecialAttackData.cost = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialCost)]);
-	status.secondSpecialAttackData.damageRate = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialDamageRate)]);
-	status.secondSpecialAttackData.radius = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialRadius)]);
-	status.secondSpecialAttackData.startFrame = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialStartFrame)]);
-	status.secondSpecialAttackData.endFrame = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialEndFrame)]);
-	status.secondSpecialAttackData.kind = m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetSpecialAttackKind(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialKind)]);
+	//ステータスを取得
+	CharacterBase::CharacterStatus status = GetCharacterStatus(statusData);
 
 	//プレイヤーのステータスを設定する
 	m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->SetStatus(status);
@@ -221,38 +255,15 @@ void GameManager::SetPlayerStatus(int number, std::vector<std::string> statusDat
 
 }
 
-void GameManager::SetEnemyStatus(int number, std::vector<std::string> statusData)
+void GameManager::SetTwoPlayerStatus(int number, std::vector<std::string> statusData)
 {
 	//エネミー作成
 	m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)] = std::make_shared<CharacterBase>(ObjectTag::kTwoPlayer, static_cast<CharacterBase::CharacterKind>(number));
 	//エネミーに自分のポインターを渡しておく
 	m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)]->SetGameManager(shared_from_this());
-	CharacterBase::CharacterStatus status;
 
-	status.name = statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kName)];
-	status.hp = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kHp)]);
-	status.startMp = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kStartMp)]);
-	status.atk = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kAtk)]);
-	status.def = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kDef)]);
-	status.spd = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSpd)]);
-	status.chargeSpd = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kChargeSpd)]);
-	status.chaseAttackNum = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kChaseNum)]);
-
-	//一つ目の必殺技の情報設定
-	status.firstSpecialAttackData.name = statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialName)];
-	status.firstSpecialAttackData.cost = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialCost)]);
-	status.firstSpecialAttackData.damageRate = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialDamageRate)]);
-	status.firstSpecialAttackData.startFrame = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialStartFrame)]);
-	status.firstSpecialAttackData.endFrame = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialEndFrame)]);
-	status.firstSpecialAttackData.kind = m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)]->GetSpecialAttackKind(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialKind)]);
-
-	//二つ目の必殺技の情報設定
-	status.secondSpecialAttackData.name = statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialCost)];
-	status.secondSpecialAttackData.cost = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialCost)]);
-	status.secondSpecialAttackData.damageRate = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialDamageRate)]);
-	status.secondSpecialAttackData.startFrame = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialStartFrame)]);
-	status.secondSpecialAttackData.endFrame = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialEndFrame)]);
-	status.secondSpecialAttackData.kind = m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)]->GetSpecialAttackKind(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialKind)]);
+	//ステータスを取得
+	CharacterBase::CharacterStatus status = GetCharacterStatus(statusData);
 
 	//エネミーのステータスを設定する
 	m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)]->SetStatus(status);
@@ -354,6 +365,13 @@ void GameManager::ExitEffect(std::shared_ptr<Effect> effect)
 
 void GameManager::UpdateStart()
 {
+	m_alpha -= kRetryFadeSpeed;
+
+	m_alpha = max(m_alpha, 0);
+
+	//フェードインが終わってアップデートを行わない
+	if (m_alpha > 0) return;
+
 	//カメラの座標設定
 	MyEngine::Vector3 onePlayerPos = m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetPos();
 	MyEngine::Vector3 twoPlayerPos = m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kTwoPlayer)]->GetPos();
@@ -393,11 +411,12 @@ void GameManager::UpdateStart()
 		if (m_time > kStartPoseTime)
 		{
 			m_time = 0;
-			m_situation = Situation::kStart2P;
 			//X座標だけ反転したものをカメラの開始位置にする
 			MyEngine::Vector3 pos = kStartCameraStartPos;
 			pos.x *= -1;
 			m_poseCameraPos = pos;
+
+			ChangeSituation(Situation::kStart2P);
 		}
 	}
 	//2Pの演出中
@@ -439,8 +458,7 @@ void GameManager::UpdateStart()
 		if (m_time > kStartPoseTime)
 		{
 			m_time = 0;
-			m_situation = Situation::kBattle;
-			m_updateSituationFunc = &GameManager::UpdateBattle;
+			ChangeSituation(Situation::kBattle);
 			m_pCamera->SetCenterAndTarget(onePlayerPos, twoPlayerPos);
 			m_pCamera->SetFrontPos(twoPlayerPos);
 			m_pCamera->SetBattleCamera();
@@ -495,8 +513,7 @@ void GameManager::UpdateBattle()
 			//正面座標を設定
 			m_pCamera->SetFrontPos(frontPos);
 
-			m_updateSituationFunc = &GameManager::UpdateKnockOut;
-			m_situation = Situation::kKnockOut;
+			ChangeSituation(Situation::kKnockOut);
 			return;
 		}
 	}
@@ -531,17 +548,15 @@ void GameManager::UpdateKnockOut()
 	//一定時間演出をしたらフェードインする
 	if (m_time > kKnockOutTime)
 	{
-		m_alpha += kFadeSpeed;
+		m_alpha += kKnockOutFadeSpeed;
 		m_alpha = min(m_alpha, 255);
 
 	}
 	//フェードインが終わったら
 	if (m_alpha >= 255)
 	{
-		//アップデートを変更
-		m_updateSituationFunc = &GameManager::UpdateResult;
-		//状況をリザルトに変更
-		m_situation = Situation::kResult;
+		//状況を変更
+		ChangeSituation(Situation::kResult);
 		//時間計測をリセット
 		m_time = 0;
 		//カメラのアップデートを変更
@@ -555,7 +570,7 @@ void GameManager::UpdateResult()
 	//フェードインしていく
 	if (m_alpha > 0)
 	{
-		m_alpha -= kFadeSpeed;
+		m_alpha -= kKnockOutFadeSpeed;
 		m_pEffectManager->DeletePlayEffect();
 
 		//カメラの座標をリザルトの初期座標に変更
@@ -607,21 +622,36 @@ void GameManager::UpdateResult()
 
 	if (selectNum == static_cast<int>(GameUi::SelectItem::kRetry))
 	{
-		//リトライ処理を作成する
-		printfDx("リトライ\n");
-		RetryInit();
+		//リトライする
+		ChangeSituation(Situation::kRetry);
 	}
 	else if (selectNum == static_cast<int>(GameUi::SelectItem::kCharacterSelect))
 	{
-		m_isChangeScene = true;
-		printfDx("セレクト\n");
+		m_nextScene = Game::Scene::kSelect;
 	}
-	else if (selectNum == static_cast<int>(GameUi::SelectItem::kTitle))
+	else if (selectNum == static_cast<int>(GameUi::SelectItem::kMenu))
 	{
-		printfDx("タイトル\n");
+		m_nextScene = Game::Scene::kMenu;
 	}
 
 
+}
+
+void GameManager::UpdateRetry()
+{
+	//白くフェードアウトしてすぐにもう一度フェードインする
+	m_alpha += kRetryFadeSpeed;
+
+	m_alpha = min(m_alpha, 255);
+
+	//フェードアウトが終わったら
+	if (m_alpha == 255)
+	{
+		//状況を変更
+		ChangeSituation(Situation::kStart1P);
+		//初期化を行う
+		RetryInit();
+	}
 }
 
 MyEngine::Vector3 GameManager::GetTargetBackPos(float distance, std::shared_ptr<CharacterBase> character)
@@ -638,4 +668,39 @@ MyEngine::Vector3 GameManager::GetTargetBackPos(float distance, std::shared_ptr<
 	{
 		return MyEngine::Vector3(0, 0, 0);
 	}
+}
+
+CharacterBase::CharacterStatus GameManager::GetCharacterStatus(std::vector<std::string> statusData)
+{
+	CharacterBase::CharacterStatus ans;
+
+	ans.name = statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kName)];
+	ans.hp = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kHp)]);
+	ans.startMp = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kStartMp)]);
+	ans.atk = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kAtk)]);
+	ans.def = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kDef)]);
+	ans.spd = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSpd)]);
+	ans.chargeSpd = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kChargeSpd)]);
+	ans.chaseAttackNum = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kChaseNum)]);
+
+	//一つ目の必殺技の情報設定
+	ans.firstSpecialAttackData.name = statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialName)];
+	ans.firstSpecialAttackData.path = statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialEffectName)];
+	ans.firstSpecialAttackData.cost = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialCost)]);
+	ans.firstSpecialAttackData.damageRate = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialDamageRate)]);
+	ans.firstSpecialAttackData.radius = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialRadius)]);
+	ans.firstSpecialAttackData.startFrame = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialStartFrame)]);
+	ans.firstSpecialAttackData.endFrame = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialEndFrame)]);
+	ans.firstSpecialAttackData.kind = m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetSpecialAttackKind(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kFirstSpecialKind)]);
+
+	//二つ目の必殺技の情報設定
+	ans.secondSpecialAttackData.name = statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialName)];
+	ans.secondSpecialAttackData.path = statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialEffectName)];
+	ans.secondSpecialAttackData.cost = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialCost)]);
+	ans.secondSpecialAttackData.damageRate = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialDamageRate)]);
+	ans.secondSpecialAttackData.radius = stof(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialRadius)]);
+	ans.secondSpecialAttackData.startFrame = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialStartFrame)]);
+	ans.secondSpecialAttackData.endFrame = stoi(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialEndFrame)]);
+	ans.secondSpecialAttackData.kind = m_pCharacters[static_cast<int>(CharacterBase::PlayerNumber::kOnePlayer)]->GetSpecialAttackKind(statusData[static_cast<int>(CharacterBase::CharacterStatusDataSort::kSecondSpecialKind)]);
+	return ans;
 }

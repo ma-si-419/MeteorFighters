@@ -26,6 +26,7 @@ namespace
 	};
 
 	const int kWhiteColor = GetColor(255, 255, 255);
+	const int kRedColor = GetColor(255, 0, 0);
 }
 
 SceneMenu::SceneMenu(SceneManager& sceneManager) :
@@ -129,10 +130,9 @@ void SceneMenu::Draw()
 	{
 		//ï`âÊèàóù
 		DrawString(item.showPosX, item.showPosY, item.showString.c_str(), kWhiteColor);
-
 	}
 
-	DrawString(0, 0, "SceneMenu", kWhiteColor);
+	DrawString(0, 0, "SceneMenu", kRedColor);
 
 #endif // _DEBUG
 

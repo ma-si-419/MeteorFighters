@@ -112,7 +112,7 @@ void CharacterStateSpecialAttack::Update()
 	}
 
 	//UŒ‚‚ğ‚â‚ß‚éƒtƒŒ[ƒ€
-	int attackEndFrame = attackData.startFrame + m_attackTime;
+	float attackEndFrame = static_cast<float>(attackData.startFrame + m_attackTime);
 
 	//•KE‹Z‚ğó‚¯‚½‚Ìó‘Ô‚Æ“G‚Ìó‘Ô‚ªˆê’v‚µ‚½‚ç
 	if (m_endHitReaction == static_cast<int>(GetTargetHitReaction()) &&

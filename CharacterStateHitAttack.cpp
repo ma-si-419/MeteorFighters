@@ -84,6 +84,7 @@ void CharacterStateHitAttack::Update()
 {
 
 	m_time++;
+	printfDx("ヒットアタック%.0f\n",m_time);
 
 	//今受けている攻撃がスタン攻撃だったら
 	if (m_pCharacter->GetHitReaction() == CharacterBase::HitReactionKind::kBottomStan ||

@@ -141,9 +141,6 @@ namespace
 
 	//リザルトのロゴを揺らす大きさ
 	constexpr int kResultLogoShakeScale = 18;
-
-	//リザルトのロゴのフェードの速さ
-	constexpr int kResultRogoFadeSpeed = 2;
 }
 
 GameUi::GameUi() :
@@ -151,12 +148,32 @@ GameUi::GameUi() :
 	m_lastHpBarNum(),
 	m_onHitDamageHp(),
 	m_hitDamageTime(),
+	m_onSubMp(),
 	m_selectItem(0),
 	m_resultTime(0),
-	m_resultLogoAlpha(255),
 	m_resultLogoScale(kResultLogoDefaultScale),
 	m_shakeTime(0)
 {
+}
+
+void GameUi::RetryInit()
+{
+	//値をすべて初期化する
+	for (auto& num : m_lastHp)			 num = 0.0f;
+	for (auto& num : m_lastHpBarNum)	 num = 0.0f;
+	for (auto& num : m_onHitDamageHp)	 num = 0.0f;
+	for (auto& num : m_onSubMp)			 num = 0.0f;
+	for (auto& num : m_hitDamageTime)	 num = 0;
+	
+	for (auto& pos : m_shakePos) pos = MyEngine::Vector2(0,0);
+
+	m_selectItem = static_cast<int>(SelectItem::kRetry);
+
+	m_resultTime = 0;
+
+	m_resultLogoScale = kResultLogoDefaultScale;
+
+	m_shakeTime = 0;
 }
 
 void GameUi::DrawHpBar(float hp, bool isLeft)
@@ -597,6 +614,8 @@ void GameUi::DrawFade(int color, int alpha)
 
 int GameUi::UpdateResult()
 {
+	//リザルトのロゴの拡縮が終了したら操作可能にする
+	if (m_resultLogoScale != kResultLogoFinalScale) return -1;
 	auto& input = MyEngine::Input::GetInstance();
 
 	//Aボタンを押したときに選択されている項目を実行する
@@ -627,8 +646,8 @@ void GameUi::DrawResult(bool isWin)
 	m_resultTime++;
 
 	DrawString(50, 300, "もう一度たたかう", GetColor(255, 255, 255));
-	DrawString(50, 350, "キャラクターセレクトに戻る", GetColor(255, 255, 255));
-	DrawString(50, 400, "タイトルに戻る", GetColor(255, 255, 255));
+	DrawString(50, 350, "キャラクターを選びなおす", GetColor(255, 255, 255));
+	DrawString(50, 400, "メインメニューに戻る", GetColor(255, 255, 255));
 
 	int posY = 0;
 
@@ -640,7 +659,7 @@ void GameUi::DrawResult(bool isWin)
 	{
 		posY = 350;
 	}
-	else if (m_selectItem == static_cast<int>(SelectItem::kTitle))
+	else if (m_selectItem == static_cast<int>(SelectItem::kMenu))
 	{
 		posY = 400;
 	}
@@ -665,17 +684,12 @@ void GameUi::DrawResult(bool isWin)
 			if (m_shakeTime < kResultLogoShakeTime)
 			{
 				//ロゴの座標を揺らす(ランダムがプラスしか出ないので半分減らす)
-				logoPosX += GetRand(kResultLogoShakeScale) + (kResultLogoShakeScale * 0.5);
-				logoPosY += GetRand(kResultLogoShakeScale) + (kResultLogoShakeScale * 0.5);
+				logoPosX += GetRand(kResultLogoShakeScale) + static_cast<int>(kResultLogoShakeScale * 0.5);
+				logoPosY += GetRand(kResultLogoShakeScale) + static_cast<int>(kResultLogoShakeScale * 0.5);
 			}
 			m_shakeTime++;
 		}
 
-
-		//アルファ値をあげていく
-		m_resultLogoAlpha += kResultRogoFadeSpeed;
-
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_resultLogoAlpha);
 		if (isWin)
 		{
 			DrawRotaGraph(logoPosX, logoPosY, m_resultLogoScale, 0.0, GraphManager::GetInstance().GetHandle("Winner"), true);
@@ -684,7 +698,6 @@ void GameUi::DrawResult(bool isWin)
 		{
 			DrawRotaGraph(logoPosX, logoPosY, m_resultLogoScale, 0.0, GraphManager::GetInstance().GetHandle("Loser"), true);
 		}
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 
 }

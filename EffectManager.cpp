@@ -9,8 +9,7 @@ namespace
 	constexpr float kDefaultPlaySpeed = 0.1f;
 }
 
-EffectManager::EffectManager() :
-	m_playSpeed(kDefaultPlaySpeed)
+EffectManager::EffectManager()
 {
 }
 
@@ -65,6 +64,21 @@ void EffectManager::Exit(std::shared_ptr<Effect> effect)
 	}
 }
 
+void EffectManager::Final()
+{
+	auto deleteEffect = m_effects;
+
+	for (auto& effect : deleteEffect)
+	{
+		Exit(effect);
+	}
+
+	for (auto& handle : m_handles)
+	{
+		DeleteEffekseerEffect(handle.second);
+	}
+}
+
 void EffectManager::Update()
 {
 
@@ -91,7 +105,7 @@ void EffectManager::Update()
 			pos.Y = item->GetPos().y;
 			pos.Z = item->GetPos().z;
 			StopEffekseer3DEffect(item->GetPlayHandle());
-			item->SetPlayHandle(manager->Play(ref, pos, item->GetLoopStartFrame()));
+			item->SetPlayHandle(manager->Play(ref, pos, static_cast<int32_t>(item->GetLoopStartFrame())));
 			item->ResetLoop();
 		}
 

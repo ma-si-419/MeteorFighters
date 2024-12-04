@@ -12,7 +12,7 @@ namespace
 	constexpr int kStartStringPosY = 432;
 
 
-	const int kWhiteColor = GetColor(255, 255, 255);
+	const int kRedColor = GetColor(255, 0, 0);
 }
 
 SceneTitle::SceneTitle(SceneManager& sceneManager) :
@@ -48,7 +48,7 @@ void SceneTitle::Draw()
 
 	DrawGraph(0, 0, graphManager.GetHandle("É^ÉCÉgÉãÉçÉS"), true);
 
-	DrawString(0, 0, "SceneTitle", kWhiteColor);
+	DrawString(0, 0, "SceneTitle", kRedColor);
 
 #endif // _DEBUG
 }

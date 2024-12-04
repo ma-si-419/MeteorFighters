@@ -111,7 +111,7 @@ void CharacterStateCharge::Update()
 	//Yボタンが押されたら
 	if (m_isPlayer && input.IsTrigger("Y"))
 	{
-		int cost = m_pCharacter->GetSpecialAttackData(1).cost;
+		float cost = static_cast<float>(m_pCharacter->GetSpecialAttackData(1).cost);
 
 		//気力が足りなかったら実行しない
 		if (m_pCharacter->SubMp(cost))

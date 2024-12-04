@@ -34,3 +34,9 @@ void Stage::Draw()
 {
 	MV1DrawModel(m_modelHandle);
 }
+
+void Stage::Final()
+{
+	MV1DeleteModel(m_modelHandle);
+	Physics::GetInstance().DeleteStage();
+}

@@ -82,7 +82,7 @@ public:
 	/// ループの設定をする
 	/// </summary>
 	/// <param name="time">ループする時間</param>
-	void SetLoop(int loopStart,int loopEnd);
+	void SetLoop(float loopStart,float loopEnd);
 
 	/// <summary>
 	/// ループをしない時に呼ぶ(エフェクトを変更した後などに使用)
@@ -99,7 +99,7 @@ public:
 	/// ループのスタートフレームを取得する
 	/// </summary>
 	/// <returns>ループのスタート</returns>
-	int GetLoopStartFrame() { return m_loopStartTime; }
+	float GetLoopStartFrame() { return m_loopStartTime; }
 
 	/// <summary>
 	/// ループの時間をリセットする
@@ -157,8 +157,8 @@ private:
 
 	float m_playSpeed;
 
-	int m_loopStartTime;
+	float m_loopStartTime;
 	
-	int m_loopEndTime;
+	float m_loopEndTime;
 };
 

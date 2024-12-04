@@ -5,7 +5,7 @@
 
 namespace
 {
-	const int kWhiteColor = GetColor(255, 255, 255);
+	const int kRedColor = GetColor(255, 0, 0);
 }
 
 SceneSelect::SceneSelect(SceneManager& sceneManager) :
@@ -40,9 +40,7 @@ void SceneSelect::Draw()
 {
 #ifdef _DEBUG
 
-	DrawBox(0, 0, 500, 500, kWhiteColor, true);
-
-	DrawString(0, 0, "SceneSelect", kWhiteColor);
+	DrawString(0, 0, "SceneSelect", kRedColor);
 
 #endif // _DEBUG
 }

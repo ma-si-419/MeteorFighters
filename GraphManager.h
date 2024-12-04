@@ -37,6 +37,17 @@ public:
 	/// <returns>画像ハンドル</returns>
 	int GetHandle(std::string graphName);
 
+#ifdef _DEBUG
+
+	/// <summary>
+	/// 現在持っているハンドルの数を返す
+	/// </summary>
+	/// <returns>画像ハンドルの数</returns>
+	int GetHandleNum();
+
+#endif // _DEBUG
+
+	
 private:
 
 	enum class FileDataSort

@@ -1254,9 +1254,8 @@ private:
 			return (1);
 
 		// 漸化式の計算
-		double d1 = (knot[j + p] == knot[j]) ? 0 : (t - knot[j]) * CalcBSplineBasisFunc(knot, j, p - 1, t) / (knot[j + p] - knot[j]);
-		double d2 = (knot[j + p + 1] == knot[j + 1]) ? 0 : (knot[j + p + 1] - t) * CalcBSplineBasisFunc(knot, j + 1, p - 1, t) / (knot[j + p + 1] - knot[j + 1]);
-
+		double d1 = (knot[static_cast<uint64_t>(j) + static_cast<uint64_t>(p)] == knot[j]) ? 0 : (t - knot[j]) * CalcBSplineBasisFunc(knot, j, static_cast<uint64_t>(p) - 1, t) / (knot[static_cast<uint64_t>(j) + static_cast<uint64_t>(p)] - knot[j]);
+		double d2 = (knot[static_cast<uint64_t>(j) + static_cast<uint64_t>(p) + 1] == knot[static_cast<uint64_t>(j) + 1]) ? 0 : (knot[static_cast<uint64_t>(j) + static_cast<uint64_t>(p) + 1] - t) * CalcBSplineBasisFunc(knot, j + 1, p - 1, t) / (knot[static_cast<uint64_t>(j) + static_cast<uint64_t>(p) + 1] - knot[static_cast<uint64_t>(j) + 1]);
 		return (d1 + d2);
 	}
 
@@ -1268,7 +1267,8 @@ public:
 		mLength(0),
 		mOrder(0),
 		mStep(0),
-		mType(0)
+		mType(0),
+		mControllPointCount(0)
 	{
 	}
 
@@ -1368,8 +1368,8 @@ public:
 		double wSum = 0; // bs の合計
 		for (int j = 0; j < mControllPointCount; ++j)
 		{
-			bs[j] = mControllPoint[j].W * CalcBSplineBasisFunc(knot, j, p, t * (t_rate));
-
+			bs[j] = mControllPoint[j].W * CalcBSplineBasisFunc(knot, j, p, static_cast<double>(t) * static_cast<double>(t_rate));
+			
 			if (!std::isnan(bs[j]))
 			{
 				wSum += bs[j];

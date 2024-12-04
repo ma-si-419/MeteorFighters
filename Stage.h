@@ -9,6 +9,7 @@ public:
 	void Init();
 	void Draw();
 
+	void Final();
 private:
 	int m_modelHandle;
 	MyEngine::Vector3 m_pos;

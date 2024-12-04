@@ -1,4 +1,6 @@
 #include "SceneGame.h"
+#include "SceneSelect.h"
+#include "SceneMenu.h"
 #include "DxLib.h"
 #include "CharacterBase.h"
 #include "GameManager.h"
@@ -10,7 +12,7 @@
 
 namespace
 {
-	const int kWhiteColor = GetColor(255, 255, 255);
+	const int kRedColor = GetColor(255, 0, 0);
 }
 
 SceneGame::SceneGame(SceneManager& sceneManager) :
@@ -48,6 +50,17 @@ void SceneGame::Update()
 	}
 
 	m_pGameManager->Update();
+
+	if (m_pGameManager->GetNextScene() == Game::Scene::kSelect)
+	{
+		//セレクトシーンに戻る
+		m_sceneManager.ChangeScene(std::make_shared<SceneSelect>(m_sceneManager));
+	}
+	else if (m_pGameManager->GetNextScene() == Game::Scene::kMenu)
+	{
+		//メニューシーンに戻る
+		m_sceneManager.ChangeScene(std::make_shared<SceneMenu>(m_sceneManager));
+	}
 }
 
 void SceneGame::Draw()
@@ -55,7 +68,7 @@ void SceneGame::Draw()
 
 #ifdef _DEBUG
 
-	DrawString(0, 0, "SceneGame", kWhiteColor);
+	DrawString(0, 0, "SceneGame",kRedColor);
 
 	Physics::GetInstance().DebugDraw();
 
@@ -70,6 +83,7 @@ void SceneGame::Draw()
 
 void SceneGame::End()
 {
+	m_pGameManager->Final();
 }
 
 void SceneGame::SetCharacter(int player, int enemy)
@@ -80,7 +94,7 @@ void SceneGame::SetCharacter(int player, int enemy)
 
 	std::vector<std::vector<std::string>> data = load.LoadFile("data/csv/characterStatus.csv");
 
-	m_pGameManager->SetPlayerStatus(player, data[player]);
+	m_pGameManager->SetOnePlayerStatus(player, data[player]);
 
-	m_pGameManager->SetEnemyStatus(enemy, data[enemy]);
+	m_pGameManager->SetTwoPlayerStatus(enemy, data[enemy]);
 }

@@ -258,10 +258,17 @@ public:
 
 	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
 
+	void Final();
+
 	/// <summary>
 	/// もう一度バトルを行う際に使用する関数
 	/// </summary>
 	void RetryInit();
+
+	/// <summary>
+	/// 残像の更新を行う
+	/// </summary>
+	void UpdateAfterImage();
 
 	/// <summary>
 	/// 敵の座標などを取得するためにゲームマネージャーのポインタをセットする
@@ -298,7 +305,7 @@ public:
 	/// </summary>
 	/// <returns>現在の気力</returns>
 	float GetMp() { return m_nowMp; }
-	
+
 	/// <summary>
 	/// 体力を減らす
 	/// </summary>
@@ -310,7 +317,7 @@ public:
 	/// </summary>
 	/// <param name="subMp">減少量</param>
 	/// <returns>足りなければfalse</returns>
-	bool SubMp(int subMp);
+	bool SubMp(float subMp);
 
 	/// <summary>
 	/// 気力を貯める
@@ -348,7 +355,7 @@ public:
 	/// <param name="animKind">アニメーションを指定</param>
 	/// <param name="loop">繰り返すかどうか</param>
 	/// <param name="blendSpeed">繰り返すかどうか</param>
-	void ChangeAnim(AnimKind animKind, bool loop ,float blendSpeed);
+	void ChangeAnim(AnimKind animKind, bool loop, float blendSpeed);
 
 	/// <summary>
 	/// アニメーションを再生する
@@ -411,7 +418,7 @@ public:
 	/// </summary>
 	/// <returns>終了していたらtrue</returns>
 	bool IsEndAnimationBlend() { return m_isEndAnimationBlend; }
-	
+
 	/// <summary>
 	/// アニメーションが終了しているかどうかを取得する
 	/// </summary>
@@ -513,7 +520,13 @@ public:
 	/// <param name="num">1Pか2Pかを設定する</param>
 	void SetCharacterNumber(PlayerNumber num) { m_playerNumber = num; }
 
-protected:
+	/// <summary>
+	/// 状況によって変化させるアップデートを変更する
+	/// </summary>
+	/// <param name="situation">GameManager::Situationをint型にキャストして引数にする</param>
+	void ChangeSituationUpdate(int situation);
+
+private:
 
 	/// <summary>
 	/// 各キャラ共通の攻撃の情報のcsvファイルに入っている順番
@@ -535,7 +548,38 @@ protected:
 		kAnimationName//アニメーションの名前
 	};
 
-	
+private:
+
+	/// <summary>
+	/// 開始時の演出中のアップデート
+	/// </summary>
+	void UpdateStart();
+
+	/// <summary>
+	/// バトル時アップデート
+	/// </summary>
+	void UpdateBattle();
+
+	/// <summary>
+	/// ノックアウト時のアップデート
+	/// </summary>
+	void UpdateKnockOut();
+
+	/// <summary>
+	/// リザルト時のアップデート
+	/// </summary>
+	void UpdateResult();
+
+	/// <summary>
+	/// 何もしない時のアップデート
+	/// </summary>
+	void UpdateNone();
+
+private:
+	using UpdateSituationFunc = void (CharacterBase::*)();
+
+	UpdateSituationFunc m_updateSituationFunc;
+
 	//自身がどちら側のキャラクターか
 	PlayerNumber m_playerNumber;
 	//モデルハンドル
@@ -590,7 +634,7 @@ protected:
 	bool m_isEndAnimationBlend;
 	//ノックアウト時のベロシティ
 	MyEngine::Vector3 m_knockOutVelo;
-	
+
 
 	friend CharacterStateBase;
 };

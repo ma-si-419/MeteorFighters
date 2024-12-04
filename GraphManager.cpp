@@ -103,3 +103,8 @@ int GraphManager::GetHandle(std::string graphName)
 {
 	return m_sceneGraphHandle[graphName];
 }
+
+int GraphManager::GetHandleNum()
+{
+	return static_cast<int>(m_sceneGraphHandle.size());
+}
