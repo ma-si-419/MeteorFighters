@@ -114,7 +114,7 @@ public:
 	{
 		kMouse,
 		kBigBoy,
-		kBlueHead
+		kBigBlue
 	};
 
 	enum class CharacterStatusDataSort

@@ -111,14 +111,27 @@ CharacterBase::~CharacterBase()
 
 void CharacterBase::Init()
 {
-	if (m_playerNumber == PlayerNumber::kOnePlayer)
+	std::string path;
+
+	//2Pなら最初にEnemyを付ける
+	if (m_playerNumber == PlayerNumber::kTwoPlayer)
 	{
-		m_modelHandle = MV1LoadModel("data/model/Fighter.mv1");
+		path = "Enemy";
 	}
-	else if (m_playerNumber == PlayerNumber::kTwoPlayer)
+
+	//キャラクターの種類によってパスを変更する
+	if (m_characterKind == CharacterKind::kMouse)
 	{
-		m_modelHandle = MV1LoadModel("data/model/Fighter2.mv1");
+		path += "BigB";
 	}
+	else if (m_characterKind == CharacterKind::kBigBlue)
+	{
+		path += "Mouse";
+	}
+
+	path = "data/model/" + path + ".mv1";
+
+	m_modelHandle = MV1LoadModel(path.c_str());
 
 	MV1SetScale(m_modelHandle, VGet(GameSceneConstant::kModelScale, GameSceneConstant::kModelScale, GameSceneConstant::kModelScale));
 
@@ -156,7 +169,7 @@ void CharacterBase::Update()
 	{
 		m_pState = m_pState->m_pNextState;
 	}
-	
+
 	//状況によって変化するアップデート
 	(this->*m_updateSituationFunc)();
 
@@ -713,7 +726,7 @@ void CharacterBase::ChangeSituationUpdate(int situation)
 	//1Pの開始演出をしているとき
 	else if (sit == GameManager::Situation::kStart1P)
 	{
-		
+
 		if (m_playerNumber == PlayerNumber::kOnePlayer)
 		{
 			//1P側はスタート処理を行う
@@ -773,7 +786,7 @@ void CharacterBase::UpdateBattle()
 
 	//残像の更新を行う
 	UpdateAfterImage();
-	
+
 	//アニメーションの更新
 	PlayAnim();
 
@@ -795,7 +808,7 @@ void CharacterBase::UpdateKnockOut()
 
 	//残像の更新を行う
 	UpdateAfterImage();
-	
+
 	//アニメーションの更新
 	PlayAnim();
 }
@@ -803,7 +816,7 @@ void CharacterBase::UpdateKnockOut()
 void CharacterBase::UpdateResult()
 {
 	//移動をしないようにする
-	m_rigidbody.SetVelo(MyEngine::Vector3(0,0,0));
+	m_rigidbody.SetVelo(MyEngine::Vector3(0, 0, 0));
 
 	//アニメーションの再生速度をリセットする
 	SetAnimPlaySpeed();
