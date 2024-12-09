@@ -105,7 +105,7 @@ namespace
 	constexpr int kMpBarGraphPosY = 150;
 
 	//Mpバーの開始座標
-	constexpr int kMpBarStartPosX = 75;
+	constexpr int kMpBarStartPosX[2] = { 75,Game::kWindowWidth - 75 };
 	constexpr int kMpBarUpPosY = 140;
 	constexpr int kMpBarUnderPosY = 160;
 
@@ -164,8 +164,8 @@ void GameUi::RetryInit()
 	for (auto& num : m_onHitDamageHp)	 num = 0.0f;
 	for (auto& num : m_onSubMp)			 num = 0.0f;
 	for (auto& num : m_hitDamageTime)	 num = 0;
-	
-	for (auto& pos : m_shakePos) pos = MyEngine::Vector2(0,0);
+
+	for (auto& pos : m_shakePos) pos = MyEngine::Vector2(0, 0);
 
 	m_selectItem = static_cast<int>(SelectItem::kRetry);
 
@@ -525,21 +525,21 @@ void GameUi::DrawMpBar(float mp, bool isLeft)
 		//赤いゲージの座標(減った分の気力量を表示)
 
 		//左上のポリゴン
-		vertex[0].pos = VGet(kMpBarStartPosX + kMpBarGapX, kMpBarUpPosY, 0);
+		vertex[0].pos = VGet(kMpBarStartPosX[0] + kMpBarGapX, kMpBarUpPosY, 0);
 		vertex[0].dif = kSubMpBarColor;
 		vertex[0].rhw = 1.0f;
 		vertex[0].u = 0.0f;
 		vertex[0].v = 0.0f;
 
 		//右上
-		vertex[1].pos = VGet(kMpBarStartPosX + kMpBarGapX + subMpBarLength, kMpBarUpPosY, 0);
+		vertex[1].pos = VGet(kMpBarStartPosX[0] + kMpBarGapX + subMpBarLength, kMpBarUpPosY, 0);
 		vertex[1].dif = kSubMpBarColor;
 		vertex[1].rhw = 1.0f;
 		vertex[1].u = 0.0f;
 		vertex[1].v = 0.0f;
 
 		//左下
-		vertex[2].pos = VGet(kMpBarStartPosX, kMpBarUnderPosY, 0);
+		vertex[2].pos = VGet(kMpBarStartPosX[0], kMpBarUnderPosY, 0);
 		vertex[2].dif = kSubMpBarColor;
 		vertex[2].rhw = 1.0f;
 		vertex[2].u = 0.0f;
@@ -547,7 +547,7 @@ void GameUi::DrawMpBar(float mp, bool isLeft)
 
 
 		//右下
-		vertex[3].pos = VGet(kMpBarStartPosX + subMpBarLength, kMpBarUnderPosY, 0);
+		vertex[3].pos = VGet(kMpBarStartPosX[0] + subMpBarLength, kMpBarUnderPosY, 0);
 		vertex[3].dif = kSubMpBarColor;
 		vertex[3].rhw = 1.0f;
 		vertex[3].u = 0.0f;
@@ -575,16 +575,16 @@ void GameUi::DrawMpBar(float mp, bool isLeft)
 		float mpBarLength = kMpBarMaxLength * (mp / GameSceneConstant::kMaxMp);
 
 		//左上のポリゴン
-		vertex[0].pos = VGet(kMpBarStartPosX + kMpBarGapX, kMpBarUpPosY, 0);
+		vertex[0].pos = VGet(kMpBarStartPosX[0] + kMpBarGapX, kMpBarUpPosY, 0);
 
 		//右上
-		vertex[1].pos = VGet(kMpBarStartPosX + kMpBarGapX + mpBarLength, kMpBarUpPosY, 0);
+		vertex[1].pos = VGet(kMpBarStartPosX[0] + kMpBarGapX + mpBarLength, kMpBarUpPosY, 0);
 
 		//左下
-		vertex[2].pos = VGet(kMpBarStartPosX, kMpBarUnderPosY, 0);
+		vertex[2].pos = VGet(kMpBarStartPosX[0], kMpBarUnderPosY, 0);
 
 		//右下
-		vertex[3].pos = VGet(kMpBarStartPosX + mpBarLength, kMpBarUnderPosY, 0);
+		vertex[3].pos = VGet(kMpBarStartPosX[0] + mpBarLength, kMpBarUnderPosY, 0);
 
 
 		//2個目の三角形の第2頂点は左下の頂点なのでコピー
@@ -600,6 +600,99 @@ void GameUi::DrawMpBar(float mp, bool isLeft)
 	}
 	else
 	{
+		//mp量が増えていたら
+		if (mp >= m_onSubMp[1])
+		{
+			//初期化する
+			m_onSubMp[1] = mp;
+		}
+		//mp量が減っていたら
+		else
+		{
+			m_onSubMp[1] -= kRedMpBarSubSpeed;
+			//下がりすぎないようにクランプ
+			m_onSubMp[1] = std::fmax(m_onSubMp[1], mp);
+		}
+
+		//Mpバーの長さ
+		float subMpBarLength = kMpBarMaxLength * (m_onSubMp[1] / GameSceneConstant::kMaxMp);
+
+		VERTEX2D vertex[6];
+
+		//赤いゲージの座標(減った分の気力量を表示)
+
+		//右上のポリゴン
+		vertex[0].pos = VGet(kMpBarStartPosX[1] - kMpBarGapX, kMpBarUpPosY, 0);
+		vertex[0].dif = kSubMpBarColor;
+		vertex[0].rhw = 1.0f;
+		vertex[0].u = 0.0f;
+		vertex[0].v = 0.0f;
+
+		//左上
+		vertex[1].pos = VGet(kMpBarStartPosX[1] - kMpBarGapX - subMpBarLength, kMpBarUpPosY, 0);
+		vertex[1].dif = kSubMpBarColor;
+		vertex[1].rhw = 1.0f;
+		vertex[1].u = 0.0f;
+		vertex[1].v = 0.0f;
+
+		//左下
+		vertex[2].pos = VGet(kMpBarStartPosX[1], kMpBarUnderPosY, 0);
+		vertex[2].dif = kSubMpBarColor;
+		vertex[2].rhw = 1.0f;
+		vertex[2].u = 0.0f;
+		vertex[2].v = 0.0f;
+
+
+		//右下
+		vertex[3].pos = VGet(kMpBarStartPosX[1] - subMpBarLength, kMpBarUnderPosY, 0);
+		vertex[3].dif = kSubMpBarColor;
+		vertex[3].rhw = 1.0f;
+		vertex[3].u = 0.0f;
+		vertex[3].v = 0.0f;
+
+		//2個目の三角形の第2頂点は左下の頂点なのでコピー
+		vertex[4] = vertex[2];
+
+		//2ポリゴン目の第3頂点は右上の頂点なのでコピー
+		vertex[5] = vertex[1];
+
+		//Mpバーの下の灰色のボックス表示
+		DrawBox(kMpBarGraphPosX[1] - kMpBarBackBoxHalfWidth, kMpBarUpPosY, kMpBarGraphPosX[1] + kMpBarBackBoxHalfWidth, kMpBarUnderPosY, GetColor(192, 192, 192), true);
+
+		//Mpバーが減った量を表す赤いバーを表示
+		DrawPolygon2D(vertex, 2, DX_NONE_GRAPH, true);
+
+		for (auto& poly : vertex)
+		{
+			poly.dif = kMpBarColor;
+		}
+
+		//通常の座標を設定
+
+		float mpBarLength = kMpBarMaxLength * (mp / GameSceneConstant::kMaxMp);
+
+		//左上のポリゴン
+		vertex[0].pos = VGet(kMpBarStartPosX[1] - kMpBarGapX, kMpBarUpPosY, 0);
+
+		//右上
+		vertex[1].pos = VGet(kMpBarStartPosX[1] - kMpBarGapX - mpBarLength, kMpBarUpPosY, 0);
+
+		//左下
+		vertex[2].pos = VGet(kMpBarStartPosX[1], kMpBarUnderPosY, 0);
+
+		//右下
+		vertex[3].pos = VGet(kMpBarStartPosX[1] - mpBarLength, kMpBarUnderPosY, 0);
+
+
+		//2個目の三角形の第2頂点は左下の頂点なのでコピー
+		vertex[4].pos = vertex[2].pos;
+
+		//2ポリゴン目の第3頂点は右上の頂点なのでコピー
+		vertex[5].pos = vertex[1].pos;
+
+		//Mpバーを表示
+		DrawPolygon2D(vertex, 2, DX_NONE_GRAPH, true);
+
 		DrawRotaGraph(kMpBarGraphPosX[1], kMpBarGraphPosY, 1.0, 0.0, barGraphHandle, true, true);
 	}
 
@@ -616,21 +709,21 @@ int GameUi::UpdateResult()
 {
 	//リザルトのロゴの拡縮が終了したら操作可能にする
 	if (m_resultLogoScale != kResultLogoFinalScale) return -1;
-	auto& input = MyEngine::Input::GetInstance();
+	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
 	//Aボタンを押したときに選択されている項目を実行する
-	if (input.IsTrigger("A"))
+	if (input->IsTrigger("A"))
 	{
 		return m_selectItem;
 	}
 	//上下入力を受け取る
-	if (input.IsTrigger("Down"))
+	if (input->IsTrigger("Down"))
 	{
 		m_selectItem++;
 
 		m_selectItem = min(m_selectItem, static_cast<int>(SelectItem::kItemNum));
 	}
-	else if (input.IsTrigger("Up"))
+	else if (input->IsTrigger("Up"))
 	{
 		m_selectItem--;
 

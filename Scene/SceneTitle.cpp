@@ -33,7 +33,9 @@ void SceneTitle::Init()
 
 void SceneTitle::Update()
 {
-	if (MyEngine::Input::GetInstance().IsTrigger("A"))
+	auto input = MyEngine::Input::GetInstance().GetInputData(0);
+
+	if (input->IsTrigger("A"))
 	{
 		m_sceneManager.ChangeScene(std::make_shared<SceneMenu>(m_sceneManager));
 	}

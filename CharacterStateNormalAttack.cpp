@@ -113,6 +113,9 @@ void CharacterStateNormalAttack::Enter()
 
 void CharacterStateNormalAttack::Update()
 {
+	//入力情報
+	auto input = GetCharacterInput();
+
 	//チャージ中はフレームを数える速度を変える
 	if (m_isCharge)
 	{
@@ -140,7 +143,7 @@ void CharacterStateNormalAttack::Update()
 	if (m_isCharge)
 	{
 		//ボタンが離されたらチャージをやめる
-		if (!MyEngine::Input::GetInstance().IsPress(m_attackKey))
+		if (!input->IsPress(m_attackKey))
 		{
 			m_isCharge = false;
 		}
@@ -335,8 +338,7 @@ void CharacterStateNormalAttack::Update()
 	//気弾攻撃ならば
 	else if (attackData.attackKind == CharacterBase::AttackKind::kEnergy)
 	{
-		//自由に移動できるようにする
-		MyEngine::Input& input = MyEngine::Input::GetInstance();
+
 		//移動方向ベクトル
 		MyEngine::Vector3 dir;
 
@@ -345,7 +347,7 @@ void CharacterStateNormalAttack::Update()
 		if (m_isPlayer)
 		{
 			//スティックの情報取得
-			MyEngine::Input::StickInfo stick = input.GetStickInfo();
+			auto stick = input->GetStickInfo();
 
 			//左スティックの傾き取得
 			leftStickDir = MyEngine::Vector3(stick.leftStickX, 0, -stick.leftStickY);
@@ -372,12 +374,12 @@ void CharacterStateNormalAttack::Update()
 			velo = dir * GetSpeed();
 		}
 		//ジャンプボタンが押されたら
-		if (m_isPlayer && input.IsPress("RB"))
+		if (m_isPlayer && input->IsPress("RB"))
 		{
 			velo.y = GetSpeed();
 		}
 		//下降ボタンが押されたら
-		else if (m_isPlayer && input.IsPushTrigger(true))
+		else if (m_isPlayer && input->IsPushTrigger(true))
 		{
 			velo.y = -GetSpeed();
 		}
@@ -440,14 +442,14 @@ void CharacterStateNormalAttack::Update()
 		if (attackData.attackKind == CharacterBase::AttackKind::kPhysical)
 		{
 			//Xボタンで次の通常攻撃に移行する
-			if (MyEngine::Input::GetInstance().IsTrigger("X"))
+			if (input->IsTrigger("X"))
 			{
 				m_nextAttackName = attackData.nextComboName;
 				m_isNextAttack = true;
 				m_attackKey = "X";
 			}
 			//Yボタンで派生攻撃を出す
-			else if (MyEngine::Input::GetInstance().IsTrigger("Y"))
+			else if (input->IsTrigger("Y"))
 			{
 				//前の攻撃が通常攻撃なら派生攻撃に移れる
 				if (m_attackKey == "X")
@@ -455,11 +457,11 @@ void CharacterStateNormalAttack::Update()
 					//Yボタンの派生技は基本チャージができる
 					m_isNextCharge = true;
 					//上入力しながらの派生攻撃
-					if (MyEngine::Input::GetInstance().GetStickInfo().leftStickY < -kPhysicalAttackStickPower)
+					if (input->GetStickInfo().leftStickY < -kPhysicalAttackStickPower)
 					{
 						m_nextAttackName = kUpperAttackName;
 					}
-					else if (MyEngine::Input::GetInstance().GetStickInfo().leftStickY > kPhysicalAttackStickPower)
+					else if (input->GetStickInfo().leftStickY > kPhysicalAttackStickPower)
 					{
 						m_nextAttackName = kLegSweepAttackName;
 					}
@@ -487,7 +489,7 @@ void CharacterStateNormalAttack::Update()
 		if (attackData.attackKind == CharacterBase::AttackKind::kEnergy)
 		{
 			//Yボタンで次の攻撃に移行する
-			if (MyEngine::Input::GetInstance().IsRelease("Y"))
+			if (input->IsRelease("Y"))
 			{
 				m_nextAttackName = attackData.nextComboName;
 				m_isNextAttack = true;

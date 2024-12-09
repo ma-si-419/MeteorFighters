@@ -167,6 +167,7 @@
     <ClCompile Include="GameCamera.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="GraphManager.cpp" />
+    <ClCompile Include="InputData.cpp" />
     <ClCompile Include="MyEngine\Utility\LocalPos.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MyEngine\Utility\Matrix.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameSceneConstant.h" />
     <ClInclude Include="GraphManager.h" />
+    <ClInclude Include="InputData.h" />
     <ClInclude Include="MyEngine\Utility\LocalPos.h" />
     <ClInclude Include="MyEngine\Utility\Matrix.h" />
     <ClInclude Include="MyEngine\Physics\CapsuleColliderData.h" />

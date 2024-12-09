@@ -186,6 +186,9 @@
     <ClCompile Include="CharacterStateSpecialAttack.cpp">
       <Filter>ソース ファイル\Actor\Character\State</Filter>
     </ClCompile>
+    <ClCompile Include="InputData.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -327,6 +330,9 @@
       <Filter>ヘッダー ファイル\Singleton</Filter>
     </ClInclude>
     <ClInclude Include="CharacterStateSpecialAttack.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="InputData.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

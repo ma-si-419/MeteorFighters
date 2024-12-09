@@ -2,6 +2,7 @@
 #include "SphereColliderData.h"
 #include "LoadCsv.h"
 #include "Attack.h"
+#include "Input.h"
 #include <cassert>
 #include <cmath>
 #include "GameManager.h"
@@ -111,6 +112,17 @@ CharacterBase::~CharacterBase()
 
 void CharacterBase::Init()
 {
+
+	//“ü—Íî•ñ‚Ìİ’è
+	if (m_playerNumber == CharacterBase::PlayerNumber::kOnePlayer)
+	{
+		m_input = MyEngine::Input::GetInstance().GetInputData(0);
+	}
+	else if (m_playerNumber == CharacterBase::PlayerNumber::kTwoPlayer)
+	{
+		m_input = MyEngine::Input::GetInstance().GetInputData(1);
+	}
+
 	std::string path;
 
 	//2P‚È‚çÅ‰‚ÉEnemy‚ğ•t‚¯‚é

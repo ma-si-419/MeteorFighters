@@ -75,8 +75,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		// ƒQ[ƒ€‚Ìˆ—
 		input.Update();
 #ifdef _DEBUG
+		auto inputData = input.GetInputData(0);
 
-		if (input.IsTrigger("LB"))
+
+		if (inputData->IsTrigger("LB"))
 		{
 			isMove = true;
 		}
@@ -92,14 +94,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		}
 
-		if (input.IsTrigger("Pause"))
+		if (inputData->IsTrigger("Pause"))
 		{
 			isStop = !isStop;
 		}
 
 		isMove = false;
 
-		if (input.IsTrigger("Select"))
+		if (inputData->IsTrigger("Select"))
 		{
 			isWindow = !isWindow;
 

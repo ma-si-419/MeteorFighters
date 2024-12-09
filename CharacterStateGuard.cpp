@@ -27,7 +27,7 @@ void CharacterStateGuard::Enter()
 void CharacterStateGuard::Update()
 {
 	//ガードボタンが押されている間このStateにいる
-	if (m_isPlayer && !MyEngine::Input::GetInstance().IsPress("B"))
+	if (m_isPlayer && !GetCharacterInput()->IsPress("B"))
 	{
 		//ガードボタンが離されたら
 		std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);

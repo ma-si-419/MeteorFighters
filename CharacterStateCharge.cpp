@@ -53,7 +53,7 @@ void CharacterStateCharge::Enter()
 void CharacterStateCharge::Update()
 {
 
-	auto& input = MyEngine::Input::GetInstance();
+	auto input = GetCharacterInput();
 
 	m_pCharacter->ChargeMp();
 
@@ -70,7 +70,7 @@ void CharacterStateCharge::Update()
 	}
 
 	//レフトショルダーが押されなくなったらアイドルStateに戻る
-	if (m_isPlayer && !input.IsPushTrigger(false))
+	if (m_isPlayer && !input->IsPushTrigger(false))
 	{
 		auto next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 
@@ -82,9 +82,9 @@ void CharacterStateCharge::Update()
 	}
 
 	//Aボタンが押されたら
-	if (m_isPlayer && input.IsTrigger("A"))
+	if (m_isPlayer && input->IsTrigger("A"))
 	{
-		MyEngine::Vector3 moveDir(input.GetStickInfo().leftStickX, 0, -input.GetStickInfo().leftStickY);
+		MyEngine::Vector3 moveDir(input->GetStickInfo().leftStickX, 0, -input->GetStickInfo().leftStickY);
 
 		//突撃Stateに移行する
 		auto next = std::make_shared<CharacterStateRush>(m_pCharacter);
@@ -109,7 +109,7 @@ void CharacterStateCharge::Update()
 	}
 
 	//Yボタンが押されたら
-	if (m_isPlayer && input.IsTrigger("Y"))
+	if (m_isPlayer && input->IsTrigger("Y"))
 	{
 		float cost = static_cast<float>(m_pCharacter->GetSpecialAttackData(1).cost);
 

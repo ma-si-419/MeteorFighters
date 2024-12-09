@@ -42,6 +42,7 @@ void CharacterStateIdle::Enter()
 
 void CharacterStateIdle::Update()
 {
+	auto input = GetCharacterInput();
 
 #ifdef _DEBUG
 
@@ -52,7 +53,7 @@ void CharacterStateIdle::Update()
 
 	if (m_isPlayer)
 	{
-		if (MyEngine::Input::GetInstance().IsPress("A"))
+		if (input->IsPress("A"))
 		{
 			m_pCharacter->SubHp(100);
 		}
@@ -80,17 +81,16 @@ void CharacterStateIdle::Update()
 	//前のフレームの終了アニメーションが再生されていたら下の条件分岐を通らない
 	if (m_isPlayEndAnim) return;
 
-	auto& input = MyEngine::Input::GetInstance();
 
 	//攻撃ボタンが押されていないときに
 	if (m_attackKey == "empty")
 	{
 		//格闘ボタンが押された時
-		if (m_isPlayer && input.IsPress("X"))
+		if (m_isPlayer && input->IsPress("X"))
 		{
 			m_attackKey = "X";
 		}
-		else if (m_isPlayer && input.IsPress("Y"))
+		else if (m_isPlayer && input->IsPress("Y"))
 		{
 			m_attackKey = "Y";
 		}
@@ -102,7 +102,7 @@ void CharacterStateIdle::Update()
 		m_attackButtonPushTime++;
 
 		//押していたボタンが離されたら
-		if (m_isPlayer && input.IsRelease(m_attackKey) ||
+		if (m_isPlayer && input->IsRelease(m_attackKey) ||
 			m_attackButtonPushTime > GameSceneConstant::kChargeAttackTime)
 		{
 			//チャージされていたかどうか判定
@@ -120,12 +120,12 @@ void CharacterStateIdle::Update()
 				if (m_attackKey == "X")
 				{
 					//スティックを上に傾けていたら
-					if (input.GetStickInfo().leftStickY < -GameSceneConstant::kPhysicalAttackStickPower)
+					if (input->GetStickInfo().leftStickY < -GameSceneConstant::kPhysicalAttackStickPower)
 					{
 						attackName = "UpCharge";
 					}
 					//スティックを下に傾けていたら
-					else if (input.GetStickInfo().leftStickY > GameSceneConstant::kPhysicalAttackStickPower)
+					else if (input->GetStickInfo().leftStickY > GameSceneConstant::kPhysicalAttackStickPower)
 					{
 						attackName = "DownCharge";
 					}
@@ -180,8 +180,8 @@ void CharacterStateIdle::Update()
 	}
 
 	//移動入力がされていたら
-	if (m_isPlayer && input.GetStickInfo().leftStickX != 0 ||
-		m_isPlayer && input.GetStickInfo().leftStickY != 0)
+	if (m_isPlayer && input->GetStickInfo().leftStickX != 0 ||
+		m_isPlayer && input->GetStickInfo().leftStickY != 0)
 	{
 		//次のStateのポインタ作成
 		auto next = std::make_shared<CharacterStateMove>(m_pCharacter);
@@ -191,7 +191,7 @@ void CharacterStateIdle::Update()
 	}
 
 	//一定時間レフトショルダーボタンが押されたら
-	if (m_isPlayer && input.GetPushTriggerTime(false) > GameSceneConstant::kChargeStateChangeTime)
+	if (m_isPlayer && input->GetPushTriggerTime(false) > GameSceneConstant::kChargeStateChangeTime)
 	{
 		//次のStateのポインタ作成
 		auto next = std::make_shared<CharacterStateCharge>(m_pCharacter);
@@ -201,10 +201,10 @@ void CharacterStateIdle::Update()
 	}
 
 	//ダッシュボタンが押された時
-	if (m_isPlayer && input.IsTrigger("A"))
+	if (m_isPlayer && input->IsTrigger("A"))
 	{
 		//一緒にレフトショルダーも押されていたら
-		if (m_isPlayer && input.IsPushTrigger(false))
+		if (m_isPlayer && input->IsPushTrigger(false))
 		{
 			//ダッシュのコストがあれば
 			if (m_pCharacter->SubMp(GameSceneConstant::kDashCost))
@@ -252,7 +252,7 @@ void CharacterStateIdle::Update()
 	if (m_pCharacter->IsGround())
 	{
 		//ジャンプボタンが押されたら
-		if (m_isPlayer && input.IsPress("RB"))
+		if (m_isPlayer && input->IsPress("RB"))
 		{
 			//ジャンプState作成
 			auto next = std::make_shared<CharacterStateJump>(m_pCharacter);
@@ -272,8 +272,8 @@ void CharacterStateIdle::Update()
 	else
 	{
 		//上昇ボタンか下降ボタンが押されたら
-		if (m_isPlayer && input.IsPress("RB") ||
-			m_isPlayer && input.IsPushTrigger(true))
+		if (m_isPlayer && input->IsPress("RB") ||
+			m_isPlayer && input->IsPushTrigger(true))
 		{
 			//次のStateのポインタ作成
 			auto next = std::make_shared<CharacterStateMove>(m_pCharacter);
@@ -284,7 +284,7 @@ void CharacterStateIdle::Update()
 	}
 
 	//ガード入力がされていたら
-	if (m_isPlayer && input.IsPress("B"))
+	if (m_isPlayer && input->IsPress("B"))
 	{
 		//次のStateのポインタ作成
 		auto next = std::make_shared<CharacterStateGuard>(m_pCharacter);

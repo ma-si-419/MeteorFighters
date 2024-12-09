@@ -74,10 +74,10 @@ void CharacterStateJump::Update()
 		m_moveVec.y = GameSceneConstant::kMaxFallSpeed;
 	}
 
-	auto& input = MyEngine::Input::GetInstance();
+	auto input = GetCharacterInput();
 
 	//ジャンプボタンをもう一度押したら空中に止まる(ステートも変更する)
-	if (m_isPlayer && input.IsTrigger("RB"))
+	if (m_isPlayer && input->IsTrigger("RB"))
 	{
 		auto next = std::make_shared<CharacterStateMove>(m_pCharacter);
 
@@ -87,11 +87,11 @@ void CharacterStateJump::Update()
 	if (m_attackKey == "empty")
 	{
 		//格闘ボタンが押された時
-		if (m_isPlayer && input.IsPress("X"))
+		if (m_isPlayer && input->IsPress("X"))
 		{
 			m_attackKey = "X";
 		}
-		else if (m_isPlayer && input.IsPress("Y"))
+		else if (m_isPlayer && input->IsPress("Y"))
 		{
 			m_attackKey = "Y";
 		}
@@ -103,7 +103,7 @@ void CharacterStateJump::Update()
 		m_attackButtonPushTime++;
 
 		//押していたボタンが離されたら
-		if (m_isPlayer && input.IsRelease(m_attackKey) ||
+		if (m_isPlayer && input->IsRelease(m_attackKey) ||
 			m_attackButtonPushTime > GameSceneConstant::kChargeAttackTime)
 		{
 			//チャージされていたかどうか判定
@@ -121,12 +121,12 @@ void CharacterStateJump::Update()
 				if (m_attackKey == "X")
 				{
 					//スティックを上に傾けていたら
-					if (input.GetStickInfo().leftStickY < -GameSceneConstant::kPhysicalAttackStickPower)
+					if (input->GetStickInfo().leftStickY < -GameSceneConstant::kPhysicalAttackStickPower)
 					{
 						attackName = "UpCharge";
 					}
 					//スティックを下に傾けていたら
-					else if (input.GetStickInfo().leftStickY > GameSceneConstant::kPhysicalAttackStickPower)
+					else if (input->GetStickInfo().leftStickY > GameSceneConstant::kPhysicalAttackStickPower)
 					{
 						attackName = "DownCharge";
 					}
@@ -181,10 +181,10 @@ void CharacterStateJump::Update()
 	}
 
 	//ダッシュボタンが押されたら
-	if (m_isPlayer && input.IsTrigger("A"))
+	if (m_isPlayer && input->IsTrigger("A"))
 	{
 
-		MyEngine::Vector3 leftStickDir(input.GetStickInfo().leftStickX, 0, -input.GetStickInfo().leftStickY);
+		MyEngine::Vector3 leftStickDir(input->GetStickInfo().leftStickX, 0, -input->GetStickInfo().leftStickY);
 
 		leftStickDir = leftStickDir.Normalize();
 

@@ -25,7 +25,9 @@ void SceneSelect::Init()
 
 void SceneSelect::Update()
 {
-	if (MyEngine::Input::GetInstance().IsTrigger("A"))
+	auto input = MyEngine::Input::GetInstance().GetInputData(0);
+
+	if (input->IsTrigger("A"))
 	{
 		//ゲームシーンのポインタ作成
 		std::shared_ptr<SceneGame> scene = std::make_shared<SceneGame>(m_sceneManager);

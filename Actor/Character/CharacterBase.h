@@ -5,6 +5,8 @@
 #include <list>
 #include <string>
 #include <map>
+#include "InputData.h"
+
 class SceneGame;
 class GameManager;
 class CharacterStateBase;
@@ -526,6 +528,12 @@ public:
 	/// <param name="situation">GameManager::Situationをint型にキャストして引数にする</param>
 	void ChangeSituationUpdate(int situation);
 
+	/// <summary>
+	/// 入力を取得する
+	/// </summary>
+	/// <returns>入力情報</returns>
+	std::shared_ptr<MyEngine::InputData> GetInputData() { return m_input; }
+
 private:
 
 	/// <summary>
@@ -580,6 +588,8 @@ private:
 
 	UpdateSituationFunc m_updateSituationFunc;
 
+	//入力情報
+	std::shared_ptr<MyEngine::InputData> m_input;
 	//自身がどちら側のキャラクターか
 	PlayerNumber m_playerNumber;
 	//モデルハンドル

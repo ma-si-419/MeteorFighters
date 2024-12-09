@@ -57,7 +57,7 @@ void SceneManager::Update()
 			}
 		}
 		//シーン切り替えが始まったら入力をさせないようにする
-		MyEngine::Input::GetInstance().StopUpdate();
+		MyEngine::Input::GetInstance().StopAllInput();
 		m_pScene->Update();
 	}
 	//シーン切り替えしていないときの処理

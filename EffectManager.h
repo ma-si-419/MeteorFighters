@@ -22,6 +22,7 @@ public:
 	/// <summary>
 	/// 登録しているエフェクトを削除する
 	/// </summary>
+	/// 
 	/// <param name="effect">削除するエフェクトのポインタ</param>
 	void Exit(std::shared_ptr<Effect> effect);
 

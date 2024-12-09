@@ -79,9 +79,9 @@ void SceneMenu::Update()
 	}
 
 	//ã‰º“ü—Í‚Å‘I‘ğ‚µ‚Ä‚¢‚é€–Ú‚ğ•Ï‰»‚³‚¹‚é
-	auto& input = MyEngine::Input::GetInstance();
+	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
-	if (input.IsTrigger("Up"))
+	if (input->IsTrigger("Up"))
 	{
 		//€–Ú‚ª‚È‚¢•”•ª‚É‚¢‚©‚È‚¢‚æ‚¤‚É
 		if (m_selectKind > 0)
@@ -89,7 +89,7 @@ void SceneMenu::Update()
 			m_selectKind--;
 		}
 	}
-	else if (input.IsTrigger("Down"))
+	else if (input->IsTrigger("Down"))
 	{
 		//€–Ú‚ª‚È‚¢•”•ª‚És‚©‚È‚¢‚æ‚¤‚É
 		if (m_selectKind < static_cast<int>(ItemKind::kSelectEnd))
@@ -98,7 +98,7 @@ void SceneMenu::Update()
 		}
 	}
 
-	if (MyEngine::Input::GetInstance().IsTrigger("A"))
+	if (input->IsTrigger("A"))
 	{
 		if (m_selectKind == static_cast<int>(ItemKind::k1PvsCPU))
 		{

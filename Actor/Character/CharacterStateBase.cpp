@@ -83,6 +83,11 @@ void CharacterStateBase::ChangeState(std::shared_ptr<CharacterStateBase> nextSta
 	m_pNextState->Enter();
 }
 
+std::shared_ptr<MyEngine::InputData> CharacterStateBase::GetCharacterInput()
+{
+	return m_pCharacter->GetInputData();
+}
+
 MyEngine::Vector3 CharacterStateBase::GetTargetPos()
 {
 	return m_pCharacter->m_pGameManager->GetTargetPos(m_pCharacter);

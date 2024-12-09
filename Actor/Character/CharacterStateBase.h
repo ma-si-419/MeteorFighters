@@ -2,6 +2,7 @@
 #include "StateBase.h"
 #include "Vector3.h"
 #include <string>
+#include "InputData.h"
 class CharacterBase;
 class Collidable;
 class Attack;
@@ -39,6 +40,8 @@ public:
 protected:
 
 	virtual void ChangeState(std::shared_ptr<CharacterStateBase> nextState);
+
+	std::shared_ptr<MyEngine::InputData> GetCharacterInput();
 
 	/// <summary>
 	/// ‘Îí‘Šè‚ÌÀ•W‚ğæ“¾‚·‚é

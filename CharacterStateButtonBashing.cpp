@@ -1,7 +1,6 @@
 #include "CharacterStateButtonBashing.h"
 #include "CharacterStateIdle.h"
 #include "DxLib.h"
-#include "Input.h"
 
 CharacterStateButtonBashing::CharacterStateButtonBashing(std::shared_ptr<CharacterBase> character) :
 	CharacterStateBase(character)
@@ -20,7 +19,7 @@ void CharacterStateButtonBashing::Update()
 
 	DrawString(0, 16, "PlayerState:ButtonBashing", GetColor(255, 255, 255));
 
-	if (MyEngine::Input::GetInstance().IsTrigger("A"))
+	if (GetCharacterInput()->IsTrigger("A"))
 	{
 		std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 
