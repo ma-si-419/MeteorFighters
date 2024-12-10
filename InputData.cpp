@@ -43,6 +43,43 @@ void MyEngine::InputData::Init()
 	m_inputActionMap["Y"] = { {InputType::kKeyboard,KEY_INPUT_Y}, {InputType::kPad,PAD_INPUT_4} };
 }
 
+void MyEngine::InputData::PushButton(const std::string& key)
+{
+	m_currentInput[key] = true;
+}
+
+void MyEngine::InputData::BashButton(const std::string& key)
+{
+	//前のフレームと違う入力にする
+	m_currentInput[key] = !m_lastInput[0][key];
+}
+
+void MyEngine::InputData::PushTrigger(bool isLeft)
+{
+	if (isLeft)
+	{
+		m_triggerInfo.left = 255;
+	}
+	else
+	{
+		m_triggerInfo.right = 255;
+	}
+}
+
+void MyEngine::InputData::TiltStick(MyEngine::Vector3 stickTilt, bool isLeft)
+{
+	if (isLeft)
+	{
+		m_stickInfo.leftStickX = stickTilt.x;
+		m_stickInfo.leftStickY = stickTilt.y;
+	}
+	else
+	{
+		m_stickInfo.rightStickX = stickTilt.x;
+		m_stickInfo.rightStickY = stickTilt.y;
+	}
+}
+
 void MyEngine::InputData::SetInputMap(std::map<std::string, bool> inputMap)
 {
 	//前のフレームの入力値を保存する

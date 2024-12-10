@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include "Vector3.h"
 
 namespace MyEngine
 {
@@ -63,14 +64,60 @@ namespace MyEngine
 
 	public:
 
+
+		/// <summary>
+		/// ボタンを押す
+		/// </summary>
+		/// <param name="key">何のボタンか</param>
+		void PushButton(const std::string& key);
+
+		/// <summary>
+		/// ボタンを連打する
+		/// </summary>
+		/// <param name="key">何のボタンを連打するか</param>
+		void BashButton(const std::string& key);
+
+		/// <summary>
+		/// トリガーを押す
+		/// </summary>
+		/// <param name="isLeft">レフトトリガーを押す場合true</param>
+		void PushTrigger(bool isLeft);
+
+		/// <summary>
+		/// スティックを傾ける
+		/// </summary>
+		/// <param name="stickTilt">スティックの傾き</param>
+		/// <param name="isLeft">左のスティックを傾けるならtrue</param>
+		void TiltStick(MyEngine::Vector3 stickTilt,bool isLeft);
+
+		/// <summary>
+		/// キー入力を設定する
+		/// </summary>
+		/// <param name="inputMap">どのキーが押されているか</param>
 		void SetInputMap(std::map<std::string, bool> inputMap);
 
+		/// <summary>
+		/// スティックの入力情報を設定する
+		/// </summary>
+		/// <param name="stick">スティックの入力情報</param>
 		void SetStickInfo(StickInfo stick);
 
+		/// <summary>
+		/// トリガー入力を設定する
+		/// </summary>
+		/// <param name="trigger">トリガーの入力情報</param>
 		void SetTriggerInfo(TriggerInfo trigger);
 
+		/// <summary>
+		/// 入力をすべて消す
+		/// </summary>
 		void StopInput();
 
+
+		/// <summary>
+		/// 何のキーが設定されているかを取得する
+		/// </summary>
+		/// <returns>設定されたキー情報</returns>
 		std::map<std::string, std::vector<InputMapInfo>> GetInputActionMap() { return m_inputActionMap; }
 
 		/// <summary>
