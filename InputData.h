@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <list>
-#include "Vector3.h"
+#include "Vector2.h"
 
 namespace MyEngine
 {
@@ -88,7 +88,7 @@ namespace MyEngine
 		/// </summary>
 		/// <param name="stickTilt">スティックの傾き</param>
 		/// <param name="isLeft">左のスティックを傾けるならtrue</param>
-		void TiltStick(MyEngine::Vector3 stickTilt,bool isLeft);
+		void TiltStick(MyEngine::Vector2 stickTilt,bool isLeft);
 
 		/// <summary>
 		/// キー入力を設定する

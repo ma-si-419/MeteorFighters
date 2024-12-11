@@ -66,7 +66,7 @@ void MyEngine::InputData::PushTrigger(bool isLeft)
 	}
 }
 
-void MyEngine::InputData::TiltStick(MyEngine::Vector3 stickTilt, bool isLeft)
+void MyEngine::InputData::TiltStick(MyEngine::Vector2 stickTilt, bool isLeft)
 {
 	if (isLeft)
 	{
