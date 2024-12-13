@@ -77,7 +77,7 @@ void CharacterStateJump::Update()
 	auto input = GetCharacterInput();
 
 	//ジャンプボタンをもう一度押したら空中に止まる(ステートも変更する)
-	if (m_isPlayer && input->IsTrigger("RB"))
+	if (input->IsTrigger("RB"))
 	{
 		auto next = std::make_shared<CharacterStateMove>(m_pCharacter);
 
@@ -87,11 +87,11 @@ void CharacterStateJump::Update()
 	if (m_attackKey == "empty")
 	{
 		//格闘ボタンが押された時
-		if (m_isPlayer && input->IsPress("X"))
+		if (input->IsPress("X"))
 		{
 			m_attackKey = "X";
 		}
-		else if (m_isPlayer && input->IsPress("Y"))
+		else if (input->IsPress("Y"))
 		{
 			m_attackKey = "Y";
 		}
@@ -103,7 +103,7 @@ void CharacterStateJump::Update()
 		m_attackButtonPushTime++;
 
 		//押していたボタンが離されたら
-		if (m_isPlayer && input->IsRelease(m_attackKey) ||
+		if (input->IsRelease(m_attackKey) ||
 			m_attackButtonPushTime > GameSceneConstant::kChargeAttackTime)
 		{
 			//チャージされていたかどうか判定
@@ -181,7 +181,7 @@ void CharacterStateJump::Update()
 	}
 
 	//ダッシュボタンが押されたら
-	if (m_isPlayer && input->IsTrigger("A"))
+	if (input->IsTrigger("A"))
 	{
 
 		MyEngine::Vector3 leftStickDir(input->GetStickInfo().leftStickX, 0, -input->GetStickInfo().leftStickY);

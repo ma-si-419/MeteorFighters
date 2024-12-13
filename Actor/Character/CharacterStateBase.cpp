@@ -30,15 +30,6 @@ namespace
 CharacterStateBase::CharacterStateBase(std::shared_ptr<CharacterBase> character)
 {
 	m_pCharacter = character;
-	//‘€ì‚³‚ê‚é‚©‚Ç‚¤‚©‚ðÝ’è
-	if (character->GetTag() == ObjectTag::kOnePlayer)
-	{
-		m_isPlayer = true;
-	}
-	else
-	{
-		m_isPlayer = false;
-	}
 }
 
 void CharacterStateBase::OnCollide(std::shared_ptr<Collidable> collider)

@@ -3,6 +3,7 @@
 #include "LoadCsv.h"
 #include "Attack.h"
 #include "Input.h"
+#include "EnemyInput.h"
 #include <cassert>
 #include <cmath>
 #include "GameManager.h"
@@ -121,7 +122,12 @@ void CharacterBase::Init()
 	else if (m_playerNumber == CharacterBase::PlayerNumber::kTwoPlayer)
 	{
 		m_input = MyEngine::Input::GetInstance().GetInputData(1);
+
+		m_pEnemyInput = std::make_shared<EnemyInput>(m_input);
+
+		m_pEnemyInput->SetGameManager(m_pGameManager);
 	}
+
 
 	std::string path;
 
@@ -176,6 +182,13 @@ void CharacterBase::Init()
 
 void CharacterBase::Update()
 {
+
+	//エネミーの入力情報を更新する
+	if (m_playerNumber == PlayerNumber::kTwoPlayer)
+	{
+		m_pEnemyInput->Update();
+	}
+
 	//Stateが変更されていたらStateを入れ替える
 	if (m_pState != m_pState->m_pNextState)
 	{

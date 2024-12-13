@@ -114,10 +114,7 @@ void CharacterStateRush::Update()
 	//スティックの傾き
 	MyEngine::Vector3 stickDir;
 
-	if (m_isPlayer)
-	{
-		stickDir = MyEngine::Vector3(input->GetStickInfo().leftStickX, 0, -input->GetStickInfo().leftStickY);
-	}
+	stickDir = MyEngine::Vector3(input->GetStickInfo().leftStickX, 0, -input->GetStickInfo().leftStickY);
 
 	////////
 
@@ -211,10 +208,10 @@ void CharacterStateRush::Update()
 	//ラッシュを行うときの処理
 
 	//Aボタンが押されたときに
-	if (m_isPlayer && input->IsTrigger("A"))
+	if (input->IsTrigger("A"))
 	{
 		//レフトショルダーも押されていたら
-		if (m_isPlayer && input->IsPushTrigger(false))
+		if (input->IsPushTrigger(false))
 		{
 			//気力が足りた場合のみ
 			if (m_pCharacter->SubMp(kEnemyRushCost))
@@ -266,11 +263,11 @@ void CharacterStateRush::Update()
 	MyEngine::Vector3 dir;
 
 	//上下移動処理
-	if (m_isPlayer && input->IsPress("RB"))
+	if (input->IsPress("RB"))
 	{
 		dir.y += kMoveVerticalPower * speed;
 	}
-	if (m_isPlayer && input->IsPushTrigger(true))
+	if (input->IsPushTrigger(true))
 	{
 		dir.y -= kMoveVerticalPower * speed;
 	}
@@ -454,7 +451,7 @@ void CharacterStateRush::Update()
 		}
 
 		//攻撃入力がされたらすぐに攻撃に移る
-		if (m_isPlayer && input->IsTrigger("X"))
+		if (input->IsTrigger("X"))
 		{
 			auto next = std::make_shared<CharacterStateNormalAttack>(m_pCharacter);
 

@@ -59,14 +59,13 @@ void CharacterStateMove::Update()
 
 	MyEngine::Vector3 inputDir;
 
-	if (m_isPlayer)
-	{
-		//スティックの情報取得
-		auto stick = input->GetStickInfo();
 
-		//左スティックの傾き取得
-		inputDir = MyEngine::Vector3(stick.leftStickX, 0, -stick.leftStickY);
-	}
+	//スティックの情報取得
+	auto stick = input->GetStickInfo();
+
+	//左スティックの傾き取得
+	inputDir = MyEngine::Vector3(stick.leftStickX, 0, -stick.leftStickY);
+
 	//移動ベクトルが0じゃなければ
 	if (inputDir.SqLength() > 0.001)
 	{
@@ -140,10 +139,10 @@ void CharacterStateMove::Update()
 	}
 
 	//ダッシュボタンが押されたら
-	if (m_isPlayer && input->IsTrigger("A"))
+	if (input->IsTrigger("A"))
 	{
 		//一緒にレフトショルダーも押されていたら
-		if (m_isPlayer && input->IsPushTrigger(false))
+		if (input->IsPushTrigger(false))
 		{
 			//ダッシュのコストがあれば
 			if (m_pCharacter->SubMp(GameSceneConstant::kDashCost))
@@ -193,7 +192,7 @@ void CharacterStateMove::Update()
 	{
 
 		//ジャンプボタンが押されたら
-		if (m_isPlayer && input->IsTrigger("RB"))
+		if (input->IsTrigger("RB"))
 		{
 			//ジャンプStateに移行する
 			auto next = std::make_shared<CharacterStateJump>(m_pCharacter);
@@ -249,13 +248,13 @@ void CharacterStateMove::Update()
 	{
 
 		//上昇ボタンが押されたら
-		if (m_isPlayer && input->IsPress("RB"))
+		if (input->IsPress("RB"))
 		{
 			velo.y = GetSpeed();
 			m_isFloat = true;
 		}
 		//下降ボタンが押されたら
-		else if (m_isPlayer && input->IsPushTrigger(true))
+		else if (input->IsPushTrigger(true))
 		{
 			velo.y = -GetSpeed();
 
@@ -299,11 +298,11 @@ void CharacterStateMove::Update()
 	if (m_attackKey == "empty")
 	{
 		//格闘ボタンが押された時
-		if (m_isPlayer && input->IsPress("X"))
+		if (input->IsPress("X"))
 		{
 			m_attackKey = "X";
 		}
-		else if (m_isPlayer && input->IsPress("Y"))
+		else if (input->IsPress("Y"))
 		{
 			m_attackKey = "Y";
 		}
@@ -315,7 +314,7 @@ void CharacterStateMove::Update()
 		m_attackButtonPushTime++;
 
 		//押していたボタンが離されたら
-		if (m_isPlayer && input->IsRelease(m_attackKey) ||
+		if (input->IsRelease(m_attackKey) ||
 			m_attackButtonPushTime > GameSceneConstant::kChargeAttackTime)
 		{
 			//チャージされていたかどうか判定
@@ -333,12 +332,12 @@ void CharacterStateMove::Update()
 				if (m_attackKey == "X")
 				{
 					//スティックを上に傾けていたら
-					if (m_isPlayer && input->GetStickInfo().leftStickY < -GameSceneConstant::kPhysicalAttackStickPower)
+					if (input->GetStickInfo().leftStickY < -GameSceneConstant::kPhysicalAttackStickPower)
 					{
 						attackName = "UpCharge";
 					}
 					//スティックを下に傾けていたら
-					else if (m_isPlayer && input->GetStickInfo().leftStickY > GameSceneConstant::kPhysicalAttackStickPower)
+					else if (input->GetStickInfo().leftStickY > GameSceneConstant::kPhysicalAttackStickPower)
 					{
 						attackName = "DownCharge";
 					}
@@ -374,7 +373,7 @@ void CharacterStateMove::Update()
 				if (m_pCharacter->SubMp(GameSceneConstant::kEnergyAttackCost))
 				{
 					next->SetAttack(m_attackKey, attackName);
-					
+
 					//StateをAttackに変更する
 					ChangeState(next);
 					return;
@@ -383,7 +382,7 @@ void CharacterStateMove::Update()
 			else
 			{
 				next->SetAttack(m_attackKey, attackName);
-				
+
 
 				//StateをAttackに変更する
 				ChangeState(next);
@@ -393,7 +392,7 @@ void CharacterStateMove::Update()
 	}
 
 	//一定時間レフトショルダーボタンが押されたら
-	if (m_isPlayer && input->GetPushTriggerTime(false) > GameSceneConstant::kChargeStateChangeTime)
+	if (input->GetPushTriggerTime(false) > GameSceneConstant::kChargeStateChangeTime)
 	{
 		//次のStateのポインタ作成
 		auto next = std::make_shared<CharacterStateCharge>(m_pCharacter);

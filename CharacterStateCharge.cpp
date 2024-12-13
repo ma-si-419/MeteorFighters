@@ -70,7 +70,7 @@ void CharacterStateCharge::Update()
 	}
 
 	//レフトショルダーが押されなくなったらアイドルStateに戻る
-	if (m_isPlayer && !input->IsPushTrigger(false))
+	if (!input->IsPushTrigger(false))
 	{
 		auto next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 
@@ -82,7 +82,7 @@ void CharacterStateCharge::Update()
 	}
 
 	//Aボタンが押されたら
-	if (m_isPlayer && input->IsTrigger("A"))
+	if (input->IsTrigger("A"))
 	{
 		MyEngine::Vector3 moveDir(input->GetStickInfo().leftStickX, 0, -input->GetStickInfo().leftStickY);
 
@@ -109,7 +109,7 @@ void CharacterStateCharge::Update()
 	}
 
 	//Yボタンが押されたら
-	if (m_isPlayer && input->IsTrigger("Y"))
+	if (input->IsTrigger("Y"))
 	{
 		float cost = static_cast<float>(m_pCharacter->GetSpecialAttackData(1).cost);
 

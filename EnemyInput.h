@@ -6,6 +6,15 @@ class GameManager;
 class EnemyInput
 {
 public:
+	enum class MoveDir
+	{
+		kFront,
+		kBack,
+		kRight,
+		kLeft
+	};
+
+public:
 
 	EnemyInput(std::shared_ptr<MyEngine::InputData> inputData);
 	~EnemyInput();
@@ -22,6 +31,8 @@ private:
 
 	void MoveLeft();
 
+	void MoveBack();
+
 	void Dash();
 
 	void PhysicalAttack();
@@ -32,9 +43,17 @@ private:
 
 private:
 
+	using MoveFunc = void(EnemyInput::*)();
+
+	MoveFunc m_moveFunc;
+
+	int m_moveTime;
+
 	std::shared_ptr<GameManager> m_pManager;
 
 	std::shared_ptr<MyEngine::InputData> m_pInputData;
+
+
 
 };
 

@@ -226,7 +226,7 @@ void CharacterStateNormalAttack::Update()
 				}
 
 				//移動前に瞬間移動のエフェクトを設定する
-				std::shared_ptr<Effect> effect =  std::make_shared<Effect>(Effect::EffectKind::kTeleportaion);
+				std::shared_ptr<Effect> effect = std::make_shared<Effect>(Effect::EffectKind::kTeleportaion);
 
 				effect->SetPos(m_pCharacter->GetPos());
 
@@ -344,14 +344,12 @@ void CharacterStateNormalAttack::Update()
 
 		MyEngine::Vector3 leftStickDir;
 
-		if (m_isPlayer)
-		{
-			//スティックの情報取得
-			auto stick = input->GetStickInfo();
+		//スティックの情報取得
+		auto stick = input->GetStickInfo();
 
-			//左スティックの傾き取得
-			leftStickDir = MyEngine::Vector3(stick.leftStickX, 0, -stick.leftStickY);
-		}
+		//左スティックの傾き取得
+		leftStickDir = MyEngine::Vector3(stick.leftStickX, 0, -stick.leftStickY);
+
 		//移動ベクトルが0じゃなければ
 		if (leftStickDir.SqLength() > 0.001)
 		{
@@ -374,12 +372,12 @@ void CharacterStateNormalAttack::Update()
 			velo = dir * GetSpeed();
 		}
 		//ジャンプボタンが押されたら
-		if (m_isPlayer && input->IsPress("RB"))
+		if (input->IsPress("RB"))
 		{
 			velo.y = GetSpeed();
 		}
 		//下降ボタンが押されたら
-		else if (m_isPlayer && input->IsPushTrigger(true))
+		else if (input->IsPushTrigger(true))
 		{
 			velo.y = -GetSpeed();
 		}

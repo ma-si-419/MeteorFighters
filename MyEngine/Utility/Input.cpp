@@ -26,11 +26,19 @@ void Input::Update()
 	int padState = {};
 	int mouseState = {};
 	GetHitKeyStateAll(keyState);
-	padState = GetJoypadInputState(DX_INPUT_PAD1);
 	mouseState = GetMouseInput();
 
 	for (int i = 0; i < 2; i++)
 	{
+		if (i == 0)
+		{
+			padState = GetJoypadInputState(DX_INPUT_PAD1);
+		}
+		else
+		{
+			padState = GetJoypadInputState(DX_INPUT_PAD2);
+		}
+
 		auto actionMap = m_inputData[i]->GetInputActionMap();
 
 		std::map<std::string, bool> inputMap;
@@ -81,7 +89,14 @@ void Input::Update()
 
 		//ƒgƒŠƒK[‚Ìî•ñŽæ“¾
 		XINPUT_STATE* xInputState = new XINPUT_STATE;
-		GetJoypadXInputState(DX_INPUT_PAD1, xInputState);
+		if (i == 0)
+		{
+			GetJoypadXInputState(DX_INPUT_PAD1, xInputState);
+		}
+		else
+		{
+			GetJoypadXInputState(DX_INPUT_PAD2, xInputState);
+		}
 		InputData::TriggerInfo triggerInfo;
 		triggerInfo.left = xInputState->LeftTrigger;
 		triggerInfo.right = xInputState->RightTrigger;

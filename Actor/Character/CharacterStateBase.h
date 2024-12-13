@@ -153,9 +153,6 @@ protected:
 	//自分のキャラクターのポインタ
 	std::shared_ptr<CharacterBase> m_pCharacter;
 
-	//自分が人によって操作されているか
-	bool m_isPlayer;
-
 	//自分についているエフェクト(基本的に1つだけ再生するようにする)
 	std::shared_ptr<Effect> m_pEffect;
 };

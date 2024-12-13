@@ -6,11 +6,12 @@
 #include <string>
 #include <map>
 #include "InputData.h"
+#include "CharacterStateBase.h"
 
 class SceneGame;
 class GameManager;
-class CharacterStateBase;
 class Attack;
+class EnemyInput;
 class CharacterBase : public Actor
 {
 public:
@@ -534,6 +535,12 @@ public:
 	/// <returns>入力情報</returns>
 	std::shared_ptr<MyEngine::InputData> GetInputData() { return m_input; }
 
+	/// <summary>
+	/// 現在のStateの状態を返す
+	/// </summary>
+	/// <returns>Stateの種類</returns>
+	CharacterStateBase::CharacterStateKind GetStateKind() { return m_pState->GetKind(); }
+
 private:
 
 	/// <summary>
@@ -588,6 +595,8 @@ private:
 
 	UpdateSituationFunc m_updateSituationFunc;
 
+	//エネミーの入力を受け付けるクラス(1P側は使用しない)
+	std::shared_ptr<EnemyInput> m_pEnemyInput;
 	//入力情報
 	std::shared_ptr<MyEngine::InputData> m_input;
 	//自身がどちら側のキャラクターか

@@ -50,15 +50,6 @@ void CharacterStateIdle::Update()
 
 #endif // _DEBUG
 
-
-	if (m_isPlayer)
-	{
-		if (input->IsPress("A"))
-		{
-			m_pCharacter->SubHp(100);
-		}
-	}
-
 	//Stateにいる時間を計測する
 	m_time++;
 
@@ -86,11 +77,11 @@ void CharacterStateIdle::Update()
 	if (m_attackKey == "empty")
 	{
 		//格闘ボタンが押された時
-		if (m_isPlayer && input->IsPress("X"))
+		if (input->IsPress("X"))
 		{
 			m_attackKey = "X";
 		}
-		else if (m_isPlayer && input->IsPress("Y"))
+		else if (input->IsPress("Y"))
 		{
 			m_attackKey = "Y";
 		}
@@ -102,7 +93,7 @@ void CharacterStateIdle::Update()
 		m_attackButtonPushTime++;
 
 		//押していたボタンが離されたら
-		if (m_isPlayer && input->IsRelease(m_attackKey) ||
+		if (input->IsRelease(m_attackKey) ||
 			m_attackButtonPushTime > GameSceneConstant::kChargeAttackTime)
 		{
 			//チャージされていたかどうか判定
@@ -180,8 +171,8 @@ void CharacterStateIdle::Update()
 	}
 
 	//移動入力がされていたら
-	if (m_isPlayer && input->GetStickInfo().leftStickX != 0 ||
-		m_isPlayer && input->GetStickInfo().leftStickY != 0)
+	if (input->GetStickInfo().leftStickX != 0 ||
+		input->GetStickInfo().leftStickY != 0)
 	{
 		//次のStateのポインタ作成
 		auto next = std::make_shared<CharacterStateMove>(m_pCharacter);
@@ -191,7 +182,7 @@ void CharacterStateIdle::Update()
 	}
 
 	//一定時間レフトショルダーボタンが押されたら
-	if (m_isPlayer && input->GetPushTriggerTime(false) > GameSceneConstant::kChargeStateChangeTime)
+	if (input->GetPushTriggerTime(false) > GameSceneConstant::kChargeStateChangeTime)
 	{
 		//次のStateのポインタ作成
 		auto next = std::make_shared<CharacterStateCharge>(m_pCharacter);
@@ -201,10 +192,10 @@ void CharacterStateIdle::Update()
 	}
 
 	//ダッシュボタンが押された時
-	if (m_isPlayer && input->IsTrigger("A"))
+	if (input->IsTrigger("A"))
 	{
 		//一緒にレフトショルダーも押されていたら
-		if (m_isPlayer && input->IsPushTrigger(false))
+		if (input->IsPushTrigger(false))
 		{
 			//ダッシュのコストがあれば
 			if (m_pCharacter->SubMp(GameSceneConstant::kDashCost))
@@ -252,7 +243,7 @@ void CharacterStateIdle::Update()
 	if (m_pCharacter->IsGround())
 	{
 		//ジャンプボタンが押されたら
-		if (m_isPlayer && input->IsPress("RB"))
+		if (input->IsPress("RB"))
 		{
 			//ジャンプState作成
 			auto next = std::make_shared<CharacterStateJump>(m_pCharacter);
@@ -272,8 +263,8 @@ void CharacterStateIdle::Update()
 	else
 	{
 		//上昇ボタンか下降ボタンが押されたら
-		if (m_isPlayer && input->IsPress("RB") ||
-			m_isPlayer && input->IsPushTrigger(true))
+		if (input->IsPress("RB") ||
+			input->IsPushTrigger(true))
 		{
 			//次のStateのポインタ作成
 			auto next = std::make_shared<CharacterStateMove>(m_pCharacter);
@@ -284,20 +275,13 @@ void CharacterStateIdle::Update()
 	}
 
 	//ガード入力がされていたら
-	if (m_isPlayer && input->IsPress("B"))
+	if (input->IsPress("B"))
 	{
 		//次のStateのポインタ作成
 		auto next = std::make_shared<CharacterStateGuard>(m_pCharacter);
 		//StateをMoveに変更する
 		ChangeState(next);
 		return;
-	}
-
-	if (!m_isPlayer)
-	{
-		a += 0.1f;
-
-		//velo.y = sin(a) * m_pCharacter->GetSpeed() * 2;
 	}
 
 	//アイドル状態の時は移動しない
