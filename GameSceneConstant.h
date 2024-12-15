@@ -49,5 +49,5 @@ namespace GameSceneConstant
 	//派生攻撃のスティックの傾き
 	constexpr int kPhysicalAttackStickPower = 500;
 	//気弾攻撃で減る気力量
-	constexpr int kEnergyAttackCost = 1200;
+	constexpr int kEnergyAttackCost = 2000;
 }

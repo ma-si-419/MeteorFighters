@@ -6,8 +6,8 @@
 #include <string>
 #include <map>
 #include "InputData.h"
-#include "CharacterStateBase.h"
 
+class CharacterStateBase;
 class SceneGame;
 class GameManager;
 class Attack;
@@ -534,12 +534,6 @@ public:
 	/// </summary>
 	/// <returns>“ü—Íî•ñ</returns>
 	std::shared_ptr<MyEngine::InputData> GetInputData() { return m_input; }
-
-	/// <summary>
-	/// Œ»İ‚ÌState‚Ìó‘Ô‚ğ•Ô‚·
-	/// </summary>
-	/// <returns>State‚Ìí—Ş</returns>
-	CharacterStateBase::CharacterStateKind GetStateKind() { return m_pState->GetKind(); }
 
 private:
 

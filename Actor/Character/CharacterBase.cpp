@@ -178,6 +178,12 @@ void CharacterBase::Init()
 	m_pState = std::make_shared<CharacterStateIdle>(thisPointer);
 	m_pState->Enter();
 
+	//敵側の処理
+	if (m_playerNumber == CharacterBase::PlayerNumber::kTwoPlayer)
+	{
+		m_pEnemyInput->SetState(m_pState);
+	}
+
 }
 
 void CharacterBase::Update()
@@ -193,6 +199,12 @@ void CharacterBase::Update()
 	if (m_pState != m_pState->m_pNextState)
 	{
 		m_pState = m_pState->m_pNextState;
+		
+		//敵側の処理
+		if (m_playerNumber == CharacterBase::PlayerNumber::kTwoPlayer)
+		{
+			m_pEnemyInput->SetState(m_pState);
+		}
 	}
 
 	//状況によって変化するアップデート

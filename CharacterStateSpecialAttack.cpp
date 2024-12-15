@@ -236,5 +236,8 @@ void CharacterStateSpecialAttack::Update()
 
 void CharacterStateSpecialAttack::Exit()
 {
-
+	if (m_pEffect)
+	{
+		ExitEffect(m_pEffect);
+	}
 }

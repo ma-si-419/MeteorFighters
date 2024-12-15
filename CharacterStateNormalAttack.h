@@ -24,6 +24,10 @@ public:
 	virtual void Update() override;
 
 	virtual void Exit() override;
+
+	std::string GetNowAttackName() { return m_nowAttackName; }
+
+	bool GetEndAttack() { return m_isEndAttack; };
 private:
 
 	//Œ»İs‚Á‚Ä‚¢‚éUŒ‚‚Ì–¼‘O
@@ -58,4 +62,7 @@ private:
 
 	//Ši“¬UŒ‚‚ÅˆÚ“®‚·‚éÀ•W
 	MyEngine::Vector3 m_moveTargetPos;
+
+	//UŒ‚‚ªI—¹‚µ‚½‚©‚Ç‚¤‚©
+	bool m_isEndAttack;
 };

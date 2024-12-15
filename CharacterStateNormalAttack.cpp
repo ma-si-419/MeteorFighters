@@ -63,7 +63,8 @@ CharacterStateNormalAttack::CharacterStateNormalAttack(std::shared_ptr<Character
 	m_chargeTime(0.0f),
 	m_isAttacked(false),
 	m_isNextCharge(false),
-	m_chaseAttackNum(0)
+	m_chaseAttackNum(0),
+	m_isEndAttack(false)
 {
 }
 void CharacterStateNormalAttack::SetAttack(std::string key, std::string attackName)
@@ -156,6 +157,8 @@ void CharacterStateNormalAttack::Update()
 	//攻撃の合計フレームを超えたら
 	if (m_time >= attackData.totalFrame)
 	{
+		m_isEndAttack = true;
+
 		//アイドル状態に戻る
 		std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 
