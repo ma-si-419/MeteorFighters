@@ -9,6 +9,7 @@ namespace
 {
 	const std::map<CharacterBase::HitReactionKind, int> kDownTimeMap =
 	{
+		{CharacterBase::HitReactionKind::kGuard,10},
 		{CharacterBase::HitReactionKind::kLow,40},
 		{CharacterBase::HitReactionKind::kMiddle,40},
 		{CharacterBase::HitReactionKind::kWeakUpBurst,60},
@@ -21,6 +22,7 @@ namespace
 
 	const std::map<CharacterBase::HitReactionKind, float> kMoveSpeedMap =
 	{
+		{CharacterBase::HitReactionKind::kGuard,0.2f},
 		{CharacterBase::HitReactionKind::kLow,0.4f},
 		{CharacterBase::HitReactionKind::kMiddle,0.8f},
 		{CharacterBase::HitReactionKind::kWeakUpBurst,1.2f},
@@ -34,6 +36,7 @@ namespace
 	//‘O‚©‚çUŒ‚‚ğó‚¯‚½‚Ì”½‰
 	const std::map<CharacterBase::HitReactionKind, CharacterBase::AnimKind> kFrontHitReactionMap =
 	{
+		{CharacterBase::HitReactionKind::kGuard,CharacterBase::AnimKind::kGuard},
 		{CharacterBase::HitReactionKind::kLow,CharacterBase::AnimKind::kLowHit1},
 		{CharacterBase::HitReactionKind::kMiddle,CharacterBase::AnimKind::kMiddleHit},
 		{CharacterBase::HitReactionKind::kWeakUpBurst,CharacterBase::AnimKind::kFrontBurst},
@@ -47,6 +50,7 @@ namespace
 	//Œã‚ë‚©‚çUŒ‚‚ğó‚¯‚½‚Ì”½‰
 	const std::map<CharacterBase::HitReactionKind, CharacterBase::AnimKind> kBackHitReactionMap =
 	{
+		{CharacterBase::HitReactionKind::kGuard,CharacterBase::AnimKind::kBackLowHit1},
 		{CharacterBase::HitReactionKind::kLow,CharacterBase::AnimKind::kBackLowHit1},
 		{CharacterBase::HitReactionKind::kMiddle,CharacterBase::AnimKind::kBackMiddleHit},
 		{CharacterBase::HitReactionKind::kWeakUpBurst,CharacterBase::AnimKind::kBackBurst},

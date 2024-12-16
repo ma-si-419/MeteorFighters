@@ -213,12 +213,16 @@ void CharacterStateRush::Update()
 		//レフトショルダーも押されていたら
 		if (input->IsPushTrigger(false))
 		{
-			//気力が足りた場合のみ
-			if (m_pCharacter->SubMp(kEnemyRushCost))
+			//敵の近くまで向かう突撃状態じゃなければ
+			if (!m_isRushEnemy)
 			{
-				//敵の近くまで向かう突撃状態になる
-				m_isRushEnemy = true;
-				m_rushTargetPos = GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance);
+				//気力が足りた場合のみ
+				if (m_pCharacter->SubMp(kEnemyRushCost))
+				{
+					//敵の近くまで向かう突撃状態になる
+					m_isRushEnemy = true;
+					m_rushTargetPos = GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance);
+				}
 			}
 		}
 		//押されていないとき

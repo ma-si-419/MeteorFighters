@@ -150,6 +150,9 @@ void EnemyInput::Update()
 	if (m_isCountActionTime)
 	{
 		m_actionTime++;
+
+		m_actionFunc = &EnemyInput::None;
+
 		printfDx("アクションタイム%d\n", m_actionTime);
 		//行う行動を選択するとき
 		if (m_actionTime > kActionTime)
@@ -341,8 +344,12 @@ void EnemyInput::EnergyCharge()
 
 	m_pInputData->PushTrigger(true);
 
-	if (m_stateTime > kChargeTime)
+	float distance = (m_pManager->GetOnePlayerPointer()->GetPos() - m_pManager->GetTwoPlayerPointer()->GetPos()).Length();
+
+	//一定時間チャージするか敵との距離が近くなれば
+	if (m_stateTime > kChargeTime || distance < kNearDistance)
 	{
+		//チャージをやめる
 		m_isCountActionTime = true;
 		m_stateTime = 0;
 	}
@@ -355,14 +362,25 @@ void EnemyInput::PhysicalAttack()
 
 	m_pInputData->BashButton("X");
 
+	//攻撃Stateに入っていたら
 	if (m_pEnemyState->GetKind() == CharacterStateBase::CharacterStateKind::kNormalAttack)
 	{
 		auto attackState = std::dynamic_pointer_cast<CharacterStateNormalAttack>(m_pEnemyState);
 
+		//攻撃終了のフラグが立っていたら
 		if (attackState->GetNowAttackName() == "Low8" || attackState->GetEndAttack())
 		{
 			m_isCountActionTime = true;
 		}
+	}
+	
+	//敵とプレイヤーの距離
+	float distance = (m_pManager->GetOnePlayerPointer()->GetPos() - m_pManager->GetTwoPlayerPointer()->GetPos()).Length();
+
+	//もし距離が離れていたら攻撃をやめる
+	if (distance > kNearDistance)
+	{
+		m_isCountActionTime = true;
 	}
 }
 

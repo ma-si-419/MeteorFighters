@@ -65,12 +65,21 @@ public:
 	MyEngine::Vector3 GetPos() { return m_rigidbody.GetPos(); }
 
 	/// <summary>
+	/// 1フレーム前の座標を返す
+	/// </summary>
+	/// <returns>1フレーム前の座標</returns>
+	MyEngine::Vector3 GetLastPos() { return m_lastPos; }
+
+	/// <summary>
 	/// 自身以外のCollidableとぶつかった時の処理を書く
 	/// </summary>
 	/// <param name="collider">ぶつかった相手側のコライダー</param>
 	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
 
 private:
+
+	//前のフレームの座標
+	MyEngine::Vector3 m_lastPos;
 
 	//攻撃のステータス
 	AttackStatus m_status;
