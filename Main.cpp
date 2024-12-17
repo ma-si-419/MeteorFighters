@@ -1,6 +1,7 @@
 #include "DxLib.h"
 #include "SceneManager.h"
 #include "GraphManager.h"
+#include "SoundManager.h"
 #include "Physics.h"
 #include "Input.h"
 #include "Game.h"
@@ -47,6 +48,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	SetDrawScreen(DX_SCREEN_BACK);
 
+	SoundManager::GetInstance().Init();
 	GraphManager::GetInstance().Init();
 	MyEngine::Input::GetInstance().Init();
 	SceneManager sceneManager;

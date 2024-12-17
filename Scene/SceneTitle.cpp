@@ -3,6 +3,7 @@
 #include "DxLib.h"
 #include "Game.h"
 #include "GraphManager.h"
+#include "SoundManager.h"
 #include "Input.h"
 
 namespace
@@ -29,6 +30,7 @@ void SceneTitle::Init()
 {
 	//‰æ‘œ‚Ìƒ[ƒh
 	GraphManager::GetInstance().LoadSceneGraph("Title");
+	SoundManager::GetInstance().LoadSceneSound("Title");
 }
 
 void SceneTitle::Update()
@@ -37,6 +39,7 @@ void SceneTitle::Update()
 
 	if (input->IsTrigger("A"))
 	{
+		SoundManager::GetInstance().OncePlaySound("Ok");
 		m_sceneManager.ChangeScene(std::make_shared<SceneMenu>(m_sceneManager));
 	}
 }

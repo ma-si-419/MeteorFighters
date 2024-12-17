@@ -188,6 +188,7 @@
     <ClCompile Include="Scene\SceneSelect.cpp" />
     <ClCompile Include="Scene\SceneTitle.cpp" />
     <ClCompile Include="Actor\StateBase.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="GameUi.cpp" />
   </ItemGroup>
@@ -239,6 +240,7 @@
     <ClInclude Include="Scene\SceneSelect.h" />
     <ClInclude Include="Scene\SceneTitle.h" />
     <ClInclude Include="Actor\StateBase.h" />
+    <ClInclude Include="SoundManager.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="GameUi.h" />
   </ItemGroup>

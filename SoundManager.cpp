@@ -1,16 +1,13 @@
-#include "GraphManager.h"
-#include "LoadCsv.h"
+#include "SoundManager.h"
+#include <map>
 #include "DxLib.h"
+#include "LoadCsv.h"
 
-GraphManager::~GraphManager()
-{
-}
-
-void GraphManager::Init()
+void SoundManager::Init()
 {
 	LoadCsv loadCsv;
 
-	std::vector<std::vector<std::string>> loadData = loadCsv.LoadFile("data/csv/graphData.csv");
+	std::vector<std::vector<std::string>> loadData = loadCsv.LoadFile("data/csv/soundData.csv");
 
 	std::vector<std::string> sceneName;
 
@@ -28,7 +25,7 @@ void GraphManager::Init()
 		pushDataInfo pushData;
 
 		//画像の名前を保存
-		pushData.name = item[static_cast<int>(FileDataSort::kGraphName)];
+		pushData.name = item[static_cast<int>(FileDataSort::kSoundName)];
 		//画像のパスを保存
 		pushData.path = item[static_cast<int>(FileDataSort::kPath)];
 		//画像をどのシーンで使うかを保存
@@ -75,14 +72,14 @@ void GraphManager::Init()
 	}
 }
 
-void GraphManager::LoadSceneGraph(std::string sceneName)
+void SoundManager::LoadSceneSound(std::string sceneName)
 {
 	//画像ハンドルを削除する
-	if (m_sceneGraphHandle.size() > 0)
+	if (m_sceneSoundHandle.size() > 0)
 	{
-		for (auto& item : m_sceneGraphHandle)
+		for (auto& item : m_sceneSoundHandle)
 		{
-			DeleteGraph(item.second);
+			DeleteSoundMem(item.second);
 		}
 	}
 
@@ -92,14 +89,43 @@ void GraphManager::LoadSceneGraph(std::string sceneName)
 	//画像をロードする
 	for (auto item : loadPaths)
 	{
-		std::string path = "data/image/" + item.second + ".png";
+		std::string path = "data/sound/" + item.second;
 
-		m_sceneGraphHandle[item.first] = LoadGraph(path.c_str());
+		m_sceneSoundHandle[item.first] = LoadSoundMem(path.c_str());
 	}
-
 }
 
-int GraphManager::GetHandle(std::string graphName)
+int SoundManager::OncePlaySound(std::string soundName)
 {
-	return m_sceneGraphHandle[graphName];
+	return PlaySoundMem(m_sceneSoundHandle[soundName],DX_PLAYTYPE_BACK);
+}
+
+int SoundManager::LoopPlaySound(std::string soundName)
+{
+	int playHandle = PlaySoundMem(m_sceneSoundHandle[soundName], DX_PLAYTYPE_LOOP);
+	
+	m_loopPlayHandles.push_back(playHandle);
+
+	return playHandle;
+}
+
+void SoundManager::StopLoopSound(int playHandle)
+{
+	StopSoundMem(playHandle);
+
+	//配列から削除する
+	auto iterator = std::remove_if(m_loopPlayHandles.begin(), m_loopPlayHandles.end(),
+		[](auto item)
+		{
+			if (item == playHandle)
+			{
+				StopSoundMem(playHandle);
+
+				return true;
+			}
+
+			return false;
+		});
+
+	m_loopPlayHandles.erase(iterator,m_loopPlayHandles.end());
 }

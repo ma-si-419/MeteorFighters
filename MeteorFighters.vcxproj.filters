@@ -192,6 +192,9 @@
     <ClCompile Include="EnemyInput.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="SoundManager.cpp">
+      <Filter>ソース ファイル\Singleton</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -340,6 +343,9 @@
     </ClInclude>
     <ClInclude Include="EnemyInput.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundManager.h">
+      <Filter>ヘッダー ファイル\Singleton</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

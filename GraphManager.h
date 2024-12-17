@@ -5,6 +5,15 @@
 class GraphManager
 {
 private:
+
+	enum class FileDataSort
+	{
+		kGraphName,
+		kPath,
+		kSceneName
+	};
+
+private:
 	GraphManager() = default;
 	~GraphManager();
 	GraphManager(const GraphManager&) = delete;
@@ -36,26 +45,8 @@ public:
 	/// <param name="">画像の名前</param>
 	/// <returns>画像ハンドル</returns>
 	int GetHandle(std::string graphName);
-
-#ifdef _DEBUG
-
-	/// <summary>
-	/// 現在持っているハンドルの数を返す
-	/// </summary>
-	/// <returns>画像ハンドルの数</returns>
-	int GetHandleNum();
-
-#endif // _DEBUG
-
 	
 private:
-
-	enum class FileDataSort
-	{
-		kGraphName,
-		kPath,
-		kSceneName
-	};
 
 	//すべての画像のパス
 	std::map<std::string, std::vector<std::pair<std::string, std::string>>> m_pathData;

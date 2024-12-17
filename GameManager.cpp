@@ -137,7 +137,8 @@ void GameManager::Update()
 
 				return true;
 			}
-	return false;
+
+			return false;
 		});
 	m_pAttacks.erase(iterator, m_pAttacks.end());
 
