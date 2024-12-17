@@ -3,6 +3,7 @@
 #include "SceneTitle.h"
 #include "DxLib.h"
 #include "Input.h"
+#include "SoundManager.h"
 
 namespace
 {
@@ -47,6 +48,8 @@ void SceneMenu::Init()
 		m_showUi[i].showPosY = kShowUiPosY[i];
 		m_showUi[i].showString = kshowUiString[i];
 	}
+
+	SoundManager::GetInstance().LoadSceneSound("Menu");
 }
 
 void SceneMenu::Update()
@@ -100,6 +103,8 @@ void SceneMenu::Update()
 
 	if (input->IsTrigger("A"))
 	{
+		SoundManager::GetInstance().OncePlaySound("Ok");
+
 		if (m_selectKind == static_cast<int>(ItemKind::k1PvsCPU))
 		{
 			m_sceneManager.ChangeScene(std::make_shared<SceneSelect>(m_sceneManager));

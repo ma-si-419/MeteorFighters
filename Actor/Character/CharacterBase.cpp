@@ -140,11 +140,11 @@ void CharacterBase::Init()
 	//キャラクターの種類によってパスを変更する
 	if (m_characterKind == CharacterKind::kMouse)
 	{
-		path += "BigB";
+		path += "Mouse";
 	}
 	else if (m_characterKind == CharacterKind::kBigBlue)
 	{
-		path += "Mouse";
+		path += "BigB";
 	}
 
 	path = "data/model/" + path + ".mv1";

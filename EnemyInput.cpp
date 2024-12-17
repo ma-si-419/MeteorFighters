@@ -3,6 +3,7 @@
 #include "CharacterStateBase.h"
 #include "CharacterStateNormalAttack.h"
 #include "LoadCsv.h"
+#include "GameSceneConstant.h"
 
 namespace
 {
@@ -312,7 +313,10 @@ void EnemyInput::Rush()
 
 	m_pInputData->BashButton("A");
 
-	float distance = (m_pManager->GetOnePlayerPointer()->GetPos() - m_pManager->GetTwoPlayerPointer()->GetPos()).Length();
+	auto player = m_pManager->GetOnePlayerPointer();
+	auto enemy = m_pManager->GetTwoPlayerPointer();
+
+	float distance = (player->GetPos() - enemy->GetPos()).Length();
 
 	if (distance < kNearDistance)
 	{
@@ -344,10 +348,13 @@ void EnemyInput::EnergyCharge()
 
 	m_pInputData->PushTrigger(true);
 
-	float distance = (m_pManager->GetOnePlayerPointer()->GetPos() - m_pManager->GetTwoPlayerPointer()->GetPos()).Length();
+	auto player = m_pManager->GetOnePlayerPointer();
+	auto enemy = m_pManager->GetTwoPlayerPointer();
 
-	//一定時間チャージするか敵との距離が近くなれば
-	if (m_stateTime > kChargeTime || distance < kNearDistance)
+	float distance = (player->GetPos() - enemy->GetPos()).Length();
+
+	//一定時間チャージ、敵が近くに来る、MPマックスのどれかになれば終了
+	if (m_stateTime > kChargeTime || distance < kNearDistance || enemy->GetMp() >= GameSceneConstant::kMaxMp)
 	{
 		//チャージをやめる
 		m_isCountActionTime = true;
@@ -374,8 +381,10 @@ void EnemyInput::PhysicalAttack()
 		}
 	}
 	
-	//敵とプレイヤーの距離
-	float distance = (m_pManager->GetOnePlayerPointer()->GetPos() - m_pManager->GetTwoPlayerPointer()->GetPos()).Length();
+	auto player = m_pManager->GetOnePlayerPointer();
+	auto enemy = m_pManager->GetTwoPlayerPointer();
+
+	float distance = (player->GetPos() - enemy->GetPos()).Length();
 
 	//もし距離が離れていたら攻撃をやめる
 	if (distance > kNearDistance)

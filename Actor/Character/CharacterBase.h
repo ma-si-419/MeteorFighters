@@ -116,7 +116,6 @@ public:
 	enum class CharacterKind
 	{
 		kMouse,
-		kBigBoy,
 		kBigBlue
 	};
 

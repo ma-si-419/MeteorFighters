@@ -3,6 +3,10 @@
 #include "DxLib.h"
 #include "LoadCsv.h"
 
+SoundManager::~SoundManager()
+{
+}
+
 void SoundManager::Init()
 {
 	LoadCsv loadCsv;
@@ -115,7 +119,7 @@ void SoundManager::StopLoopSound(int playHandle)
 
 	//”z—ñ‚©‚çíœ‚·‚é
 	auto iterator = std::remove_if(m_loopPlayHandles.begin(), m_loopPlayHandles.end(),
-		[](auto item)
+		[&](auto item)
 		{
 			if (item == playHandle)
 			{

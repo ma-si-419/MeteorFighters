@@ -16,7 +16,22 @@ public:
 
 private:
 
+	void SelectOnePlayer();
+
+	void SelectTwoPlayer();
+
+	void ConfirmCharacter();
+
+private:
+
+
+
+	using UpdateSelectFunc = void (SceneSelect::*)();
+
+	UpdateSelectFunc m_updateSelectFunc;
+
 	int m_playerNumber;
+
 	int m_enemyNumber;
 
 };
