@@ -55,7 +55,7 @@ public:
 	{
 		kIdle,
 		kSkyDash,
-		kGuard,
+		kGuardMiddle,
 		kDodgeLeft,
 		kDodgeRight,
 		kDodgeBack,
@@ -110,7 +110,9 @@ public:
 		kEndSecondSpecialAttack,
 		kStartPose,
 		kWinPose,
-		kLosePose
+		kLosePose,
+		kGuardLow,
+		kGuardHigh
 	};
 
 	enum class CharacterKind

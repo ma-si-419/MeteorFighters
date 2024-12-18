@@ -12,11 +12,11 @@ namespace
 
 	constexpr float kOnMoveMaxLocalPosX = 42.0f;//左幅(大きいほど左に広がる)
 	constexpr float kOnMoveMaxLocalPosY = 18.0f;//下幅(大きいほど下に広がる)
-	constexpr float kOnMoveMaxLocalPosZ = -30.0f;//手前幅(大きいほどプレイヤーが手前に来る)
+	constexpr float kOnMoveMaxLocalPosZ = -25.0f;//手前幅(大きいほどプレイヤーが手前に来る)
 
 	constexpr float kOnMoveMinLocalPosX = -42.0f;//右幅(小さいほど右に広がる)
 	constexpr float kOnMoveMinLocalPosY = -12.0f;//上幅(小さいほど上に広がる)
-	constexpr float kOnMoveMinLocalPosZ = -40.0f;//奥幅(小さいほどプレイヤーが奥に行く)
+	constexpr float kOnMoveMinLocalPosZ = -30.0f;//奥幅(小さいほどプレイヤーが奥に行く)
 
 
 	constexpr float kLocalInitPosX = 27.0f;
@@ -58,6 +58,9 @@ namespace
 
 	//緩やかにカメラを揺らす時の揺れの速さ
 	constexpr float kSwaySpeed = 0.5f;
+
+	//カメラに近づき始める上下の差
+	constexpr float kStartApproachYGap = 50.0f;
 
 }
 
@@ -177,13 +180,22 @@ void GameCamera::NormalUpdate()
 
 	//最小値の調整
 
-	//X座標は離れるほどあそびを小さくしていく
+	//X座標は離れるほど左右のあそびを小さくしていく
 	float minX = kOnMoveMinLocalPosX + ((m_nextCameraPos - m_targetPos).Length()) * kLangeSubRate;
 	m_nextCameraPos.x = std::fmax(m_nextCameraPos.x, minX);
 
 
 	m_nextCameraPos.y = std::fmax(m_nextCameraPos.y, kOnMoveMinLocalPosY);
 	m_nextCameraPos.z = std::fmax(m_nextCameraPos.z, kOnMoveMinLocalPosZ);
+
+	//上下の座が大きくなるほどプレイヤーにXZをちかづけていく
+	MyEngine::Vector3 approachVec = -m_nextCameraPos;
+
+	approachVec.y = 0;
+
+	float yGap = m_targetPos.y - m_localPos.GetCenterPos().y;	
+
+
 
 	//プレイヤーが移動していないとき
 	if (m_playerVelo.SqLength() < 0.001f)

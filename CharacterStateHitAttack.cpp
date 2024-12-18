@@ -36,7 +36,7 @@ namespace
 	//‘O‚©‚çUŒ‚‚ğó‚¯‚½‚Ì”½‰
 	const std::map<CharacterBase::HitReactionKind, CharacterBase::AnimKind> kFrontHitReactionMap =
 	{
-		{CharacterBase::HitReactionKind::kGuard,CharacterBase::AnimKind::kGuard},
+		{CharacterBase::HitReactionKind::kGuard,CharacterBase::AnimKind::kGuardMiddle},
 		{CharacterBase::HitReactionKind::kLow,CharacterBase::AnimKind::kLowHit1},
 		{CharacterBase::HitReactionKind::kMiddle,CharacterBase::AnimKind::kMiddleHit},
 		{CharacterBase::HitReactionKind::kWeakUpBurst,CharacterBase::AnimKind::kFrontBurst},

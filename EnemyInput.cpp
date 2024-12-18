@@ -108,19 +108,16 @@ void EnemyInput::Update()
 		if (toPlayerLength < kNearDistance)
 		{
 			moveDir = kNearMoveDir[rand];
-			printfDx("近距離\n");
 		}
 		//中距離だと判断した時
 		else if (toPlayerLength < kMiddleDistance)
 		{
 			moveDir = kMiddleMoveDir[rand];
-			printfDx("中距離\n");
 		}
 		//遠距離だと判断した時
 		else
 		{
 			moveDir = kFarMoveDir[rand];
-			printfDx("遠距離\n");
 		}
 
 		if (moveDir == MoveDir::kFront)
@@ -154,7 +151,6 @@ void EnemyInput::Update()
 
 		m_actionFunc = &EnemyInput::None;
 
-		printfDx("アクションタイム%d\n", m_actionTime);
 		//行う行動を選択するとき
 		if (m_actionTime > kActionTime)
 		{
@@ -270,10 +266,10 @@ void EnemyInput::Update()
 	}
 
 	//移動処理
-	(this->*m_moveFunc)();
+	//(this->*m_moveFunc)();
 
 	//アクション処理
-	(this->*m_actionFunc)();
+	//(this->*m_actionFunc)();
 }
 
 void EnemyInput::MoveFront()
@@ -298,7 +294,6 @@ void EnemyInput::MoveBack()
 
 void EnemyInput::Dash()
 {
-	printfDx("ダッシュ\n");
 
 	m_pInputData->PushButton("A");
 
@@ -307,7 +302,6 @@ void EnemyInput::Dash()
 
 void EnemyInput::Rush()
 {
-	printfDx("ラッシュ\n");
 
 	m_pInputData->PushTrigger(true);
 
@@ -327,7 +321,6 @@ void EnemyInput::Rush()
 
 void EnemyInput::SpecialAttack()
 {
-	printfDx("必殺\n");
 
 	m_pInputData->PushTrigger(true);
 
@@ -342,9 +335,6 @@ void EnemyInput::SpecialAttack()
 void EnemyInput::EnergyCharge()
 {
 	m_stateTime++;
-
-	printfDx("チャージ\n");
-	printfDx("stateTime%d\n", m_stateTime);
 
 	m_pInputData->PushTrigger(true);
 
@@ -365,7 +355,6 @@ void EnemyInput::EnergyCharge()
 
 void EnemyInput::PhysicalAttack()
 {
-	printfDx("格闘攻撃\n");
 
 	m_pInputData->BashButton("X");
 
@@ -395,7 +384,6 @@ void EnemyInput::PhysicalAttack()
 
 void EnemyInput::EnergyAttack()
 {
-	printfDx("気弾攻撃\n");
 
 	m_pInputData->BashButton("Y");
 
@@ -408,15 +396,9 @@ void EnemyInput::EnergyAttack()
 			m_isCountActionTime = true;
 		}
 	}
-	else
-	{
-		printfDx("ステート%d\n", static_cast<int>(m_pEnemyState->GetKind()));
-	}
 }
 
 void EnemyInput::Guard()
 {
-	printfDx("ガード\n");
-
 	m_pInputData->PushButton("B");
 }
