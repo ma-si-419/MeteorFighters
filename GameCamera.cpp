@@ -59,8 +59,17 @@ namespace
 	//緩やかにカメラを揺らす時の揺れの速さ
 	constexpr float kSwaySpeed = 0.5f;
 
-	//カメラに近づき始める上下の差
-	constexpr float kStartApproachYGap = 50.0f;
+	//上下の差ができた際にY座標をどれだけずらすか
+	constexpr float kCameraPosMaxYGap = 10.0f;
+
+	//上下の差の最大と判断するY座標の差
+	constexpr float kMaxYGap = 50.0f;
+
+	//上下の差があるときのプレイヤーに近づくカメラの最近距離
+	constexpr float kNearestLength = 10.0f;
+
+	//カメラに最も近づく時のY座標の差
+	constexpr float kNearestCameraPosYGap = 100.0f;
 
 }
 
@@ -188,14 +197,17 @@ void GameCamera::NormalUpdate()
 	m_nextCameraPos.y = std::fmax(m_nextCameraPos.y, kOnMoveMinLocalPosY);
 	m_nextCameraPos.z = std::fmax(m_nextCameraPos.z, kOnMoveMinLocalPosZ);
 
-	//上下の座が大きくなるほどプレイヤーにXZをちかづけていく
-	MyEngine::Vector3 approachVec = -m_nextCameraPos;
+	//上下の座が大きければカメラの座標を補正する
+	MyEngine::Vector3 addVec;
 
-	approachVec.y = 0;
-
+	//上下の差に合わせてカメラの座標を上下に動かす
 	float yGap = m_targetPos.y - m_localPos.GetCenterPos().y;	
 
+	float yShiftLength = yGap / kMaxYGap;
 
+	addVec.y = -yShiftLength;
+	
+	m_nextCameraPos += addVec;
 
 	//プレイヤーが移動していないとき
 	if (m_playerVelo.SqLength() < 0.001f)
