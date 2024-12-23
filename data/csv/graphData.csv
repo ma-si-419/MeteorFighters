@@ -5,3 +5,7 @@ HpBarNum,HpBarNumBox,Game
 Winner,Winner,Game
 Loser,Loser,Game
 MpBar,MpBar,Game
+SelectItemBox,SelectItemBox,Menu
+ItemBox,ItemBox,Menu
+Mouse,MouseFace,Title
+BlueHead,BlueHeadFace,Title

@@ -169,6 +169,7 @@
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="GraphManager.cpp" />
     <ClCompile Include="InputData.cpp" />
+    <ClCompile Include="MenuUi.cpp" />
     <ClCompile Include="MyEngine\Utility\LocalPos.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MyEngine\Utility\Matrix.cpp" />
@@ -191,6 +192,7 @@
     <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="GameUi.cpp" />
+    <ClCompile Include="TitleUi.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor\Actor.h" />
@@ -217,6 +219,7 @@
     <ClInclude Include="GameSceneConstant.h" />
     <ClInclude Include="GraphManager.h" />
     <ClInclude Include="InputData.h" />
+    <ClInclude Include="MenuUi.h" />
     <ClInclude Include="MyEngine\Utility\LocalPos.h" />
     <ClInclude Include="MyEngine\Utility\Matrix.h" />
     <ClInclude Include="MyEngine\Physics\CapsuleColliderData.h" />
@@ -243,6 +246,7 @@
     <ClInclude Include="SoundManager.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="GameUi.h" />
+    <ClInclude Include="TitleUi.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MeteorFighters.rc" />

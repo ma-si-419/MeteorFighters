@@ -1,5 +1,8 @@
 #pragma once
 #include "SceneBase.h"
+#include <memory>
+
+class TitleUi;
 class SceneTitle : public SceneBase
 {
 public:
@@ -14,5 +17,7 @@ public:
 	//I—¹ˆ—
 	virtual void End() override;
 
+private:
+	std::shared_ptr<TitleUi> m_pTitleUi;
 };
 

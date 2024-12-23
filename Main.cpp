@@ -121,8 +121,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		// 画面が切り替わるのを待つ
 		ScreenFlip();
 
-		// escキーでゲーム終了
-		if (CheckHitKey(KEY_INPUT_ESCAPE))
+
+		//終了フラグがたっていれば
+		if (sceneManager.IsEnd())
 		{
 			break;
 		}

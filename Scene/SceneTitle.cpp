@@ -5,6 +5,7 @@
 #include "GraphManager.h"
 #include "SoundManager.h"
 #include "Input.h"
+#include "TitleUi.h"
 
 namespace
 {
@@ -19,7 +20,7 @@ namespace
 SceneTitle::SceneTitle(SceneManager& sceneManager) :
 	SceneBase(sceneManager)
 {
-
+	m_pTitleUi = std::make_shared<TitleUi>();
 }
 
 SceneTitle::~SceneTitle()
@@ -31,6 +32,8 @@ void SceneTitle::Init()
 	//画像のロード
 	GraphManager::GetInstance().LoadSceneGraph("Title");
 	SoundManager::GetInstance().LoadSceneSound("Title");
+
+	m_pTitleUi->Init();
 }
 
 void SceneTitle::Update()
@@ -42,20 +45,14 @@ void SceneTitle::Update()
 		SoundManager::GetInstance().OncePlaySound("Ok");
 		m_sceneManager.ChangeScene(std::make_shared<SceneMenu>(m_sceneManager));
 	}
+
+	m_pTitleUi->Update();
 }
 
 
 void SceneTitle::Draw()
 {
-	auto& graphManager = GraphManager::GetInstance();
-
-#ifdef _DEBUG
-
-	DrawGraph(0, 0, graphManager.GetHandle("タイトルロゴ"), true);
-
-	DrawString(0, 0, "SceneTitle", kRedColor);
-
-#endif // _DEBUG
+	m_pTitleUi->Draw();
 }
 
 void SceneTitle::End()
