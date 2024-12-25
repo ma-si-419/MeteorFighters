@@ -2,7 +2,7 @@
 #include "InputData.h"
 #include <memory>
 
-class GameManager;
+class BattleManager;
 class CharacterStateBase;
 class EnemyInput
 {
@@ -39,7 +39,7 @@ public:
 	EnemyInput(std::shared_ptr<MyEngine::InputData> inputData);
 	~EnemyInput();
 
-	void SetGameManager(std::shared_ptr<GameManager> manager) { m_pManager = manager; };
+	void SetGameManager(std::shared_ptr<BattleManager> manager) { m_pManager = manager; };
 
 	void SetState(std::shared_ptr<CharacterStateBase> state) { m_pEnemyState = state; }
 
@@ -99,7 +99,7 @@ private:
 
 	int m_moveTime;
 
-	std::shared_ptr<GameManager> m_pManager;
+	std::shared_ptr<BattleManager> m_pManager;
 
 	std::shared_ptr<MyEngine::InputData> m_pInputData;
 

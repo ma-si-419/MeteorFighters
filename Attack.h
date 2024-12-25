@@ -1,6 +1,6 @@
 #pragma once
 #include "Collidable.h"
-#include "CharacterBase.h"
+#include "Character.h"
 class Effect;
 class EffectManager;
 class Attack : public Collidable
@@ -17,8 +17,8 @@ public:
 		float speed = 0;
 		int lifeTime = 0;
 		float radius = 0;
-		CharacterBase::AttackKind attackKind = CharacterBase::AttackKind::kPhysical;
-		CharacterBase::AttackHitKind attackHitKind = CharacterBase::AttackHitKind::kLow;
+		Character::AttackKind attackKind = Character::AttackKind::kPhysical;
+		Character::AttackHitKind attackHitKind = Character::AttackHitKind::kLow;
 	};
 
 public:

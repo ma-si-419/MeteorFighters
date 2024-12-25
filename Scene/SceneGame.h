@@ -1,8 +1,9 @@
 #pragma once
 #include "SceneBase.h"
 #include <vector>
-class GameManager;
-class Actor;
+
+class BattleManager;
+class Character;
 class SceneGame : public SceneBase
 {
 public:
@@ -25,8 +26,9 @@ public:
 	void SetCharacter(int player,int enemy);
 
 private:
-	std::vector<std::shared_ptr<Actor>> m_pActors;
-	std::shared_ptr<GameManager> m_pGameManager;
+
+	std::vector<std::shared_ptr<Character>> m_pCharacters;
+	std::shared_ptr<BattleManager> m_pBattleManager;
 
 };
 

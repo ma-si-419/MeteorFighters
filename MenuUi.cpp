@@ -44,8 +44,8 @@ namespace
 	//表示する文字列
 	const std::string kUiString[static_cast<int>(MenuUi::SelectItem::kItemNum)] =
 	{
-		"連戦モード",
 		"CPUとバトル",
+		"チュートリアル",
 		"タイトルに戻る",
 		"ゲームを終了する",
 	};
@@ -58,7 +58,7 @@ namespace
 
 MenuUi::MenuUi():
 	m_selectItemFontHandle(-1),
-	m_selectItem(SelectItem::kContinuousBattle)
+	m_selectItem(SelectItem::kBattle)
 {
 	m_selectItemFontHandle = CreateFontToHandle(kFontName,64,0,DX_FONTTYPE_ANTIALIASING_EDGE,-1,3);
 	m_skyDomeHandle = MV1LoadModel("data/model/Dome.mv1");

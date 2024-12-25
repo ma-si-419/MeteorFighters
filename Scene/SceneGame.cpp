@@ -2,8 +2,8 @@
 #include "SceneSelect.h"
 #include "SceneMenu.h"
 #include "DxLib.h"
-#include "CharacterBase.h"
-#include "GameManager.h"
+#include "Character.h"
+#include "BattleManager.h"
 #include "GraphManager.h"
 #include "Physics.h"
 #include "LoadCsv.h"
@@ -30,12 +30,12 @@ void SceneGame::Init()
 	//画像のロード
 	GraphManager::GetInstance().LoadSceneGraph("Game");
 
-	m_pActors.push_back(m_pGameManager->GetOnePlayerPointer());
-	m_pActors.push_back(m_pGameManager->GetTwoPlayerPointer());
+	m_pCharacters.push_back(m_pBattleManager->GetOnePlayerPointer());
+	m_pCharacters.push_back(m_pBattleManager->GetTwoPlayerPointer());
 	
-	m_pGameManager->Init();
+	m_pBattleManager->Init();
 
-	for (auto& actor : m_pActors)
+	for (auto& actor : m_pCharacters)
 	{
 		actor->Init();
 	}
@@ -44,19 +44,19 @@ void SceneGame::Init()
 void SceneGame::Update()
 {
 
-	for (auto& actor : m_pActors)
+	for (auto& actor : m_pCharacters)
 	{
 		actor->Update();
 	}
 
-	m_pGameManager->Update();
+	m_pBattleManager->Update();
 
-	if (m_pGameManager->GetNextScene() == Game::Scene::kSelect)
+	if (m_pBattleManager->GetNextScene() == Game::Scene::kSelect)
 	{
 		//セレクトシーンに戻る
 		m_sceneManager.ChangeScene(std::make_shared<SceneSelect>(m_sceneManager));
 	}
-	else if (m_pGameManager->GetNextScene() == Game::Scene::kMenu)
+	else if (m_pBattleManager->GetNextScene() == Game::Scene::kMenu)
 	{
 		//メニューシーンに戻る
 		m_sceneManager.ChangeScene(std::make_shared<SceneMenu>(m_sceneManager));
@@ -74,27 +74,27 @@ void SceneGame::Draw()
 
 #endif // _DEBUG
 
-	for (auto& actor : m_pActors)
+	for (auto& actor : m_pCharacters)
 	{
 		actor->Draw();
 	}
-	m_pGameManager->Draw();
+	m_pBattleManager->Draw();
 }
 
 void SceneGame::End()
 {
-	m_pGameManager->Final();
+	m_pBattleManager->Final();
 }
 
 void SceneGame::SetCharacter(int player, int enemy)
 {
-	m_pGameManager = std::make_shared<GameManager>(std::make_shared<GameCamera>());
+	m_pBattleManager = std::make_shared<BattleManager>(std::make_shared<GameCamera>());
 
 	LoadCsv load;
 
 	std::vector<std::vector<std::string>> data = load.LoadFile("data/csv/characterStatus.csv");
 
-	m_pGameManager->SetOnePlayerStatus(player, data[player]);
+	m_pBattleManager->SetOnePlayerStatus(player, data[player]);
 
-	m_pGameManager->SetTwoPlayerStatus(enemy, data[enemy]);
+	m_pBattleManager->SetTwoPlayerStatus(enemy, data[enemy]);
 }

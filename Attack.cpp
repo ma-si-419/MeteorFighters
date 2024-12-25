@@ -39,7 +39,7 @@ void Attack::Init(AttackStatus status, std::shared_ptr<EffectManager> manager)
 
 	m_pEffectManager = manager;
 
-	//	if (status.attackKind == CharacterBase::AttackKind::kEnergy)
+	//	if (status.attackKind == Character::AttackKind::kEnergy)
 	//	{
 	m_pEffect = std::make_shared<Effect>(Effect::EffectKind::kEnergy);
 

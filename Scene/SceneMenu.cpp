@@ -1,6 +1,7 @@
 #include "SceneMenu.h"
 #include "SceneSelect.h"
 #include "SceneTitle.h"
+#include "SceneTutorial.h"
 #include "DxLib.h"
 #include "Input.h"
 #include "SoundManager.h"
@@ -28,13 +29,13 @@ void SceneMenu::Update()
 {
 	int selectItem = m_pMenuUi->Update();
 
-	if (selectItem == static_cast<int>(MenuUi::SelectItem::kContinuousBattle))
+	if (selectItem == static_cast<int>(MenuUi::SelectItem::kBattle))
 	{
 		m_sceneManager.ChangeScene(std::make_shared<SceneSelect>(m_sceneManager));
 	}
-	else if (selectItem == static_cast<int>(MenuUi::SelectItem::kBattle))
+	else if (selectItem == static_cast<int>(MenuUi::SelectItem::kTutorial))
 	{
-		m_sceneManager.ChangeScene(std::make_shared<SceneSelect>(m_sceneManager));
+		m_sceneManager.ChangeScene(std::make_shared<SceneTutorial>(m_sceneManager));
 	}
 	else if (selectItem == static_cast<int>(MenuUi::SelectItem::kTitle))
 	{

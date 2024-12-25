@@ -6,8 +6,8 @@ class MenuUi
 public:
 	enum class SelectItem
 	{
-		kContinuousBattle,
 		kBattle,
+		kTutorial,
 		kTitle,
 		kEndGame,
 		kItemNum

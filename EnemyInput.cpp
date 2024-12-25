@@ -1,5 +1,5 @@
 #include "EnemyInput.h"
-#include "GameManager.h"
+#include "BattleManager.h"
 #include "CharacterStateBase.h"
 #include "CharacterStateNormalAttack.h"
 #include "LoadCsv.h"

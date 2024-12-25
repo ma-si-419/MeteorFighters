@@ -76,14 +76,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Actor;$(ProjectDir)Actor/Character;$(ProjectDir)Actor/Character/Player;$(ProjectDir)Actor/Character/Enemy;data/addFile</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Character;$(ProjectDir)Character/State;data/addFile</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4099;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Actor;$(ProjectDir)Actor/Character;$(ProjectDir)Actor/Character/Player;$(ProjectDir)Actor/Character/Enemy;data/addFile</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Character;$(ProjectDir)Character/State;data/addFile</AdditionalLibraryDirectories>
       <AdditionalOptions>/ignore:4099</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
@@ -95,7 +95,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Actor;$(ProjectDir)Actor/Character;$(ProjectDir)Actor/Character/Player;$(ProjectDir)Actor/Character/Enemy;data/addFile</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Character;$(ProjectDir)Character/State;data/addFile</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4099;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -104,7 +104,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Actor;$(ProjectDir)Actor/Character;$(ProjectDir)Actor/Character/Player;$(ProjectDir)Actor/Character/Enemy;data/addFile</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Character;$(ProjectDir)Character/State;data/addFile</AdditionalLibraryDirectories>
       <AdditionalOptions>/ignore:4099</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
@@ -114,14 +114,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Actor;$(ProjectDir)Actor/Character;$(ProjectDir)Actor/Character/Player;$(ProjectDir)Actor/Character/Enemy;data/addFile</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Character;$(ProjectDir)Character/State;data/addFile</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4099;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Actor;$(ProjectDir)Actor/Character;$(ProjectDir)Actor/Character/Player;$(ProjectDir)Actor/Character/Enemy;data/addFile</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Character;$(ProjectDir)Character/State;data/addFile</AdditionalLibraryDirectories>
       <AdditionalOptions>/ignore:4099</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
@@ -133,7 +133,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Actor;$(ProjectDir)Actor/Character;$(ProjectDir)Actor/Character/Player;$(ProjectDir)Actor/Character/Enemy;data/addFile</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Character;$(ProjectDir)Character/State;data/addFile</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4099;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -142,31 +142,30 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Actor;$(ProjectDir)Actor/Character;$(ProjectDir)Actor/Character/Player;$(ProjectDir)Actor/Character/Enemy;data/addFile</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Character;$(ProjectDir)Character/State;data/addFile</AdditionalLibraryDirectories>
       <AdditionalOptions>/ignore:4099</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Actor\Actor.cpp" />
     <ClCompile Include="Attack.cpp" />
-    <ClCompile Include="Actor\Character\CharacterBase.cpp" />
-    <ClCompile Include="Actor\Character\CharacterStateBase.cpp" />
-    <ClCompile Include="CharacterStateButtonBashing.cpp" />
-    <ClCompile Include="CharacterStateCharge.cpp" />
-    <ClCompile Include="CharacterStateDash.cpp" />
-    <ClCompile Include="CharacterStateGuard.cpp" />
-    <ClCompile Include="CharacterStateHitAttack.cpp" />
-    <ClCompile Include="CharacterStateJump.cpp" />
-    <ClCompile Include="CharacterStateMove.cpp" />
-    <ClCompile Include="CharacterStateNormalAttack.cpp" />
-    <ClCompile Include="CharacterStateRush.cpp" />
-    <ClCompile Include="CharacterStateSpecialAttack.cpp" />
-    <ClCompile Include="ChracterStateIdle.cpp" />
+    <ClCompile Include="Character\Character.cpp" />
+    <ClCompile Include="Character\State\CharacterStateBase.cpp" />
+    <ClCompile Include="Character\State\CharacterStateButtonBashing.cpp" />
+    <ClCompile Include="Character\State\CharacterStateCharge.cpp" />
+    <ClCompile Include="Character\State\CharacterStateDash.cpp" />
+    <ClCompile Include="Character\State\CharacterStateGuard.cpp" />
+    <ClCompile Include="Character\State\CharacterStateHitAttack.cpp" />
+    <ClCompile Include="Character\State\CharacterStateJump.cpp" />
+    <ClCompile Include="Character\State\CharacterStateMove.cpp" />
+    <ClCompile Include="Character\State\CharacterStateNormalAttack.cpp" />
+    <ClCompile Include="Character\State\CharacterStateRush.cpp" />
+    <ClCompile Include="Character\State\CharacterStateSpecialAttack.cpp" />
+    <ClCompile Include="Character\State\ChracterStateIdle.cpp" />
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="EffectManager.cpp" />
     <ClCompile Include="EnemyInput.cpp" />
     <ClCompile Include="GameCamera.cpp" />
-    <ClCompile Include="GameManager.cpp" />
+    <ClCompile Include="BattleManager.cpp" />
     <ClCompile Include="GraphManager.cpp" />
     <ClCompile Include="InputData.cpp" />
     <ClCompile Include="MenuUi.cpp" />
@@ -182,40 +181,40 @@
     <ClCompile Include="MyEngine\Utility\LoadCsv.cpp" />
     <ClCompile Include="MyEngine\Utility\Vector2.cpp" />
     <ClCompile Include="MyEngine\Utility\Vector3.cpp" />
+    <ClCompile Include="SceneTutorial.cpp" />
     <ClCompile Include="Scene\SceneBase.cpp" />
     <ClCompile Include="Scene\SceneGame.cpp" />
     <ClCompile Include="Scene\SceneManager.cpp" />
     <ClCompile Include="Scene\SceneMenu.cpp" />
     <ClCompile Include="Scene\SceneSelect.cpp" />
     <ClCompile Include="Scene\SceneTitle.cpp" />
-    <ClCompile Include="Actor\StateBase.cpp" />
+    <ClCompile Include="Character\State\StateBase.cpp" />
     <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="GameUi.cpp" />
     <ClCompile Include="TitleUi.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Actor\Actor.h" />
     <ClInclude Include="Attack.h" />
-    <ClInclude Include="Actor\Character\CharacterBase.h" />
-    <ClInclude Include="Actor\Character\CharacterStateBase.h" />
-    <ClInclude Include="CharacterStateButtonBashing.h" />
-    <ClInclude Include="CharacterStateCharge.h" />
-    <ClInclude Include="CharacterStateDash.h" />
-    <ClInclude Include="CharacterStateGuard.h" />
-    <ClInclude Include="CharacterStateHitAttack.h" />
-    <ClInclude Include="CharacterStateIdle.h" />
-    <ClInclude Include="CharacterStateJump.h" />
-    <ClInclude Include="CharacterStateMove.h" />
-    <ClInclude Include="CharacterStateNormalAttack.h" />
-    <ClInclude Include="CharacterStateRush.h" />
-    <ClInclude Include="CharacterStateSpecialAttack.h" />
+    <ClInclude Include="Character\Character.h" />
+    <ClInclude Include="Character\State\CharacterStateBase.h" />
+    <ClInclude Include="Character\State\CharacterStateButtonBashing.h" />
+    <ClInclude Include="Character\State\CharacterStateCharge.h" />
+    <ClInclude Include="Character\State\CharacterStateDash.h" />
+    <ClInclude Include="Character\State\CharacterStateGuard.h" />
+    <ClInclude Include="Character\State\CharacterStateHitAttack.h" />
+    <ClInclude Include="Character\State\CharacterStateIdle.h" />
+    <ClInclude Include="Character\State\CharacterStateJump.h" />
+    <ClInclude Include="Character\State\CharacterStateMove.h" />
+    <ClInclude Include="Character\State\CharacterStateNormalAttack.h" />
+    <ClInclude Include="Character\State\CharacterStateRush.h" />
+    <ClInclude Include="Character\State\CharacterStateSpecialAttack.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="EffectManager.h" />
     <ClInclude Include="EnemyInput.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameCamera.h" />
-    <ClInclude Include="GameManager.h" />
+    <ClInclude Include="BattleManager.h" />
     <ClInclude Include="GameSceneConstant.h" />
     <ClInclude Include="GraphManager.h" />
     <ClInclude Include="InputData.h" />
@@ -233,16 +232,15 @@
     <ClInclude Include="MyEngine\Utility\LoadCsv.h" />
     <ClInclude Include="MyEngine\Utility\Vector2.h" />
     <ClInclude Include="MyEngine\Utility\Vector3.h" />
-    <ClInclude Include="PlayerStateCharge.h" />
-    <ClInclude Include="PlayerStateDash.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SceneTutorial.h" />
     <ClInclude Include="Scene\SceneBase.h" />
     <ClInclude Include="Scene\SceneGame.h" />
     <ClInclude Include="Scene\SceneManager.h" />
     <ClInclude Include="Scene\SceneMenu.h" />
     <ClInclude Include="Scene\SceneSelect.h" />
     <ClInclude Include="Scene\SceneTitle.h" />
-    <ClInclude Include="Actor\StateBase.h" />
+    <ClInclude Include="Character\State\StateBase.h" />
     <ClInclude Include="SoundManager.h" />
     <ClInclude Include="Stage.h" />
     <ClInclude Include="GameUi.h" />
