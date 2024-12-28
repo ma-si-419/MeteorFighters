@@ -1,7 +1,7 @@
 #include "CharacterStateBase.h"
 #include "CharacterStateHitAttack.h"
 #include "Character.h"
-#include "BattleManager.h"
+#include "GameManagerBase.h"
 #include "Attack.h"
 #include "Input.h"
 #include "Effect.h"

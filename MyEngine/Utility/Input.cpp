@@ -81,26 +81,29 @@ void Input::Update()
 		//スティックの入力
 		InputData::StickInfo stickInfo;
 
-		//スティックの入力を取得する
-		GetJoypadAnalogInput(&stickInfo.leftStickX, &stickInfo.leftStickY, DX_INPUT_PAD1);
-		GetJoypadAnalogInputRight(&stickInfo.rightStickX, &stickInfo.rightStickY, DX_INPUT_PAD1);
-
-		m_inputData[i]->SetStickInfo(stickInfo);
-
-		//トリガーの情報取得
+		//トリガーの入力
 		XINPUT_STATE* xInputState = new XINPUT_STATE;
 		if (i == 0)
 		{
+			GetJoypadAnalogInput(&stickInfo.leftStickX, &stickInfo.leftStickY, DX_INPUT_PAD1);
+			GetJoypadAnalogInputRight(&stickInfo.rightStickX, &stickInfo.rightStickY, DX_INPUT_PAD1);
 			GetJoypadXInputState(DX_INPUT_PAD1, xInputState);
 		}
 		else
 		{
+			GetJoypadAnalogInput(&stickInfo.leftStickX, &stickInfo.leftStickY, DX_INPUT_PAD2);
+			GetJoypadAnalogInputRight(&stickInfo.rightStickX, &stickInfo.rightStickY, DX_INPUT_PAD2);
 			GetJoypadXInputState(DX_INPUT_PAD2, xInputState);
 		}
+
 		InputData::TriggerInfo triggerInfo;
 		triggerInfo.left = xInputState->LeftTrigger;
 		triggerInfo.right = xInputState->RightTrigger;
 
+		//スティックの入力を設定する
+		m_inputData[i]->SetStickInfo(stickInfo);
+
+		//トリガーの情報を設定する
 		m_inputData[i]->SetTriggerInfo(triggerInfo);
 
 	}

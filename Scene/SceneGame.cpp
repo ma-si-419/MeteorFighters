@@ -30,10 +30,10 @@ void SceneGame::Init()
 	//画像のロード
 	GraphManager::GetInstance().LoadSceneGraph("Game");
 
-	m_pCharacters.push_back(m_pBattleManager->GetOnePlayerPointer());
-	m_pCharacters.push_back(m_pBattleManager->GetTwoPlayerPointer());
+	m_pCharacters.push_back(m_pGameManager->GetOnePlayerPointer());
+	m_pCharacters.push_back(m_pGameManager->GetTwoPlayerPointer());
 	
-	m_pBattleManager->Init();
+	m_pGameManager->Init();
 
 	for (auto& actor : m_pCharacters)
 	{
@@ -49,14 +49,14 @@ void SceneGame::Update()
 		actor->Update();
 	}
 
-	m_pBattleManager->Update();
+	m_pGameManager->Update();
 
-	if (m_pBattleManager->GetNextScene() == Game::Scene::kSelect)
+	if (m_pGameManager->GetNextScene() == Game::Scene::kSelect)
 	{
 		//セレクトシーンに戻る
 		m_sceneManager.ChangeScene(std::make_shared<SceneSelect>(m_sceneManager));
 	}
-	else if (m_pBattleManager->GetNextScene() == Game::Scene::kMenu)
+	else if (m_pGameManager->GetNextScene() == Game::Scene::kMenu)
 	{
 		//メニューシーンに戻る
 		m_sceneManager.ChangeScene(std::make_shared<SceneMenu>(m_sceneManager));
@@ -78,23 +78,23 @@ void SceneGame::Draw()
 	{
 		actor->Draw();
 	}
-	m_pBattleManager->Draw();
+	m_pGameManager->Draw();
 }
 
 void SceneGame::End()
 {
-	m_pBattleManager->Final();
+	m_pGameManager->Final();
 }
 
 void SceneGame::SetCharacter(int player, int enemy)
 {
-	m_pBattleManager = std::make_shared<BattleManager>(std::make_shared<GameCamera>());
+	m_pGameManager = std::make_shared<BattleManager>(std::make_shared<GameCamera>());
 
 	LoadCsv load;
 
 	std::vector<std::vector<std::string>> data = load.LoadFile("data/csv/characterStatus.csv");
 
-	m_pBattleManager->SetOnePlayerStatus(player, data[player]);
+	m_pGameManager->SetOnePlayerStatus(player, data[player]);
 
-	m_pBattleManager->SetTwoPlayerStatus(enemy, data[enemy]);
+	m_pGameManager->SetTwoPlayerStatus(enemy, data[enemy]);
 }

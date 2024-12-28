@@ -12,8 +12,6 @@ public:
 	/// <param name="path">ファイルパス</param>
 	/// <returns>読み込んだ結果の文字列</returns>
 	std::vector<std::vector<std::string>> LoadFile(std::string path);
-private:
-
 
 	/// <summary>
 	/// 文字列を指定した文字で区切る

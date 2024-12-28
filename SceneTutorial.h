@@ -2,7 +2,7 @@
 #include "SceneBase.h"
 #include <vector>
 
-class BattleManager;
+class GameManagerBase;
 class Character;
 class SceneTutorial : public SceneBase
 {
@@ -25,6 +25,7 @@ private:
 
 	std::vector<std::shared_ptr<Character>> m_pCharacters;
 
-	std::shared_ptr<BattleManager> m_pManager;
+	std::shared_ptr<GameManagerBase> m_pManager;
+
 };
 

@@ -9,7 +9,7 @@
 
 class CharacterStateBase;
 class SceneGame;
-class BattleManager;
+class GameManagerBase;
 class Attack;
 class EnemyInput;
 class Character : public Collidable
@@ -278,7 +278,7 @@ public:
 	/// 敵の座標などを取得するためにゲームマネージャーのポインタをセットする
 	/// </summary>
 	/// <param name="manager">ゲームマネージャーのポインタ</param>
-	void SetGameManager(std::shared_ptr<BattleManager> manager);
+	void SetGameManager(std::shared_ptr<GameManagerBase> manager);
 
 	/// <summary>
 	/// 現在のワールド座標を返す
@@ -527,7 +527,7 @@ public:
 	/// <summary>
 	/// 状況によって変化させるアップデートを変更する
 	/// </summary>
-	/// <param name="situation">BattleManager::Situationをint型にキャストして引数にする</param>
+	/// <param name="situation">GameManagerBase::Situationをint型にキャストして引数にする</param>
 	void ChangeSituationUpdate(int situation);
 
 	/// <summary>
@@ -601,7 +601,7 @@ private:
 	//シーンのポインタ
 	std::shared_ptr<SceneGame> m_pScene;
 	//マネージャーのポインタ
-	std::shared_ptr<BattleManager> m_pBattleManager;
+	std::shared_ptr<GameManagerBase> m_pBattleManager;
 	//State
 	std::shared_ptr<CharacterStateBase> m_pState;
 	//作成した残像

@@ -9,3 +9,17 @@ SelectItemBox,SelectItemBox,Menu
 ItemBox,ItemBox,Menu
 Mouse,MouseFace,Title
 BlueHead,BlueHeadFace,Title
+HpBar,HpBar,Tutorial
+HpBarNum,HpBarNumBox,Tutorial
+MpBar,MpBar,Tutorial
+BackBox,TutorialBackBox,Tutorial
+ButtonFrame,TutorialButtonFrame,Tutorial
+A,TutorialA,Tutorial
+B,TutorialB,Tutorial
+X,TutorialX,Tutorial
+Y,TutorialY,Tutorial
+RB,TutorialRB,Tutorial
+LB,TutorialLB,Tutorial
+RT,TutorialRT,Tutorial
+LT,TutorialLT,Tutorial
+Stick,TutorialLStick,Tutorial

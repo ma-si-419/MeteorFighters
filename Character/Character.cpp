@@ -221,8 +221,8 @@ void Character::Update()
 void Character::Draw()
 {
 	//リザルト時に2P側を消す
-	if (m_pBattleManager->GetNowSituation() == BattleManager::Situation::kResult ||
-		m_pBattleManager->GetNowSituation() == BattleManager::Situation::kRetry)
+	if (m_pBattleManager->GetNowSituation() == GameManagerBase::BattleSituation::kResult ||
+		m_pBattleManager->GetNowSituation() == GameManagerBase::BattleSituation::kRetry)
 	{
 		if (m_playerNumber == PlayerNumber::kTwoPlayer) return;
 	}
@@ -322,7 +322,7 @@ void Character::UpdateAfterImage()
 	}
 }
 
-void Character::SetGameManager(std::shared_ptr<BattleManager> manager)
+void Character::SetGameManager(std::shared_ptr<GameManagerBase> manager)
 {
 	m_pBattleManager = manager;
 }
@@ -752,16 +752,16 @@ void Character::SetIsTrigger(bool flag)
 
 void Character::ChangeSituationUpdate(int situation)
 {
-	auto sit = static_cast<BattleManager::Situation>(situation);
+	auto sit = static_cast<GameManagerBase::BattleSituation>(situation);
 
 	//リトライが押されたとき
-	if (sit == BattleManager::Situation::kRetry)
+	if (sit == GameManagerBase::BattleSituation::kRetry)
 	{
 		//アニメーションを止める
 		m_updateSituationFunc = &Character::UpdateNone;
 	}
 	//1Pの開始演出をしているとき
-	else if (sit == BattleManager::Situation::kStart1P)
+	else if (sit == GameManagerBase::BattleSituation::kStart1P)
 	{
 
 		if (m_playerNumber == PlayerNumber::kOnePlayer)
@@ -776,7 +776,7 @@ void Character::ChangeSituationUpdate(int situation)
 		}
 	}
 	//2Pの開始演出をしているとき
-	else if (sit == BattleManager::Situation::kStart2P)
+	else if (sit == GameManagerBase::BattleSituation::kStart2P)
 	{
 		if (m_playerNumber == PlayerNumber::kTwoPlayer)
 		{
@@ -790,17 +790,17 @@ void Character::ChangeSituationUpdate(int situation)
 		}
 	}
 	//バトル時
-	else if (sit == BattleManager::Situation::kBattle)
+	else if (sit == GameManagerBase::BattleSituation::kBattle)
 	{
 		m_updateSituationFunc = &Character::UpdateBattle;
 	}
 	//ノックアウトの演出時
-	else if (sit == BattleManager::Situation::kKnockOut)
+	else if (sit == GameManagerBase::BattleSituation::kKnockOut)
 	{
 		m_updateSituationFunc = &Character::UpdateKnockOut;
 	}
 	//リザルト時
-	else if (sit == BattleManager::Situation::kResult)
+	else if (sit == GameManagerBase::BattleSituation::kResult)
 	{
 		m_updateSituationFunc = &Character::UpdateResult;
 	}

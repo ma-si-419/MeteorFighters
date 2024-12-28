@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Attack.cpp" />
+    <ClCompile Include="BattleManager.cpp" />
     <ClCompile Include="Character\Character.cpp" />
     <ClCompile Include="Character\State\CharacterStateBase.cpp" />
     <ClCompile Include="Character\State\CharacterStateButtonBashing.cpp" />
@@ -165,7 +166,7 @@
     <ClCompile Include="EffectManager.cpp" />
     <ClCompile Include="EnemyInput.cpp" />
     <ClCompile Include="GameCamera.cpp" />
-    <ClCompile Include="BattleManager.cpp" />
+    <ClCompile Include="GameManagerBase.cpp" />
     <ClCompile Include="GraphManager.cpp" />
     <ClCompile Include="InputData.cpp" />
     <ClCompile Include="MenuUi.cpp" />
@@ -193,9 +194,12 @@
     <ClCompile Include="Stage.cpp" />
     <ClCompile Include="GameUi.cpp" />
     <ClCompile Include="TitleUi.cpp" />
+    <ClCompile Include="TutorialManager.cpp" />
+    <ClCompile Include="TutorialUi.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Attack.h" />
+    <ClInclude Include="BattleManager.h" />
     <ClInclude Include="Character\Character.h" />
     <ClInclude Include="Character\State\CharacterStateBase.h" />
     <ClInclude Include="Character\State\CharacterStateButtonBashing.h" />
@@ -214,7 +218,7 @@
     <ClInclude Include="EnemyInput.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameCamera.h" />
-    <ClInclude Include="BattleManager.h" />
+    <ClInclude Include="GameManagerBase.h" />
     <ClInclude Include="GameSceneConstant.h" />
     <ClInclude Include="GraphManager.h" />
     <ClInclude Include="InputData.h" />
@@ -245,6 +249,8 @@
     <ClInclude Include="Stage.h" />
     <ClInclude Include="GameUi.h" />
     <ClInclude Include="TitleUi.h" />
+    <ClInclude Include="TutorialManager.h" />
+    <ClInclude Include="TutorialUi.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MeteorFighters.rc" />
