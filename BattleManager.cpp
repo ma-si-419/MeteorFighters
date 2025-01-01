@@ -78,27 +78,6 @@ void BattleManager::Init()
 #endif // _DEBUG
 }
 
-void BattleManager::RetryInit()
-{
-	m_pCharacters[0]->RetryInit();
-	m_pCharacters[1]->RetryInit();
-
-	m_pCamera->SetPoseCamera();
-	m_poseCameraPos = kStartCameraStartPos;
-
-	//カメラの座標設定
-	MyEngine::Vector3 onePlayerPos = m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetPos();
-	MyEngine::Vector3 twoPlayerPos = m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetPos();
-	//1Pを中心に1Pをターゲットにする
-	m_pCamera->SetCenterAndTarget(onePlayerPos, onePlayerPos);
-
-	m_pCamera->SetLocalPos(m_poseCameraPos);
-
-	m_pCamera->SetFrontPos(twoPlayerPos);
-
-	m_pGameUi->RetryInit();
-}
-
 void BattleManager::Update()
 {
 #ifdef _DEBUG
@@ -138,6 +117,9 @@ void BattleManager::ChangeSituation(BattleSituation situation)
 	else if (situation == BattleSituation::kStart1P || situation == BattleSituation::kStart2P)
 	{
 		m_updateSituationFunc = &BattleManager::UpdateStart;
+
+		m_pCamera->SetPoseCamera();
+		m_poseCameraPos = kStartCameraStartPos;
 	}
 	//バトル時
 	else if (situation == BattleSituation::kBattle)
@@ -165,15 +147,6 @@ void BattleManager::Draw()
 {
 	//共通の描画処理
 	DrawCommon();
-
-	//1Pの体力を描画する
-	m_pGameUi->DrawHpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetHp(), true);
-	//2Pの体力を描画する
-	m_pGameUi->DrawHpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetHp(), false);
-	//1Pの気力を描画する
-	m_pGameUi->DrawMpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetMp(), true);
-	//2Pの気力を描画する
-	m_pGameUi->DrawMpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetMp(), false);
 
 	//フェードのアルファ値が0よりも高い場合表示する
 	if (m_alpha > 0)

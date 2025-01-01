@@ -1,5 +1,6 @@
 #include "TutorialManager.h"
 #include "TutorialUi.h"
+#include "GameUi.h"
 #include "LoadCsv.h"
 #include "GameCamera.h"
 #include "Attack.h"
@@ -17,6 +18,8 @@ TutorialManager::TutorialManager(std::shared_ptr<GameCamera> camera) :
 
 {
 	m_pTutorialUi = std::make_shared<TutorialUi>();
+
+	m_pGameUi = std::make_shared<GameUi>();
 }
 
 TutorialManager::~TutorialManager()
@@ -78,9 +81,26 @@ void TutorialManager::UpdateMenu()
 {
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
+	TutorialUi::MenuItem selectItem = m_pTutorialUi->GetSelectItem();
+
 	if (input->IsTrigger("A"))
 	{
-		ChangeSituation(TutorialSituation::kStart);
+		//状況をリセットするを押されたら
+		if (selectItem == TutorialUi::MenuItem::kReset)
+		{
+			RetryInit();
+		}
+		//メニューを閉じるが押されたら
+		else if (selectItem == TutorialUi::MenuItem::kMenuEnd)
+		{
+			ChangeSituation(TutorialSituation::kStart);
+		}
+		//チュートリアルを終了するが押されたら
+		else if (selectItem == TutorialUi::MenuItem::kTutorialEnd)
+		{
+			//メインメニューに戻る
+			m_nextScene = Game::Scene::kMenu;
+		}
 	}
 }
 
@@ -98,7 +118,7 @@ void TutorialManager::UpdatePlaying()
 {
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
-	if (input->IsTrigger("A"))
+	if (input->IsTrigger("X"))
 	{
 		ChangeSituation(TutorialSituation::kMenu);
 		m_nowTutorial = static_cast<TutorialKind>(static_cast<int>(m_nowTutorial) + 1);

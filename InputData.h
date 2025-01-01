@@ -128,7 +128,7 @@ namespace MyEngine
 		bool IsPress(const std::string& action)const;
 
 		/// <summary>
-		/// キーが押されている時間を返す()
+		/// キーが押されている時間を返す(60フレームまで)
 		/// </summary>
 		/// <param name="action">判定したいキー</param>
 		/// <returns>押している時間</returns>

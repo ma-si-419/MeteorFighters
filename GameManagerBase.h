@@ -40,6 +40,11 @@ public:
 	virtual void Init() abstract;
 
 	/// <summary>
+	/// ゲームをもう一度行う際の初期化を行う
+	/// </summary>
+	void RetryInit();
+
+	/// <summary>
 	/// ゲームマネージャーの更新
 	/// </summary>
 	virtual void Update()abstract;
@@ -205,7 +210,7 @@ protected:
 	std::shared_ptr<GameCamera> m_pCamera;
 	//エフェクト管理クラス
 	std::shared_ptr<EffectManager> m_pEffectManager;
-	//UI管理クラス
+	//ゲームシーンのUI管理クラス
 	std::shared_ptr<GameUi> m_pGameUi;
 	//ゲームの状況
 	BattleSituation m_situation;

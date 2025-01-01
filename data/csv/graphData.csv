@@ -23,3 +23,5 @@ LB,TutorialLB,Tutorial
 RT,TutorialRT,Tutorial
 LT,TutorialLT,Tutorial
 Stick,TutorialLStick,Tutorial
+Menu,TutorialMenu,Tutorial
+SelectItem,TutorialMenuSelectItem,Tutorial

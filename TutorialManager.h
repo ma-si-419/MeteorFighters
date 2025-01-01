@@ -95,6 +95,7 @@ private:
 	//チュートリアルをクリアしたかどうか
 	bool m_isSuccessTutorial;
 
+	//チュートリアルのUI
 	std::shared_ptr<TutorialUi> m_pTutorialUi;
 };
 

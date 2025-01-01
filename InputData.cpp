@@ -8,7 +8,7 @@ namespace
 	//トリガーを押していると判定する強さ
 	constexpr int kTriggerPower = 128;
 	//何フレーム前の入力まで残すか
-	constexpr int kLastInputSaveNum = 30;
+	constexpr int kLastInputSaveNum = 60;
 }
 
 

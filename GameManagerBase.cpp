@@ -29,6 +29,24 @@ GameManagerBase::~GameManagerBase()
 {
 }
 
+void GameManagerBase::RetryInit()
+{
+	m_pCharacters[0]->RetryInit();
+	m_pCharacters[1]->RetryInit();
+
+	//カメラの座標設定
+	MyEngine::Vector3 onePlayerPos = m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetPos();
+	MyEngine::Vector3 twoPlayerPos = m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetPos();
+	//1Pを中心に1Pをターゲットにする
+	m_pCamera->SetCenterAndTarget(onePlayerPos, onePlayerPos);
+
+	m_pCamera->SetLocalPos(m_poseCameraPos);
+
+	m_pCamera->SetFrontPos(twoPlayerPos);
+
+	m_pGameUi->RetryInit();
+}
+
 void GameManagerBase::SetOnePlayerStatus(int number, std::vector<std::string> statusData)
 {
 	//プレイヤー作成
@@ -213,6 +231,15 @@ void GameManagerBase::DrawCommon()
 
 	//エフェクトの描画
 	m_pEffectManager->Draw();
+
+	//1Pの体力を描画する
+	m_pGameUi->DrawHpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetHp(), true);
+	//2Pの体力を描画する
+	m_pGameUi->DrawHpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetHp(), false);
+	//1Pの気力を描画する
+	m_pGameUi->DrawMpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetMp(), true);
+	//2Pの気力を描画する
+	m_pGameUi->DrawMpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetMp(), false);
 }
 
 Character::CharacterStatus GameManagerBase::GetCharacterStatus(std::vector<std::string> statusData)

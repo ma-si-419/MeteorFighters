@@ -28,11 +28,6 @@ public:
 	void Init() override;
 
 	/// <summary>
-	/// ゲームをもう一度行う際の初期化を行う
-	/// </summary>
-	void RetryInit();
-
-	/// <summary>
 	/// ゲームマネージャーの更新
 	/// </summary>
 	void Update() override;
