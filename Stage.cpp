@@ -8,7 +8,7 @@ namespace
 
 Stage::Stage()
 {
-	m_modelHandle = MV1LoadModel("data/model/protoStage.mv1");
+	m_modelHandle = MV1LoadModel("data/model/Stage.mv1");
 }
 
 Stage::~Stage()
