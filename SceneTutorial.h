@@ -27,5 +27,7 @@ private:
 
 	std::shared_ptr<GameManagerBase> m_pManager;
 
+	bool m_isChangeScene;
+
 };
 

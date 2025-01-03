@@ -8,6 +8,25 @@
 #include "Stage.h"
 #include "Input.h"
 
+namespace
+{
+	//チュートリアルをクリアする条件
+	const std::vector<TutorialManager::TutorialSuccessKind> kTutorialSuccessTerms[static_cast<int>(TutorialManager::TutorialKind::kTutorialNum)] =
+	{
+		{TutorialManager::TutorialSuccessKind::kMove},
+		{TutorialManager::TutorialSuccessKind::kStep},
+		{TutorialManager::TutorialSuccessKind::kJump},
+		{TutorialManager::TutorialSuccessKind::kUp,TutorialManager::TutorialSuccessKind::kDown },
+		{TutorialManager::TutorialSuccessKind::kPhysicalAttack},
+		{TutorialManager::TutorialSuccessKind::kChargePhysicalAttack},
+		{TutorialManager::TutorialSuccessKind::kEnergyCharge},
+		{TutorialManager::TutorialSuccessKind::kEnergyAttack},
+		{TutorialManager::TutorialSuccessKind::kChargeEnergyAttadk},
+		{TutorialManager::TutorialSuccessKind::kGuard},
+		{TutorialManager::TutorialSuccessKind::kSpecialAttack}
+	};
+}
+
 TutorialManager::TutorialManager(std::shared_ptr<GameCamera> camera) :
 	GameManagerBase(camera),
 	m_isSuccessTutorial(false),
@@ -75,6 +94,17 @@ void TutorialManager::Draw()
 
 void TutorialManager::Final()
 {
+	for (auto& character : m_pCharacters)
+	{
+		character->Final();
+	}
+	for (auto& attack : m_pAttacks)
+	{
+		attack->Final();
+	}
+	m_pStage->Final();
+	m_pCamera->Final();
+	m_pEffectManager->Final();
 }
 
 void TutorialManager::UpdateMenu()
@@ -118,7 +148,23 @@ void TutorialManager::UpdatePlaying()
 {
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
-	if (input->IsTrigger("X"))
+	//チュートリアルが成功したかどうか
+	bool isSuccess = true;
+
+	auto& terms = kTutorialSuccessTerms[static_cast<int>(m_nowTutorial)];
+
+	for (auto item : terms)
+	{
+		//ここでクリアしているかを確認
+		if (m_successTutorialKinds[item])
+		{
+			//一つでもクリアしていない項目があればfalseにする
+			isSuccess = false;
+		}
+	}
+
+	//クリアした時の演出を作成する
+	if (isSuccess)
 	{
 		ChangeSituation(TutorialSituation::kMenu);
 		m_nowTutorial = static_cast<TutorialKind>(static_cast<int>(m_nowTutorial) + 1);

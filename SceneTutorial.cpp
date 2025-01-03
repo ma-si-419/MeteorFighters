@@ -6,7 +6,8 @@
 #include "GraphManager.h"
 
 SceneTutorial::SceneTutorial(SceneManager& sceneManager) :
-	SceneBase(sceneManager)
+	SceneBase(sceneManager),
+	m_isChangeScene(false)
 {
 	m_pManager = std::make_shared<TutorialManager>(std::make_shared<GameCamera>());
 
@@ -50,10 +51,13 @@ void SceneTutorial::Update()
 
 	m_pManager->Update();
 
-	if (m_pManager->GetNextScene() == Game::Scene::kMenu)
+	if (m_pManager->GetNextScene() == Game::Scene::kMenu &&
+		!m_isChangeScene)
 	{
 		//メニューシーンに戻る
 		m_sceneManager.ChangeScene(std::make_shared<SceneMenu>(m_sceneManager));
+	
+		m_isChangeScene = true;
 	}
 }
 

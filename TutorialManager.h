@@ -17,6 +17,23 @@ public:
 		kEnergyAttack,
 		kChargeEnergyAttack,
 		kGuard,
+		kSpecialAttack,
+		kTutorialNum
+	};
+
+	enum class TutorialSuccessKind
+	{
+		kMove,
+		kStep,
+		kJump,
+		kUp,
+		kDown,
+		kPhysicalAttack,
+		kChargePhysicalAttack,
+		kEnergyAttack,
+		kChargeEnergyAttadk,
+		kEnergyCharge,
+		kGuard,
 		kSpecialAttack
 	};
 
@@ -51,8 +68,7 @@ public:
 
 	void Final() override;
 
-	void SuccessTutorial() { m_isSuccessTutorial = true; }
-
+	void SuccessTutorial(TutorialSuccessKind kind) { m_successTutorialKinds[kind] = true; }
 
 private:
 
@@ -97,5 +113,7 @@ private:
 
 	//チュートリアルのUI
 	std::shared_ptr<TutorialUi> m_pTutorialUi;
-};
 
+	//チュートリアルのクリア条件で何をクリアしたかを保存する
+	std::map<TutorialSuccessKind, bool> m_successTutorialKinds;
+};

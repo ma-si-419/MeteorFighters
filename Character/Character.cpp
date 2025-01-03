@@ -804,6 +804,11 @@ void Character::ChangeSituationUpdate(int situation)
 	{
 		m_updateSituationFunc = &Character::UpdateResult;
 	}
+	//ƒƒjƒ…[‚âˆê’â~‚ğs‚Á‚Ä‚¢‚é‚Æ‚«
+	else if (sit == GameManagerBase::BattleSituation::kMenu)
+	{
+		m_updateSituationFunc = &Character::UpdateNone;
+	}
 }
 
 void Character::UpdateStart()

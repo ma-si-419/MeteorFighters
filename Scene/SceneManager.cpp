@@ -84,5 +84,4 @@ void SceneManager::ChangeScene(std::shared_ptr<SceneBase> next)
 	}
 	m_isFadeOut = true;
 	m_pNextScene = next;
-
 }
