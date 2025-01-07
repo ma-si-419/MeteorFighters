@@ -310,7 +310,7 @@ int CharacterStateHitAttack::GetNextAnimKind(int kind)
 		else if (animKind == Character::AnimKind::kLowHit2)
 		{
 			ans = Character::AnimKind::kLowHit3;
-		}
+		}	
 	}
 
 	return static_cast<int>(ans);

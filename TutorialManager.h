@@ -31,7 +31,7 @@ public:
 		kPhysicalAttack,
 		kChargePhysicalAttack,
 		kEnergyAttack,
-		kChargeEnergyAttadk,
+		kChargeEnergyAttack,
 		kEnergyCharge,
 		kGuard,
 		kSpecialAttack
@@ -51,7 +51,8 @@ private:
 	{
 		kMenu,
 		kStart,
-		kPlaying
+		kPlaying,
+		kSuccess
 	};
 
 public:
@@ -78,11 +79,15 @@ private:
 
 	void UpdatePlaying();
 
+	void UpdateSuccess();
+
 	void DrawMenu();
 
 	void DrawStart();
 	 
 	void DrawPlaying();
+
+	void DrawSuccess();
 
 	/// <summary>
 	/// 状況を変化させる
@@ -107,9 +112,6 @@ private:
 
 	//現在の状況
 	TutorialSituation m_tutorialSituation;
-
-	//チュートリアルをクリアしたかどうか
-	bool m_isSuccessTutorial;
 
 	//チュートリアルのUI
 	std::shared_ptr<TutorialUi> m_pTutorialUi;

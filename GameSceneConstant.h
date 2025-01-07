@@ -7,9 +7,9 @@ namespace GameSceneConstant
 	//キャラクターの当たり判定の大きさ
 	constexpr float kCharacterRadius = 5.0f;
 	//ジャンプ力
-	constexpr float kJumpPower = 6.0f;
+	constexpr float kJumpPower = 5.0f;
 	//空中での重力の強さ
-	constexpr float kSkyGravityPower = -0.2f;
+	constexpr float kSkyGravityPower = -0.3f;
 	//地上での重力の強さ
 	constexpr float kGroundGravityPower = -0.5f;
 	//落下速度の限界

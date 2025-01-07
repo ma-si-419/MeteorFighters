@@ -143,6 +143,13 @@ protected:
 	/// </summary>
 	/// <param name="effect">削除したいエフェクトのポインタ</param>
 	void ExitEffect(std::shared_ptr<Effect> effect);
+	
+	
+	/// <summary>
+	/// チュートリアルクリア条件を達成したとする
+	/// </summary>
+	/// <param name="tutorialNumber">チュートリアルの番号(TutorialManager::TutorialSuccessKindをintにキャストする)</param>
+	void SuccessTutorial(int tutorialNumber);
 
 	//現在の状態
 	CharacterStateKind m_kind = CharacterStateKind::kIdle;

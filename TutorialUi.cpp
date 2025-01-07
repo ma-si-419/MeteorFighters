@@ -72,13 +72,34 @@ namespace
 
 	//選択している項目が大きくなっていく速度
 	constexpr double kSelectItemBoxScalingSpeed = 0.05;
+
+	//クリア時の画像の初期拡大率
+	constexpr double kSuccessGraphInitScale = 5.0;
+
+	//クリア時の画像を小さくしていく速度
+	constexpr double kSuccessGraphScalingSpeed = 0.3;
+
+	//クリア時の画像の最終的な大きさ
+	constexpr double kSuccessGraphFinalScale = 1.2;
+
+	//クリア時の画像を揺らす時間
+	constexpr int kSuccessGraphShakeTime = 4;
+
+	//クリア時の画像を揺らす大きさ
+	constexpr int kSuccessGraphShakeScale = 4;
+	constexpr int kSuccessGraphShakeHalfScale = 2;
+
+	//クリア後どのくらいまつか
+	constexpr int kSuccessEndTime = 60;
 }
 
 TutorialUi::TutorialUi() :
 	m_drawButtonNum(0),
 	m_selectItem(static_cast<MenuItem>(0)),
 	m_tutorialNumber(0),
-	m_selectItemMoveTime(0)
+	m_selectItemMoveTime(0),
+	m_successTime(0),
+	m_isSuccessEnd(false)
 {
 	LoadCsv load;
 
@@ -204,9 +225,6 @@ void TutorialUi::InitPlaying(int number)
 		//描画数だけループ
 		for (int i = 0; i < m_drawButtonNum; i++)
 		{
-			//ボタンを描画する
-			DrawRotaGraph(posX, kButtonPosY, 1.0, 0.0, manager.GetHandle(button[i]), true);
-
 			GraphData buttonData;
 
 			buttonData.handle = manager.GetHandle(button[i]);
@@ -225,6 +243,27 @@ void TutorialUi::InitPlaying(int number)
 	{
 
 	}
+
+}
+
+void TutorialUi::InitSuccess()
+{
+	auto& manager = GraphManager::GetInstance();
+
+	m_updateFunc = &TutorialUi::UpdateSuccess;
+
+	//クリア時の画像を取得
+	GraphData success;
+	success.handle = manager.GetHandle("Success");
+	//座標はボタンを表示している座標
+	success.pos = MyEngine::Vector2(kButtonPosX,kButtonPosY);
+	//最初は大きく
+	success.scale = kSuccessGraphInitScale;
+
+	m_drawGraphs["Success"] = success;
+
+	m_isSuccessEnd = false;
+	m_successTime = 0;
 
 }
 
@@ -334,6 +373,35 @@ void TutorialUi::DrawPlaying(int number)
 
 		DrawRotaGraph(buttonData.pos.x, buttonData.pos.y, buttonData.scale, 0.0, buttonData.handle, true);
 	}
+}
+
+void TutorialUi::DrawSuccess(int number)
+{
+	GraphData frameData = m_drawGraphs["ButtonFrame"];
+
+	//ボタンを表示するフレーム
+	DrawRotaGraph(frameData.pos.x, frameData.pos.y, frameData.scale, 0.0, frameData.handle, true);
+
+	//プレイ中の説明
+	auto playingString = m_tutorialData[number][static_cast<int>(TutorialManager::TutorialDataIndex::kPlayingString)];
+
+	//プレイ中の説明を描画
+	DrawStringCenter(playingString, MyEngine::Vector2(kPlayingStringPosX, kPlayingStringPosY), m_playingFontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
+
+	//押すボタンを表示する
+	for (int i = 0; i < m_drawButtonNum; i++)
+	{
+		std::string name = "Button" + std::to_string(i);
+
+		GraphData buttonData = m_drawGraphs[name];
+
+		DrawRotaGraph(buttonData.pos.x, buttonData.pos.y, buttonData.scale, 0.0, buttonData.handle, true);
+	}
+
+	GraphData success = m_drawGraphs["Success"];
+
+	//クリア時の画像表示
+	DrawRotaGraph(success.pos.x, success.pos.y, success.scale, 0.0, success.handle, true);
 }
 
 void TutorialUi::DrawStringCenter(std::string string, MyEngine::Vector2 centerPos, int font, int color, int edgeColor)
@@ -471,4 +539,38 @@ void TutorialUi::UpdateStart()
 
 void TutorialUi::UpdatePlaying()
 {
+	if (m_isSuccessTutorial)
+	{
+		InitSuccess();
+	}
+}
+
+void TutorialUi::UpdateSuccess()
+{
+	//クリア時の画像を少しずつ小さくしていく
+	auto& success = m_drawGraphs["Success"];
+
+	success.scale -= kSuccessGraphScalingSpeed;
+
+	//クランプ
+	success.scale = max(success.scale,kSuccessGraphFinalScale);
+	
+	//最小まで小さくなったら
+	if (success.scale == kSuccessGraphFinalScale)
+	{
+		//少し揺らす
+		if (m_successTime < kSuccessGraphShakeTime)
+		{
+			success.pos.x = (kButtonPosX + GetRand(kSuccessGraphShakeScale)) - kSuccessGraphShakeHalfScale;
+			success.pos.y = (kButtonPosY + GetRand(kSuccessGraphShakeScale)) - kSuccessGraphShakeHalfScale;
+		}
+		
+		if(m_successTime > kSuccessEndTime)
+		{
+			//演出が終わったフラグを立てる
+			m_isSuccessEnd = true;
+		}
+
+		m_successTime++;
+	}
 }

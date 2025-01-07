@@ -6,6 +6,8 @@
 #include "Input.h"
 #include "DxLib.h"
 #include "Effect.h"
+#include "GameSceneConstant.h"
+#include "TutorialManager.h"
 
 namespace
 {
@@ -130,6 +132,11 @@ void CharacterStateCharge::Update()
 
 	SetCharacterVelo(MyEngine::Vector3(0, 0, 0));
 
+	//気力がマックスになっていたら
+	if (m_pCharacter->GetMp() >= GameSceneConstant::kMaxMp)
+	{
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kEnergyCharge));
+	}
 
 #ifdef _DEBUG
 

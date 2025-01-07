@@ -4,6 +4,7 @@
 #include "Effect.h"
 #include "Attack.h"
 #include "GameSceneConstant.h"
+#include "TutorialManager.h"
 #include <cassert>
 #include <map>
 #include <cmath>
@@ -240,4 +241,7 @@ void CharacterStateSpecialAttack::Exit()
 	{
 		ExitEffect(m_pEffect);
 	}
+
+	//必殺技発動のチュートリアルをクリアさせる
+	SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kSpecialAttack));
 }

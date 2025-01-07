@@ -7,6 +7,7 @@
 #include "EffectManager.h"
 #include "Stage.h"
 #include "Input.h"
+#include "EnemyInput.h"
 
 namespace
 {
@@ -21,7 +22,7 @@ namespace
 		{TutorialManager::TutorialSuccessKind::kChargePhysicalAttack},
 		{TutorialManager::TutorialSuccessKind::kEnergyCharge},
 		{TutorialManager::TutorialSuccessKind::kEnergyAttack},
-		{TutorialManager::TutorialSuccessKind::kChargeEnergyAttadk},
+		{TutorialManager::TutorialSuccessKind::kChargeEnergyAttack},
 		{TutorialManager::TutorialSuccessKind::kGuard},
 		{TutorialManager::TutorialSuccessKind::kSpecialAttack}
 	};
@@ -29,7 +30,6 @@ namespace
 
 TutorialManager::TutorialManager(std::shared_ptr<GameCamera> camera) :
 	GameManagerBase(camera),
-	m_isSuccessTutorial(false),
 	m_nowTutorial(TutorialKind::kMove),
 	m_drawSituationFunc(&TutorialManager::DrawMenu),
 	m_updateSituationFunc(&TutorialManager::UpdateMenu),
@@ -148,6 +148,11 @@ void TutorialManager::UpdatePlaying()
 {
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
+	if (input->IsTrigger("Pause"))
+	{
+		ChangeSituation(TutorialSituation::kMenu);
+	}
+
 	//チュートリアルが成功したかどうか
 	bool isSuccess = true;
 
@@ -156,18 +161,37 @@ void TutorialManager::UpdatePlaying()
 	for (auto item : terms)
 	{
 		//ここでクリアしているかを確認
-		if (m_successTutorialKinds[item])
+		if (!m_successTutorialKinds[item])
 		{
 			//一つでもクリアしていない項目があればfalseにする
 			isSuccess = false;
 		}
 	}
 
-	//クリアした時の演出を作成する
+	//クリアしたかどうかをUiに送る
+	m_pTutorialUi->SetSuccessTutorial(isSuccess);
+
+	//クリアしていたら描画処理を変更する
 	if (isSuccess)
 	{
-		ChangeSituation(TutorialSituation::kMenu);
+		ChangeSituation(TutorialSituation::kSuccess);
+	}
+
+}
+
+void TutorialManager::UpdateSuccess()
+{
+	//クリア演出が終わっていたら次のメニューに移る
+	if (m_pTutorialUi->IsSuccessEnd())
+	{
 		m_nowTutorial = static_cast<TutorialKind>(static_cast<int>(m_nowTutorial) + 1);
+
+		for (auto& item : m_successTutorialKinds)
+		{
+			item.second = false;
+		}
+
+		ChangeSituation(TutorialSituation::kStart);
 	}
 }
 
@@ -184,6 +208,11 @@ void TutorialManager::DrawStart()
 void TutorialManager::DrawPlaying()
 {
 	m_pTutorialUi->DrawPlaying(static_cast<int>(m_nowTutorial));
+}
+
+void TutorialManager::DrawSuccess()
+{
+	m_pTutorialUi->DrawSuccess(static_cast<int>(m_nowTutorial));
 }
 
 void TutorialManager::ChangeSituation(TutorialSituation next)
@@ -229,6 +258,19 @@ void TutorialManager::ChangeSituation(TutorialSituation next)
 		m_updateSituationFunc = &TutorialManager::UpdatePlaying;
 		//描画処理の変更
 		m_drawSituationFunc = &TutorialManager::DrawPlaying;
+	}
+	else if (next == TutorialSituation::kSuccess)
+	{
+		//プレイヤーの状況を変更
+		for (auto& player : m_pCharacters) player->ChangeSituationUpdate(static_cast<int>(BattleSituation::kBattle));
+
+		//初期化を行う
+		m_pTutorialUi->InitSuccess();
+		//更新処理の変更
+		m_updateSituationFunc = &TutorialManager::UpdateSuccess;
+		//描画処理を変更
+		m_drawSituationFunc = &TutorialManager::DrawSuccess;
+
 	}
 
 }

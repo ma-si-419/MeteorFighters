@@ -7,6 +7,7 @@
 #include "CapsuleColliderData.h"
 #include "Physics.h"
 #include "GameSceneConstant.h"
+#include "TutorialManager.h"
 #include "Input.h"
 
 namespace
@@ -15,7 +16,7 @@ namespace
 	constexpr float kMoveVecRate = 0.9f;
 
 	//着地時の硬直時間
-	constexpr int kLandingTime = 7;
+	constexpr int kLandingTime = 0;
 }
 
 CharacterStateJump::CharacterStateJump(std::shared_ptr<Character> character) :
@@ -51,6 +52,9 @@ void CharacterStateJump::Enter()
 
 	m_pNextState = shared_from_this();
 	m_kind = CharacterStateKind::kJump;
+
+	//ジャンプチュートリアルのクリア判定をtrueにする
+	SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kJump));
 
 }
 
@@ -249,4 +253,5 @@ void CharacterStateJump::Update()
 
 void CharacterStateJump::Exit()
 {
+	printfDx("終わり\n");
 }

@@ -25,6 +25,7 @@ void CharacterStateButtonBashing::Update()
 
 		ChangeState(next);
 	}
+
 #endif // _DEBUG
 
 }

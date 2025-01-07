@@ -2,6 +2,7 @@
 #include "CharacterStateHitAttack.h"
 #include "Character.h"
 #include "GameManagerBase.h"
+#include "TutorialManager.h"
 #include "Attack.h"
 #include "Input.h"
 #include "Effect.h"
@@ -165,6 +166,9 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack, CharacterStat
 		//基本的にガード状態にする
 		kind = Character::HitReactionKind::kGuard;
 
+		//ガードチュートリアルをクリアさせる
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kGuard));
+
 		//打撃系は0ダメージ
 		if (status.attackKind == Character::AttackKind::kPhysical)
 		{
@@ -235,4 +239,13 @@ void CharacterStateBase::EntryEffect(std::shared_ptr<Effect> effect)
 void CharacterStateBase::ExitEffect(std::shared_ptr<Effect> effect)
 {
 	m_pCharacter->m_pBattleManager->ExitEffect(effect);
+}
+
+void CharacterStateBase::SuccessTutorial(int tutorialNumber)
+{
+	auto manager = std::dynamic_pointer_cast<TutorialManager>(m_pCharacter->m_pBattleManager);
+
+	auto clearKind = static_cast<TutorialManager::TutorialSuccessKind>(tutorialNumber);
+
+	manager->SuccessTutorial(clearKind);
 }

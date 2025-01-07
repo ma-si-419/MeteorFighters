@@ -2,6 +2,7 @@
 #include "CharacterStateIdle.h"
 #include "Character.h"
 #include "GameSceneConstant.h"
+#include "TutorialManager.h"
 #include <cmath>
 
 namespace
@@ -77,6 +78,10 @@ void CharacterStateDash::Enter()
 	}
 
 	m_pCharacter->SetAnimPlaySpeed(kAnimPlaySpeed);
+
+	//ダッシュチュートリアルクリア判定をtrueにする
+	SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kStep));
+
 }
 
 void CharacterStateDash::Update()

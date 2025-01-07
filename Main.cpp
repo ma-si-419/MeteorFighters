@@ -93,7 +93,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			Physics::GetInstance().Update();
 
 			sceneManager.Update();
-		
+
 #ifdef _DEBUG
 
 		}
@@ -113,10 +113,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		}
 
-		DrawFormatString(1400,0,GetColor(255,255,255),"FPS:%0.2f",GetFPS());
+
 
 #endif // _DEBUG
 		sceneManager.Draw();
+
+#ifdef _DEBUG
+
+		DrawFormatString(1400, 0, GetColor(255, 0, 0), "FPS:%0.2f", GetFPS());
+
+#endif // _DEBUG
 
 		// âÊñ Ç™êÿÇËë÷ÇÌÇÈÇÃÇë“Ç¬
 		ScreenFlip();

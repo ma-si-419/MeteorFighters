@@ -36,12 +36,20 @@ public:
 
 	void InitPlaying(int number);
 
+	void InitSuccess();
+
 	void DrawMenu();
 
 	void DrawStart(int number);
 
 	void DrawPlaying(int number);
 
+	void DrawSuccess(int number);
+
+	/// <summary>
+	/// 今行っているチュートリアルをクリアしたかどうかを設定する
+	/// </summary>
+	void SetSuccessTutorial(bool flag) { m_isSuccessTutorial = flag; }
 	
 	/// <summary>
 	/// メニュー画面で選択したものを取得する
@@ -49,6 +57,10 @@ public:
 	/// <returns>なにも選択していないときは-1を返す</returns>
 	MenuItem GetSelectItem() { return m_selectItem; };
 
+	/// <summary>
+	/// クリア演出が終わったかどうかを返す
+	/// </summary>
+	bool IsSuccessEnd() { return m_isSuccessEnd; }
 private:
 
 	void DrawStringCenter(std::string string, MyEngine::Vector2 centerPos, int fontHandle, int color, int edgeColor);
@@ -58,6 +70,8 @@ private:
 	void UpdateStart();
 
 	void UpdatePlaying();
+
+	void UpdateSuccess();
 
 private:
 
@@ -101,5 +115,14 @@ private:
 
 	//現在行っているチュートリアル
 	int m_tutorialNumber;
+
+	//現在行っているチュートリアルをクリアしたらtrueにする
+	bool m_isSuccessTutorial;
+
+	//クリア時の画像を揺らしている時間
+	int m_successTime;
+
+	//クリアの演出が終わったかどうか
+	bool m_isSuccessEnd;
 };
 

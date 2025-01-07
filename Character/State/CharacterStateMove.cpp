@@ -7,6 +7,7 @@
 #include "CharacterStateNormalAttack.h"
 #include "CharacterStateJump.h"
 #include "GameSceneConstant.h"
+#include "TutorialManager.h"
 #include "DxLib.h"
 #include "Input.h"
 #include "Character.h"
@@ -67,7 +68,7 @@ void CharacterStateMove::Update()
 	inputDir = MyEngine::Vector3(stick.leftStickX, 0, -stick.leftStickY);
 
 	//移動ベクトルが0じゃなければ
-	if (inputDir.SqLength() > 0.001)
+	if (inputDir.SqLength() > 0.001f)
 	{
 
 		inputDir = inputDir.Normalize();
@@ -252,6 +253,9 @@ void CharacterStateMove::Update()
 		{
 			velo.y = GetSpeed();
 			m_isFloat = true;
+
+			//上昇チュートリアルをクリアにする
+			SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kUp));
 		}
 		//下降ボタンが押されたら
 		else if (input->IsPushTrigger(true))
@@ -265,6 +269,9 @@ void CharacterStateMove::Update()
 				m_pCharacter->ChangeAnim(Character::AnimKind::kJumping, true);
 			}
 
+			//下降チュートリアルをクリアにする
+			SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kDown));
+		
 		}
 
 		//前のフレームから空中にいれば
@@ -402,12 +409,24 @@ void CharacterStateMove::Update()
 	}
 
 	//移動していなかったら
-	if (velo.SqLength() < 0.01f)
+	if (velo.SqLength() < 0.001f)
 	{
 		//アイドル状態に戻る
 		std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 
 		ChangeState(next);
+	}
+	//移動しているときの場合
+	else
+	{
+		//敵との距離
+		auto distance = (GetTargetPos() - m_pCharacter->GetPos()).Length();
+
+		//敵との距離が近いと判断したら移動チュートリアルクリアフラグを立てる
+		if (distance < GameSceneConstant::kNearLange)
+		{
+			SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kMove));
+		}
 	}
 	//移動ベクトルを設定する
 	SetCharacterVelo(velo);

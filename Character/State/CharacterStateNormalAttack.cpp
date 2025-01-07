@@ -6,6 +6,7 @@
 #include <cmath>
 #include "Effect.h"
 #include "GameSceneConstant.h"
+#include "TutorialManager.h"
 
 namespace
 {
@@ -433,6 +434,29 @@ void CharacterStateNormalAttack::Update()
 
 		//攻撃を作成
 		m_pCharacter->CreateAttack(attack);
+
+		//格闘攻撃の最期の攻撃をしていたら格闘攻撃チュートリアルクリアさせる
+		if (attackData.animationName == "LowAttack8")
+		{
+			SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kPhysicalAttack));
+		}
+		//チャージ格闘攻撃をしていたらチャージ格闘攻撃チュートリアルをクリアさせる
+		else if (attackData.animationName == "UpChargeAttack" ||
+			attackData.animationName == "MiddleChargeAttack" ||
+			attackData.animationName == "DownChargeAttack")
+		{
+			SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kChargePhysicalAttack));
+		}
+		//気弾攻撃をしていたら気弾攻撃チュートリアルをクリアさせる
+		else if (attackData.animationName == "EnergyAttackRight")
+		{
+			SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kEnergyAttack));
+		}
+		//チャージ気弾攻撃をしていたらチャージ気弾攻撃チュートリアルをクリアさせる
+		else if (attackData.animationName == "EnergyChargeAttack")
+		{
+			SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kChargeEnergyAttack));
+		}
 	}
 
 	//次の攻撃を行うか判定する
