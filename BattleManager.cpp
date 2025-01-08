@@ -51,7 +51,7 @@ namespace
 }
 
 BattleManager::BattleManager(std::shared_ptr<GameCamera> camera) :
-	GameManagerBase(camera)
+	GameManagerBase(camera, GameManagerBase::GameKind::kBattle)
 {
 	m_pStage = std::make_shared<Stage>();
 	m_pStage->Init();

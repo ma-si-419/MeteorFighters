@@ -99,7 +99,7 @@ void LoadManager::Draw()
 	DrawStringToHandle(kStringPosX, kStringPosY, "Loading...", GetColor(255, 255, 255), m_fontHandle, GetColor(192, 192, 192));
 
 	//É{Å[Éãï\é¶
-	for (auto item : m_ballGraphs)
+	for (const auto& item : m_ballGraphs)
 	{
 		DrawRotaGraph(item.posX, item.posY, 1.0, item.rota, item.handle, true);
 	}

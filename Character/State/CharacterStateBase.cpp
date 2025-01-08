@@ -243,6 +243,9 @@ void CharacterStateBase::ExitEffect(std::shared_ptr<Effect> effect)
 
 void CharacterStateBase::SuccessTutorial(int tutorialNumber)
 {
+	//ゲームモードがチュートリアルでなければ無視する
+	if (m_pCharacter->m_pBattleManager->GetGameKind() != GameManagerBase::GameKind::kTutorial) return;
+
 	auto manager = std::dynamic_pointer_cast<TutorialManager>(m_pCharacter->m_pBattleManager);
 
 	auto clearKind = static_cast<TutorialManager::TutorialSuccessKind>(tutorialNumber);

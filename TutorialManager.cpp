@@ -29,7 +29,7 @@ namespace
 }
 
 TutorialManager::TutorialManager(std::shared_ptr<GameCamera> camera) :
-	GameManagerBase(camera),
+	GameManagerBase(camera,GameManagerBase::GameKind::kTutorial),
 	m_nowTutorial(TutorialKind::kMove),
 	m_drawSituationFunc(&TutorialManager::DrawMenu),
 	m_updateSituationFunc(&TutorialManager::UpdateMenu),

@@ -11,11 +11,12 @@
 #include "Game.h"
 #include <cmath>
 
-GameManagerBase::GameManagerBase(std::shared_ptr<GameCamera> camera) :
+GameManagerBase::GameManagerBase(std::shared_ptr<GameCamera> camera ,GameManagerBase::GameKind kind) :
 	m_time(0),
 	m_alpha(0),
 	m_nextScene(Game::Scene::kGame),
-	m_situation(BattleSituation::kStart1P)
+	m_situation(BattleSituation::kStart1P),
+	m_gameKind(kind)
 {
 	m_pStage = std::make_shared<Stage>();
 	m_pStage->Init();
@@ -71,11 +72,14 @@ void GameManagerBase::UpdateAsyncLoad()
 	{
 
 		//モデルハンドルを渡す
-		m_pCharacters[0]->SetModelHandle(m_modelHandles["Player1"]);
-		m_pCharacters[1]->SetModelHandle(m_modelHandles["Player2"]);
+		m_pCharacters[0]->SetModelHandle(m_modelHandles.at("Player1"));
+		m_pCharacters[1]->SetModelHandle(m_modelHandles.at("Player2"));
 
-		m_pStage->SetStageModelHandle(m_modelHandles["Stage"]);
-		m_pStage->SetSkyDomeModelHandle(m_modelHandles["SkyDome"]);
+		m_pStage->SetStageModelHandle(m_modelHandles.at("Stage"));
+		m_pStage->SetSkyDomeModelHandle(m_modelHandles.at("SkyDome"));
+
+		//非同期ロードが終了したタイミングでInitを呼ぶ
+		Init();
 
 		//非同期ロードを終了する
 		manager.EndAsyncLoad();

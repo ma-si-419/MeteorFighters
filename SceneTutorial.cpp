@@ -46,6 +46,12 @@ void SceneTutorial::Init()
 
 	loadManager.StartAsyncLoad();
 
+	//返り値を受け取るマップ作成
+	m_pGameManager->AddLoadModel("Player1");
+	m_pGameManager->AddLoadModel("Player2");
+	m_pGameManager->AddLoadModel("Stage");
+	m_pGameManager->AddLoadModel("SkyDome");
+
 	loadManager.LoadHandle("Player1", m_pCharacters[0]->GetModelPath(), LoadManager::FileKind::kModel);
 	loadManager.LoadHandle("Player2", m_pCharacters[1]->GetModelPath(), LoadManager::FileKind::kModel);
 	loadManager.LoadHandle("Stage", m_pGameManager->GetStagePath(), LoadManager::FileKind::kModel);

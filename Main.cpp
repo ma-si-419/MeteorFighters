@@ -114,11 +114,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		}
 
-		if (inputData->IsTrigger("Pause"))
-		{
-			isStop = !isStop;
-		}
-
 		isMove = false;
 
 		if (inputData->IsTrigger("Select"))

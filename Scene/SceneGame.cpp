@@ -32,9 +32,7 @@ void SceneGame::Init()
 	GraphManager::GetInstance().LoadSceneGraph("Game");
 
 	//非同期ロードマネージャー
-	auto& manager = LoadManager::GetInstance();
-
-	m_pGameManager->Init();
+	auto& loadManager = LoadManager::GetInstance();
 
 	m_pCharacters.push_back(m_pGameManager->GetOnePlayerPointer());
 	m_pCharacters.push_back(m_pGameManager->GetTwoPlayerPointer());
@@ -43,15 +41,21 @@ void SceneGame::Init()
 	for (auto& actor : m_pCharacters)
 	{
 		actor->Init();
-
 	}
 
-	manager.StartAsyncLoad();
+	loadManager.StartAsyncLoad();
 
-	manager.LoadHandle("Player1", m_pCharacters[0]->GetModelPath(), LoadManager::FileKind::kModel);
-	manager.LoadHandle("Player2", m_pCharacters[1]->GetModelPath(), LoadManager::FileKind::kModel);
-	manager.LoadHandle("Stage", m_pGameManager->GetStagePath(), LoadManager::FileKind::kModel);
-	manager.LoadHandle("SkyDome", m_pGameManager->GetSkyDomePath(), LoadManager::FileKind::kModel);
+	//返り値を受け取るマップ作成
+	m_pGameManager->AddLoadModel("Player1");
+	m_pGameManager->AddLoadModel("Player2");
+	m_pGameManager->AddLoadModel("Stage");
+	m_pGameManager->AddLoadModel("SkyDome");
+
+	//モデルのロードをマネージャーにお願いする
+	loadManager.LoadHandle("Player1", m_pCharacters[0]->GetModelPath(), LoadManager::FileKind::kModel);
+	loadManager.LoadHandle("Player2", m_pCharacters[1]->GetModelPath(), LoadManager::FileKind::kModel);
+	loadManager.LoadHandle("Stage", m_pGameManager->GetStagePath(), LoadManager::FileKind::kModel);
+	loadManager.LoadHandle("SkyDome", m_pGameManager->GetSkyDomePath(), LoadManager::FileKind::kModel);
 
 }
 

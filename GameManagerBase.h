@@ -29,9 +29,14 @@ public:
 		kMenu
 	};
 
+	enum class GameKind
+	{
+		kBattle,
+		kTutorial
+	};
 public:
 
-	GameManagerBase(std::shared_ptr<GameCamera> camera);
+	GameManagerBase(std::shared_ptr<GameCamera> camera,GameKind kind);
 	~GameManagerBase();
 
 	/// <summary>
@@ -196,6 +201,19 @@ public:
 	/// </summary>
 	/// <returns>スカイドームのパス</returns>
 	std::string GetSkyDomePath();
+
+	/// <summary>
+	/// 非同期ロードを行うモデルを追加する
+	/// </summary>
+	/// <param name="name">非同期ロードを行うモデルの名前を入れる</param>
+	void AddLoadModel(std::string name) { m_modelHandles[name] = -1; }
+
+
+	/// <summary>
+	/// 現在のゲームモードを返す
+	/// </summary>
+	GameKind GetGameKind() { return m_gameKind; }
+
 protected:
 
 	/// <summary>
@@ -231,6 +249,8 @@ protected:
 	std::shared_ptr<GameUi> m_pGameUi;
 	//ゲームの状況
 	BattleSituation m_situation;
+	//何を行っているのか
+	GameKind m_gameKind;
 	//時間を計る際に使用する変数
 	int m_time;
 	//演出時のカメラ座標
