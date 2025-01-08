@@ -47,6 +47,10 @@ void SceneSelect::Update()
 	(this->*m_updateSelectFunc)();
 }
 
+void SceneSelect::UpdateAsyncLoad()
+{
+}
+
 void SceneSelect::Draw()
 {
 #ifdef _DEBUG

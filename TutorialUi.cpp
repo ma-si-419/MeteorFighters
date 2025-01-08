@@ -80,7 +80,7 @@ namespace
 	constexpr double kSuccessGraphScalingSpeed = 0.3;
 
 	//クリア時の画像の最終的な大きさ
-	constexpr double kSuccessGraphFinalScale = 1.2;
+	constexpr double kSuccessGraphFinalScale = 1.0;
 
 	//クリア時の画像を揺らす時間
 	constexpr int kSuccessGraphShakeTime = 4;

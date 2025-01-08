@@ -5,6 +5,7 @@
 #include "GameCamera.h"
 #include "Character.h"
 #include "Effectmanager.h"
+#include "Loadmanager.h"
 #include "Effect.h"
 #include "GameUi.h"
 #include "Game.h"
@@ -47,10 +48,45 @@ void GameManagerBase::RetryInit()
 	m_pGameUi->RetryInit();
 }
 
+void GameManagerBase::UpdateAsyncLoad()
+{
+	//非同期ロードを終了するかどうか
+	bool isEnd = false;
+	auto& manager = LoadManager::GetInstance();
+
+	//ハンドルを取得する
+	for (auto& item : m_modelHandles)
+	{
+		item.second = manager.GetHandle(item.first);////////////////////////////////////
+	}
+
+	if (GetASyncLoadNum() == 0)
+	{
+		isEnd = true;
+	}
+
+
+	//ハンドルがすべて取得できていたら
+	if (isEnd)
+	{
+
+		//モデルハンドルを渡す
+		m_pCharacters[0]->SetModelHandle(m_modelHandles["Player1"]);
+		m_pCharacters[1]->SetModelHandle(m_modelHandles["Player2"]);
+
+		m_pStage->SetStageModelHandle(m_modelHandles["Stage"]);
+		m_pStage->SetSkyDomeModelHandle(m_modelHandles["SkyDome"]);
+
+		//非同期ロードを終了する
+		manager.EndAsyncLoad();
+	}
+}
+
 void GameManagerBase::SetOnePlayerStatus(int number, std::vector<std::string> statusData)
 {
 	//プレイヤー作成
 	m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)] = std::make_shared<Character>(ObjectTag::kOnePlayer, static_cast<Character::CharacterKind>(number));
+
 	//プレイヤーに自分のポインターを渡しておく
 	m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->SetGameManager(shared_from_this());
 
@@ -187,6 +223,16 @@ MyEngine::Vector3 GameManagerBase::GetTargetBackPos(float distance, std::shared_
 	}
 }
 
+std::string GameManagerBase::GetStagePath()
+{
+	return m_pStage->GetStagePath();
+}
+
+std::string GameManagerBase::GetSkyDomePath()
+{
+	return m_pStage->GetSkyDomePath();
+}
+
 void GameManagerBase::UpdateCommon()
 {
 	//カメラの更新
@@ -210,7 +256,7 @@ void GameManagerBase::UpdateCommon()
 				return true;
 			}
 
-			return false;
+	return false;
 		});
 	m_pAttacks.erase(iterator, m_pAttacks.end());
 

@@ -2,6 +2,7 @@
 #include "SceneManager.h"
 #include "GraphManager.h"
 #include "SoundManager.h"
+#include "LoadManager.h"
 #include "Physics.h"
 #include "Input.h"
 #include "Game.h"
@@ -48,10 +49,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Effekseer_SetGraphicsDeviceLostCallbackFunctions();
 	Effekseer_Sync3DSetting();
 
+	//フォントの読み込み
+	LPCSTR fontPath = "data/font/default.ttf";
+	if (AddFontResourceEx(fontPath, FR_PRIVATE, NULL) > 0)
+	{
+	}
+	else
+	{
+		// フォント読込エラー処理
+		assert(0 && "フォント読み込み失敗");
+	}
+
 	SetDrawScreen(DX_SCREEN_BACK);
 
 	SoundManager::GetInstance().Init();
 	GraphManager::GetInstance().Init();
+	LoadManager::GetInstance().Init();
 	MyEngine::Input::GetInstance().Init();
 	SceneManager sceneManager;
 
@@ -78,6 +91,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		// ゲームの処理
 		input.Update();
+		LoadManager::GetInstance().Update();
 #ifdef _DEBUG
 		auto inputData = input.GetInputData(0);
 
@@ -90,9 +104,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		if (!isStop || isMove)
 		{
 #endif // _DEBUG
+
 			Physics::GetInstance().Update();
 
 			sceneManager.Update();
+
 
 #ifdef _DEBUG
 
@@ -114,9 +130,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 
 
-
 #endif // _DEBUG
+
 		sceneManager.Draw();
+
+		LoadManager::GetInstance().Draw();
 
 #ifdef _DEBUG
 

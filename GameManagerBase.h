@@ -50,6 +50,11 @@ public:
 	virtual void Update()abstract;
 
 	/// <summary>
+	/// 非同期ロード中のアップデート
+	/// </summary>
+	virtual void UpdateAsyncLoad();
+
+	/// <summary>
 	/// 攻撃の描画などを行う
 	/// </summary>
 	virtual void Draw() abstract;
@@ -179,6 +184,18 @@ public:
 	/// </summary>
 	/// <returns>現在ゲームシーンで何が行われているかを返す</returns>
 	BattleSituation GetNowSituation() { return m_situation; }
+
+	/// <summary>
+	/// ステージのモデルのパスを返す
+	/// </summary>
+	/// <returns>ステージのパス</returns>
+	std::string GetStagePath();
+
+	/// <summary>
+	/// スカイドームのパスを返す
+	/// </summary>
+	/// <returns>スカイドームのパス</returns>
+	std::string GetSkyDomePath();
 protected:
 
 	/// <summary>
@@ -222,4 +239,6 @@ protected:
 	int m_alpha;
 	//シーンをセレクトシーンに戻す時にtrueにする
 	Game::Scene m_nextScene;
+	//非同期処理を行うモデルの配列
+	std::map<std::string,int> m_modelHandles;
 };

@@ -13,6 +13,8 @@ public:
 	virtual void Init() override;
 	//更新処理
 	virtual void Update() override;
+	//非同期処理が行われているときのアップデート
+	virtual void UpdateAsyncLoad() override;
 	//描画処理
 	virtual void Draw() override;
 	//終了処理
@@ -23,4 +25,3 @@ private:
 	std::shared_ptr<MenuUi> m_pMenuUi;
 
 };
-

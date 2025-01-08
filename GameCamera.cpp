@@ -6,7 +6,7 @@ namespace
 	const MyEngine::Vector3 kPlayerToCameraInitVec(-17, 15, -30);
 
 	constexpr float kCameraNear = 3.0f;
-	constexpr float kCameraFar = 1000.0f;
+	constexpr float kCameraFar = 1500.0f;
 
 	constexpr float kCameraToPlayerLange = 50.0f;
 

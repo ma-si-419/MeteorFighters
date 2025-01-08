@@ -5,6 +5,7 @@
 #include "Character.h"
 #include "BattleManager.h"
 #include "GraphManager.h"
+#include "LoadManager.h"
 #include "Physics.h"
 #include "LoadCsv.h"
 #include "Game.h"
@@ -18,7 +19,7 @@ namespace
 SceneGame::SceneGame(SceneManager& sceneManager) :
 	SceneBase(sceneManager)
 {
-	
+
 }
 
 SceneGame::~SceneGame()
@@ -30,15 +31,28 @@ void SceneGame::Init()
 	//画像のロード
 	GraphManager::GetInstance().LoadSceneGraph("Game");
 
-	m_pCharacters.push_back(m_pGameManager->GetOnePlayerPointer());
-	m_pCharacters.push_back(m_pGameManager->GetTwoPlayerPointer());
-	
+	//非同期ロードマネージャー
+	auto& manager = LoadManager::GetInstance();
+
 	m_pGameManager->Init();
 
+	m_pCharacters.push_back(m_pGameManager->GetOnePlayerPointer());
+	m_pCharacters.push_back(m_pGameManager->GetTwoPlayerPointer());
+
+	//モデルのパス設定
 	for (auto& actor : m_pCharacters)
 	{
 		actor->Init();
+
 	}
+
+	manager.StartAsyncLoad();
+
+	manager.LoadHandle("Player1", m_pCharacters[0]->GetModelPath(), LoadManager::FileKind::kModel);
+	manager.LoadHandle("Player2", m_pCharacters[1]->GetModelPath(), LoadManager::FileKind::kModel);
+	manager.LoadHandle("Stage", m_pGameManager->GetStagePath(), LoadManager::FileKind::kModel);
+	manager.LoadHandle("SkyDome", m_pGameManager->GetSkyDomePath(), LoadManager::FileKind::kModel);
+
 }
 
 void SceneGame::Update()
@@ -63,12 +77,17 @@ void SceneGame::Update()
 	}
 }
 
+void SceneGame::UpdateAsyncLoad()
+{
+	m_pGameManager->UpdateAsyncLoad();
+}
+
 void SceneGame::Draw()
 {
 
 #ifdef _DEBUG
 
-	DrawString(0, 0, "SceneGame",kRedColor);
+	DrawString(0, 0, "SceneGame", kRedColor);
 
 	Physics::GetInstance().DebugDraw();
 

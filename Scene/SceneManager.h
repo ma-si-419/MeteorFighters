@@ -1,5 +1,6 @@
 #pragma once
 #include<memory>
+#include<vector>
 class SceneBase;
 class SceneManager
 {
@@ -17,6 +18,8 @@ public:
 	void Draw();
 	//別のシーンに移動する際に使用する関数
 	void ChangeScene(std::shared_ptr<SceneBase> next);
+	//非同期ロードを行うときに使用する
+	void SetAsyncLoad(std::vector<int> handles);
 	//終了処理を呼ぶときに使う
 	void GameEnd() { m_isEnd = true; }
 	//終了処理が呼ばれたかどうか取得する
@@ -33,4 +36,6 @@ private:
 	bool m_isChangeScene;//シーンを切り替えるときにtrueにする
 
 	int m_fadeAlpha;//フェードで表示する黒いボックスのα値
+
+	std::vector<int> m_handles;
 };

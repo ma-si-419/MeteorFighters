@@ -10,6 +10,8 @@ public:
 	virtual void Init() abstract;
 	//更新処理
 	virtual void Update() abstract;
+	//非同期処理が行われているときのアップデート
+	virtual void UpdateAsyncLoad() abstract;
 	//描画処理
 	virtual void Draw() abstract;
 	//終了処理

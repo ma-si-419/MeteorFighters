@@ -1,4 +1,5 @@
 #include "SceneManager.h"
+#include "LoadManager.h"
 #include "Input.h"
 #include "Game.h"
 #include "SceneTitle.h"
@@ -7,7 +8,7 @@
 namespace
 {
 	constexpr int kKnockOutFadeSpeed = 15;
-	const int kBlack = GetColor(0,0,0);
+	const int kBlack = GetColor(0, 0, 0);
 }
 
 SceneManager::SceneManager() :
@@ -46,14 +47,22 @@ void SceneManager::Update()
 				m_isFadeOut = false;
 			}
 		}
-		//フェードインする
 		else
 		{
-			m_fadeAlpha -= kKnockOutFadeSpeed;
-			if (m_fadeAlpha < 0)
+			//非同期ロードしていなければフェードインする
+			if (LoadManager::GetInstance().IsEndLoad())
 			{
-				m_fadeAlpha = 0;
-				m_isChangeScene = false;
+				m_fadeAlpha -= kKnockOutFadeSpeed;
+				if (m_fadeAlpha < 0)
+				{
+					m_fadeAlpha = 0;
+					m_isChangeScene = false;
+				}
+			}
+			else
+			{
+				//非同期ロード中の処理
+				m_pScene->UpdateAsyncLoad();
 			}
 		}
 		//シーン切り替えが始まったら入力をさせないようにする
@@ -84,4 +93,9 @@ void SceneManager::ChangeScene(std::shared_ptr<SceneBase> next)
 	}
 	m_isFadeOut = true;
 	m_pNextScene = next;
+}
+
+void SceneManager::SetAsyncLoad(std::vector<int> handles)
+{
+	m_handles = handles;
 }

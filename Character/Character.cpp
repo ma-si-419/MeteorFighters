@@ -92,7 +92,8 @@ Character::Character(ObjectTag tag, CharacterKind kind) :
 	m_animBlendRate(1.0f),
 	m_animBlendSpeed(kAnimBlendSpeed),
 	m_isEndAnimationBlend(true),
-	m_isEndAnim(false)
+	m_isEndAnim(false),
+	m_modelPath("empty")
 {
 	auto sphereData = std::dynamic_pointer_cast<SphereColliderData>(m_pColData);
 
@@ -128,7 +129,6 @@ void Character::Init()
 		m_pEnemyInput->SetGameManager(m_pBattleManager);
 	}
 
-
 	std::string path;
 
 	//2Pなら最初にEnemyを付ける
@@ -149,9 +149,7 @@ void Character::Init()
 
 	path = "data/model/" + path + ".mv1";
 
-	m_modelHandle = MV1LoadModel(path.c_str());
-
-	MV1SetScale(m_modelHandle, VGet(GameSceneConstant::kModelScale, GameSceneConstant::kModelScale, GameSceneConstant::kModelScale));
+	m_modelPath = path;
 
 	Collidable::Init();
 
@@ -811,6 +809,13 @@ void Character::ChangeSituationUpdate(int situation)
 	}
 }
 
+void Character::SetModelHandle(int handle)
+{
+	m_modelHandle = handle;
+
+	MV1SetScale(m_modelHandle, VGet(GameSceneConstant::kModelScale, GameSceneConstant::kModelScale, GameSceneConstant::kModelScale));
+}
+
 void Character::UpdateStart()
 {
 	//アニメーションを変更していなければ変更する
@@ -903,5 +908,6 @@ void Character::UpdateResult()
 
 void Character::UpdateNone()
 {
-	//何も更新しない
+	//移動をしないようにする
+	m_rigidbody.SetVelo(MyEngine::Vector3(0, 0, 0));
 }

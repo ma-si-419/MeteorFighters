@@ -61,13 +61,14 @@ public:
 
 	~TutorialManager();
 
-	void Init() override;
+	virtual void Init() override;
 
-	void Update() override;
+	virtual void Update() override;
 
-	void Draw() override;
 
-	void Final() override;
+	virtual void Draw() override;
+
+	virtual void Final() override;
 
 	void SuccessTutorial(TutorialSuccessKind kind) { m_successTutorialKinds[kind] = true; }
 

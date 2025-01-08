@@ -536,6 +536,18 @@ public:
 	/// <returns>入力情報</returns>
 	std::shared_ptr<MyEngine::InputData> GetInputData() { return m_input; }
 
+	/// <summary>
+	/// モデルのパスを取得する
+	/// </summary>
+	/// <returns>モデルのパス</returns>
+	std::string GetModelPath() { return m_modelPath; }
+
+	/// <summary>
+	/// モデルのハンドルを設定する
+	/// </summary>
+	/// <param name="handle">モデルのハンドル</param>
+	void SetModelHandle(int handle);
+
 private:
 
 	/// <summary>
@@ -590,6 +602,8 @@ private:
 
 	UpdateSituationFunc m_updateSituationFunc;
 
+	//モデルのパス
+	std::string m_modelPath;
 	//エネミーの入力を受け付けるクラス(1P側は使用しない)
 	std::shared_ptr<EnemyInput> m_pEnemyInput;
 	//入力情報

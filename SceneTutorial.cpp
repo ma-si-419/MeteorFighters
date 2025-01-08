@@ -2,6 +2,7 @@
 #include "SceneMenu.h"
 #include "GameCamera.h"
 #include "TutorialManager.h"
+#include "LoadManager.h"
 #include "LoadCsv.h"
 #include "GraphManager.h"
 
@@ -9,15 +10,15 @@ SceneTutorial::SceneTutorial(SceneManager& sceneManager) :
 	SceneBase(sceneManager),
 	m_isChangeScene(false)
 {
-	m_pManager = std::make_shared<TutorialManager>(std::make_shared<GameCamera>());
+	m_pGameManager = std::make_shared<TutorialManager>(std::make_shared<GameCamera>());
 
 	LoadCsv load;
 
 	std::vector<std::vector<std::string>> data = load.LoadFile("data/csv/characterStatus.csv");
 
-	m_pManager->SetOnePlayerStatus(0, data[0]);
+	m_pGameManager->SetOnePlayerStatus(0, data[0]);
 
-	m_pManager->SetTwoPlayerStatus(1, data[1]);
+	m_pGameManager->SetTwoPlayerStatus(1, data[1]);
 }
 
 SceneTutorial::~SceneTutorial()
@@ -29,10 +30,12 @@ void SceneTutorial::Init()
 	//画像のロード
 	GraphManager::GetInstance().LoadSceneGraph("Tutorial");
 
-	m_pCharacters.push_back(m_pManager->GetOnePlayerPointer());
-	m_pCharacters.push_back(m_pManager->GetTwoPlayerPointer());
+	auto& loadManager = LoadManager::GetInstance();
 
-	m_pManager->Init();
+	m_pCharacters.push_back(m_pGameManager->GetOnePlayerPointer());
+	m_pCharacters.push_back(m_pGameManager->GetTwoPlayerPointer());
+
+	m_pGameManager->Init();
 
 	for (auto& actor : m_pCharacters)
 	{
@@ -40,6 +43,14 @@ void SceneTutorial::Init()
 	}
 
 	for (auto character : m_pCharacters)character->ChangeSituationUpdate(static_cast<int>(GameManagerBase::BattleSituation::kBattle));
+
+	loadManager.StartAsyncLoad();
+
+	loadManager.LoadHandle("Player1", m_pCharacters[0]->GetModelPath(), LoadManager::FileKind::kModel);
+	loadManager.LoadHandle("Player2", m_pCharacters[1]->GetModelPath(), LoadManager::FileKind::kModel);
+	loadManager.LoadHandle("Stage", m_pGameManager->GetStagePath(), LoadManager::FileKind::kModel);
+	loadManager.LoadHandle("SkyDome", m_pGameManager->GetSkyDomePath(), LoadManager::FileKind::kModel);
+
 }
 
 void SceneTutorial::Update()
@@ -49,9 +60,9 @@ void SceneTutorial::Update()
 		actor->Update();
 	}
 
-	m_pManager->Update();
+	m_pGameManager->Update();
 
-	if (m_pManager->GetNextScene() == Game::Scene::kMenu &&
+	if (m_pGameManager->GetNextScene() == Game::Scene::kMenu &&
 		!m_isChangeScene)
 	{
 		//メニューシーンに戻る
@@ -61,16 +72,21 @@ void SceneTutorial::Update()
 	}
 }
 
+void SceneTutorial::UpdateAsyncLoad()
+{
+	m_pGameManager->UpdateAsyncLoad();
+}
+
 void SceneTutorial::Draw()
 {
 	for (auto& actor : m_pCharacters)
 	{
 		actor->Draw();
 	}
-	m_pManager->Draw();
+	m_pGameManager->Draw();
 }
 
 void SceneTutorial::End()
 {
-	m_pManager->Final();
+	m_pGameManager->Final();
 }

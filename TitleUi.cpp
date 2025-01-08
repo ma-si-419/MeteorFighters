@@ -9,12 +9,15 @@ namespace
 	//フォントの名前
 	const TCHAR* kFontName = "GN-キルゴUかなNB";
 
+	//文字の大きさ
+	constexpr int kFontSize = 64;
+
 	//カメラのNearFar
 	constexpr float kCameraNear = 0.1f;
 	constexpr float kCameraFar = 100.0f;
 
 	//PRESSANYBUTTONを表示する座標
-	constexpr int kStringPosX = 50;
+	constexpr int kStringPosX = 70;
 	constexpr int kStringPosY = 700;
 
 	//表示する文字列
@@ -33,7 +36,7 @@ namespace
 	const MyEngine::Vector2 kBigBlueInitPos(Game::kWindowWidth, 150);
 
 	//最大何フレームキャラクターが頭を出すか
-	constexpr int kMaxCharacterMoveFrame = 120;
+	constexpr int kMaxCharacterMoveFrame = 100;
 
 	//キャラクターの移動速度
 	constexpr int kCharacterMoveSpeed = 10;
@@ -52,7 +55,7 @@ TitleUi::TitleUi() :
 	m_mouseSide = Side::kUp;
 	m_blueHeadSide = Side::kRight;
 
-	m_fontHandle = CreateFontToHandle(kFontName, 72, 0, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
+	m_fontHandle = CreateFontToHandle(kFontName, kFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
 }
 
 TitleUi::~TitleUi()
@@ -183,18 +186,20 @@ void TitleUi::Update()
 
 void TitleUi::Draw()
 {
+	auto& manager = GraphManager::GetInstance();
+
 	MV1DrawModel(m_skyDomeHandle);
 
 	if (m_isExistString)
 	{
 		DrawStringToHandle(kStringPosX, kStringPosY, kUiString.c_str(), GetColor(255, 255, 255), m_fontHandle, GetColor(0, 0, 0));
 	}
-	auto& manager = GraphManager::GetInstance();
 
 	DrawGraph(0, 0, manager.GetHandle("TitleLogo"), true);
 
 	DrawCharacter(m_mouseSide, m_mousePos, manager.GetHandle("Mouse"));
 	DrawCharacter(m_blueHeadSide, m_blueHeadPos, manager.GetHandle("BlueHead"));
+
 }
 
 void TitleUi::DrawCharacter(Side side, MyEngine::Vector2 pos, int handle)

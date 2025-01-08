@@ -49,6 +49,10 @@ void SceneTitle::Update()
 	m_pTitleUi->Update();
 }
 
+void SceneTitle::UpdateAsyncLoad()
+{
+}
+
 
 void SceneTitle::Draw()
 {

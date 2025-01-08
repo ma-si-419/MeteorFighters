@@ -49,6 +49,10 @@ void SceneMenu::Update()
 
 }
 
+void SceneMenu::UpdateAsyncLoad()
+{
+}
+
 void SceneMenu::Draw()
 {
 #ifdef _DEBUG

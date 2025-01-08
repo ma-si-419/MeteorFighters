@@ -169,6 +169,7 @@
     <ClCompile Include="GameManagerBase.cpp" />
     <ClCompile Include="GraphManager.cpp" />
     <ClCompile Include="InputData.cpp" />
+    <ClCompile Include="LoadManager.cpp" />
     <ClCompile Include="MenuUi.cpp" />
     <ClCompile Include="MyEngine\Utility\LocalPos.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -222,6 +223,7 @@
     <ClInclude Include="GameSceneConstant.h" />
     <ClInclude Include="GraphManager.h" />
     <ClInclude Include="InputData.h" />
+    <ClInclude Include="LoadManager.h" />
     <ClInclude Include="MenuUi.h" />
     <ClInclude Include="MyEngine\Utility\LocalPos.h" />
     <ClInclude Include="MyEngine\Utility\Matrix.h" />
