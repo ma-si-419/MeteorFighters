@@ -47,10 +47,19 @@ namespace
 	constexpr int kMenuStringPosX = Game::kWindowWidth / 2;
 
 	//左右で変更できるメニューの文字を表示する座標
-	constexpr int kMoveMenuStringPosX = 500;
+	constexpr int kMoveMenuStringPosX = 650;
 
 	//メニューでチュートリアルの名前を表示する座標
-	constexpr int kMenuTutorialNamePosX = 1100;
+	constexpr int kMenuTutorialNamePosX = 1005;
+
+	//チュートリアルの左右の矢印とチュートリアルの名前の距離
+	constexpr float kMenuTutorialNameSideArrowDistance = 125.0f;
+
+	//チュートリアルの左右の矢印を揺らす速さ
+	constexpr float kMenuTutorialNameSideArrowSpeed = 0.2f;
+
+	//チュートリアルの左右の矢印を揺らす大きさ
+	constexpr int kMenuTutorialNameSideArrowScale = 4;
 
 	//一つ目の高さ
 	constexpr int kMenuStringPosY = 250;
@@ -100,7 +109,8 @@ TutorialUi::TutorialUi() :
 	m_selectItemMoveTime(0),
 	m_successTime(0),
 	m_isSuccessEnd(false),
-	m_selectTutorialNumber(0)
+	m_selectTutorialNumber(0),
+	m_selectTutorialStringArrowPos(0)
 {
 	LoadCsv load;
 
@@ -257,7 +267,7 @@ void TutorialUi::InitSuccess()
 	GraphData success;
 	success.handle = manager.GetHandle("Success");
 	//座標はボタンを表示している座標
-	success.pos = MyEngine::Vector2(kButtonPosX,kButtonPosY);
+	success.pos = MyEngine::Vector2(kButtonPosX, kButtonPosY);
 	//最初は大きく
 	success.scale = kSuccessGraphInitScale;
 
@@ -294,7 +304,7 @@ void TutorialUi::DrawMenu()
 	//選択している項目の後ろのボックスを表示する
 	GraphData itemBox = m_drawGraphs["SelectItemBox"];
 
-	DrawRotaGraph(itemBox.pos.x,itemBox.pos.y,itemBox.scale,0.0,itemBox.handle,true);
+	DrawRotaGraph(itemBox.pos.x, itemBox.pos.y, itemBox.scale, 0.0, itemBox.handle, true);
 
 	//文字列を表示する
 	for (int i = 0; i < static_cast<int>(TutorialUi::MenuItem::kItemNum); i++)
@@ -316,15 +326,19 @@ void TutorialUi::DrawMenu()
 	}
 
 	//選択しているチュートリアルを表示する
-	MyEngine::Vector2 changeTutorialPos = MyEngine::Vector2(kMenuTutorialNamePosX,kMenuStringPosY + kMenuStringDistanceY);
+	MyEngine::Vector2 selectTutorialPos = MyEngine::Vector2(kMenuTutorialNamePosX, kMenuStringPosY + kMenuStringDistanceY);
+	std::string selectTutorialName = m_tutorialData[m_selectTutorialNumber][static_cast<int>(TutorialManager::TutorialDataIndex::kTutorialName)];
+	DrawStringCenter(selectTutorialName, selectTutorialPos, m_menuFontHandle, GetColor(0, 0, 0), GetColor(255, 255, 255));
 
-	/// <summary>
-	/// ///////////////////////////////////////////////////////////
-	/// </summary>
-	DrawStringCenter(changeTutorialPos);
+	//選択しているチュートリアルの左右の矢印を表示する
+	float leftGap = kMenuTutorialNameSideArrowDistance + sinf(m_selectTutorialStringArrowPos) * kMenuTutorialNameSideArrowScale;
+	float rightGap = kMenuTutorialNameSideArrowDistance + sinf(m_selectTutorialStringArrowPos) * kMenuTutorialNameSideArrowScale;
 
-	///////////////////////////////////////////////////////////////
+	MyEngine::Vector2 leftArrowPos = MyEngine::Vector2(selectTutorialPos.x - leftGap + static_cast<float>(kMenuFontSize / 2), selectTutorialPos.y - static_cast<float>(kMenuFontSize / 2));
+	MyEngine::Vector2 rightArrowPos = MyEngine::Vector2(selectTutorialPos.x + rightGap - static_cast<float>(kMenuFontSize / 2), selectTutorialPos.y - static_cast<float>(kMenuFontSize / 2));
 
+	DrawStringToHandle(leftArrowPos.x, leftArrowPos.y, "＜", GetColor(0, 0, 0), m_menuFontHandle, GetColor(255, 255, 255));
+	DrawStringToHandle(rightArrowPos.x, rightArrowPos.y, "＞", GetColor(0, 0, 0), m_menuFontHandle, GetColor(255, 255, 255));
 }
 
 void TutorialUi::DrawStart(int number)
@@ -437,11 +451,23 @@ void TutorialUi::DrawStringCenter(std::string string, MyEngine::Vector2 centerPo
 	//奇数の場合
 	else
 	{
-		wordNum++;
+		pos.x = centerPos.x;
 
-		//文字の座標を左にずらす
-		pos.x = centerPos.x - static_cast<float>(GetFontSizeToHandle(font) * wordNum / 2);
-		pos.x += GetFontEdgeSizeToHandle(font) / 2;
+		//文字数が1文字じゃなければ
+		if (wordNum > 1)
+		{
+			//文字の座標を左にずらす
+			pos.x -= static_cast<float>(GetFontSizeToHandle(font) * (wordNum + 1) / 2);
+		}
+		//文字数が一文字であれば
+		else
+		{
+			//文字の座標を一文字分左にずらす
+			pos.x -= static_cast<float>(GetFontSizeToHandle(font) * wordNum);
+		}
+
+		//半角分右に動かす
+		pos.x += GetFontSizeToHandle(font) / 2;
 
 		//文字の大きさの半分だけ上にずらす
 		pos.y = centerPos.y - static_cast<float>(GetFontSizeToHandle(font) / 2);
@@ -531,10 +557,11 @@ void TutorialUi::UpdateMenu()
 	{
 		m_selectItemMoveTime++;
 	}
-	
+
 	//左右に動かせる項目であれば
 	if (m_selectItem == MenuItem::kChangeTutorial)
 	{
+
 		//右を押したら
 		if (input->IsTrigger("Right"))
 		{
@@ -548,9 +575,11 @@ void TutorialUi::UpdateMenu()
 		}
 
 		//クランプ
-		m_selectTutorialNumber = min(m_selectTutorialNumber,0);
-		m_selectTutorialNumber = max(m_selectTutorialNumber, static_cast<int>(TutorialManager::TutorialKind::kTutorialNum) - 1);
+		m_selectTutorialNumber = max(m_selectTutorialNumber, 0);
+		m_selectTutorialNumber = min(m_selectTutorialNumber, static_cast<int>(TutorialManager::TutorialKind::kTutorialNum) - 1);
 	}
+	//左右の矢印を揺らす
+	m_selectTutorialStringArrowPos += kMenuTutorialNameSideArrowSpeed;
 
 	//選択している項目を更新
 	m_selectItem = static_cast<MenuItem>(selectItem);
@@ -584,8 +613,8 @@ void TutorialUi::UpdateSuccess()
 	success.scale -= kSuccessGraphScalingSpeed;
 
 	//クランプ
-	success.scale = max(success.scale,kSuccessGraphFinalScale);
-	
+	success.scale = max(success.scale, kSuccessGraphFinalScale);
+
 	//最小まで小さくなったら
 	if (success.scale == kSuccessGraphFinalScale)
 	{
@@ -595,8 +624,8 @@ void TutorialUi::UpdateSuccess()
 			success.pos.x = (kButtonPosX + GetRand(kSuccessGraphShakeScale)) - kSuccessGraphShakeHalfScale;
 			success.pos.y = (kButtonPosY + GetRand(kSuccessGraphShakeScale)) - kSuccessGraphShakeHalfScale;
 		}
-		
-		if(m_successTime > kSuccessEndTime)
+
+		if (m_successTime > kSuccessEndTime)
 		{
 			//演出が終わったフラグを立てる
 			m_isSuccessEnd = true;

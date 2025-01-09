@@ -120,6 +120,9 @@ private:
 	//選択しているチュートリアルの番号
 	int m_selectTutorialNumber;
 
+	//選択しているチュートリアルの左右の矢印の揺れ幅
+	float m_selectTutorialStringArrowPos;
+
 	//描画している画像配列
 	std::map<std::string, GraphData> m_drawGraphs;
 
