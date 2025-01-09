@@ -82,10 +82,6 @@ void Attack::Update()
 
 void Attack::Draw()
 {
-	if (m_isTrack)
-	{
-		DrawSphere3D(m_rigidbody.GetPos().CastVECTOR(), 2.0f, 4, GetColor(255, 0, 0), GetColor(255, 0, 0), true);
-	}
 }
 
 void Attack::Final()

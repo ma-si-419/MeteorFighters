@@ -24,6 +24,8 @@ public:
 	void GameEnd() { m_isEnd = true; }
 	//終了処理が呼ばれたかどうか取得する
 	bool IsEnd() { return m_isEnd; }
+	//シーンを変更しているかどうか
+	bool IsChangeScene() { return m_isChangeScene; }
 private:
 	std::shared_ptr<SceneBase> m_pScene;//現在のシーン
 

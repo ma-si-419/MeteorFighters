@@ -65,7 +65,6 @@ public:
 
 	virtual void Update() override;
 
-
 	virtual void Draw() override;
 
 	virtual void Final() override;

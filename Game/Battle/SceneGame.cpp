@@ -69,15 +69,21 @@ void SceneGame::Update()
 
 	m_pGameManager->Update();
 
-	if (m_pGameManager->GetNextScene() == Game::Scene::kSelect)
+
+	//シーン移動をしていなければ実行する
+	if (!m_sceneManager.IsChangeScene())
 	{
-		//セレクトシーンに戻る
-		m_sceneManager.ChangeScene(std::make_shared<SceneSelect>(m_sceneManager));
-	}
-	else if (m_pGameManager->GetNextScene() == Game::Scene::kMenu)
-	{
-		//メニューシーンに戻る
-		m_sceneManager.ChangeScene(std::make_shared<SceneMenu>(m_sceneManager));
+		//シーン移動
+		if (m_pGameManager->GetNextScene() == Game::Scene::kSelect)
+		{
+			//セレクトシーンに戻る
+			m_sceneManager.ChangeScene(std::make_shared<SceneSelect>(m_sceneManager));
+		}
+		else if (m_pGameManager->GetNextScene() == Game::Scene::kMenu)
+		{
+			//メニューシーンに戻る
+			m_sceneManager.ChangeScene(std::make_shared<SceneMenu>(m_sceneManager));
+		}
 	}
 }
 

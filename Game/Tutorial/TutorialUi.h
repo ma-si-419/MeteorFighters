@@ -58,9 +58,22 @@ public:
 	MenuItem GetSelectItem() { return m_selectItem; };
 
 	/// <summary>
+	/// 選択したチュートリアル
+	/// </summary>
+	/// <returns>メニュー画面で選択したチュートリアルを返す</returns>
+	int GetTutorialNumber() { return m_selectTutorialNumber; }
+
+	/// <summary>
+	/// 現在選択しているチュートリアル番号を設定する
+	/// </summary>
+	/// <param name="number">現在行っているチュートリアル番号</param>
+	void SetNowTutorialNumber(int number) { m_selectTutorialNumber = number; }
+
+	/// <summary>
 	/// クリア演出が終わったかどうかを返す
 	/// </summary>
 	bool IsSuccessEnd() { return m_isSuccessEnd; }
+
 private:
 
 	void DrawStringCenter(std::string string, MyEngine::Vector2 centerPos, int fontHandle, int color, int edgeColor);
@@ -103,6 +116,9 @@ private:
 
 	//表示しているボタンの数
 	int m_drawButtonNum;
+
+	//選択しているチュートリアルの番号
+	int m_selectTutorialNumber;
 
 	//描画している画像配列
 	std::map<std::string, GraphData> m_drawGraphs;

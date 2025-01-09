@@ -5,10 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="ヘッダー ファイル">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="ソース ファイル\MyEngine">
       <UniqueIdentifier>{9bb88e2a-6a5b-4fff-bba2-e28f94db2a6a}</UniqueIdentifier>
     </Filter>
@@ -21,24 +17,9 @@
     <Filter Include="ソース ファイル\Scene">
       <UniqueIdentifier>{bf1c5de7-6815-4eae-bbe5-299d951e0f95}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\MyEngine">
-      <UniqueIdentifier>{de1114f5-d2dc-4a73-803d-8b7e559bb28d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\Scene">
-      <UniqueIdentifier>{253714e5-2c80-4d70-a1e2-786ba1b1aaed}</UniqueIdentifier>
-    </Filter>
     <Filter Include="リソース ファイル">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\MyEngine\Utility">
-      <UniqueIdentifier>{8646aafd-e412-4fe5-b500-261f9be9065e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\MyEngine\Physics">
-      <UniqueIdentifier>{0856b894-2454-45d7-a946-a063271ce0f8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\Singleton">
-      <UniqueIdentifier>{71593332-d338-4e54-b6d8-d4aa7615a3c3}</UniqueIdentifier>
     </Filter>
     <Filter Include="ソース ファイル\Singleton">
       <UniqueIdentifier>{ef7c8d77-1e01-4a4a-ae19-ef24bc5f8bc1}</UniqueIdentifier>
@@ -49,11 +30,66 @@
     <Filter Include="ソース ファイル\Character\State">
       <UniqueIdentifier>{6506dda7-4c09-4531-9776-f135c69e33a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\MyEngine">
+      <UniqueIdentifier>{de1114f5-d2dc-4a73-803d-8b7e559bb28d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\MyEngine\Utility">
+      <UniqueIdentifier>{8646aafd-e412-4fe5-b500-261f9be9065e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\MyEngine\Physics">
+      <UniqueIdentifier>{0856b894-2454-45d7-a946-a063271ce0f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Scene">
+      <UniqueIdentifier>{253714e5-2c80-4d70-a1e2-786ba1b1aaed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Singleton">
+      <UniqueIdentifier>{71593332-d338-4e54-b6d8-d4aa7615a3c3}</UniqueIdentifier>
+    </Filter>
     <Filter Include="ヘッダー ファイル\Character">
       <UniqueIdentifier>{acf81256-c178-4f35-9093-aaff601dcede}</UniqueIdentifier>
     </Filter>
     <Filter Include="ヘッダー ファイル\Character\State">
       <UniqueIdentifier>{a8945192-fcc4-4653-94c2-8afe1d8b1150}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Title">
+      <UniqueIdentifier>{1d45750c-9321-4a5a-b2da-d23279fd11e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game">
+      <UniqueIdentifier>{084dcc03-971a-401a-bfe0-42c1b8b1dcaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game\Battle">
+      <UniqueIdentifier>{df6d1f09-57e4-431e-a5b3-749c075da5eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game\Tutorial">
+      <UniqueIdentifier>{4c0e82f5-2504-47ef-a285-05fea2cb7b7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Menu">
+      <UniqueIdentifier>{8a8317e0-e985-42c5-b6c8-696dd04ce7a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Select">
+      <UniqueIdentifier>{4fbf245d-c936-4d88-a7ba-5b073e0932e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Game">
+      <UniqueIdentifier>{c0991173-91dd-43a5-aa49-eb47030db387}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Select">
+      <UniqueIdentifier>{04c06bdf-e9cf-442b-a97a-eaaa318119d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Menu">
+      <UniqueIdentifier>{1b75d79f-aed2-4345-b1b8-dcb6448b7ee5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Game\Tutorial">
+      <UniqueIdentifier>{af9e0eb5-87c4-4d20-98b3-158b4794d620}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Game\Battle">
+      <UniqueIdentifier>{b165111f-615d-4bfa-b401-7d6a5e9d8bf4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Title">
+      <UniqueIdentifier>{a95bf301-9b8a-46af-a158-a18453d349db}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -87,35 +123,11 @@
     <ClCompile Include="Scene\SceneManager.cpp">
       <Filter>ソース ファイル\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\SceneTitle.cpp">
-      <Filter>ソース ファイル\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\SceneGame.cpp">
-      <Filter>ソース ファイル\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\SceneMenu.cpp">
-      <Filter>ソース ファイル\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\SceneSelect.cpp">
-      <Filter>ソース ファイル\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="MyEngine\Utility\Matrix.cpp">
       <Filter>ソース ファイル\MyEngine\Utility</Filter>
     </ClCompile>
     <ClCompile Include="MyEngine\Utility\LocalPos.cpp">
       <Filter>ソース ファイル\MyEngine\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="GameCamera.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="GameManagerBase.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Attack.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Stage.cpp">
-      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Character\State\ChracterStateIdle.cpp">
       <Filter>ソース ファイル\Character\State</Filter>
@@ -150,41 +162,17 @@
     <ClCompile Include="Character\State\CharacterStateHitAttack.cpp">
       <Filter>ソース ファイル\Character\State</Filter>
     </ClCompile>
-    <ClCompile Include="EffectManager.cpp">
+    <ClCompile Include="MyEngine\Utility\EffectManager.cpp">
       <Filter>ソース ファイル\MyEngine\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="Effect.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="GameUi.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphManager.cpp">
-      <Filter>ソース ファイル\Singleton</Filter>
-    </ClCompile>
-    <ClCompile Include="MyEngine\Physics\Physics.cpp">
-      <Filter>ソース ファイル\Singleton</Filter>
-    </ClCompile>
-    <ClCompile Include="MyEngine\Utility\Input.cpp">
+    <ClCompile Include="Singleton\GraphManager.cpp">
       <Filter>ソース ファイル\Singleton</Filter>
     </ClCompile>
     <ClCompile Include="Character\State\CharacterStateSpecialAttack.cpp">
       <Filter>ソース ファイル\Character\State</Filter>
     </ClCompile>
-    <ClCompile Include="InputData.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="EnemyInput.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="SoundManager.cpp">
+    <ClCompile Include="Singleton\SoundManager.cpp">
       <Filter>ソース ファイル\Singleton</Filter>
-    </ClCompile>
-    <ClCompile Include="MenuUi.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="TitleUi.cpp">
-      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Character\Character.cpp">
       <Filter>ソース ファイル\Character</Filter>
@@ -192,20 +180,68 @@
     <ClCompile Include="Character\State\StateBase.cpp">
       <Filter>ソース ファイル\Character\State</Filter>
     </ClCompile>
-    <ClCompile Include="SceneTutorial.cpp">
-      <Filter>ソース ファイル\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="BattleManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="TutorialManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="TutorialUi.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="LoadManager.cpp">
+    <ClCompile Include="Singleton\LoadManager.cpp">
       <Filter>ソース ファイル\Singleton</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Attack.cpp">
+      <Filter>ソース ファイル\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Effect.cpp">
+      <Filter>ソース ファイル\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Character\EnemyInput.cpp">
+      <Filter>ソース ファイル\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameCamera.cpp">
+      <Filter>ソース ファイル\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameManagerBase.cpp">
+      <Filter>ソース ファイル\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Stage.cpp">
+      <Filter>ソース ファイル\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Title\TitleUi.cpp">
+      <Filter>ソース ファイル\Title</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Battle\BattleManager.cpp">
+      <Filter>ソース ファイル\Game\Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Tutorial\TutorialManager.cpp">
+      <Filter>ソース ファイル\Game\Tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Tutorial\TutorialUi.cpp">
+      <Filter>ソース ファイル\Game\Tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GameUi.cpp">
+      <Filter>ソース ファイル\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Menu\SceneMenu.cpp">
+      <Filter>ソース ファイル\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="Select\SceneSelect.cpp">
+      <Filter>ソース ファイル\Select</Filter>
+    </ClCompile>
+    <ClCompile Include="Title\SceneTitle.cpp">
+      <Filter>ソース ファイル\Title</Filter>
+    </ClCompile>
+    <ClCompile Include="Menu\MenuUi.cpp">
+      <Filter>ソース ファイル\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Tutorial\SceneTutorial.cpp">
+      <Filter>ソース ファイル\Game\Tutorial</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Battle\SceneGame.cpp">
+      <Filter>ソース ファイル\Game\Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="MyEngine\Utility\InputData.cpp">
+      <Filter>ソース ファイル\MyEngine\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="MyEngine\Utility\Input.cpp">
+      <Filter>ソース ファイル\MyEngine\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="MyEngine\Physics\Physics.cpp">
+      <Filter>ソース ファイル\MyEngine\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -215,19 +251,7 @@
     <ClInclude Include="Scene\SceneBase.h">
       <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\SceneGame.h">
-      <Filter>ヘッダー ファイル\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Scene\SceneManager.h">
-      <Filter>ヘッダー ファイル\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\SceneTitle.h">
-      <Filter>ヘッダー ファイル\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\SceneMenu.h">
-      <Filter>ヘッダー ファイル\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\SceneSelect.h">
       <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
     <ClInclude Include="MyEngine\Physics\CapsuleColliderData.h">
@@ -263,22 +287,7 @@
     <ClInclude Include="MyEngine\Utility\Vector3.h">
       <Filter>ヘッダー ファイル\MyEngine\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="GameCamera.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="GameManagerBase.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Attack.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Stage.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="GameSceneConstant.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Character\State\CharacterStateBase.h">
@@ -314,41 +323,14 @@
     <ClInclude Include="Character\State\CharacterStateRush.h">
       <Filter>ヘッダー ファイル\Character\State</Filter>
     </ClInclude>
-    <ClInclude Include="EffectManager.h">
+    <ClInclude Include="MyEngine\Utility\EffectManager.h">
       <Filter>ヘッダー ファイル\MyEngine\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Effect.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="GameUi.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphManager.h">
+    <ClInclude Include="Singleton\GraphManager.h">
       <Filter>ヘッダー ファイル\Singleton</Filter>
     </ClInclude>
-    <ClInclude Include="MyEngine\Physics\Physics.h">
+    <ClInclude Include="Singleton\SoundManager.h">
       <Filter>ヘッダー ファイル\Singleton</Filter>
-    </ClInclude>
-    <ClInclude Include="MyEngine\Utility\Input.h">
-      <Filter>ヘッダー ファイル\Singleton</Filter>
-    </ClInclude>
-    <ClInclude Include="Character\State\CharacterStateSpecialAttack.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="InputData.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="EnemyInput.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="SoundManager.h">
-      <Filter>ヘッダー ファイル\Singleton</Filter>
-    </ClInclude>
-    <ClInclude Include="MenuUi.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="TitleUi.h">
-      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Character\Character.h">
       <Filter>ヘッダー ファイル\Character</Filter>
@@ -356,20 +338,74 @@
     <ClInclude Include="Character\State\StateBase.h">
       <Filter>ヘッダー ファイル\Character\State</Filter>
     </ClInclude>
-    <ClInclude Include="SceneTutorial.h">
-      <Filter>ヘッダー ファイル\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="BattleManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="TutorialManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="TutorialUi.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="LoadManager.h">
+    <ClInclude Include="Singleton\LoadManager.h">
       <Filter>ヘッダー ファイル\Singleton</Filter>
+    </ClInclude>
+    <ClInclude Include="Character\State\CharacterStateSpecialAttack.h">
+      <Filter>ヘッダー ファイル\Character\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Effect.h">
+      <Filter>ヘッダー ファイル\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Character\EnemyInput.h">
+      <Filter>ヘッダー ファイル\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Attack.h">
+      <Filter>ヘッダー ファイル\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameCamera.h">
+      <Filter>ヘッダー ファイル\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameManagerBase.h">
+      <Filter>ヘッダー ファイル\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameSceneConstant.h">
+      <Filter>ヘッダー ファイル\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameUi.h">
+      <Filter>ヘッダー ファイル\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu\MenuUi.h">
+      <Filter>ヘッダー ファイル\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Stage.h">
+      <Filter>ヘッダー ファイル\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu\SceneMenu.h">
+      <Filter>ヘッダー ファイル\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="Select\SceneSelect.h">
+      <Filter>ヘッダー ファイル\Select</Filter>
+    </ClInclude>
+    <ClInclude Include="Title\SceneTitle.h">
+      <Filter>ヘッダー ファイル\Title</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Tutorial\SceneTutorial.h">
+      <Filter>ヘッダー ファイル\Game\Tutorial</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Battle\SceneGame.h">
+      <Filter>ヘッダー ファイル\Game\Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Battle\BattleManager.h">
+      <Filter>ヘッダー ファイル\Game\Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="Title\TitleUi.h">
+      <Filter>ヘッダー ファイル\Title</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Tutorial\TutorialManager.h">
+      <Filter>ヘッダー ファイル\Game\Tutorial</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Tutorial\TutorialUi.h">
+      <Filter>ヘッダー ファイル\Game\Tutorial</Filter>
+    </ClInclude>
+    <ClInclude Include="MyEngine\Utility\InputData.h">
+      <Filter>ヘッダー ファイル\MyEngine\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="MyEngine\Utility\Input.h">
+      <Filter>ヘッダー ファイル\MyEngine\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="MyEngine\Physics\Physics.h">
+      <Filter>ヘッダー ファイル\MyEngine\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

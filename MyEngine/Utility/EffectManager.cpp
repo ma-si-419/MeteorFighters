@@ -43,8 +43,6 @@ void EffectManager::Entry(std::shared_ptr<Effect> effect, MyEngine::Vector3 pos)
 
 	int playHandle = PlayEffekseer3DEffect(handle);
 
-	printfDx("ƒvƒŒƒC\n");
-
 	SetPosPlayingEffekseer3DEffect(playHandle, pos.x, pos.y, pos.z);
 
 	effect->SetPlayHandle(playHandle);

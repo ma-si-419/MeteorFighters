@@ -29,12 +29,11 @@ namespace
 }
 
 TutorialManager::TutorialManager(std::shared_ptr<GameCamera> camera) :
-	GameManagerBase(camera,GameManagerBase::GameKind::kTutorial),
+	GameManagerBase(camera, GameManagerBase::GameKind::kTutorial),
 	m_nowTutorial(TutorialKind::kMove),
 	m_drawSituationFunc(&TutorialManager::DrawMenu),
 	m_updateSituationFunc(&TutorialManager::UpdateMenu),
 	m_tutorialSituation(TutorialSituation::kMenu)
-
 {
 	m_pTutorialUi = std::make_shared<TutorialUi>();
 
@@ -115,21 +114,37 @@ void TutorialManager::UpdateMenu()
 
 	if (input->IsTrigger("A"))
 	{
+		bool isEnd = false;
+
 		//状況をリセットするを押されたら
 		if (selectItem == TutorialUi::MenuItem::kReset)
 		{
 			RetryInit();
+			m_nowTutorial = static_cast<TutorialKind>(m_pTutorialUi->GetTutorialNumber());
+			isEnd = true;
 		}
 		//メニューを閉じるが押されたら
 		else if (selectItem == TutorialUi::MenuItem::kMenuEnd)
 		{
-			ChangeSituation(TutorialSituation::kStart);
+			isEnd = true;
+			//今行っているチュートリアルと選択しているチュートリアルが異なっていたら
+			if (m_nowTutorial != static_cast<TutorialKind>(m_pTutorialUi->GetTutorialNumber()))
+			{
+				m_nowTutorial = static_cast<TutorialKind>(m_pTutorialUi->GetTutorialNumber());
+				RetryInit();
+			}
 		}
 		//チュートリアルを終了するが押されたら
 		else if (selectItem == TutorialUi::MenuItem::kTutorialEnd)
 		{
 			//メインメニューに戻る
 			m_nextScene = Game::Scene::kMenu;
+		}
+
+		//メニュー画面を閉じる選択肢が選ばれていたら
+		if (isEnd)
+		{
+			ChangeSituation(TutorialSituation::kStart);
 		}
 	}
 }
@@ -227,6 +242,7 @@ void TutorialManager::ChangeSituation(TutorialSituation next)
 		for (auto& player : m_pCharacters) player->ChangeSituationUpdate(static_cast<int>(BattleSituation::kMenu));
 
 		//初期化を行う
+		m_pTutorialUi->SetNowTutorialNumber(static_cast<int>(m_nowTutorial));
 		m_pTutorialUi->InitMenu();
 		//更新処理の変更
 		m_updateSituationFunc = &TutorialManager::UpdateMenu;

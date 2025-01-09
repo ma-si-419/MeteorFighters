@@ -99,7 +99,8 @@ TutorialUi::TutorialUi() :
 	m_tutorialNumber(0),
 	m_selectItemMoveTime(0),
 	m_successTime(0),
-	m_isSuccessEnd(false)
+	m_isSuccessEnd(false),
+	m_selectTutorialNumber(0)
 {
 	LoadCsv load;
 
@@ -313,6 +314,17 @@ void TutorialUi::DrawMenu()
 
 		DrawStringCenter(kMenuStrings[i], pos, m_menuFontHandle, GetColor(0, 0, 0), GetColor(255, 255, 255));
 	}
+
+	//選択しているチュートリアルを表示する
+	MyEngine::Vector2 changeTutorialPos = MyEngine::Vector2(kMenuTutorialNamePosX,kMenuStringPosY + kMenuStringDistanceY);
+
+	/// <summary>
+	/// ///////////////////////////////////////////////////////////
+	/// </summary>
+	DrawStringCenter(changeTutorialPos);
+
+	///////////////////////////////////////////////////////////////
+
 }
 
 void TutorialUi::DrawStart(int number)
@@ -406,6 +418,7 @@ void TutorialUi::DrawSuccess(int number)
 
 void TutorialUi::DrawStringCenter(std::string string, MyEngine::Vector2 centerPos, int font, int color, int edgeColor)
 {
+
 	//文字を表示する座標
 	MyEngine::Vector2 pos;
 
@@ -445,8 +458,6 @@ void TutorialUi::UpdateMenu()
 
 	//選択している項目
 	int selectItem = static_cast<int>(m_selectItem);
-
-
 
 	//上下入力で選択しているものを変更する
 	if (input->IsTrigger("Up"))
@@ -521,6 +532,26 @@ void TutorialUi::UpdateMenu()
 		m_selectItemMoveTime++;
 	}
 	
+	//左右に動かせる項目であれば
+	if (m_selectItem == MenuItem::kChangeTutorial)
+	{
+		//右を押したら
+		if (input->IsTrigger("Right"))
+		{
+			m_selectTutorialNumber++;
+		}
+
+		//左を押したら
+		if (input->IsTrigger("Left"))
+		{
+			m_selectTutorialNumber--;
+		}
+
+		//クランプ
+		m_selectTutorialNumber = min(m_selectTutorialNumber,0);
+		m_selectTutorialNumber = max(m_selectTutorialNumber, static_cast<int>(TutorialManager::TutorialKind::kTutorialNum) - 1);
+	}
+
 	//選択している項目を更新
 	m_selectItem = static_cast<MenuItem>(selectItem);
 

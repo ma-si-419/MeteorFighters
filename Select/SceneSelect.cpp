@@ -14,7 +14,7 @@ namespace
 	//キャラクターの数(0から数えて)
 	constexpr int kCharacterNum = 1;
 
-#ifdef _DEBUG
+//     #ifdef _DEBUG
 
 	const std::string kCharacterName[2] =
 	{
@@ -22,7 +22,7 @@ namespace
 		"デカアオアタマ"
 	};
 
-#endif // _DEBUG
+//	   #endif // _DEBUG
 }
 
 SceneSelect::SceneSelect(SceneManager& sceneManager) :
@@ -53,14 +53,14 @@ void SceneSelect::UpdateAsyncLoad()
 
 void SceneSelect::Draw()
 {
-#ifdef _DEBUG
+//      #ifdef _DEBUG
 
 	DrawString(100, 100, kCharacterName[m_playerNumber].c_str(), kRedColor);
 	DrawString(300, 100, kCharacterName[m_enemyNumber].c_str(), kRedColor);
 
 	DrawString(0, 0, "SceneSelect", kRedColor);
 
-#endif // _DEBUG
+//      #endif // _DEBUG
 }
 
 void SceneSelect::End()

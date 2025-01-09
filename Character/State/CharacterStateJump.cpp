@@ -253,5 +253,4 @@ void CharacterStateJump::Update()
 
 void CharacterStateJump::Exit()
 {
-	printfDx("èIÇÌÇË\n");
 }
