@@ -158,6 +158,10 @@ void Character::Init()
 
 	auto thisPointer = std::dynamic_pointer_cast<Character>(shared_from_this());
 
+	//初期ステートの設定
+	m_pState = std::make_shared<CharacterStateIdle>(thisPointer);
+	m_pState->Enter();
+
 	//初期座標の決定
 	if (m_playerNumber == PlayerNumber::kOnePlayer)
 	{
@@ -172,10 +176,6 @@ void Character::Init()
 		SetFrontPos(kOnePlayerInitPos);
 	}
 
-	//初期ステートの設定
-	m_pState = std::make_shared<CharacterStateIdle>(thisPointer);
-	m_pState->Enter();
-
 	//敵側の処理
 	if (m_playerNumber == Character::PlayerNumber::kTwoPlayer)
 	{
@@ -186,6 +186,7 @@ void Character::Init()
 
 void Character::Update()
 {
+	m_targetLocalPos.SetCenterPos(GetPos());
 
 	//エネミーの入力情報を更新する
 	if (m_playerNumber == PlayerNumber::kTwoPlayer)
@@ -638,7 +639,7 @@ bool Character::IsFrontTarget()
 
 	toTargetDir = toTargetDir.Normalize();
 
-	if (toTargetDir.z > 0)
+	if (toTargetDir.z > 0.0f)
 	{
 		return true;
 	}
@@ -761,7 +762,7 @@ void Character::ChangeSituationUpdate(int situation)
 	//1Pの開始演出をしているとき
 	else if (sit == GameManagerBase::BattleSituation::kStart1P)
 	{
-
+		InitStart();
 		if (m_playerNumber == PlayerNumber::kOnePlayer)
 		{
 			//1P側はスタート処理を行う
@@ -814,6 +815,23 @@ void Character::SetModelHandle(int handle)
 	m_modelHandle = handle;
 
 	MV1SetScale(m_modelHandle, VGet(GameSceneConstant::kModelScale, GameSceneConstant::kModelScale, GameSceneConstant::kModelScale));
+}
+
+void Character::InitStart()
+{
+	//初期座標の決定
+	if (m_playerNumber == PlayerNumber::kOnePlayer)
+	{
+		m_rigidbody.SetPos(kOnePlayerInitPos);
+		m_lookPos.SetCenterPos(kOnePlayerInitPos);
+		SetFrontPos(kTwoPlayerInitPos);
+	}
+	else if (m_playerNumber == PlayerNumber::kTwoPlayer)
+	{
+		m_rigidbody.SetPos(kTwoPlayerInitPos);
+		m_lookPos.SetCenterPos(kTwoPlayerInitPos);
+		SetFrontPos(kOnePlayerInitPos);
+	}
 }
 
 void Character::UpdateStart()

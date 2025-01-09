@@ -250,8 +250,11 @@ void TutorialManager::ChangeSituation(TutorialSituation next)
 	else if (next == TutorialSituation::kPlaying)
 	{
 		//プレイヤーの状況を変更
-		for (auto& player : m_pCharacters) player->ChangeSituationUpdate(static_cast<int>(BattleSituation::kBattle));
-
+		for (auto& player : m_pCharacters)
+		{
+			player->LookTarget();
+			player->ChangeSituationUpdate(static_cast<int>(BattleSituation::kBattle));
+		}
 		//初期化を行う
 		m_pTutorialUi->InitPlaying(static_cast<int>(m_nowTutorial));
 		//更新処理の変更

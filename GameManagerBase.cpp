@@ -58,7 +58,7 @@ void GameManagerBase::UpdateAsyncLoad()
 	//ƒnƒ“ƒhƒ‹‚ðŽæ“¾‚·‚é
 	for (auto& item : m_modelHandles)
 	{
-		item.second = manager.GetHandle(item.first);////////////////////////////////////
+		item.second = manager.GetHandle(item.first);
 	}
 
 	if (GetASyncLoadNum() == 0)

@@ -266,10 +266,10 @@ void EnemyInput::Update()
 	}
 
 	//ˆÚ“®ˆ—
-	//(this->*m_moveFunc)();
+//	(this->*m_moveFunc)();
 
 	//ƒAƒNƒVƒ‡ƒ“ˆ—
-	//(this->*m_actionFunc)();
+//	(this->*m_actionFunc)();
 }
 
 void EnemyInput::MoveFront()

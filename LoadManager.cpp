@@ -14,18 +14,21 @@ namespace
 
 	//ボールの初期座標
 	constexpr int kBallInitPosX = -100;
-	constexpr int kBallPosY = 800;
+	constexpr int kBallPosY = 750;
 	//どこまで行ったら初期位置に戻るか
 	constexpr int kBallFinalPosX = Game::kWindowWidth + 200;
 
 	//ボールの最低速度
-	constexpr int kBallMinSpeed = 3;
+	constexpr int kBallMinSpeed = 5;
 
 	//ボールのランダムの速度
-	constexpr int kBallRandSpeed = 5;
+	constexpr int kBallRandSpeed = 10;
 
 	//ボールの回る速度
-	constexpr double kBallRotaSpeed = 0.1;
+	constexpr double kBallRotaSpeed = 0.02;
+
+	//移動速度によって増やす回る速度
+	constexpr double kBallAddSpeedRate = 0.015;
 
 	//フォントの名前
 	const TCHAR* kFontName = "GN-キルゴUかなNB";
@@ -47,6 +50,14 @@ void LoadManager::Init()
 	m_ballGraphs[static_cast<int>(BallKind::kYellow)].handle = LoadGraph("data/image/YellowBall.png");
 	m_ballGraphs[static_cast<int>(BallKind::kOrange)].handle = LoadGraph("data/image/OrangeBall.png");
 
+
+	//ローディング中に使用する画像の初期化
+	for (auto& item : m_ballGraphs)
+	{
+		item.speed = GetRand(kBallRandSpeed) + kBallMinSpeed;
+		item.posX = kBallInitPosX;
+		item.posY = kBallPosY;
+	}
 }
 
 void LoadManager::Update()
@@ -73,9 +84,9 @@ void LoadManager::Update()
 	for (auto& item : m_ballGraphs)
 	{
 		item.posX += item.speed;
-		item.rota += kBallRotaSpeed;
+		item.rota += kBallRotaSpeed + static_cast<double>(item.speed) * kBallAddSpeedRate;
 
-		if (item.posX > kBallInitPosX)
+		if (item.posX > kBallFinalPosX)
 		{
 			item.speed = GetRand(kBallRandSpeed) + kBallMinSpeed;
 			item.posX = kBallInitPosX;

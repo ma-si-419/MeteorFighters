@@ -35,9 +35,14 @@ void SceneManager::Update()
 	//シーン切り替えフラグがたっていたら
 	if (m_isChangeScene)
 	{
+
 		//フェードアウトする
 		if (m_isFadeOut)
 		{
+
+			//シーン切り替えが始まったら入力をさせないようにする
+			MyEngine::Input::GetInstance().StopAllInput();
+			m_pScene->Update();
 			m_fadeAlpha += kKnockOutFadeSpeed;
 			if (m_fadeAlpha > 255)
 			{
@@ -52,6 +57,8 @@ void SceneManager::Update()
 			//非同期ロードしていなければフェードインする
 			if (LoadManager::GetInstance().IsEndLoad())
 			{
+				MyEngine::Input::GetInstance().StopAllInput();
+				m_pScene->Update();
 				m_fadeAlpha -= kKnockOutFadeSpeed;
 				if (m_fadeAlpha < 0)
 				{
@@ -65,9 +72,7 @@ void SceneManager::Update()
 				m_pScene->UpdateAsyncLoad();
 			}
 		}
-		//シーン切り替えが始まったら入力をさせないようにする
-		MyEngine::Input::GetInstance().StopAllInput();
-		m_pScene->Update();
+
 	}
 	//シーン切り替えしていないときの処理
 	else

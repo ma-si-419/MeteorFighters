@@ -573,6 +573,11 @@ private:
 private:
 
 	/// <summary>
+	/// 開始時の初期化
+	/// </summary>
+	void InitStart();
+
+	/// <summary>
 	/// 開始時の演出中のアップデート
 	/// </summary>
 	void UpdateStart();
