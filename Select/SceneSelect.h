@@ -1,5 +1,8 @@
 #pragma once
+#include <memory>
 #include "SceneBase.h"
+
+class SelectManager;
 class SceneSelect : public SceneBase
 {
 public:
@@ -18,23 +21,7 @@ public:
 
 private:
 
-	void SelectOnePlayer();
-
-	void SelectTwoPlayer();
-
-	void ConfirmCharacter();
-
-private:
-
-
-
-	using UpdateSelectFunc = void (SceneSelect::*)();
-
-	UpdateSelectFunc m_updateSelectFunc;
-
-	int m_playerNumber;
-
-	int m_enemyNumber;
+	std::shared_ptr<SelectManager> m_selectManager;
 
 };
 

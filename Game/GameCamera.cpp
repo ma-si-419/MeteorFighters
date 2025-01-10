@@ -20,8 +20,8 @@ namespace
 
 
 	constexpr float kLocalInitPosX = 27.0f;
-	constexpr float kLocalInitTopPosY = 0.0f;
-	constexpr float kLocalInitUnderPosY = 11.0f;
+	constexpr float kLocalInitTopPosY = -2.0f;
+	constexpr float kLocalInitUnderPosY = 8.0f;
 	constexpr float kLocalInitPosZ = -30.0f;
 
 	//プレイヤーとターゲットの間でどの当たりにカメラの焦点を合わせるか
@@ -178,22 +178,12 @@ void GameCamera::NormalUpdate()
 	//X,Y,Zそれぞれを一定の値の中にとどめるようにする
 
 	//最大値の調整
-
-	//X座標は離れるほどあそびを小さくしていく
-	float maxX = kOnMoveMaxLocalPosX - ((m_nextCameraPos - m_targetPos).Length()) * kLangeSubRate;
-	m_nextCameraPos.x = std::fmin(m_nextCameraPos.x, maxX);
-
-
+	m_nextCameraPos.x = std::fmin(m_nextCameraPos.x, kOnMoveMaxLocalPosX);
 	m_nextCameraPos.y = std::fmin(m_nextCameraPos.y, kOnMoveMaxLocalPosY);
 	m_nextCameraPos.z = std::fmin(m_nextCameraPos.z, kOnMoveMaxLocalPosZ);
 
 	//最小値の調整
-
-	//X座標は離れるほど左右のあそびを小さくしていく
-	float minX = kOnMoveMinLocalPosX + ((m_nextCameraPos - m_targetPos).Length()) * kLangeSubRate;
-	m_nextCameraPos.x = std::fmax(m_nextCameraPos.x, minX);
-
-
+	m_nextCameraPos.x = std::fmax(m_nextCameraPos.x, kOnMoveMinLocalPosX);
 	m_nextCameraPos.y = std::fmax(m_nextCameraPos.y, kOnMoveMinLocalPosY);
 	m_nextCameraPos.z = std::fmax(m_nextCameraPos.z, kOnMoveMinLocalPosZ);
 
@@ -224,11 +214,11 @@ void GameCamera::NormalUpdate()
 			//X座標は左右を超えていたら一定座標まで戻す
 			if (m_nextCameraPos.x > kLocalInitPosX)
 			{
-				initPos.x = kLocalInitPosX - ((m_nextCameraPos - m_targetPos).Length()) * kLangeSubRate;
+				initPos.x = kLocalInitPosX;
 			}
 			else if (m_nextCameraPos.x < -kLocalInitPosX)
 			{
-				initPos.x = -kLocalInitPosX + ((m_nextCameraPos - m_targetPos).Length()) * kLangeSubRate;
+				initPos.x = -kLocalInitPosX;
 			}
 			//Y座標は上下で戻す座標を変える
 			if (m_nextCameraPos.y > kLocalInitUnderPosY)

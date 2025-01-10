@@ -265,11 +265,14 @@ void EnemyInput::Update()
 		m_actionTime = 0;
 	}
 
-	//移動処理
-//	(this->*m_moveFunc)();
+	if (m_pManager->GetGameKind() == GameManagerBase::GameKind::kBattle)
+	{
+		//移動処理
+		(this->*m_moveFunc)();
 
-	//アクション処理
-//	(this->*m_actionFunc)();
+		//アクション処理
+		(this->*m_actionFunc)();
+	}
 }
 
 void EnemyInput::MoveFront()
@@ -369,7 +372,7 @@ void EnemyInput::PhysicalAttack()
 			m_isCountActionTime = true;
 		}
 	}
-	
+
 	auto player = m_pManager->GetOnePlayerPointer();
 	auto enemy = m_pManager->GetTwoPlayerPointer();
 

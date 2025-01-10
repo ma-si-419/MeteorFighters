@@ -482,6 +482,7 @@ void Character::SetNormalAttackData(std::vector<std::vector<std::string>> normal
 		pushData.nextComboName = item[static_cast<int>(NormalAttackDataSort::kNextComboName)];
 		pushData.targetHitReaction = item[static_cast<int>(NormalAttackDataSort::kTargetHitReaction)];
 		pushData.attackHitKind = kAttackHitKindMap.at(item[static_cast<int>(NormalAttackDataSort::kAttackHitKind)]);
+		pushData.animationSpeed = stof(item[static_cast<int>(NormalAttackDataSort::kAnimationSpeed)]);
 
 		m_normalAttackData[item[static_cast<int>(NormalAttackDataSort::kAttackName)]] = pushData;
 	}

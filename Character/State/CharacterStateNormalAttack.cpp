@@ -52,6 +52,8 @@ namespace
 	const std::string kEnergyChargeAttack = "EnergyCharge";
 	//瞬間移動する攻撃
 	const std::string kTeleportationAttack = "Teleportation";
+	//アニメーションのブレンドスピード
+	constexpr float kAnimBlendSpeed = 0.15f;
 }
 
 CharacterStateNormalAttack::CharacterStateNormalAttack(std::shared_ptr<Character> character) :
@@ -90,7 +92,8 @@ void CharacterStateNormalAttack::Enter()
 	Character::AnimKind anim = static_cast<Character::AnimKind>(GetAttackAnimKind(animName));
 
 	//アニメーションの変更
-	m_pCharacter->ChangeAnim(anim, false);
+	m_pCharacter->ChangeAnim(anim, false,kAnimBlendSpeed);
+	m_pCharacter->SetAnimPlaySpeed(m_pCharacter->GetNormalAttackData(m_nowAttackName).animationSpeed);
 
 	//向かう方向の設定
 	MyEngine::Vector3 shiftVec = (GetTargetPos() - m_pCharacter->GetPos()).Normalize();
@@ -288,7 +291,8 @@ void CharacterStateNormalAttack::Update()
 			m_moveTargetPos = GetTargetPos() + shiftVec;
 			Character::AnimKind anim = static_cast<Character::AnimKind>(GetAttackAnimKind(nextAttack.animationName));
 
-			m_pCharacter->ChangeAnim(anim, false);
+			m_pCharacter->ChangeAnim(anim, false,kAnimBlendSpeed);
+			m_pCharacter->SetAnimPlaySpeed(nextAttack.animationSpeed);
 
 			m_isNextAttack = false;
 
@@ -460,8 +464,7 @@ void CharacterStateNormalAttack::Update()
 	}
 
 	//次の攻撃を行うか判定する
-	if (m_time < attackData.cancelFrame &&
-		m_time > kNextAttackInputTime)
+	if (m_time > kNextAttackInputTime)
 	{
 		//格闘攻撃なら
 		if (attackData.attackKind == Character::AttackKind::kPhysical)
@@ -533,4 +536,6 @@ void CharacterStateNormalAttack::Update()
 
 void CharacterStateNormalAttack::Exit()
 {
+	//アニメーションの再生速度を戻しておく
+	m_pCharacter->SetAnimPlaySpeed();
 }

@@ -183,6 +183,7 @@ public:
 		int cancelFrame = -1;
 		float moveSpeed = -1;
 		float attackMoveSpeed = -1;
+		float animationSpeed = -1;
 		bool isTeleportation = false;
 		AttackHitKind attackHitKind = AttackHitKind::kLow;
 		AttackKind attackKind = AttackKind::kPhysical;
@@ -567,7 +568,8 @@ private:
 		kAttackKind,//攻撃の種類
 		kNextComboName,//次に出る攻撃の名前
 		kTargetHitReaction,//敵の状態が何だったら攻撃を出せるか
-		kAnimationName//アニメーションの名前
+		kAnimationName,//アニメーションの名前
+		kAnimationSpeed//アニメーションの再生速度
 	};
 
 private:

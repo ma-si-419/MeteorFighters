@@ -334,8 +334,8 @@ void TutorialUi::DrawMenu()
 	float leftGap = kMenuTutorialNameSideArrowDistance + sinf(m_selectTutorialStringArrowPos) * kMenuTutorialNameSideArrowScale;
 	float rightGap = kMenuTutorialNameSideArrowDistance + sinf(m_selectTutorialStringArrowPos) * kMenuTutorialNameSideArrowScale;
 
-	MyEngine::Vector2 leftArrowPos = MyEngine::Vector2(selectTutorialPos.x - leftGap + static_cast<float>(kMenuFontSize / 2), selectTutorialPos.y - static_cast<float>(kMenuFontSize / 2));
-	MyEngine::Vector2 rightArrowPos = MyEngine::Vector2(selectTutorialPos.x + rightGap - static_cast<float>(kMenuFontSize / 2), selectTutorialPos.y - static_cast<float>(kMenuFontSize / 2));
+	MyEngine::Vector2 leftArrowPos = MyEngine::Vector2(selectTutorialPos.x - leftGap - static_cast<float>(kMenuFontSize), selectTutorialPos.y - static_cast<float>(kMenuFontSize / 2));
+	MyEngine::Vector2 rightArrowPos = MyEngine::Vector2(selectTutorialPos.x + rightGap, selectTutorialPos.y - static_cast<float>(kMenuFontSize / 2));
 
 	DrawStringToHandle(leftArrowPos.x, leftArrowPos.y, "ÅÉ", GetColor(0, 0, 0), m_menuFontHandle, GetColor(255, 255, 255));
 	DrawStringToHandle(rightArrowPos.x, rightArrowPos.y, "ÅÑ", GetColor(0, 0, 0), m_menuFontHandle, GetColor(255, 255, 255));
