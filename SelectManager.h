@@ -1,12 +1,29 @@
 #pragma once
+#include <memory>
+
+class SelectUi;
 class SelectManager
 {
+public:
+
+	enum class CharacterNumber
+	{
+		kMouse,
+		kRandom,
+		kBlueHead,
+		kCharacterNum
+	};
+
 public:
 	SelectManager();
 
 	virtual ~SelectManager();
 
+	void Init();
+
 	void Update();
+
+	void Draw();
 
 	/// <summary>
 	/// 1プレイヤー側のキャラクターの番号を返す
@@ -24,7 +41,7 @@ public:
 	/// 次のフレームで移行するシーンを取得する
 	/// </summary>
 	/// <returns>次のシーン(Game::Sceneキャストして使用)</returns>
-	int GetNextScene() {return m_nextScene};
+	int GetNextScene() { return m_nextScene; };
 private:
 
 	void SelectOnePlayer();
@@ -38,6 +55,8 @@ private:
 	using UpdateSelectFunc = void (SelectManager::*)();
 
 	UpdateSelectFunc m_updateSelectFunc;
+
+	std::shared_ptr<SelectUi> m_pUi;
 
 	int m_playerNumber;
 

@@ -26,10 +26,10 @@ Stick,TutorialLStick,Tutorial
 Menu,TutorialMenu,Tutorial
 SelectItem,TutorialMenuSelectItem,Tutorial
 Success,TutorialSuccess,Tutorial
+Character0,SelectCharacter0,Select
 Character1,SelectCharacter1,Select
-Character2,SelectCharacter2,Select
 HeadSet,SelectHeadSet,Select
 Icon0,SelectIcon0,Select
 Icon1,SelectIcon1,Select
 IconRandom,SelectIconRandom,Select
-VS,SelectVS,Select
+Vs,SelectVs,Select
