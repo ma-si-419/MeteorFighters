@@ -134,6 +134,7 @@ void BattleManager::ChangeSituation(BattleSituation situation)
 	{
 		m_updateSituationFunc = &BattleManager::UpdateBattle;
 		m_pBattleUi->ChangeSituation(BattleUi::UiSituation::kNone);
+		Physics::GetInstance().StartUpdate();
 	}
 	//ノックアウト時
 	else if (situation == BattleSituation::kKnockOut)
@@ -165,18 +166,6 @@ void BattleManager::Draw()
 	if (m_alpha > 0)
 	{
 		m_pGameUi->DrawFade(GetColor(255, 255, 255), m_alpha);
-	}
-
-	if (m_situation == BattleSituation::kResult)
-	{
-		if (m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetHp() > 0)
-		{
-			m_pGameUi->DrawResult(true);
-		}
-		else
-		{
-			m_pGameUi->DrawResult(false);
-		}
 	}
 
 	//バトル時のUiの描画
@@ -328,17 +317,26 @@ void BattleManager::UpdateBattle()
 			int twoPlayer = static_cast<int>(Character::PlayerNumber::kTwoPlayer);
 
 			//負けている方を中心とする
+
+			//1Pが負けた場合
 			if (m_pCharacters[onePlayer]->GetHp() <= 0)
 			{
 				centerPos = m_pCharacters[onePlayer]->GetPos();
 				loserToWinnerVec = m_pCharacters[twoPlayer]->GetPos() - m_pCharacters[onePlayer]->GetPos();
 				frontPos = m_pCharacters[twoPlayer]->GetPos();
+
+				//1Pが負けたと設定する
+				m_pBattleUi->SetResult(false);
 			}
+			//1Pが勝った場合
 			else
 			{
 				centerPos = m_pCharacters[twoPlayer]->GetPos();
 				loserToWinnerVec = m_pCharacters[onePlayer]->GetPos() - m_pCharacters[twoPlayer]->GetPos();
 				frontPos = m_pCharacters[onePlayer]->GetPos();
+
+				//1Pが負けたと設定する
+				m_pBattleUi->SetResult(true);
 			}
 
 			//ターゲット座標
@@ -468,18 +466,19 @@ void BattleManager::UpdateResult()
 		m_pCamera->SetLocalPos(m_poseCameraPos);
 	}
 
-	int selectNum = m_pGameUi->UpdateResult();
+	int selectNum = m_pBattleUi->GetDecisionItem();
 
-	if (selectNum == static_cast<int>(GameUi::SelectItem::kRetry))
+	if (selectNum == static_cast<int>(BattleUi::ResultItem::kRetry))
 	{
 		//リトライする
 		ChangeSituation(BattleSituation::kRetry);
+		m_pBattleUi->ChangeSituation(BattleUi::UiSituation::kNone);
 	}
-	else if (selectNum == static_cast<int>(GameUi::SelectItem::kCharacterSelect))
+	else if (selectNum == static_cast<int>(BattleUi::ResultItem::kCharacterSelect))
 	{
 		m_nextScene = Game::Scene::kSelect;
 	}
-	else if (selectNum == static_cast<int>(GameUi::SelectItem::kMenu))
+	else if (selectNum == static_cast<int>(BattleUi::ResultItem::kMenu))
 	{
 		m_nextScene = Game::Scene::kMenu;
 	}
@@ -518,5 +517,31 @@ void BattleManager::UpdateMenu()
 		ChangeSituation(BattleSituation::kBattle);
 		m_pBattleUi->ChangeSituation(BattleUi::UiSituation::kNone);
 		Physics::GetInstance().StartUpdate();
+	}
+
+	auto select = static_cast<BattleUi::MenuItem>(m_pBattleUi->GetDecisionItem());
+
+	//キャラクターを選びなおす
+	if (select == BattleUi::MenuItem::kBackCharacterSelect)
+	{
+		m_nextScene = Game::Scene::kSelect;
+	}
+	//バトルに戻る
+	else if (select == BattleUi::MenuItem::kReturnBattle)
+	{
+		ChangeSituation(BattleSituation::kBattle);
+		m_pBattleUi->ChangeSituation(BattleUi::UiSituation::kNone);
+	}
+	//メニューに戻る
+	else if (select == BattleUi::MenuItem::kBackMenu)
+	{
+		m_nextScene = Game::Scene::kMenu;
+	}
+	//もう一度最初から戦う
+	else if (select == BattleUi::MenuItem::kRetry)
+	{
+		//リトライする
+		ChangeSituation(BattleSituation::kRetry);
+		m_pBattleUi->ChangeSituation(BattleUi::UiSituation::kNone);
 	}
 }

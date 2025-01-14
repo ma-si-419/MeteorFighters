@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector2.h"
+#include <string>
 
 class GameUi
 {
@@ -32,18 +33,6 @@ public:
 	/// <param name="color">色</param>
 	/// <param name="alpha">アルファ値</param>
 	void DrawFade(int color,int alpha);
-
-	/// <summary>
-	/// バトル後のリザルトの更新
-	/// </summary>
-	/// <returns>何も選択していないときは-1を返す</returns>
-	int UpdateResult();
-
-	/// <summary>
-	/// 勝敗を表示する
-	/// </summary>
-	/// <param name="isWin">1Pが勝ったかどうか</param>
-	void DrawResult(bool isWin);
 
 private:
 

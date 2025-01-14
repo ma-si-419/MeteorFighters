@@ -12,16 +12,6 @@ class BattleManager : public GameManagerBase
 {
 public:
 
-	enum class MenuItem
-	{
-		kReturnBattle,
-		kRetry,
-		kBackCharacterSelect,
-		kBackMenu
-	};
-
-public:
-
 	BattleManager(std::shared_ptr<GameCamera> camera);
 	~BattleManager();
 

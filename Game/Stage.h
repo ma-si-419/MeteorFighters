@@ -9,6 +9,9 @@ public:
 	virtual ~Stage();
 
 	void Init();
+
+	void Update();
+
 	void Draw();
 
 	void Final();

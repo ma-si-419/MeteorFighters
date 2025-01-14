@@ -239,6 +239,9 @@ std::string GameManagerBase::GetSkyDomePath()
 
 void GameManagerBase::UpdateCommon()
 {
+	//ステージの更新を行う
+	m_pStage->Update();
+
 	//攻撃クラスの更新を行う
 	for (auto& item : m_pAttacks)
 	{

@@ -8,9 +8,13 @@ namespace
 	const VECTOR kSkyDomeScale = VGet(10.0f, 10.0f, 10.0f);
 
 	const VECTOR kStageScale = VGet(0.1f, 0.1f, 0.1f);
+
+	constexpr float kSkyDomeRotaSpeed = 0.001f;
 }
 
-Stage::Stage()
+Stage::Stage():
+	m_skyDomeHandle(-1),
+	m_stageHandle(-1)
 {
 	m_stagePath = "data/model/Stage.mv1";
 	m_skyDomePath = "data/model/Dome.mv1";
@@ -23,6 +27,16 @@ Stage::~Stage()
 
 void Stage::Init()
 {
+
+}
+
+void Stage::Update()
+{
+	auto rota = MV1GetRotationXYZ(m_skyDomeHandle);
+
+	rota.y += kSkyDomeRotaSpeed;
+
+	MV1SetRotationXYZ(m_skyDomeHandle,rota);
 
 }
 

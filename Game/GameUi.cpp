@@ -125,8 +125,7 @@ GameUi::GameUi() :
 	m_lastHpBarNum(),
 	m_onHitDamageHp(),
 	m_hitDamageTime(),
-	m_onSubMp(),
-	m_selectItem(0)
+	m_onSubMp()
 {
 }
 
@@ -140,14 +139,6 @@ void GameUi::RetryInit()
 	for (auto& num : m_hitDamageTime)	 num = 0;
 
 	for (auto& pos : m_shakePos) pos = MyEngine::Vector2(0, 0);
-
-	m_selectItem = static_cast<int>(SelectItem::kRetry);
-
-	m_resultTime = 0;
-
-	m_resultLogoScale = kResultLogoDefaultScale;
-
-	m_shakeTime = 0;
 }
 
 void GameUi::DrawHpBar(float hp, bool isLeft)
@@ -677,15 +668,4 @@ void GameUi::DrawFade(int color, int alpha)
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
 	DrawBox(0, 0, Game::kWindowWidth, Game::kWindowHeight, color, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-}
-
-int GameUi::UpdateResult()
-{
-
-
-}
-
-void GameUi::DrawResult(bool isWin)
-{
-	
 }
