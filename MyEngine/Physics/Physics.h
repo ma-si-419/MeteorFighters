@@ -46,6 +46,16 @@ public:
 	void Update();
 
 	/// <summary>
+	/// 更新を止める
+	/// </summary>
+	void StopUpdate() { m_isUpdate = false; }
+
+	/// <summary>
+	/// 更新を始める
+	/// </summary>
+	void StartUpdate() { m_isUpdate = true; }
+
+	/// <summary>
 	/// ステージの当たり判定の更新を行う
 	/// </summary>
 	void StageColUpdate();
@@ -106,5 +116,8 @@ private:
 	HITRESULT_LINE m_lineRes{};
 	//ステージのモデルハンドル
 	int m_stageHandle = -1;
+
+	//更新をするかどうか
+	bool m_isUpdate = true;
 
 };

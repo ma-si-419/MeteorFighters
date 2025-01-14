@@ -118,29 +118,6 @@ namespace
 	//Mpバーの下に表示する灰色のボックスの大きさ
 	constexpr int kMpBarBackBoxHalfWidth = 280;
 	constexpr int kMpBarBackBoxHalfHeight = 30;
-
-
-	//リザルトのwinとloseを表示する座標
-	constexpr int kResultLogoPosX = Game::kWindowWidth / 2;
-	constexpr int kResultLogoPosY = 700;
-
-	//リザルトのロゴを表示するまでの時間
-	constexpr int kResultDisplayStartTime = 90;
-
-	//リザルトのロゴの最初の拡大率
-	constexpr double kResultLogoDefaultScale = 3.0;
-
-	//リザルトのロゴの最後の拡大率
-	constexpr double kResultLogoFinalScale = 1.0;
-
-	//リザルトのロゴの縮小速度
-	constexpr double kResultLogoScallingSpeed = 0.12;
-
-	//リザルトのロゴを揺らす時間
-	constexpr int kResultLogoShakeTime = 6;
-
-	//リザルトのロゴを揺らす大きさ
-	constexpr int kResultLogoShakeScale = 18;
 }
 
 GameUi::GameUi() :
@@ -149,10 +126,7 @@ GameUi::GameUi() :
 	m_onHitDamageHp(),
 	m_hitDamageTime(),
 	m_onSubMp(),
-	m_selectItem(0),
-	m_resultTime(0),
-	m_resultLogoScale(kResultLogoDefaultScale),
-	m_shakeTime(0)
+	m_selectItem(0)
 {
 }
 
@@ -707,90 +681,11 @@ void GameUi::DrawFade(int color, int alpha)
 
 int GameUi::UpdateResult()
 {
-	//リザルトのロゴの拡縮が終了したら操作可能にする
-	if (m_resultLogoScale != kResultLogoFinalScale) return -1;
-	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
-	//Aボタンを押したときに選択されている項目を実行する
-	if (input->IsTrigger("A"))
-	{
-		return m_selectItem;
-	}
-	//上下入力を受け取る
-	if (input->IsTrigger("Down"))
-	{
-		m_selectItem++;
-
-		m_selectItem = min(m_selectItem, static_cast<int>(SelectItem::kItemNum));
-	}
-	else if (input->IsTrigger("Up"))
-	{
-		m_selectItem--;
-
-		m_selectItem = max(m_selectItem, 0);
-	}
-
-	return -1;
 
 }
 
 void GameUi::DrawResult(bool isWin)
 {
-	m_resultTime++;
-
-	DrawString(50, 300, "もう一度たたかう", GetColor(255, 255, 255));
-	DrawString(50, 350, "キャラクターを選びなおす", GetColor(255, 255, 255));
-	DrawString(50, 400, "メインメニューに戻る", GetColor(255, 255, 255));
-
-	int posY = 0;
-
-	if (m_selectItem == static_cast<int>(SelectItem::kRetry))
-	{
-		posY = 300;
-	}
-	else if (m_selectItem == static_cast<int>(SelectItem::kCharacterSelect))
-	{
-		posY = 350;
-	}
-	else if (m_selectItem == static_cast<int>(SelectItem::kMenu))
-	{
-		posY = 400;
-	}
-
-	DrawString(30, posY, "→", GetColor(255, 255, 255));
-
-	//リザルト画面になって一定時間たったら
-	if (m_resultTime > kResultDisplayStartTime)
-	{
-		//ロゴの大きさを小さくしていく
-		m_resultLogoScale -= kResultLogoScallingSpeed;
-
-		//一定以上小さくならないようにする
-		m_resultLogoScale = max(m_resultLogoScale, kResultLogoFinalScale);
-
-		int logoPosX = kResultLogoPosX;
-		int logoPosY = kResultLogoPosY;
-
-		//一定以上小さくなったら少し揺らす
-		if (m_resultLogoScale == kResultLogoFinalScale)
-		{
-			if (m_shakeTime < kResultLogoShakeTime)
-			{
-				//ロゴの座標を揺らす(ランダムがプラスしか出ないので半分減らす)
-				logoPosX += GetRand(kResultLogoShakeScale) + static_cast<int>(kResultLogoShakeScale * 0.5);
-				logoPosY += GetRand(kResultLogoShakeScale) + static_cast<int>(kResultLogoShakeScale * 0.5);
-			}
-			m_shakeTime++;
-		}
-
-		if (isWin)
-		{
-			DrawRotaGraph(logoPosX, logoPosY, m_resultLogoScale, 0.0, GraphManager::GetInstance().GetHandle("Winner"), true);
-		}
-		else
-		{
-			DrawRotaGraph(logoPosX, logoPosY, m_resultLogoScale, 0.0, GraphManager::GetInstance().GetHandle("Loser"), true);
-		}
-	}
-
+	
 }

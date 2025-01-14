@@ -29,13 +29,13 @@ public:
 	/// 1プレイヤー側のキャラクターの番号を返す
 	/// </summary>
 	/// <returns>1プレイヤーのキャラクターの番号を返す</returns>
-	int GetPlayerNumber() { return m_playerNumber; }
+	int GetPlayerNumber();
 
 	/// <summary>
 	/// 2プレイヤー側のキャラクターの番号を返す
 	/// </summary>
 	/// <returns>2プレイヤーのキャラクターの番号を返す</returns>
-	int GetEnemyNumber() { return m_enemyNumber; }
+	int GetEnemyNumber();
 
 	/// <summary>
 	/// 次のフレームで移行するシーンを取得する
@@ -57,6 +57,8 @@ private:
 	UpdateSelectFunc m_updateSelectFunc;
 
 	std::shared_ptr<SelectUi> m_pUi;
+
+	int m_selectNumber;
 
 	int m_playerNumber;
 

@@ -10,6 +10,7 @@ public:
 		kTutorial,
 		kTitle,
 		kEndGame,
+		kItemEnd = kEndGame,
 		kItemNum
 	};
 
@@ -49,6 +50,7 @@ public:
 	GraphUiStatus& GetGraphRef(std::string name);
 
 private:
+
 	SelectItem m_selectItem;
 
 	StringUiStatus m_stringUi[static_cast<int>(SelectItem::kItemNum)];
@@ -58,4 +60,7 @@ private:
 	int m_selectItemFontHandle;
 
 	int m_skyDomeHandle;
+
+	//ƒƒjƒ…[‰æ–Ê‚Å‘O‰ñ€–Ú‚ğ“®‚©‚µ‚Ä‚©‚ç‚ÌŠÔ
+	int m_selectItemMoveTime;
 };

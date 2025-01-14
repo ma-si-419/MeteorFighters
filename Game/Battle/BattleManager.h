@@ -7,16 +7,19 @@
 #include "Character.h"
 #include "Game.h"
 
-class Player;
-class Enemy;
-class GameCamera;
-class Attack;
-class Stage;
-class EffectManager;
-class Effect;
-class GameUi;
+class BattleUi;
 class BattleManager : public GameManagerBase
 {
+public:
+
+	enum class MenuItem
+	{
+		kReturnBattle,
+		kRetry,
+		kBackCharacterSelect,
+		kBackMenu
+	};
+
 public:
 
 	BattleManager(std::shared_ptr<GameCamera> camera);
@@ -86,5 +89,9 @@ private:
 
 	UpdateSituationFunc m_updateSituationFunc;
 
+	//ƒoƒgƒ‹Žž‚ÌUI
+	std::shared_ptr<BattleUi> m_pBattleUi;
+
+	int m_menuSelectNumber;
 };
 

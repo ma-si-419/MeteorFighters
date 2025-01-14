@@ -8,11 +8,15 @@ namespace
 {
 	//スティックが傾いたと判定する傾きの大きさ
 	constexpr int kStickTiltPower = 500;
-	//キャラクターの数(0から数えて)
-	constexpr int kCharacterNum = 1;
+
+	//キャラクターの並び順
+	constexpr int kCharacterIndex[static_cast<int>(SelectManager::CharacterNumber::kCharacterNum)] =
+	{
+		{0},{-1},{1}
+	};
 }
 
-SelectManager::SelectManager():
+SelectManager::SelectManager() :
 	m_playerNumber(0),
 	m_enemyNumber(0),
 	m_nextScene(-1)
@@ -34,8 +38,8 @@ void SelectManager::Update()
 {
 	(this->*m_updateSelectFunc)();
 
-	m_pUi->SetNumber(m_playerNumber,true);
-	m_pUi->SetNumber(m_enemyNumber,false);
+	m_pUi->SetNumber(m_playerNumber, true);
+	m_pUi->SetNumber(m_enemyNumber, false);
 
 	m_pUi->Update();
 }
@@ -45,9 +49,40 @@ void SelectManager::Draw()
 	m_pUi->Draw();
 }
 
+int SelectManager::GetPlayerNumber()
+{
+	int ans = kCharacterIndex[m_playerNumber];
+
+	//ランダムが選ばれていれば
+	while (ans == -1)
+	{
+		//ランダムで選ぶ
+		ans = kCharacterIndex[GetRand(static_cast<int>(SelectManager::CharacterNumber::kCharacterNum))];
+	}
+
+	return ans;
+}
+
+int SelectManager::GetEnemyNumber()
+{
+	int ans = kCharacterIndex[m_enemyNumber];
+
+	//ランダムが選ばれていれば
+	while (ans == -1)
+	{
+		//ランダムで選ぶ
+		ans = kCharacterIndex[GetRand(static_cast<int>(SelectManager::CharacterNumber::kCharacterNum))];
+	}
+
+	return ans;
+}
+
 void SelectManager::SelectOnePlayer()
 {
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
+
+	//選択しているアイコンをUiに渡す
+	m_pUi->SetIconFrame(m_playerNumber);
 
 	//キャラクター選択
 	if (input->IsTrigger("Right"))
@@ -82,6 +117,9 @@ void SelectManager::SelectTwoPlayer()
 {
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
+	//選択しているアイコンをUiに渡す
+	m_pUi->SetIconFrame(m_enemyNumber);
+
 	//キャラクターの選択
 	if (input->IsTrigger("Right"))
 	{
@@ -101,6 +139,8 @@ void SelectManager::SelectTwoPlayer()
 	{
 		SoundManager::GetInstance().OncePlaySound("Ok");
 		m_updateSelectFunc = &SelectManager::ConfirmCharacter;
+
+		m_pUi->SetDrawIconFrame(false);
 	}
 	//Bボタンを押したら1プレイヤーのキャラクター選択画面に戻る
 	else if (input->IsTrigger("B"))
@@ -121,10 +161,12 @@ void SelectManager::ConfirmCharacter()
 
 		m_nextScene = static_cast<int>(Game::Scene::kGame);
 	}
-	//Bボタンを押したら1プレイヤーのキャラクター選択画面に戻る
+	//Bボタンを押したら2プレイヤーのキャラクター選択画面に戻る
 	else if (input->IsTrigger("B"))
 	{
 		SoundManager::GetInstance().OncePlaySound("Cancel");
 		m_updateSelectFunc = &SelectManager::SelectTwoPlayer;
+
+		m_pUi->SetDrawIconFrame(true);
 	}
 }

@@ -246,8 +246,11 @@
     <ClCompile Include="SelectManager.cpp">
       <Filter>ソース ファイル\Select</Filter>
     </ClCompile>
+    <ClCompile Include="BattleUi.cpp">
+      <Filter>ソース ファイル\Game\Battle</Filter>
+    </ClCompile>
     <ClCompile Include="SelectUi.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Select</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -417,7 +420,10 @@
       <Filter>ヘッダー ファイル\Select</Filter>
     </ClInclude>
     <ClInclude Include="SelectUi.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\Select</Filter>
+    </ClInclude>
+    <ClInclude Include="BattleUi.h">
+      <Filter>ヘッダー ファイル\Game\Battle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

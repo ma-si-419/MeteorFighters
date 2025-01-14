@@ -34,6 +34,12 @@ namespace
 	//Uiを動かす速さ
 	constexpr int kShowUiMoveSpeed = 18;
 
+	//上下入力でリピート入力を受け付ける時間
+	constexpr int kRepeatInputTime = 15;
+
+	//リピート入力の間隔
+	constexpr int kRepeatInterval = 5;
+
 	//カメラのNearFar
 	constexpr float kCameraNear = 0.1f;
 	constexpr float kCameraFar = 100.0f;
@@ -56,11 +62,12 @@ namespace
 }
 
 
-MenuUi::MenuUi():
+MenuUi::MenuUi() :
 	m_selectItemFontHandle(-1),
-	m_selectItem(SelectItem::kBattle)
+	m_selectItem(SelectItem::kBattle),
+	m_selectItemMoveTime(0)
 {
-	m_selectItemFontHandle = CreateFontToHandle(kFontName,64,0,DX_FONTTYPE_ANTIALIASING_EDGE,-1,3);
+	m_selectItemFontHandle = CreateFontToHandle(kFontName, 64, 0, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
 	m_skyDomeHandle = MV1LoadModel("data/model/Dome.mv1");
 }
 
@@ -72,10 +79,10 @@ MenuUi::~MenuUi()
 void MenuUi::Init()
 {
 	//カメラの設定
-	SetCameraPositionAndTarget_UpVecY(VGet(0,0,0),VGet(0,0,1));
+	SetCameraPositionAndTarget_UpVecY(VGet(0, 0, 0), VGet(0, 0, 1));
 
 	//NearFarの設定
-	SetCameraNearFar(kCameraNear,kCameraFar);
+	SetCameraNearFar(kCameraNear, kCameraFar);
 
 
 	//文字列を設定する
@@ -113,7 +120,7 @@ void MenuUi::Init()
 	EntryGraph(name, status);
 
 	//スカイドームの設定
-	MV1SetPosition(m_skyDomeHandle,VGet(0,0,0));
+	MV1SetPosition(m_skyDomeHandle, VGet(0, 0, 0));
 
 }
 
@@ -177,46 +184,77 @@ int MenuUi::Update()
 		}
 	}
 
+
+
 	//上下入力で選択している項目を変化させる
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
+	//前のフレームの情報
+	auto lastItem = m_selectItem;
+
+	//動かしやすいようにint型にキャスト
+	auto selectItem = static_cast<int>(m_selectItem);
+
+	//トリガー入力
 	if (input->IsTrigger("Up"))
 	{
-		auto lastItem = m_selectItem;
 
 		//上にカーソルを動かす
-		m_selectItem = static_cast<SelectItem>(static_cast<int>(m_selectItem) - 1);
+		selectItem--;
 
-		//項目がない部分にいかないように
-		m_selectItem = static_cast<SelectItem>(max(static_cast<int>(m_selectItem), 0));
-
-		//カーソルが動いていたら
-		if (m_selectItem != lastItem)
+		//一番上にカーソルがあった場合
+		if (selectItem < 0)
 		{
-			//動かしたタイミングで選択している項目の後ろのボックスのX座標を初期位置に戻す
-			selectItemBox.showPosX = kItemBoxUiPosX;
-			//アルファ値も0にする
-			selectItemBox.alpha = 0;
+			//一番下に移動する
+			selectItem = static_cast<int>(SelectItem::kItemEnd);
 		}
 	}
 	else if (input->IsTrigger("Down"))
 	{
-		auto lastItem = m_selectItem;
-
 		//下にカーソルを動かす
-		m_selectItem = static_cast<SelectItem>(static_cast<int>(m_selectItem) + 1);
+		selectItem++;
 
-		//項目がない部分に行かないように
-		m_selectItem = static_cast<SelectItem>(min(static_cast<int>(m_selectItem), static_cast<int>(SelectItem::kItemNum) - 1));
-
-		//カーソルが動いていたら
-		if (m_selectItem != lastItem)
+		if (selectItem > static_cast<int>(SelectItem::kItemEnd))
 		{
-			//動かしたタイミングで選択している項目の後ろのボックスのX座標を初期位置に戻す
-			selectItemBox.showPosX = kItemBoxUiPosX;
-			//アルファ値も0にする
-			selectItemBox.alpha = 0;
+			//一番上に移動する
+			selectItem = 0;
 		}
+
+	}
+
+	//リピート入力
+	if (m_selectItemMoveTime > kRepeatInterval)
+	{
+		if (input->GetPressTime("Up") > kRepeatInputTime)
+		{
+			selectItem--;
+		}
+		else if (input->GetPressTime("Down") > kRepeatInputTime)
+		{
+			selectItem++;
+		}
+	}
+
+	//クランプ
+	selectItem = max(selectItem, 0);
+	selectItem = min(selectItem, static_cast<int>(SelectItem::kItemNum) - 1);
+	
+	m_selectItem = static_cast<SelectItem>(selectItem);
+
+	//カーソルが動いていたら
+	if (m_selectItem != lastItem)
+	{
+		//動かしたタイミングで選択している項目の後ろのボックスのX座標を初期位置に戻す
+		selectItemBox.showPosX = kItemBoxUiPosX;
+		//アルファ値も0にする
+		selectItemBox.alpha = 0;
+
+		//動いて何フレーム立ったかリセット
+		m_selectItemMoveTime = 0;
+	}
+	else
+	{
+		m_selectItemMoveTime++;
 	}
 
 	if (input->IsTrigger("A"))
@@ -248,7 +286,7 @@ void MenuUi::DrawItem()
 	for (auto item : m_stringUi)
 	{
 		//描画処理
-		DrawStringToHandle(item.showPosX, item.showPosY, item.showString.c_str(), GetColor(255, 255, 255),m_selectItemFontHandle,GetColor(0,0,0));
+		DrawStringToHandle(item.showPosX, item.showPosY, item.showString.c_str(), GetColor(255, 255, 255), m_selectItemFontHandle, GetColor(0, 0, 0));
 	}
 
 }

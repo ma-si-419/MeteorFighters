@@ -239,9 +239,6 @@ std::string GameManagerBase::GetSkyDomePath()
 
 void GameManagerBase::UpdateCommon()
 {
-	//カメラの更新
-	m_pCamera->Update();
-
 	//攻撃クラスの更新を行う
 	for (auto& item : m_pAttacks)
 	{

@@ -69,7 +69,6 @@ void SceneGame::Update()
 
 	m_pGameManager->Update();
 
-
 	//ƒV[ƒ“ˆÚ“®‚ğ‚µ‚Ä‚¢‚È‚¯‚ê‚ÎÀs‚·‚é
 	if (!m_sceneManager.IsChangeScene())
 	{

@@ -4,15 +4,6 @@
 class GameUi
 {
 public:
-	enum class SelectItem
-	{
-		kRetry,
-		kCharacterSelect,
-		kMenu,
-		kItemNum = kMenu
-	};
-
-public:
 
 	GameUi();
 
@@ -74,14 +65,4 @@ private:
 	//攻撃を受けてからのフレームを保存する
 	int m_hitDamageTime[2];
 
-	int m_selectItem;
-
-	//リザルト画面の描画を始めてからの時間を計測する
-	int m_resultTime;
-
-	//リザルト画面のロゴの拡大率
-	double m_resultLogoScale;
-
-	//何フレーム揺らしたか
-	int m_shakeTime;
 };

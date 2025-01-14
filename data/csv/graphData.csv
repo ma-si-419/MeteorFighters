@@ -5,6 +5,8 @@ HpBarNum,HpBarNumBox,Game
 Winner,Winner,Game
 Loser,Loser,Game
 MpBar,MpBar,Game
+Menu,Menu,Game
+SelectItem,MenuSelectItem,Game
 SelectItemBox,SelectItemBox,Menu
 ItemBox,ItemBox,Menu
 Mouse,MouseFace,Title
@@ -23,13 +25,15 @@ LB,TutorialLB,Tutorial
 RT,TutorialRT,Tutorial
 LT,TutorialLT,Tutorial
 Stick,TutorialLStick,Tutorial
-Menu,TutorialMenu,Tutorial
-SelectItem,TutorialMenuSelectItem,Tutorial
+Menu,Menu,Tutorial
+SelectItem,MenuSelectItem,Tutorial
 Success,TutorialSuccess,Tutorial
 Character0,SelectCharacter0,Select
 Character1,SelectCharacter1,Select
+Random,SelectRandom,Select
 HeadSet,SelectHeadSet,Select
 Icon0,SelectIcon0,Select
 Icon1,SelectIcon1,Select
 IconRandom,SelectIconRandom,Select
 Vs,SelectVs,Select
+IconFrame,SelectIconFrame,Select

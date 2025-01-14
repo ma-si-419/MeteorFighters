@@ -1,4 +1,5 @@
 #include "BattleManager.h"
+#include "BattleUi.h"
 #include "Attack.h"
 #include "LoadCsv.h"
 #include "Stage.h"
@@ -9,6 +10,8 @@
 #include "GameUi.h"
 #include "Game.h"
 #include <cmath>
+#include "Physics.h"
+#include "Input.h"
 
 namespace
 {
@@ -60,6 +63,8 @@ BattleManager::BattleManager(std::shared_ptr<GameCamera> camera) :
 	m_pEffectManager = std::make_shared<EffectManager>();
 	m_pGameUi = std::make_shared<GameUi>();
 
+	m_pBattleUi = std::make_shared<BattleUi>();
+
 	m_updateSituationFunc = &BattleManager::UpdateStart;
 }
 
@@ -95,6 +100,9 @@ void BattleManager::Update()
 	//状況によって変わるUpdate
 	(this->*m_updateSituationFunc)();
 
+	//Uiの更新
+	m_pBattleUi->Update();
+
 	//ゲームシーン共通の更新
 	UpdateCommon();
 
@@ -125,22 +133,27 @@ void BattleManager::ChangeSituation(BattleSituation situation)
 	else if (situation == BattleSituation::kBattle)
 	{
 		m_updateSituationFunc = &BattleManager::UpdateBattle;
+		m_pBattleUi->ChangeSituation(BattleUi::UiSituation::kNone);
 	}
 	//ノックアウト時
 	else if (situation == BattleSituation::kKnockOut)
 	{
 		m_updateSituationFunc = &BattleManager::UpdateKnockOut;
+		m_pBattleUi->ChangeSituation(BattleUi::UiSituation::kNone);
 	}
 	//リザルト時
 	else if (situation == BattleSituation::kResult)
 	{
 		m_updateSituationFunc = &BattleManager::UpdateResult;
+		m_pBattleUi->ChangeSituation(BattleUi::UiSituation::kResult);
 	}
+	//メニュー時
 	else if (situation == BattleSituation::kMenu)
 	{
 		m_updateSituationFunc = &BattleManager::UpdateMenu;
+		m_pBattleUi->ChangeSituation(BattleUi::UiSituation::kMenu);
+		Physics::GetInstance().StopUpdate();
 	}
-
 }
 
 void BattleManager::Draw()
@@ -165,6 +178,9 @@ void BattleManager::Draw()
 			m_pGameUi->DrawResult(false);
 		}
 	}
+
+	//バトル時のUiの描画
+	m_pBattleUi->Draw();
 }
 
 void BattleManager::Final()
@@ -284,6 +300,8 @@ void BattleManager::UpdateStart()
 		}
 	}
 
+	//カメラの更新
+	m_pCamera->Update();
 }
 
 void BattleManager::UpdateBattle()
@@ -355,6 +373,16 @@ void BattleManager::UpdateBattle()
 
 	//カメラにプレイヤーのベロシティを設定する
 	m_pCamera->SetPlayerVelo(m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetVelo());
+
+	auto input = MyEngine::Input::GetInstance().GetInputData(0);
+
+	if (input->IsTrigger("Pause"))
+	{
+		ChangeSituation(BattleSituation::kMenu);
+	}
+
+	//カメラの更新
+	m_pCamera->Update();
 }
 
 void BattleManager::UpdateKnockOut()
@@ -381,6 +409,9 @@ void BattleManager::UpdateKnockOut()
 		//カメラのアップデートを変更
 		m_pCamera->SetPoseCamera();
 	}
+
+	//カメラの更新
+	m_pCamera->Update();
 }
 
 void BattleManager::UpdateResult()
@@ -453,7 +484,8 @@ void BattleManager::UpdateResult()
 		m_nextScene = Game::Scene::kMenu;
 	}
 
-
+	//カメラの更新
+	m_pCamera->Update();
 }
 
 void BattleManager::UpdateRetry()
@@ -471,8 +503,20 @@ void BattleManager::UpdateRetry()
 		//初期化を行う
 		RetryInit();
 	}
+
+	//カメラの更新
+	m_pCamera->Update();
 }
 
 void BattleManager::UpdateMenu()
 {
+	auto input = MyEngine::Input::GetInstance().GetInputData(0);
+
+	//Bボタンが押されたら
+	if (input->IsTrigger("B"))
+	{
+		ChangeSituation(BattleSituation::kBattle);
+		m_pBattleUi->ChangeSituation(BattleUi::UiSituation::kNone);
+		Physics::GetInstance().StartUpdate();
+	}
 }

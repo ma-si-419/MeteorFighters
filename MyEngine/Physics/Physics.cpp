@@ -55,6 +55,9 @@ void Physics::Exit(std::shared_ptr<Collidable> col)
 
 void Physics::Update()
 {
+	//更新しないと決められていたら早期リターン
+	if (!m_isUpdate) return;
+
 	//仮処理
 	for (auto& item : m_collidables)
 	{

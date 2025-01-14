@@ -256,8 +256,6 @@ void GameCamera::NormalUpdate()
 		m_stopCorrectTime = 0;
 	}
 
-
-
 	//ƒJƒƒ‰‚ª‘¬‚­ˆÚ“®‚·‚é‚Æİ’è‚³‚ê‚Ä‚¢‚½‚ç
 	if (m_isFastMove)
 	{

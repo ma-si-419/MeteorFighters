@@ -188,6 +188,7 @@ void TitleUi::Draw()
 {
 	auto& manager = GraphManager::GetInstance();
 
+	//スカイドームの描画
 	MV1DrawModel(m_skyDomeHandle);
 
 	if (m_isExistString)

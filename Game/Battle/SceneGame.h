@@ -4,6 +4,7 @@
 
 class GameManagerBase;
 class Character;
+class BattleUi;
 class SceneGame : public SceneBase
 {
 public:

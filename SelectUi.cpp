@@ -5,6 +5,11 @@
 
 namespace
 {
+	//カメラの設定
+	constexpr float kCameraNear = 0.1f;
+	constexpr float kCameraFar = 100.0f;
+
+
 	//キャラクターの画像設定
 	constexpr int kPlayerCharacterPosX = 320;
 	constexpr int kEnemyCharacterPosX = 1280;
@@ -25,6 +30,10 @@ namespace
 	constexpr int kIconDistance = 170;
 	constexpr int kIconPosY = 500;
 
+	//選択しているアイコンを示す画像設定
+	constexpr double kIconFrameAddScaleMax = 0.1;
+	constexpr float kIconFrameScallingSpeed = 0.13f;
+
 	//HeadSetの画像設定
 	constexpr int kHeadSetPosX = 800;
 	constexpr int kHeadSetPosY = 200;
@@ -36,7 +45,7 @@ namespace
 	const std::string kCharacterNames[static_cast<int>(SelectManager::CharacterNumber::kCharacterNum)] =
 	{
 		"Character0",
-		"Character0",
+		"Random",
 		"Character1"
 	};
 }
@@ -45,7 +54,9 @@ SelectUi::SelectUi() :
 	m_lastPlayerNumber(0),
 	m_lastEnemyNumber(0),
 	m_playerNumber(0),
-	m_enemyNumber(0)
+	m_enemyNumber(0),
+	m_skyDomeHandle(-1),
+	m_iconFrameScalling(0.0f)
 {
 
 }
@@ -56,6 +67,18 @@ SelectUi::~SelectUi()
 
 void SelectUi::Init()
 {
+	//スカイドームの設定
+	m_skyDomeHandle = MV1LoadModel("data/model/Dome.mv1");
+
+	//カメラの設定
+	SetCameraPositionAndTarget_UpVecY(VGet(0, 0, 0), VGet(0, 0, 1));
+
+	//NearFarの設定
+	SetCameraNearFar(kCameraNear, kCameraFar);
+
+	//スカイドームの設定
+	MV1SetPosition(m_skyDomeHandle, VGet(0, 0, 0));
+
 	auto& graphManager = GraphManager::GetInstance();
 
 	//プレイヤーの画像設定
@@ -99,6 +122,13 @@ void SelectUi::Init()
 	icon.handle = graphManager.GetHandle("Icon1");
 	m_drawGraphs[GraphName::kIcon2] = icon;
 
+	//選択しているアイコンのフレーム
+	GraphData iconFrame;
+	iconFrame.posX = kIconPosX;
+	iconFrame.posY = kIconPosY;
+	iconFrame.handle = graphManager.GetHandle("IconFrame");
+	m_drawGraphs[GraphName::kIconFrame] = iconFrame;
+
 	//HeadSetの画像設定
 	GraphData headSet;
 	headSet.posX = kHeadSetPosX;
@@ -127,22 +157,27 @@ void SelectUi::Update()
 
 	//現在選んでいる画像をフェードインさせる
 	m_drawGraphs[GraphName::kPlayer].posX -= kLastCharacterGraphMoveSpeed;
-	m_drawGraphs[GraphName::kPlayer].posX = max(m_drawGraphs[GraphName::kPlayer].posX,kPlayerCharacterPosX);
+	m_drawGraphs[GraphName::kPlayer].posX = max(m_drawGraphs[GraphName::kPlayer].posX, kPlayerCharacterPosX);
 
 	m_drawGraphs[GraphName::kPlayer].alpha += kLastCharacterGraphFadeSpeed;
 
 	//2P側
 	m_drawGraphs[GraphName::kEnemy].posX = kLastCharacterGraphMoveSpeed;
-	m_drawGraphs[GraphName::kEnemy].posX = max(m_drawGraphs[GraphName::kEnemy].posX,kEnemyCharacterPosX);
+	m_drawGraphs[GraphName::kEnemy].posX = max(m_drawGraphs[GraphName::kEnemy].posX, kEnemyCharacterPosX);
 
 	m_drawGraphs[GraphName::kEnemy].alpha += kLastCharacterGraphFadeSpeed;
 
-
+	//選択しているアイコンのフレームを拡縮させる
+	m_iconFrameScalling += kIconFrameScallingSpeed;
+	m_drawGraphs[GraphName::kIconFrame].scale = (sinf(m_iconFrameScalling) * kIconFrameAddScaleMax) + 1.0f;
 
 }
 
 void SelectUi::Draw()
 {
+	//スカイドームの描画
+	MV1DrawModel(m_skyDomeHandle);
+
 	//画像をまとめて表示する
 	for (auto& item : m_drawGraphs)
 	{
@@ -176,11 +211,11 @@ void SelectUi::SetNumber(int number, bool isPlayer)
 			m_drawGraphs[GraphName::kLastPlayer].posX = kPlayerCharacterPosX;
 			//ハンドルを更新する
 			m_drawGraphs[GraphName::kLastPlayer].handle = graphManager.GetHandle(kCharacterNames[m_lastPlayerNumber]);
-		
+
 			//現在の画像も横にずらす
 			m_drawGraphs[GraphName::kPlayer].posX = kPlayerCharacterPosX + kCharacterPopDistance;
 			m_drawGraphs[GraphName::kPlayer].alpha = 0;
-		
+
 		}
 
 		m_lastPlayerNumber = m_playerNumber;
@@ -196,7 +231,7 @@ void SelectUi::SetNumber(int number, bool isPlayer)
 			m_drawGraphs[GraphName::kLastEnemy].posX = kEnemyCharacterPosX;
 			//ハンドルを更新する
 			m_drawGraphs[GraphName::kLastEnemy].handle = graphManager.GetHandle(kCharacterNames[m_lastEnemyNumber]);
-		
+
 			//現在の画像も横にずらす
 			m_drawGraphs[GraphName::kEnemy].posX = kPlayerCharacterPosX + kCharacterPopDistance;
 			m_drawGraphs[GraphName::kEnemy].alpha = 0;
@@ -208,5 +243,22 @@ void SelectUi::SetNumber(int number, bool isPlayer)
 		m_enemyNumber = number;
 		//ハンドルを更新する
 		m_drawGraphs[GraphName::kEnemy].handle = graphManager.GetHandle(kCharacterNames[m_enemyNumber]);
+	}
+}
+
+void SelectUi::SetIconFrame(int number)
+{
+	m_drawGraphs[GraphName::kIconFrame].posX = kIconPosX + (kIconDistance * number);
+}
+
+void SelectUi::SetDrawIconFrame(bool flag)
+{
+	if (flag)
+	{
+		m_drawGraphs[GraphName::kIconFrame].alpha = 255;
+	}
+	else
+	{
+		m_drawGraphs[GraphName::kIconFrame].alpha = 0;
 	}
 }
