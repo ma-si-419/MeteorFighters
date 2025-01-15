@@ -544,7 +544,7 @@ public:
 	/// キャラクターの番号を取得する
 	/// </summary>
 	/// <returns>1Pか2Pかを返す</returns>
-	PlayerNumber GetCharacterNumber() { return m_playerNumber; }
+	PlayerNumber GetPlayerNumber() { return m_playerNumber; }
 
 	/// <summary>
 	/// 状況によって変化させるアップデートを変更する

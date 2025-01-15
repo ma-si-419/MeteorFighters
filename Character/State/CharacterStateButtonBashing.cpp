@@ -11,21 +11,25 @@ namespace
 	const MyEngine::Vector3 kEnemyInitPos(30, 100, 30);
 
 	//中心座標
-	const MyEngine::Vector3 kTargetPos(0,100,0);
+	const MyEngine::Vector3 kTargetPos(0, 100, 0);
 
 	//最初の移動速度
 	constexpr float kInitMoveSpeed = -3.5f;
+
+	//ぶつかった時の移動速度
+	constexpr float kBumpSpeed = -5.0f;
 
 	//最大速度
 	constexpr float kMaxMoveSpeed = 3.0f;
 
 	//加速度
-	constexpr float kAcceleration = 0.25f;
+	constexpr float kAcceleration = 0.28f;
 }
 
 CharacterStateButtonBashing::CharacterStateButtonBashing(std::shared_ptr<Character> character) :
 	CharacterStateBase(character),
-	m_moveSpeed(kInitMoveSpeed)
+	m_moveSpeed(kInitMoveSpeed),
+	m_isBump(false)
 {
 }
 
@@ -35,7 +39,7 @@ void CharacterStateButtonBashing::Enter()
 	m_kind = CharacterStateKind::kButtonBashing;
 
 	//1Pか2Pかで最初の座標を変更する
-	if (m_pCharacter->GetCharacterNumber() == Character::PlayerNumber::kOnePlayer)
+	if (m_pCharacter->GetPlayerNumber() == Character::PlayerNumber::kOnePlayer)
 	{
 		SetCharacterPos(kPlayerInitPos);
 	}
@@ -45,7 +49,7 @@ void CharacterStateButtonBashing::Enter()
 	}
 
 	//アニメーション変更
-	m_pCharacter->ChangeAnim(Character::AnimKind::kButtonBashingHitBack,false);
+	m_pCharacter->ChangeAnim(Character::AnimKind::kButtonBashingHitBack, false);
 
 	//ボタン連打を始めるとマネージャーに伝える
 	StartButtonBashing();
@@ -66,18 +70,30 @@ void CharacterStateButtonBashing::Update()
 	m_moveSpeed += kAcceleration;
 
 	//移動速度をクランプ
-	m_moveSpeed = fmin(m_moveSpeed,kMaxMoveSpeed);
+	m_moveSpeed = fmin(m_moveSpeed, kMaxMoveSpeed);
 
 	//敵との距離
 	float toEnemyLength = (GetTargetPos() - m_pCharacter->GetPos()).Length();
 
+	printfDx("%.3f\n", toEnemyLength);
+
 	//敵とぶつかる距離になったら
-	if (toEnemyLength < GameSceneConstant::kCharacterRadius)
+	if (toEnemyLength < (GameSceneConstant::kCharacterRadius * 2.0f) + 0.1f)
 	{
-		if ()
+		//一度ぶつかっていたら
+		if (m_isBump)
 		{
 			//////////////////////////////////////
+			m_moveSpeed = 0.0f;
 		}
+		//初めてぶつかるタイミングであれば
+		else
+		{
+			m_moveSpeed = kBumpSpeed;
+			m_pCharacter->ChangeAnim(Character::AnimKind::kButtonBashingHitBack, false);
+		}
+
+		m_isBump = true;
 	}
 
 	//移動ベクトル
@@ -91,10 +107,22 @@ void CharacterStateButtonBashing::Update()
 	//移動速度が前方向になっていれば
 	if (m_moveSpeed > 0.0f)
 	{
-		//アニメーションが攻撃中になっていなければ
-		if (m_pCharacter->GetPlayAnimKind() != Character::AnimKind::kOnButtonBashing)
+		//一度ぶつかっていたら
+		if (m_isBump)
 		{
-			m_pCharacter->ChangeAnim(Character::AnimKind::kOnButtonBashing,true);
+			if (m_pCharacter->GetPlayAnimKind() != Character::AnimKind::kOnButtonBashing)
+			{
+				m_pCharacter->ChangeAnim(Character::AnimKind::kOnButtonBashing, true);
+			}
+		}
+		//一度も敵とぶつかっていなければ
+		else
+		{
+			//アニメーションを変更する
+			if (m_pCharacter->GetPlayAnimKind() != Character::AnimKind::kButtonBashingPlayerAttack)
+			{
+				m_pCharacter->ChangeAnim(Character::AnimKind::kButtonBashingPlayerAttack, false);
+			}
 		}
 	}
 

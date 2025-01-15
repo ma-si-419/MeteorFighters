@@ -253,7 +253,7 @@ void EnemyInput::Update()
 
 					
 					///////////////////////////////////////////
-		//m_actionFunc = &EnemyInput::Rush;
+					m_actionFunc = &EnemyInput::Rush;
 					///////////////////////////////////////////
 
 

@@ -168,14 +168,14 @@ bool CharacterStateBase::IsButtonBashing()
 
 void CharacterStateBase::BashButton()
 {
-	m_pCharacter->m_pBattleManager->AddBashButtonNum(m_pCharacter->GetCharacterNumber());
+	m_pCharacter->m_pBattleManager->AddBashButtonNum(m_pCharacter->GetPlayerNumber());
 }
 
 bool CharacterStateBase::IsBashWin()
 {
 	auto winner = m_pCharacter->m_pBattleManager->GetButtonBashWinner();
 
-	if (winner == m_pCharacter->GetCharacterNumber())
+	if (winner == m_pCharacter->GetPlayerNumber())
 	{
 		return true;
 	}

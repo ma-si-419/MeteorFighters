@@ -14,5 +14,7 @@ public:
 private:
 
 	float m_moveSpeed;
+
+	bool m_isBump;
 };
 
