@@ -2,6 +2,7 @@
 #include "CharacterStateIdle.h"
 #include "CharacterStateDash.h"
 #include "CharacterStateNormalAttack.h"
+#include "CharacterStateButtonBashing.h"
 #include "DxLib.h"
 #include "Input.h"
 #include "Character.h"
@@ -100,6 +101,15 @@ void CharacterStateRush::Enter()
 
 void CharacterStateRush::Update()
 {
+	//もし相手のStateがButtonBashingになっていれば
+	if (GetTargetState() == CharacterStateKind::kButtonBashing)
+	{
+		auto next = std::make_shared<CharacterStateButtonBashing>(m_pCharacter);
+
+		ChangeState(next);
+		return;
+	}
+
 	m_time++;
 
 	//通常時で気力が足りなければ
@@ -373,6 +383,17 @@ void CharacterStateRush::Update()
 	//敵の背後に向かうフラグが立っていれば
 	if (m_isRushEnemy)
 	{
+		//もし敵がRushStateであれば
+		if (GetTargetState() == CharacterStateKind::kRush)
+		{
+			//ボタン連打対決に移行する
+			auto next = std::make_shared<CharacterStateButtonBashing>(m_pCharacter);
+
+			ChangeState(next);
+		
+			return;
+		}
+
 		//障害物に当たらないようにする
 		m_pCharacter->SetIsTrigger(true);
 

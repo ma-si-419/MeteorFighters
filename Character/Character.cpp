@@ -666,6 +666,11 @@ Character::AnimKind Character::GetAttackAnimKind(std::string animName)
 	return kAttackAnimKindMap.at(animName);
 }
 
+int Character::GetStateKind()
+{
+	return static_cast<int>(m_pState->GetKind());
+}
+
 void Character::LookTarget()
 {
 	auto pointer = std::dynamic_pointer_cast<Character>(shared_from_this());

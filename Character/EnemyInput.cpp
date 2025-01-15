@@ -250,6 +250,13 @@ void EnemyInput::Update()
 						m_actionFunc = &EnemyInput::None;
 						break;
 					}
+
+					
+					///////////////////////////////////////////
+		//m_actionFunc = &EnemyInput::Rush;
+					///////////////////////////////////////////
+
+
 					//ÉãÅ[ÉvÇ©ÇÁî≤ÇØÇÈ
 					break;
 				}

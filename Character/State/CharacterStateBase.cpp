@@ -1,5 +1,6 @@
 #include "CharacterStateBase.h"
 #include "CharacterStateHitAttack.h"
+#include "CharacterStateButtonBashing.h"
 #include "Character.h"
 #include "GameManagerBase.h"
 #include "TutorialManager.h"
@@ -95,6 +96,11 @@ int CharacterStateBase::GetTargetHitReaction()
 	return static_cast<int>(m_pCharacter->m_pBattleManager->GetTargetHitReaction(m_pCharacter));
 }
 
+CharacterStateBase::CharacterStateKind CharacterStateBase::GetTargetState()
+{
+	return static_cast<CharacterStateKind>(m_pCharacter->m_pBattleManager->GetTargetState(m_pCharacter));
+}
+
 void CharacterStateBase::SetCharacterVelo(MyEngine::Vector3 velo)
 {
 	m_pCharacter->m_rigidbody.SetVelo(velo);
@@ -148,6 +154,33 @@ void CharacterStateBase::ShakeCamera(int time)
 void CharacterStateBase::SwayCamera()
 {
 	m_pCharacter->m_pBattleManager->SwayCamera();
+}
+
+void CharacterStateBase::StartButtonBashing()
+{
+	m_pCharacter->m_pBattleManager->StartButtonBashing();
+}
+
+bool CharacterStateBase::IsButtonBashing()
+{
+	return m_pCharacter->m_pBattleManager->IsButtonBashing();
+}
+
+void CharacterStateBase::BashButton()
+{
+	m_pCharacter->m_pBattleManager->AddBashButtonNum(m_pCharacter->GetCharacterNumber());
+}
+
+bool CharacterStateBase::IsBashWin()
+{
+	auto winner = m_pCharacter->m_pBattleManager->GetButtonBashWinner();
+
+	if (winner == m_pCharacter->GetCharacterNumber())
+	{
+		return true;
+	}
+
+	return false;
 }
 
 void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack, CharacterStateBase::CharacterStateKind stateKind)

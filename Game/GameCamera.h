@@ -78,11 +78,7 @@ private:
 	//演出時のカメラ
 	void PoseUpdate();
 	//バトル時のカメラ
-	void NormalUpdate();
-	//どちらかが倒れた時のカメラ
-	void KnockOutUpdate();
-	//勝敗を示す時のカメラ
-	void ResultUpdate();
+	void BattleUpdate();
 
 private:
 

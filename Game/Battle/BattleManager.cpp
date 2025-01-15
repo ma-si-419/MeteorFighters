@@ -5,6 +5,7 @@
 #include "Stage.h"
 #include "GameCamera.h"
 #include "Character.h"
+#include "CharacterStateBase.h"
 #include "Effectmanager.h"
 #include "Effect.h"
 #include "GameUi.h"
@@ -295,12 +296,11 @@ void BattleManager::UpdateStart()
 
 void BattleManager::UpdateBattle()
 {
-	//キャラクターどちらかの体力が0になっていたらゲームを終了するフラグを立てる
 	for (auto item : m_pCharacters)
 	{
+		//キャラクターどちらかの体力が0になっていたらゲームを終了するフラグを立てる
 		if (item->GetHp() <= 0)
 		{
-
 			//カメラの設定をここで一度だけ行う
 
 			//ローカル座標を設定する
@@ -347,6 +347,8 @@ void BattleManager::UpdateBattle()
 
 			//正面座標を設定
 			m_pCamera->SetFrontPos(frontPos);
+
+			m_pCamera->SetPoseCamera();
 
 			ChangeSituation(BattleSituation::kKnockOut);
 			return;

@@ -32,6 +32,10 @@ public:
 
 	virtual void OnCollide(std::shared_ptr<Collidable> collider);
 
+	/// <summary>
+	///	Stateの種類を取得する
+	/// </summary>
+	/// <returns>Stateの種類</returns>
 	CharacterStateKind GetKind() { return m_kind; }
 
 	//次のState
@@ -60,6 +64,12 @@ protected:
 	/// </summary>
 	/// <returns>対戦相手のやられ状態</returns>
 	int GetTargetHitReaction();
+
+	/// <summary>
+	/// 対戦相手の今のStateを取得する
+	/// </summary>
+	/// <returns>対戦相手の現在のState</returns>
+	CharacterStateKind GetTargetState();
 
 	/// <summary>
 	/// プレイヤーの移動ベクトルを設定する
@@ -126,6 +136,28 @@ protected:
 	void SwayCamera();
 
 	/// <summary>
+	/// ボタン連打を始める
+	/// </summary>
+	void StartButtonBashing();
+
+	/// <summary>
+	/// ボタン連打を行っているかを取得する
+	/// </summary>
+	/// <returns>ボタン連打を行っているならtrue</returns>
+	bool IsButtonBashing();
+
+	/// <summary>
+	/// ボタン連打時にボタンを押したときに呼ぶ関数
+	/// </summary>
+	void BashButton();
+
+	/// <summary>
+	/// ボタン連打の勝者を取得する
+	/// </summary>
+	/// <returns>勝っていたらtrue</returns>
+	bool IsBashWin();
+
+	/// <summary>
 	/// 攻撃を受けた時に呼ぶ関数
 	/// </summary>
 	/// <param name="attack">受けた攻撃のクラス</param>
@@ -143,13 +175,15 @@ protected:
 	/// </summary>
 	/// <param name="effect">削除したいエフェクトのポインタ</param>
 	void ExitEffect(std::shared_ptr<Effect> effect);
-	
-	
+
+
 	/// <summary>
 	/// チュートリアルクリア条件を達成したとする
 	/// </summary>
 	/// <param name="tutorialNumber">チュートリアルの番号(TutorialManager::TutorialSuccessKindをintにキャストする)</param>
 	void SuccessTutorial(int tutorialNumber);
+
+protected:
 
 	//現在の状態
 	CharacterStateKind m_kind = CharacterStateKind::kIdle;

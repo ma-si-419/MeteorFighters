@@ -114,7 +114,7 @@ void GameCamera::Final()
 
 void GameCamera::SetBattleCamera()
 {
-	m_updateFunc = &GameCamera::NormalUpdate;
+	m_updateFunc = &GameCamera::BattleUpdate;
 	m_localPos.SetLocalPos(kPlayerToCameraInitVec);
 	m_nextCameraPos = m_localPos.GetWorldPos();
 }
@@ -142,7 +142,7 @@ void GameCamera::PoseUpdate()
 	SetLightDirectionHandle(m_lightHandle, (m_localPos.GetWorldPos() - m_targetPos).Normalize().CastVECTOR());
 }
 
-void GameCamera::NormalUpdate()
+void GameCamera::BattleUpdate()
 {
 	//“®‚©‚È‚¢ŽžŠÔ‚ªÝ’è‚³‚ê‚Ä‚¢‚½‚ç
 	if (m_stopTime > 0)
@@ -324,13 +324,4 @@ void GameCamera::NormalUpdate()
 	SetLightDirectionHandle(m_lightHandle, (m_localPos.GetWorldPos() - targetPos).Normalize().CastVECTOR());
 
 	m_lastCameraPos = m_localPos.GetWorldPos();
-}
-
-void GameCamera::KnockOutUpdate()
-{
-	
-}
-
-void GameCamera::ResultUpdate()
-{
 }

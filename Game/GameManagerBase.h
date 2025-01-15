@@ -24,6 +24,7 @@ public:
 		kStart1P,
 		kStart2P,
 		kBattle,
+		kButtonBashing,
 		kKnockOut,
 		kResult,
 		kMenu
@@ -34,9 +35,17 @@ public:
 		kBattle,
 		kTutorial
 	};
+
+	enum class ButtonBashingSituation
+	{
+		kFirstHit,
+		kSecondHit,
+		kFighting
+	};
+
 public:
 
-	GameManagerBase(std::shared_ptr<GameCamera> camera,GameKind kind);
+	GameManagerBase(std::shared_ptr<GameCamera> camera, GameKind kind);
 	~GameManagerBase();
 
 	/// <summary>
@@ -121,6 +130,13 @@ public:
 	Character::HitReactionKind GetTargetHitReaction(std::shared_ptr<Character> character);
 
 	/// <summary>
+	/// 対戦相手の今のStateを取得する
+	/// </summary>
+	/// <param name="character">この関数を呼んだキャラクターのポインタ</param>
+	/// <returns>対戦相手のState</returns>
+	int GetTargetState(std::shared_ptr<Character> character);
+
+	/// <summary>
 	/// 対戦相手の背後座標を取得する
 	/// </summary>
 	/// <param name="distance">背後の距離</param>
@@ -203,11 +219,38 @@ public:
 	std::string GetSkyDomePath();
 
 	/// <summary>
+	/// ボタン連打状態かどうかを返す
+	/// </summary>
+	/// <returns>ボタン連打状態ならtrue</returns>
+	bool IsButtonBashing() { return m_isButtonBashing; }
+
+	/// <summary>
+	/// ボタン連打で勝った方を返す
+	/// </summary>
+	/// <returns>ボタン連打で買った方を返す</returns>
+	Character::PlayerNumber GetButtonBashWinner();
+
+	/// <summary>
+	/// ボタンを連打した回数を増やす
+	/// </summary>
+	/// <param name="player">どちらのプレイヤーか</param>
+	void AddBashButtonNum(Character::PlayerNumber player) { m_buttonBashNum[static_cast<int>(player)]++; };
+
+	/// <summary>
+	/// ボタン連打を始めるタイミングで呼ぶ
+	/// </summary>
+	void StartButtonBashing();
+
+	/// <summary>
+	/// ボタン連打の状況を次に進める
+	/// </summary>
+	void ProceedNextBashingSituation() { m_buttonBashingSituation = static_cast<ButtonBashingSituation>(static_cast<int>(m_buttonBashingSituation) + 1); }
+
+	/// <summary>
 	/// 非同期ロードを行うモデルを追加する
 	/// </summary>
 	/// <param name="name">非同期ロードを行うモデルの名前を入れる</param>
 	void AddLoadModel(std::string name) { m_modelHandles[name] = -1; }
-
 
 	/// <summary>
 	/// 現在のゲームモードを返す
@@ -225,6 +268,16 @@ protected:
 	/// ゲームシーン共通の描画処理
 	/// </summary>
 	void DrawCommon();
+
+	/// <summary>
+	/// ボタン連打時の更新を行う
+	/// </summary>
+	void UpdateButtonBashing();
+
+	/// <summary>
+	/// ボタン連打時の描画を行う
+	/// </summary>
+	void DrawButtonBashing();
 
 	/// <summary>
 	/// 文字列のステータスをCharacterStatusに変換する
@@ -257,8 +310,16 @@ protected:
 	MyEngine::Vector3 m_poseCameraPos;
 	//フェードを行うときの変数
 	int m_alpha;
+	//ボタン連打を行っているかどうか
+	bool m_isButtonBashing;
+	//ボタン連打を行った回数
+	int m_buttonBashNum[2];
+	//ボタン連打を行って何フレーム立ったかを保存する
+	int m_buttonBashingTime;
+	//ボタン連打の今の状態
+	ButtonBashingSituation m_buttonBashingSituation;
 	//シーンをセレクトシーンに戻す時にtrueにする
 	Game::Scene m_nextScene;
 	//非同期処理を行うモデルの配列
-	std::map<std::string,int> m_modelHandles;
+	std::map<std::string, int> m_modelHandles;
 };

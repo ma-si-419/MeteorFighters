@@ -26,7 +26,7 @@ namespace
 	constexpr int kMenuBackBoxMaxAlpha = 125;
 
 	//ƒŠƒUƒ‹ƒg‚ÌƒƒS‚ÌÅ‰‚ÌŠg‘å—¦
-	constexpr double kResultLogoDefaultScale = 3.0;
+	constexpr double kResultLogoInitScale = 3.0;
 
 	//ƒŠƒUƒ‹ƒg‚ÌƒƒS‚ÌÅŒã‚ÌŠg‘å—¦
 	constexpr double kResultLogoFinalScale = 1.0;
@@ -106,7 +106,7 @@ BattleUi::BattleUi() :
 	m_selectItemMoveTime(0),
 	m_decisionItem(-1),
 	m_isWin(true),
-	m_resultLogoScale(kResultLogoDefaultScale),
+	m_resultLogoScale(kResultLogoInitScale),
 	m_resultTime(0),
 	m_shakeTime(0),
 	m_selectItem(0),
@@ -144,6 +144,8 @@ void BattleUi::ChangeSituation(UiSituation situation)
 	m_selectItem = 0;
 	m_menuAlpha = 0;
 	m_resultMenuAlpha = 0;
+	m_resultTime = 0;
+	m_resultLogoScale = kResultLogoInitScale;
 
 	switch (situation)
 	{

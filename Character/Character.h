@@ -112,7 +112,11 @@ public:
 		kWinPose,
 		kLosePose,
 		kGuardLow,
-		kGuardHigh
+		kGuardHigh,
+		kButtonBashingHitBack,
+		kButtonBashingPlayerAttack,
+		kButtonBashingEnemyAttack,
+		kOnButtonBashing
 	};
 
 	enum class CharacterKind
@@ -474,6 +478,17 @@ public:
 	HitReactionKind GetHitReaction() { return m_nowHitReaction; }
 
 	/// <summary>
+	/// 現在のStateの種類を返す
+	/// </summary>
+	int GetStateKind();
+
+	/// <summary>
+	/// ボタンを連打した回数を返す
+	/// </summary>
+	/// <returns>連打した回数</returns>
+	int GetButtonBashingNum();
+
+	/// <summary>
 	/// やられ状態を設定する
 	/// </summary>
 	/// <param name="kind">次のやられ状態</param>
@@ -524,6 +539,12 @@ public:
 	/// </summary>
 	/// <param name="num">1Pか2Pかを設定する</param>
 	void SetCharacterNumber(PlayerNumber num) { m_playerNumber = num; }
+
+	/// <summary>
+	/// キャラクターの番号を取得する
+	/// </summary>
+	/// <returns>1Pか2Pかを返す</returns>
+	PlayerNumber GetCharacterNumber() { return m_playerNumber; }
 
 	/// <summary>
 	/// 状況によって変化させるアップデートを変更する

@@ -11,12 +11,24 @@
 #include "Game.h"
 #include <cmath>
 
+namespace
+{
+	//何フレームボタン連打対決を行うのか
+	constexpr int kButtonBashingTime = 120;
+
+	//ボタン連打対決の時のカメラのターゲット座標
+	const MyEngine::Vector3 kButtonBashingCameraTargetPos(0,100,0);
+}
+
 GameManagerBase::GameManagerBase(std::shared_ptr<GameCamera> camera ,GameManagerBase::GameKind kind) :
 	m_time(0),
 	m_alpha(0),
 	m_nextScene(Game::Scene::kGame),
 	m_situation(BattleSituation::kStart1P),
-	m_gameKind(kind)
+	m_gameKind(kind),
+	m_buttonBashingTime(0),
+	m_buttonBashNum(),
+	m_isButtonBashing(false)
 {
 	m_pStage = std::make_shared<Stage>();
 	m_pStage->Init();
@@ -166,6 +178,18 @@ Character::HitReactionKind GameManagerBase::GetTargetHitReaction(std::shared_ptr
 	}
 }
 
+int GameManagerBase::GetTargetState(std::shared_ptr<Character> character)
+{
+	if (character == m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)])
+	{
+		return m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetStateKind();
+	}
+	else if (character == m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)])
+	{
+		return m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetStateKind();
+	}
+}
+
 void GameManagerBase::AddAttack(std::shared_ptr<Attack> attack)
 {
 	m_pAttacks.push_back(attack);
@@ -213,6 +237,7 @@ void GameManagerBase::ExitEffect(std::shared_ptr<Effect> effect)
 
 MyEngine::Vector3 GameManagerBase::GetTargetBackPos(float distance, std::shared_ptr<Character> character)
 {
+	//対戦相手の背中の座標を取得する
 	if (character == m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)])
 	{
 		return m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetBackPos(distance);
@@ -237,8 +262,37 @@ std::string GameManagerBase::GetSkyDomePath()
 	return m_pStage->GetSkyDomePath();
 }
 
+Character::PlayerNumber GameManagerBase::GetButtonBashWinner()
+{
+	int one = m_buttonBashNum[static_cast<int>(Character::PlayerNumber::kOnePlayer)];
+	int two = m_buttonBashNum[static_cast<int>(Character::PlayerNumber::kTwoPlayer)];
+
+	if (one >= two)
+	{
+		return Character::PlayerNumber::kOnePlayer;
+	}
+	else
+	{
+		return Character::PlayerNumber::kTwoPlayer;
+	}
+}
+
+void GameManagerBase::StartButtonBashing()
+{
+	m_isButtonBashing = true;
+	m_buttonBashingTime = 0;
+	m_buttonBashNum[0] = 0;
+	m_buttonBashNum[1] = 0;
+}
+
 void GameManagerBase::UpdateCommon()
 {
+	//ボタン連打状態だったら
+	if (m_isButtonBashing)
+	{
+		UpdateButtonBashing();
+	}
+
 	//ステージの更新を行う
 	m_pStage->Update();
 
@@ -270,6 +324,12 @@ void GameManagerBase::UpdateCommon()
 
 void GameManagerBase::DrawCommon()
 {
+	//ボタン連打状態だったら
+	if (m_isButtonBashing)
+	{
+		DrawButtonBashing();
+	}
+
 	for (auto& item : m_pAttacks)
 	{
 		//攻撃の描画
@@ -290,6 +350,36 @@ void GameManagerBase::DrawCommon()
 	m_pGameUi->DrawMpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetMp(), true);
 	//2Pの気力を描画する
 	m_pGameUi->DrawMpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetMp(), false);
+}
+
+void GameManagerBase::UpdateButtonBashing()
+{
+	//行っている時間を計測する
+	m_buttonBashingTime++;
+
+	//カメラの設定
+	m_pCamera->SetPoseCamera();
+
+	m_pCamera->SetCenterAndTarget(kButtonBashingCameraTargetPos, kButtonBashingCameraTargetPos);
+
+	//際者はターゲットを中心として手前下からの画角にする
+	MyEngine::Vector3 cameraLocalPos(10,-5,-80);
+
+	m_pCamera->SetLocalPos(cameraLocalPos);
+
+	m_pCamera->Update();
+
+	//一定時間行ったらやめる
+	if (m_buttonBashingTime > kButtonBashingTime)
+	{
+		m_isButtonBashing = false;
+		m_pCamera->SetBattleCamera();
+	}
+}
+
+void GameManagerBase::DrawButtonBashing()
+{
+	//どのボタンを連打すればいいのかを表示する
 }
 
 Character::CharacterStatus GameManagerBase::GetCharacterStatus(std::vector<std::string> statusData)

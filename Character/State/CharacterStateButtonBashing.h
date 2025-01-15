@@ -10,5 +10,9 @@ public:
 	virtual void Update() override;
 
 	virtual void Exit() override;
+
+private:
+
+	float m_moveSpeed;
 };
 
