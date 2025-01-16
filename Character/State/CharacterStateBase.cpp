@@ -64,6 +64,20 @@ void CharacterStateBase::OnCollide(std::shared_ptr<Collidable> collider)
 	}
 }
 
+void CharacterStateBase::UpdateCommon()
+{
+	if (m_kind != CharacterStateKind::kButtonBashing)
+	{
+		//相手のStateがボタン連打だったらButtonBashingStateに変更する
+		if (GetTargetState() == CharacterStateKind::kButtonBashing)
+		{
+			auto next = std::make_shared<CharacterStateButtonBashing>(m_pCharacter);
+
+			ChangeState(next);
+		}
+	}
+}
+
 void CharacterStateBase::ChangeState(std::shared_ptr<CharacterStateBase> nextState)
 {
 	//終了処理
@@ -161,6 +175,11 @@ void CharacterStateBase::StartButtonBashing()
 	m_pCharacter->m_pBattleManager->StartButtonBashing();
 }
 
+void CharacterStateBase::SetBashingSituation(int number)
+{
+	m_pCharacter->m_pBattleManager->SetBashingSituation(static_cast<GameManagerBase::ButtonBashingSituation>(number));
+}
+
 bool CharacterStateBase::IsButtonBashing()
 {
 	return m_pCharacter->m_pBattleManager->IsButtonBashing();
@@ -246,13 +265,13 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack, CharacterStat
 		std::shared_ptr<Effect> hitEffect = std::make_shared<Effect>(effectKind);
 		hitEffect->SetLifeTime(kHitEffectLifeTime);
 		m_pCharacter->m_pBattleManager->GetEffectManagerPointer()->Entry(hitEffect, m_pCharacter->GetPos());
-		
+
 		MyEngine::Vector3 rotation;
 
 		float vX = attack->GetPos().x - m_pCharacter->GetPos().x;
 		float vZ = attack->GetPos().z - m_pCharacter->GetPos().z;
 
-		rotation.y = std::atan2f(vX,vZ);
+		rotation.y = std::atan2f(vX, vZ);
 
 		hitEffect->SetRotation(rotation);
 	}

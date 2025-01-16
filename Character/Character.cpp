@@ -194,6 +194,9 @@ void Character::Update()
 		m_pEnemyInput->Update();
 	}
 
+	//í‚ÉXV‚·‚é‚à‚Ì
+	m_pState->UpdateCommon();
+
 	//State‚ª•ÏX‚³‚ê‚Ä‚¢‚½‚çState‚ð“ü‚ê‘Ö‚¦‚é
 	if (m_pState != m_pState->m_pNextState)
 	{

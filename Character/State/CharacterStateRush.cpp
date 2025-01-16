@@ -101,15 +101,6 @@ void CharacterStateRush::Enter()
 
 void CharacterStateRush::Update()
 {
-	//‚à‚µ‘Šè‚ÌState‚ªButtonBashing‚É‚È‚Á‚Ä‚¢‚ê‚Î
-	if (GetTargetState() == CharacterStateKind::kButtonBashing)
-	{
-		auto next = std::make_shared<CharacterStateButtonBashing>(m_pCharacter);
-
-		ChangeState(next);
-		return;
-	}
-
 	m_time++;
 
 	//’Êí‚Å‹C—Í‚ª‘«‚è‚È‚¯‚ê‚Î

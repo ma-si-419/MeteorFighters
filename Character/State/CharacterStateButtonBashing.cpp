@@ -3,33 +3,49 @@
 #include "Character.h"
 #include "DxLib.h"
 #include "GameSceneConstant.h"
+#include "GameManagerBase.h"
 
 
 namespace
 {
-	const MyEngine::Vector3 kPlayerInitPos(-30, 100, -30);
-	const MyEngine::Vector3 kEnemyInitPos(30, 100, 30);
+	const MyEngine::Vector3 kPlayerInitPos(-3, 100, -3);
+	const MyEngine::Vector3 kEnemyInitPos(3, 100, 3);
 
 	//中心座標
 	const MyEngine::Vector3 kTargetPos(0, 100, 0);
 
-	//最初の移動速度
-	constexpr float kInitMoveSpeed = -3.5f;
-
 	//ぶつかった時の移動速度
-	constexpr float kBumpSpeed = -5.0f;
+	constexpr float kBumpSpeed = -10.0f;
+
+	//ぶつかってから止まりはじめるまでの時間
+	constexpr int kStopStartTime = 3;
+
+	//止まる力
+	constexpr float kStopPower = -(kBumpSpeed / 10.0f);
+
+	//止まった時にどのくらいとどまるか
+	constexpr int kHitBackStayTime = 15;
 
 	//最大速度
 	constexpr float kMaxMoveSpeed = 3.0f;
 
 	//加速度
-	constexpr float kAcceleration = 0.28f;
+	constexpr float kAcceleration = 0.2f;
+
+	//初速
+	constexpr float kDashInitSpeed = 1.0f;
+
+	//ブレンドスピード
+	constexpr float kBlendSpeed = 0.03f;
 }
 
 CharacterStateButtonBashing::CharacterStateButtonBashing(std::shared_ptr<Character> character) :
 	CharacterStateBase(character),
-	m_moveSpeed(kInitMoveSpeed),
-	m_isBump(false)
+	m_moveSpeed(kBumpSpeed),
+	m_isBump(false),
+	m_bumpTime(0),
+	m_stayTime(0),
+	m_isStay(false)
 {
 }
 
@@ -57,6 +73,9 @@ void CharacterStateButtonBashing::Enter()
 
 void CharacterStateButtonBashing::Update()
 {
+	//ぶつかってから何フレーム立ったかを保存する
+	m_bumpTime++;
+
 	//敵の方向を向く
 	m_pCharacter->LookTarget();
 
@@ -66,25 +85,87 @@ void CharacterStateButtonBashing::Update()
 	//中心に向かって移動する
 	MyEngine::Vector3 moveDir = (toTarget).Normalize();
 
-	//移動速度を足していく
-	m_moveSpeed += kAcceleration;
+	//止まり始めるタイミングになったら
+	if (m_bumpTime > kStopStartTime)
+	{
+		//移動速度がマイナスであれば
+		if (m_moveSpeed < 0.0f)
+		{
+			//動きを止めていく
+			m_moveSpeed += kStopPower;
 
-	//移動速度をクランプ
+			//移動速度がプラスになれば
+			if (m_moveSpeed > 0.0f)
+			{
+				m_isStay = true;
+			}
+		}
+	}
+
+	//一定時間とどまる
+	if (m_isStay)
+	{
+		//止まっている時間を足していく
+		m_moveSpeed = 0.0f;
+		m_stayTime++;
+
+		//一定時間とどまったら
+		if (m_stayTime > kHitBackStayTime)
+		{
+			//とどまるのをやめる
+			m_isStay = false;
+			m_stayTime = 0;
+			m_moveSpeed = kDashInitSpeed;
+			if (m_pCharacter->GetPlayerNumber() == Character::PlayerNumber::kOnePlayer)
+			{
+				//二つ目のSituationに行く
+				SetBashingSituation(static_cast<int>(GameManagerBase::ButtonBashingSituation::kSecondHit));
+			}
+		}
+	}
+
+	//とどまるのが終わったら
+	if (m_bumpTime > kStopStartTime && !m_isStay)
+	{
+		//加速していく
+		m_moveSpeed += kAcceleration;
+	}
+
+	//移動速度のクランプ
 	m_moveSpeed = fmin(m_moveSpeed, kMaxMoveSpeed);
 
 	//敵との距離
 	float toEnemyLength = (GetTargetPos() - m_pCharacter->GetPos()).Length();
 
-	printfDx("%.3f\n", toEnemyLength);
+	//移動ベクトル
+	MyEngine::Vector3 moveVec;
+
+	//移動ベクトルで移動するかどうか
+	bool isMove = true;
 
 	//敵とぶつかる距離になったら
-	if (toEnemyLength < (GameSceneConstant::kCharacterRadius * 2.0f) + 0.1f)
+	if ((GetTargetPos() - m_pCharacter->GetPos()).Length() < (GameSceneConstant::kCharacterRadius * 2.0f) + 3.0f)
 	{
 		//一度ぶつかっていたら
 		if (m_isBump)
 		{
-			//////////////////////////////////////
-			m_moveSpeed = 0.0f;
+			//移動しないようにする
+			isMove = false;
+			SetCharacterVelo(MyEngine::Vector3(0, 0, 0));
+
+			//二つ目のSituationに行く
+			SetBashingSituation(static_cast<int>(GameManagerBase::ButtonBashingSituation::kFighting));
+
+			//座標を補正する
+			if (m_pCharacter->GetPlayerNumber() == Character::PlayerNumber::kOnePlayer)
+			{
+				SetCharacterPos(kPlayerInitPos);
+			}
+			else
+			{
+				SetCharacterPos(kEnemyInitPos);
+			}
+
 		}
 		//初めてぶつかるタイミングであれば
 		else
@@ -94,10 +175,14 @@ void CharacterStateButtonBashing::Update()
 		}
 
 		m_isBump = true;
+		m_bumpTime = 0;
 	}
 
-	//移動ベクトル
-	MyEngine::Vector3 moveVec = moveDir * m_moveSpeed;
+
+	if (isMove)
+	{
+		moveVec = moveDir * m_moveSpeed;
+	}
 
 	//移動ベクトルを設定
 	SetCharacterVelo(moveVec);
@@ -105,7 +190,7 @@ void CharacterStateButtonBashing::Update()
 	//アニメーションの変更
 
 	//移動速度が前方向になっていれば
-	if (m_moveSpeed > 0.0f)
+	if (m_moveSpeed >= 0.0f && !m_isStay)
 	{
 		//一度ぶつかっていたら
 		if (m_isBump)
@@ -119,9 +204,9 @@ void CharacterStateButtonBashing::Update()
 		else
 		{
 			//アニメーションを変更する
-			if (m_pCharacter->GetPlayAnimKind() != Character::AnimKind::kButtonBashingPlayerAttack)
+			if (m_pCharacter->GetPlayAnimKind() != Character::AnimKind::kButtonBashingAttack)
 			{
-				m_pCharacter->ChangeAnim(Character::AnimKind::kButtonBashingPlayerAttack, false);
+				m_pCharacter->ChangeAnim(Character::AnimKind::kButtonBashingAttack, false, kBlendSpeed);
 			}
 		}
 	}

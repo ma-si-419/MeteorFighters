@@ -40,7 +40,8 @@ public:
 	{
 		kFirstHit,
 		kSecondHit,
-		kFighting
+		kFighting,
+		kSituationNum
 	};
 
 public:
@@ -244,7 +245,7 @@ public:
 	/// <summary>
 	/// ボタン連打の状況を次に進める
 	/// </summary>
-	void ProceedNextBashingSituation() { m_buttonBashingSituation = static_cast<ButtonBashingSituation>(static_cast<int>(m_buttonBashingSituation) + 1); }
+	void SetBashingSituation(ButtonBashingSituation situation) { m_buttonBashingSituation = situation; }
 
 	/// <summary>
 	/// 非同期ロードを行うモデルを追加する
@@ -316,6 +317,10 @@ protected:
 	int m_buttonBashNum[2];
 	//ボタン連打を行って何フレーム立ったかを保存する
 	int m_buttonBashingTime;
+	//ボタン連打を行っているときのカメラ座標
+	MyEngine::Vector3 m_buttonBashingCameraPos;
+	//ボタン連打を行っているときのカメラの回転度
+	float m_buttonBashingCameraRota;
 	//ボタン連打の今の状態
 	ButtonBashingSituation m_buttonBashingSituation;
 	//シーンをセレクトシーンに戻す時にtrueにする

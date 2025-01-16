@@ -114,8 +114,7 @@ public:
 		kGuardLow,
 		kGuardHigh,
 		kButtonBashingHitBack,
-		kButtonBashingPlayerAttack,
-		kButtonBashingEnemyAttack,
+		kButtonBashingAttack,
 		kOnButtonBashing
 	};
 

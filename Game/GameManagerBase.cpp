@@ -1,6 +1,7 @@
 #include "GameManagerBase.h"
 #include "Attack.h"
 #include "LoadCsv.h"
+#include "LocalPos.h"
 #include "Stage.h"
 #include "GameCamera.h"
 #include "Character.h"
@@ -14,13 +15,33 @@
 namespace
 {
 	//何フレームボタン連打対決を行うのか
-	constexpr int kButtonBashingTime = 120;
+	constexpr int kButtonBashingTime = 300;
 
 	//ボタン連打対決の時のカメラのターゲット座標
-	const MyEngine::Vector3 kButtonBashingCameraTargetPos(0,100,0);
+	const MyEngine::Vector3 kButtonBashingCameraTargetPos(0, 100, 0);
+
+	const MyEngine::Vector3 kButtonBashingCameraPos[static_cast<int>(GameManagerBase::ButtonBashingSituation::kSituationNum)] =
+	{
+		MyEngine::Vector3(-50,90,-100),
+		MyEngine::Vector3(-30,90,70),
+		MyEngine::Vector3(5,90,5)
+	};
+
+	//カメラ間を移動する時間
+	float kButtonBashingMoveTime = 20.0f;
+
+	const MyEngine::Vector3 kButtonBashingCameraMoveVec[static_cast<int>(GameManagerBase::ButtonBashingSituation::kSituationNum)] =
+	{
+		MyEngine::Vector3(0,0,0),
+		(kButtonBashingCameraPos[static_cast<int>(GameManagerBase::ButtonBashingSituation::kSecondHit)] - kButtonBashingCameraPos[static_cast<int>(GameManagerBase::ButtonBashingSituation::kFirstHit)]) / kButtonBashingMoveTime,
+		(kButtonBashingCameraPos[static_cast<int>(GameManagerBase::ButtonBashingSituation::kFighting)] - kButtonBashingCameraPos[static_cast<int>(GameManagerBase::ButtonBashingSituation::kSecondHit)]) / kButtonBashingMoveTime
+	};
+
+	//カメラを回転させる速度
+	float kCameraRotaSpeed = 0.08f;
 }
 
-GameManagerBase::GameManagerBase(std::shared_ptr<GameCamera> camera ,GameManagerBase::GameKind kind) :
+GameManagerBase::GameManagerBase(std::shared_ptr<GameCamera> camera, GameManagerBase::GameKind kind) :
 	m_time(0),
 	m_alpha(0),
 	m_nextScene(Game::Scene::kGame),
@@ -28,7 +49,8 @@ GameManagerBase::GameManagerBase(std::shared_ptr<GameCamera> camera ,GameManager
 	m_gameKind(kind),
 	m_buttonBashingTime(0),
 	m_buttonBashNum(),
-	m_isButtonBashing(false)
+	m_isButtonBashing(false),
+	m_buttonBashingCameraRota(0.0f)
 {
 	m_pStage = std::make_shared<Stage>();
 	m_pStage->Init();
@@ -283,6 +305,9 @@ void GameManagerBase::StartButtonBashing()
 	m_buttonBashingTime = 0;
 	m_buttonBashNum[0] = 0;
 	m_buttonBashNum[1] = 0;
+	m_buttonBashingSituation = ButtonBashingSituation::kFirstHit;
+
+	m_buttonBashingCameraPos = kButtonBashingCameraPos[static_cast<int>(m_buttonBashingSituation)];
 }
 
 void GameManagerBase::UpdateCommon()
@@ -357,17 +382,60 @@ void GameManagerBase::UpdateButtonBashing()
 	//行っている時間を計測する
 	m_buttonBashingTime++;
 
+	//カメラが目指す座標
+	MyEngine::Vector3 cameraGoalPos = kButtonBashingCameraPos[static_cast<int>(m_buttonBashingSituation)];
+
+	//カメラの移動ベクトル
+	MyEngine::Vector3 cameraMoveVec = kButtonBashingCameraMoveVec[static_cast<int>(m_buttonBashingSituation)];
+
+	//現在のカメラの座標と目的地までのベクトル
+	MyEngine::Vector3 cameraToGoalVec = cameraGoalPos - m_buttonBashingCameraPos;
+
+
+	//カメラを回す時にtrueにする
+	bool isRota = false;
+
+	//目的地までのベクトルよりも移動ベクトルの方が大きかったら
+	if (cameraMoveVec.Length() > cameraToGoalVec.Length())
+	{
+		cameraMoveVec = cameraToGoalVec;
+
+		if (m_buttonBashingSituation == ButtonBashingSituation::kFighting)
+		{
+			isRota = true;
+		}
+	}
+
+	//回転すると設定されてなければ
+	if (!isRota)
+	{
+		//カメラ座標の更新
+		m_buttonBashingCameraPos += cameraMoveVec;
+		m_pCamera->SetCenterAndTarget(m_buttonBashingCameraPos, kButtonBashingCameraTargetPos);
+	}
+	//回転する場合
+	else
+	{
+		m_buttonBashingCameraRota += kCameraRotaSpeed;
+
+		MyEngine::Vector3 rota = MyEngine::Vector3(0.0f, m_buttonBashingCameraRota, 0.0f);
+
+		auto mat = rota.GetRotationMat();
+
+		MyEngine::Vector3 targetToCamera = m_buttonBashingCameraPos - kButtonBashingCameraTargetPos;
+
+		MyEngine::Vector3 cameraPos = targetToCamera.MatTransform(mat) + kButtonBashingCameraTargetPos;
+
+		m_pCamera->SetCenterAndTarget(cameraPos,kButtonBashingCameraTargetPos);
+	}
+
 	//カメラの設定
 	m_pCamera->SetPoseCamera();
-
-	m_pCamera->SetCenterAndTarget(kButtonBashingCameraTargetPos, kButtonBashingCameraTargetPos);
-
-	//際者はターゲットを中心として手前下からの画角にする
-	MyEngine::Vector3 cameraLocalPos(10,-5,-80);
-
-	m_pCamera->SetLocalPos(cameraLocalPos);
+	m_pCamera->SetFrontPos(kButtonBashingCameraTargetPos);
 
 	m_pCamera->Update();
+
+	printfDx("%d", static_cast<int>(m_buttonBashingSituation));
 
 	//一定時間行ったらやめる
 	if (m_buttonBashingTime > kButtonBashingTime)

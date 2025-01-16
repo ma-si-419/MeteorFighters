@@ -33,6 +33,11 @@ public:
 	virtual void OnCollide(std::shared_ptr<Collidable> collider);
 
 	/// <summary>
+	/// 常に更新を行うものだけ更新する
+	/// </summary>
+	void UpdateCommon();
+
+	/// <summary>
 	///	Stateの種類を取得する
 	/// </summary>
 	/// <returns>Stateの種類</returns>
@@ -139,6 +144,12 @@ protected:
 	/// ボタン連打を始める
 	/// </summary>
 	void StartButtonBashing();
+
+	/// <summary>
+	/// ボタン連打の状況を進める
+	/// </summary>
+	/// <param name="number">GameManagerBase::ButtonBashingSituationをキャストして使用</param>
+	void SetBashingSituation(int number);
 
 	/// <summary>
 	/// ボタン連打を行っているかを取得する
