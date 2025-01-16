@@ -73,6 +73,10 @@ void CharacterStateButtonBashing::Enter()
 
 void CharacterStateButtonBashing::Update()
 {
+
+	//もし相手のStateがButtonBashing出なければ早期リターン
+	if (GetTargetState() != CharacterStateKind::kButtonBashing) return;
+
 	//ぶつかってから何フレーム立ったかを保存する
 	m_bumpTime++;
 
@@ -80,7 +84,16 @@ void CharacterStateButtonBashing::Update()
 	m_pCharacter->LookTarget();
 
 	//中心までのベクトル
-	MyEngine::Vector3 toTarget = kTargetPos - m_pCharacter->GetPos();
+	MyEngine::Vector3 toTarget;
+
+	if (m_pCharacter->GetPlayerNumber() == Character::PlayerNumber::kOnePlayer)
+	{
+		toTarget = kTargetPos - kPlayerInitPos;
+	}
+	else
+	{
+		toTarget = kTargetPos - kEnemyInitPos;
+	}
 
 	//中心に向かって移動する
 	MyEngine::Vector3 moveDir = (toTarget).Normalize();
@@ -144,7 +157,8 @@ void CharacterStateButtonBashing::Update()
 	bool isMove = true;
 
 	//敵とぶつかる距離になったら
-	if ((GetTargetPos() - m_pCharacter->GetPos()).Length() < (GameSceneConstant::kCharacterRadius * 2.0f) + 3.0f)
+	if ((GetTargetPos() - m_pCharacter->GetPos()).Length() < (GameSceneConstant::kCharacterRadius * 2.0f) + 3.0f &&
+		m_moveSpeed >= 0.0f)
 	{
 		//一度ぶつかっていたら
 		if (m_isBump)
@@ -165,17 +179,24 @@ void CharacterStateButtonBashing::Update()
 			{
 				SetCharacterPos(kEnemyInitPos);
 			}
-
 		}
 		//初めてぶつかるタイミングであれば
 		else
 		{
+			if (m_pCharacter->GetPlayerNumber() == Character::PlayerNumber::kOnePlayer)
+			{
+				moveDir = (kPlayerInitPos - kTargetPos).Normalize();
+			}
+			else
+			{
+				moveDir = (kEnemyInitPos - kTargetPos).Normalize();
+			}
 			m_moveSpeed = kBumpSpeed;
 			m_pCharacter->ChangeAnim(Character::AnimKind::kButtonBashingHitBack, false);
 		}
+		m_bumpTime = 0;
 
 		m_isBump = true;
-		m_bumpTime = 0;
 	}
 
 

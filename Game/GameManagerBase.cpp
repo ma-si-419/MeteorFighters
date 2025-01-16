@@ -30,11 +30,12 @@ namespace
 	//カメラ間を移動する時間
 	float kButtonBashingMoveTime = 20.0f;
 
-	const MyEngine::Vector3 kButtonBashingCameraMoveVec[static_cast<int>(GameManagerBase::ButtonBashingSituation::kSituationNum)] =
+	//カメラの移動速度
+	const float kButtonBashingCameraMoveSpeed[static_cast<int>(GameManagerBase::ButtonBashingSituation::kSituationNum)] =
 	{
-		MyEngine::Vector3(0,0,0),
-		(kButtonBashingCameraPos[static_cast<int>(GameManagerBase::ButtonBashingSituation::kSecondHit)] - kButtonBashingCameraPos[static_cast<int>(GameManagerBase::ButtonBashingSituation::kFirstHit)]) / kButtonBashingMoveTime,
-		(kButtonBashingCameraPos[static_cast<int>(GameManagerBase::ButtonBashingSituation::kFighting)] - kButtonBashingCameraPos[static_cast<int>(GameManagerBase::ButtonBashingSituation::kSecondHit)]) / kButtonBashingMoveTime
+		0.0f,
+		((kButtonBashingCameraPos[static_cast<int>(GameManagerBase::ButtonBashingSituation::kSecondHit)] - kButtonBashingCameraPos[static_cast<int>(GameManagerBase::ButtonBashingSituation::kFirstHit)]) / kButtonBashingMoveTime).Length(),
+		((kButtonBashingCameraPos[static_cast<int>(GameManagerBase::ButtonBashingSituation::kFighting)] - kButtonBashingCameraPos[static_cast<int>(GameManagerBase::ButtonBashingSituation::kSecondHit)]) / kButtonBashingMoveTime).Length()
 	};
 
 	//カメラを回転させる速度
@@ -385,8 +386,8 @@ void GameManagerBase::UpdateButtonBashing()
 	//カメラが目指す座標
 	MyEngine::Vector3 cameraGoalPos = kButtonBashingCameraPos[static_cast<int>(m_buttonBashingSituation)];
 
-	//カメラの移動ベクトル
-	MyEngine::Vector3 cameraMoveVec = kButtonBashingCameraMoveVec[static_cast<int>(m_buttonBashingSituation)];
+	//カメラの移動速度
+	float cameraMoveSpeed = kButtonBashingCameraMoveSpeed[static_cast<int>(m_buttonBashingSituation)];
 
 	//現在のカメラの座標と目的地までのベクトル
 	MyEngine::Vector3 cameraToGoalVec = cameraGoalPos - m_buttonBashingCameraPos;
@@ -396,9 +397,9 @@ void GameManagerBase::UpdateButtonBashing()
 	bool isRota = false;
 
 	//目的地までのベクトルよりも移動ベクトルの方が大きかったら
-	if (cameraMoveVec.Length() > cameraToGoalVec.Length())
+	if (cameraMoveSpeed > cameraToGoalVec.Length())
 	{
-		cameraMoveVec = cameraToGoalVec;
+		cameraMoveSpeed = cameraToGoalVec.Length();
 
 		if (m_buttonBashingSituation == ButtonBashingSituation::kFighting)
 		{
@@ -410,7 +411,7 @@ void GameManagerBase::UpdateButtonBashing()
 	if (!isRota)
 	{
 		//カメラ座標の更新
-		m_buttonBashingCameraPos += cameraMoveVec;
+		m_buttonBashingCameraPos += cameraToGoalVec.Normalize() * cameraMoveSpeed;
 		m_pCamera->SetCenterAndTarget(m_buttonBashingCameraPos, kButtonBashingCameraTargetPos);
 	}
 	//回転する場合
@@ -434,8 +435,6 @@ void GameManagerBase::UpdateButtonBashing()
 	m_pCamera->SetFrontPos(kButtonBashingCameraTargetPos);
 
 	m_pCamera->Update();
-
-	printfDx("%d", static_cast<int>(m_buttonBashingSituation));
 
 	//一定時間行ったらやめる
 	if (m_buttonBashingTime > kButtonBashingTime)
