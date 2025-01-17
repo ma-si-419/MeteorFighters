@@ -48,7 +48,7 @@ void CharacterStateDash::Enter()
 	}
 
 	//敵の距離が近ければ
-	if ((GetTargetPos() - m_pCharacter->GetPos()).Length() < GameSceneConstant::kNearLange)
+	if ((m_pManager->GetTargetPos(m_pCharacter) - m_pCharacter->GetPos()).Length() < GameSceneConstant::kNearLange)
 	{
 		//回避行動をする
 		m_isDodge = true;
@@ -89,8 +89,8 @@ void CharacterStateDash::Update()
 	m_time++;
 
 	//エネミーの方向に移動方向を回転させる
-	float vX = GetTargetPos().x - m_pCharacter->GetPos().x;
-	float vZ = GetTargetPos().z - m_pCharacter->GetPos().z;
+	float vX = m_pManager->GetTargetPos(m_pCharacter).x - m_pCharacter->GetPos().x;
+	float vZ = m_pManager->GetTargetPos(m_pCharacter).z - m_pCharacter->GetPos().z;
 
 	float yAngle = std::atan2f(vX, vZ);
 
@@ -107,15 +107,15 @@ void CharacterStateDash::Update()
 
 		MyEngine::LocalPos enemyLocal;
 
-		enemyLocal.SetCenterPos(GetTargetPos());
+		enemyLocal.SetCenterPos(m_pManager->GetTargetPos(m_pCharacter));
 
 		enemyLocal.SetLocalPos(MyEngine::Vector3(0.0f, 0.0f, GameSceneConstant::kCharacterRadius));
 
 		enemyLocal.SetFrontPos(m_pCharacter->GetPos());
 
-		MyEngine::Vector3 targetPos = GetTargetPos() + enemyLocal.GetWorldPos();
+		MyEngine::Vector3 targetPos = m_pManager->GetTargetPos(m_pCharacter) + enemyLocal.GetWorldPos();
 
-		MyEngine::Vector3 toTarget = (GetTargetPos() - m_pCharacter->GetPos()).Normalize();
+		MyEngine::Vector3 toTarget = (m_pManager->GetTargetPos(m_pCharacter) - m_pCharacter->GetPos()).Normalize();
 
 		dir = (dir * (1.0f - frontRate)) + toTarget * frontRate;
 	}
@@ -151,7 +151,7 @@ void CharacterStateDash::Update()
 		//残像を作成するタイミングになったら
 		if (static_cast<int>(m_time) % GameSceneConstant::kAfterImageCreateTime == 0)
 		{
-			CreateAfterImage();
+			m_pCharacter->CreateAfterImage();
 		}
 
 		//一定時間移動したらアイドルStateに戻る

@@ -8,6 +8,8 @@ class Collidable;
 class Attack;
 class Input;
 class Effect;
+class EffectManager;
+class GameManagerBase;
 class CharacterStateBase : public StateBase
 {
 public:
@@ -53,30 +55,6 @@ protected:
 	std::shared_ptr<MyEngine::InputData> GetCharacterInput();
 
 	/// <summary>
-	/// 対戦相手の座標を取得する
-	/// </summary>
-	/// <returns>対戦相手の座標</returns>
-	MyEngine::Vector3 GetTargetPos();
-
-	/// <summary>
-	/// 対戦相手の移動ベクトルを取得する
-	/// </summary>
-	/// <returns>対戦相手の移動ベクトル</returns>
-	MyEngine::Vector3 GetTargetVelo();
-
-	/// <summary>
-	/// 対戦相手のやられ状態を取得する
-	/// </summary>
-	/// <returns>対戦相手のやられ状態</returns>
-	int GetTargetHitReaction();
-
-	/// <summary>
-	/// 対戦相手の今のStateを取得する
-	/// </summary>
-	/// <returns>対戦相手の現在のState</returns>
-	CharacterStateKind GetTargetState();
-
-	/// <summary>
 	/// プレイヤーの移動ベクトルを設定する
 	/// </summary>
 	/// <param name="velo">移動ベクトル</param>
@@ -89,104 +67,11 @@ protected:
 	void SetCharacterPos(MyEngine::Vector3 pos);
 
 	/// <summary>
-	/// 対戦相手の背後座標を取得する
-	/// </summary>
-	/// <param name="distance">距離</param>
-	/// <returns>対戦相手の背後座標</returns>
-	MyEngine::Vector3 GetTargetBackPos(float distance);
-
-	/// <summary>
-	/// プレイヤーの残像を作成する
-	/// </summary>
-	void CreateAfterImage();
-
-	/// <summary>
-	/// アニメーション番号を取得する
-	/// </summary>
-	/// <param name="animName">アニメーションの名前</param>
-	/// <returns>アニメーション番号</returns>
-	int GetAttackAnimKind(std::string animName);
-
-	/// <summary>
-	/// キャラクターの移動速度を取得する
-	/// </summary>
-	/// <returns>使用しているキャラクターの移動速度</returns>
-	float GetSpeed();
-
-	/// <summary>
-	/// カメラの補正を止める
-	/// </summary>
-	void StopCameraCorrection();
-
-	/// <summary>
-	/// カメラの移動を止める(時間指定)
-	/// </summary>
-	/// <param name="time">カメラを止める時間</param>
-	void StopCamera(int time);
-
-	/// <summary>
-	/// カメラの補正を始める
-	/// </summary>
-	void StartCameraCorrection();
-
-	/// <summary>
-	/// カメラを揺れを設定する
-	/// </summary>
-	/// <param name="time">揺らす時間</param>
-	void ShakeCamera(int time);
-
-	/// <summary>
-	/// カメラを緩やかに揺らす
-	/// </summary>
-	void SwayCamera();
-
-	/// <summary>
-	/// ボタン連打を始める
-	/// </summary>
-	void StartButtonBashing();
-
-	/// <summary>
-	/// ボタン連打の状況を進める
-	/// </summary>
-	/// <param name="number">GameManagerBase::ButtonBashingSituationをキャストして使用</param>
-	void SetBashingSituation(int number);
-
-	/// <summary>
-	/// ボタン連打を行っているかを取得する
-	/// </summary>
-	/// <returns>ボタン連打を行っているならtrue</returns>
-	bool IsButtonBashing();
-
-	/// <summary>
-	/// ボタン連打時にボタンを押したときに呼ぶ関数
-	/// </summary>
-	void BashButton();
-
-	/// <summary>
-	/// ボタン連打の勝者を取得する
-	/// </summary>
-	/// <returns>勝っていたらtrue</returns>
-	bool IsBashWin();
-
-	/// <summary>
 	/// 攻撃を受けた時に呼ぶ関数
 	/// </summary>
 	/// <param name="attack">受けた攻撃のクラス</param>
 	/// <param name="stateKind">現在のState</param>
 	void HitAttack(std::shared_ptr<Attack> attack, CharacterStateBase::CharacterStateKind stateKind);
-
-	/// <summary>
-	/// エフェクトを登録する
-	/// </summary>
-	/// <param name="effect">登録したいエフェクトのポインタ</param>
-	void EntryEffect(std::shared_ptr<Effect> effect);
-
-	/// <summary>
-	/// エフェクトを削除する
-	/// </summary>
-	/// <param name="effect">削除したいエフェクトのポインタ</param>
-	void ExitEffect(std::shared_ptr<Effect> effect);
-
 
 	/// <summary>
 	/// チュートリアルクリア条件を達成したとする
@@ -204,6 +89,9 @@ protected:
 
 	//自分のキャラクターのポインタ
 	std::shared_ptr<Character> m_pCharacter;
+
+	//バトルマネージャー
+	std::shared_ptr<GameManagerBase> m_pManager;
 
 	//自分についているエフェクト(基本的に1つだけ再生するようにする)
 	std::shared_ptr<Effect> m_pEffect;

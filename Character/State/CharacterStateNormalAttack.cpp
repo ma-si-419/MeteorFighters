@@ -89,20 +89,20 @@ void CharacterStateNormalAttack::Enter()
 	//設定された攻撃のアニメーション取得
 	std::string animName = m_pCharacter->GetNormalAttackData(m_nowAttackName).animationName;
 
-	Character::AnimKind anim = static_cast<Character::AnimKind>(GetAttackAnimKind(animName));
+	Character::AnimKind anim = static_cast<Character::AnimKind>(m_pCharacter->GetAttackAnimKind(animName));
 
 	//アニメーションの変更
 	m_pCharacter->ChangeAnim(anim, false,kAnimBlendSpeed);
 	m_pCharacter->SetAnimPlaySpeed(m_pCharacter->GetNormalAttackData(m_nowAttackName).animationSpeed);
 
 	//向かう方向の設定
-	MyEngine::Vector3 shiftVec = (GetTargetPos() - m_pCharacter->GetPos()).Normalize();
+	MyEngine::Vector3 shiftVec = (m_pManager->GetTargetPos(m_pCharacter) - m_pCharacter->GetPos()).Normalize();
 
 	shiftVec *= kPhysicalAttackNearLange;
 
 	shiftVec.y = 0;
 
-	m_moveTargetPos = GetTargetPos() + shiftVec;
+	m_moveTargetPos = m_pManager->GetTargetPos(m_pCharacter) + shiftVec;
 
 	m_pCharacter->LookTarget();
 
@@ -183,7 +183,7 @@ void CharacterStateNormalAttack::Update()
 			Character::NormalAttackData nextAttack = m_pCharacter->GetNormalAttackData(m_nextAttackName);
 
 			//次の攻撃を出す条件に敵の状態があれば今の敵のやられ状態と照らし合わせる
-			Character::HitReactionKind enemyHitReaction = static_cast<Character::HitReactionKind>(GetTargetHitReaction());
+			Character::HitReactionKind enemyHitReaction = static_cast<Character::HitReactionKind>(m_pManager->GetTargetHitReaction(m_pCharacter));
 
 			//次の攻撃が気力攻撃であれば
 			if (nextAttack.attackKind == Character::AttackKind::kEnergy)
@@ -239,15 +239,15 @@ void CharacterStateNormalAttack::Update()
 
 				effect->SetLifeTime(kTeleportationEffectTime);
 
-				EntryEffect(effect);
+				m_pManager->EntryEffect(effect);
 
 				//カメラを少しだけ止める
-				StopCamera(kTeleportationCameraStopTime);
+				m_pManager->StopCamera(kTeleportationCameraStopTime);
 
 				//次の攻撃発生フレーム時に敵がいる場所を計算する
-				MyEngine::Vector3 teleportationPos = GetTargetPos() + (GetTargetVelo() * (static_cast<float>(nextAttack.attackFrame)));
+				MyEngine::Vector3 teleportationPos = m_pManager->GetTargetPos(m_pCharacter) + (m_pManager->GetTargetVelo(m_pCharacter) * (static_cast<float>(nextAttack.attackFrame)));
 				//瞬間移動先に攻撃の攻撃範囲分だけずれを足す
-				MyEngine::Vector3 attackShiftVec = GetTargetVelo();
+				MyEngine::Vector3 attackShiftVec = m_pManager->GetTargetVelo(m_pCharacter);
 
 				teleportationPos += attackShiftVec.Normalize() * (kTeleportationShiftLange);
 
@@ -276,9 +276,9 @@ void CharacterStateNormalAttack::Update()
 			MyEngine::LocalPos attackPos;
 
 			//ローカル座標の中心を設定
-			attackPos.SetCenterPos(GetTargetPos());
+			attackPos.SetCenterPos(m_pManager->GetTargetPos(m_pCharacter));
 			//ローカル座標の正面座標を設定
-			attackPos.SetFrontPos(GetTargetPos() + (m_pCharacter->GetPos() - GetTargetPos()).Normalize());
+			attackPos.SetFrontPos(m_pManager->GetTargetPos(m_pCharacter) + (m_pCharacter->GetPos() - m_pManager->GetTargetPos(m_pCharacter)).Normalize());
 			//ローカル座標を設定
 			attackPos.SetLocalPos(MyEngine::Vector3(0.0f, 0.0f, kPhysicalAttackRadius));
 
@@ -288,8 +288,8 @@ void CharacterStateNormalAttack::Update()
 
 			shiftVec.y = 0;
 
-			m_moveTargetPos = GetTargetPos() + shiftVec;
-			Character::AnimKind anim = static_cast<Character::AnimKind>(GetAttackAnimKind(nextAttack.animationName));
+			m_moveTargetPos = m_pManager->GetTargetPos(m_pCharacter) + shiftVec;
+			Character::AnimKind anim = static_cast<Character::AnimKind>(m_pCharacter->GetAttackAnimKind(nextAttack.animationName));
 
 			m_pCharacter->ChangeAnim(anim, false,kAnimBlendSpeed);
 			m_pCharacter->SetAnimPlaySpeed(nextAttack.animationSpeed);
@@ -365,8 +365,8 @@ void CharacterStateNormalAttack::Update()
 			dir = leftStickDir.Normalize();
 
 			//エネミーの方向に移動方向を回転させる
-			float vX = GetTargetPos().x - m_pCharacter->GetPos().x;
-			float vZ = GetTargetPos().z - m_pCharacter->GetPos().z;
+			float vX = m_pManager->GetTargetPos(m_pCharacter).x - m_pCharacter->GetPos().x;
+			float vZ = m_pManager->GetTargetPos(m_pCharacter).z - m_pCharacter->GetPos().z;
 
 			float angle = std::atan2f(vX, vZ);
 
@@ -377,17 +377,17 @@ void CharacterStateNormalAttack::Update()
 			dir = dir.MatTransform(mat);
 
 			//移動方向にスピードをかける
-			velo = dir * GetSpeed();
+			velo = dir * m_pCharacter->GetSpeed();
 		}
 		//ジャンプボタンが押されたら
 		if (input->IsPress("RB"))
 		{
-			velo.y = GetSpeed();
+			velo.y = m_pCharacter->GetSpeed();
 		}
 		//下降ボタンが押されたら
 		else if (input->IsPushTrigger(true))
 		{
-			velo.y = -GetSpeed();
+			velo.y = -m_pCharacter->GetSpeed();
 		}
 	}
 
@@ -397,7 +397,6 @@ void CharacterStateNormalAttack::Update()
 	{
 		m_isAttacked = true;
 		Character::AttackData attack;
-
 
 		//チャージした時のダメージ
 		if (m_chargeTime > 0.0f)
@@ -500,7 +499,7 @@ void CharacterStateNormalAttack::Update()
 					m_isNextAttack = true;
 				}
 				//敵が吹っ飛び状態の時に派生攻撃をしていたら
-				Character::HitReactionKind kind = static_cast<Character::HitReactionKind>(GetTargetHitReaction());
+				Character::HitReactionKind kind = static_cast<Character::HitReactionKind>(m_pManager->GetTargetHitReaction(m_pCharacter));
 				if (kind == Character::HitReactionKind::kUpBurst ||
 					kind == Character::HitReactionKind::kFarBurst ||
 					kind == Character::HitReactionKind::kDownBurst)

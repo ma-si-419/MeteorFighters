@@ -49,7 +49,7 @@ void CharacterStateCharge::Enter()
 	//エフェクトのループ設定
 	m_pEffect->SetLoop(kEffectStartFrame, kEffectEndFrame);
 	//エフェクトをマネージャーに登録
-	EntryEffect(m_pEffect);
+	m_pManager->EntryEffect(m_pEffect);
 }
 
 void CharacterStateCharge::Update()
@@ -67,7 +67,7 @@ void CharacterStateCharge::Update()
 		{
 			m_pCharacter->ChangeAnim(Character::AnimKind::kInCharge, true);
 			m_pCharacter->SetAnimPlaySpeed();
-			ShakeCamera(kCameraShakeTime);
+			m_pManager->ShakeCamera(kCameraShakeTime);
 		}
 	}
 
@@ -148,5 +148,5 @@ void CharacterStateCharge::Update()
 void CharacterStateCharge::Exit()
 {
 	//エフェクトを削除する
-	ExitEffect(m_pEffect);
+	m_pManager->ExitEffect(m_pEffect);
 }

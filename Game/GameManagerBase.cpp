@@ -28,7 +28,7 @@ namespace
 	};
 
 	//カメラ間を移動する時間
-	float kButtonBashingMoveTime = 20.0f;
+	constexpr float kButtonBashingMoveTime = 20.0f;
 
 	//カメラの移動速度
 	const float kButtonBashingCameraMoveSpeed[static_cast<int>(GameManagerBase::ButtonBashingSituation::kSituationNum)] =
@@ -39,7 +39,19 @@ namespace
 	};
 
 	//カメラを回転させる速度
-	float kCameraRotaSpeed = 0.08f;
+	constexpr float kCameraRotaSpeed = 0.08f;
+
+	//連打するボタンの種類数
+	constexpr int kBashingButtonNum = 4;
+
+	//連打するボタンの種類
+	const std::string kBashingButtonKind[kBashingButtonNum] =
+	{
+		"A",
+		"B",
+		"X",
+		"Y"
+	};
 }
 
 GameManagerBase::GameManagerBase(std::shared_ptr<GameCamera> camera, GameManagerBase::GameKind kind) :
@@ -51,7 +63,8 @@ GameManagerBase::GameManagerBase(std::shared_ptr<GameCamera> camera, GameManager
 	m_buttonBashingTime(0),
 	m_buttonBashNum(),
 	m_isButtonBashing(false),
-	m_buttonBashingCameraRota(0.0f)
+	m_buttonBashingCameraRota(0.0f),
+	m_bashingButton("empty")
 {
 	m_pStage = std::make_shared<Stage>();
 	m_pStage->Init();
@@ -309,6 +322,9 @@ void GameManagerBase::StartButtonBashing()
 	m_buttonBashingSituation = ButtonBashingSituation::kFirstHit;
 
 	m_buttonBashingCameraPos = kButtonBashingCameraPos[static_cast<int>(m_buttonBashingSituation)];
+
+	//連打するボタンをランダムで決める
+	m_bashingButton = kBashingButtonKind[GetRand(kBashingButtonNum - 1)];
 }
 
 void GameManagerBase::UpdateCommon()
@@ -433,7 +449,6 @@ void GameManagerBase::UpdateButtonBashing()
 	//カメラの設定
 	m_pCamera->SetPoseCamera();
 	m_pCamera->SetFrontPos(kButtonBashingCameraTargetPos);
-
 	m_pCamera->Update();
 
 	//一定時間行ったらやめる

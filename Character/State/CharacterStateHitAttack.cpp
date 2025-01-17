@@ -4,6 +4,7 @@
 #include "DxLib.h"
 #include "Character.h"
 #include "Attack.h"
+#include "GameManagerBase.h"
 
 namespace
 {
@@ -161,7 +162,7 @@ void CharacterStateHitAttack::HitAttack(int kind)
 	MyEngine::LocalPos local;
 	local.SetCenterPos(m_pCharacter->GetPos());
 	//ƒ[ƒJƒ‹À•W‚Ì‘O•ûŒü‚ðUŒ‚‚µ‚½‚à‚Ì‚©‚çUŒ‚‚³‚ê‚½‚à‚Ì‚ÉŒü‚¯‚é
-	MyEngine::Vector3 centerFrontPos = (m_pCharacter->GetPos() - GetTargetPos()).Normalize() + m_pCharacter->GetPos();
+	MyEngine::Vector3 centerFrontPos = (m_pCharacter->GetPos() - m_pManager->GetTargetPos(m_pCharacter)).Normalize() + m_pCharacter->GetPos();
 	local.SetFrontPos(centerFrontPos);
 
 
@@ -235,7 +236,7 @@ void CharacterStateHitAttack::HitAttack(int kind)
 	{
 		MyEngine::Vector3 frontPos;
 
-		frontPos = (m_pCharacter->GetPos() - GetTargetPos()) + m_pCharacter->GetPos();
+		frontPos = (m_pCharacter->GetPos() - m_pManager->GetTargetPos(m_pCharacter)) + m_pCharacter->GetPos();
 
 		m_pCharacter->SetFrontPos(frontPos);
 	}

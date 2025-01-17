@@ -116,7 +116,7 @@ void CharacterStateSpecialAttack::Update()
 	float attackEndFrame = static_cast<float>(attackData.startFrame + m_attackTime);
 
 	//必殺技を受けた時の状態と敵の状態が一致したら
-	if (m_endHitReaction == static_cast<int>(GetTargetHitReaction()) &&
+	if (m_endHitReaction == static_cast<int>(m_pManager->GetTargetHitReaction(m_pCharacter)) &&
 		m_time < attackEndFrame)
 	{
 		//攻撃をやめるフレームまで進める
@@ -136,7 +136,7 @@ void CharacterStateSpecialAttack::Update()
 			m_pCharacter->ChangeAnim(Character::AnimKind::kEndSecondSpecialAttack, false);
 		}
 		//エフェクトを止める
-		ExitEffect(m_pEffect);
+		m_pManager->ExitEffect(m_pEffect);
 	}
 	//エフェクトが設定されていたら
 	if (m_pEffect)
@@ -227,7 +227,7 @@ void CharacterStateSpecialAttack::Update()
 		float rotY = std::atan2f(vX, vZ);
 
 		m_pEffect->SetRotation(MyEngine::Vector3(0.0f, rotY, 0.0f));
-		EntryEffect(m_pEffect);
+		m_pManager->EntryEffect(m_pEffect);
 
 		//攻撃を出したと設定
 		m_isAttacked = true;
@@ -239,7 +239,7 @@ void CharacterStateSpecialAttack::Exit()
 {
 	if (m_pEffect)
 	{
-		ExitEffect(m_pEffect);
+		m_pManager->ExitEffect(m_pEffect);
 	}
 
 	//必殺技発動のチュートリアルをクリアさせる

@@ -8,6 +8,7 @@
 #include "Character.h"
 #include "GameSceneConstant.h"
 #include "Effect.h"
+#include "GameManagerBase.h"
 #include <cmath>
 
 namespace
@@ -69,8 +70,8 @@ CharacterStateRush::CharacterStateRush(std::shared_ptr<Character> character) :
 void CharacterStateRush::SetMoveDir(MyEngine::Vector3 dir)
 {
 	//エネミーの方向に移動方向を回転させる
-	float vX = GetTargetPos().x - m_pCharacter->GetPos().x;
-	float vZ = GetTargetPos().z - m_pCharacter->GetPos().z;
+	float vX = m_pManager->GetTargetPos(m_pCharacter).x - m_pCharacter->GetPos().x;
+	float vZ = m_pManager->GetTargetPos(m_pCharacter).z - m_pCharacter->GetPos().z;
 
 	float yAngle = std::atan2f(vX, vZ);
 
@@ -85,7 +86,7 @@ void CharacterStateRush::SetMoveDir(MyEngine::Vector3 dir)
 	//前入力は敵に向かっていくが後ろ入力はy座標を計算に入れないのでその計算
 	if (dir.z > 0)
 	{
-		MyEngine::Vector3 toTargetDir = (GetTargetPos() - m_pCharacter->GetPos()).Normalize();
+		MyEngine::Vector3 toTargetDir = (m_pManager->GetTargetPos(m_pCharacter) - m_pCharacter->GetPos()).Normalize();
 
 		m_moveDir = m_moveDir * (1.0f - dir.z) + toTargetDir * dir.z;
 	}
@@ -134,7 +135,7 @@ void CharacterStateRush::Update()
 			m_pCharacter->SetAnimPlaySpeed(kEndAnimPlaySpeed);
 
 			//エフェクトを変更する
-			ExitEffect(m_pEffect);
+			m_pManager->ExitEffect(m_pEffect);
 
 			m_pEffect = std::make_shared<Effect>(Effect::EffectKind::kDashEnd);
 
@@ -146,7 +147,7 @@ void CharacterStateRush::Update()
 			//敵に向かう入力がされていた時
 			if (m_isRushEnemy)
 			{
-				MyEngine::Vector3 targetPos = GetTargetPos();
+				MyEngine::Vector3 targetPos = m_pManager->GetTargetPos(m_pCharacter);
 				MyEngine::Vector3 pos = m_pCharacter->GetPos();
 
 				float vX = targetPos.x - pos.x;
@@ -168,7 +169,7 @@ void CharacterStateRush::Update()
 
 			m_pEffect->SetRotation(rotation);
 
-			EntryEffect(m_pEffect);
+			m_pManager->EntryEffect(m_pEffect);
 
 		}
 		//攻撃入力がされていたら攻撃状態に移行する
@@ -179,7 +180,7 @@ void CharacterStateRush::Update()
 			next->SetAttack("X", "DashAttack");
 
 			//敵の方向を向く
-			m_pCharacter->SetFrontPos(GetTargetPos());
+			m_pCharacter->SetFrontPos(m_pManager->GetTargetPos(m_pCharacter));
 
 			ChangeState(next);
 		}
@@ -222,7 +223,7 @@ void CharacterStateRush::Update()
 				{
 					//敵の近くまで向かう突撃状態になる
 					m_isRushEnemy = true;
-					m_rushTargetPos = GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance);
+					m_rushTargetPos = m_pManager->GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance,m_pCharacter);
 				}
 			}
 		}
@@ -249,7 +250,7 @@ void CharacterStateRush::Update()
 				{
 					m_isEndRush = true;
 
-					ShakeCamera(kCameraShakeTime);
+					m_pManager->ShakeCamera(kCameraShakeTime);
 				}
 			}
 		}
@@ -282,8 +283,8 @@ void CharacterStateRush::Update()
 	{
 		stickDir = stickDir.Normalize();
 		//エネミーの方向に移動方向を回転させる
-		float vX = GetTargetPos().x - m_pCharacter->GetPos().x;
-		float vZ = GetTargetPos().z - m_pCharacter->GetPos().z;
+		float vX = m_pManager->GetTargetPos(m_pCharacter).x - m_pCharacter->GetPos().x;
+		float vZ = m_pManager->GetTargetPos(m_pCharacter).z - m_pCharacter->GetPos().z;
 
 		float yAngle = std::atan2f(vX, vZ);
 
@@ -300,7 +301,7 @@ void CharacterStateRush::Update()
 		//前入力は敵に向かっていくが後ろ入力はy座標を計算に入れないのでその計算
 		if (stickDir.z > 0)
 		{
-			MyEngine::Vector3 toTargetDir = (GetTargetPos() - m_pCharacter->GetPos()).Normalize();
+			MyEngine::Vector3 toTargetDir = (m_pManager->GetTargetPos(m_pCharacter) - m_pCharacter->GetPos()).Normalize();
 
 			dir = dir * (1.0f - stickDir.z) + toTargetDir * stickDir.z;
 		}
@@ -316,14 +317,14 @@ void CharacterStateRush::Update()
 		//まだ開始アニメーションを再生していたら
 		if (m_pCharacter->GetPlayAnimKind() == Character::AnimKind::kRushStart)
 		{
-			ShakeCamera(kCameraShakeTime);
+			m_pManager->ShakeCamera(kCameraShakeTime);
 			//アニメーションを変更する
 			m_pCharacter->ChangeAnim(Character::AnimKind::kSkyDash, true);
 			//エフェクトを再生する
 			m_pEffect = std::make_shared<Effect>(Effect::EffectKind::kDash);
 			m_pEffect->SetPos(m_pCharacter->GetPos());
 			m_pEffect->SetLoop(30, 32);
-			EntryEffect(m_pEffect);
+			m_pManager->EntryEffect(m_pEffect);
 		}
 	}
 	//まだ開始アニメーションを再生していたら
@@ -375,7 +376,7 @@ void CharacterStateRush::Update()
 	if (m_isRushEnemy)
 	{
 		//もし敵がRushStateであれば
-		if (GetTargetState() == CharacterStateKind::kRush)
+		if (static_cast<CharacterStateKind>(m_pManager->GetTargetState(m_pCharacter)) == CharacterStateKind::kRush)
 		{
 			//ボタン連打対決に移行する
 			auto next = std::make_shared<CharacterStateButtonBashing>(m_pCharacter);
@@ -420,15 +421,15 @@ void CharacterStateRush::Update()
 		}
 
 		//一定距離までは目的座標を更新し続ける
-		if ((GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance) - m_pCharacter->GetPos()).Length() > GameSceneConstant::kCameraMoveDistance)
+		if ((m_pManager->GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance,m_pCharacter) - m_pCharacter->GetPos()).Length() > GameSceneConstant::kCameraMoveDistance)
 		{
-			m_rushTargetPos = GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance);
-			StopCameraCorrection();
+			m_rushTargetPos = m_pManager->GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance,m_pCharacter);
+			m_pManager->StopCameraCorrection();
 		}
 		//一定距離まで近づいたら
 		else
 		{
-			StartCameraCorrection();
+			m_pManager->StartCameraCorrection();
 
 			//カメラを高速移動させる
 			m_pCharacter->StartFastCameraMove();
@@ -442,11 +443,11 @@ void CharacterStateRush::Update()
 				//敵の方向を向く
 				MyEngine::Vector3 nextPos = m_pCharacter->GetPos() + velo;
 
-				MyEngine::Vector3 nextToTarget = GetTargetPos() - nextPos;
+				MyEngine::Vector3 nextToTarget = m_pManager->GetTargetPos(m_pCharacter) - nextPos;
 
 				m_pCharacter->SetFrontPos(nextToTarget + m_pCharacter->GetPos());
 
-				ShakeCamera(kCameraShakeTime);
+				m_pManager->ShakeCamera(kCameraShakeTime);
 
 				m_isEndRush = true;
 			}
@@ -458,7 +459,7 @@ void CharacterStateRush::Update()
 		//次の移動座標がエネミーとぶつかるのならばラッシュをやめる
 		MyEngine::Vector3 nextPos = m_pCharacter->GetPos() + velo;
 
-		float lange = (GetTargetPos() - nextPos).Length();
+		float lange = (m_pManager->GetTargetPos(m_pCharacter) - nextPos).Length();
 
 		//キャラクターの半径二体分よりも距離が近ければ
 		if (lange < GameSceneConstant::kCharacterRadius * 2)
@@ -500,7 +501,7 @@ void CharacterStateRush::Update()
 	if (!m_isEndRush)
 	{
 		//カメラを少し揺らす
-		SwayCamera();
+		m_pManager->SwayCamera();
 
 		//移動方向を見る
 		m_pCharacter->SetFrontPos(m_pCharacter->GetPos() + velo);
@@ -517,5 +518,5 @@ void CharacterStateRush::Update()
 }
 void CharacterStateRush::Exit()
 {
-	ExitEffect(m_pEffect);
+	m_pManager->ExitEffect(m_pEffect);
 }

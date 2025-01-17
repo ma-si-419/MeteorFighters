@@ -235,7 +235,7 @@ public:
 	/// ボタンを連打した回数を増やす
 	/// </summary>
 	/// <param name="player">どちらのプレイヤーか</param>
-	void AddBashButtonNum(Character::PlayerNumber player) { m_buttonBashNum[static_cast<int>(player)]++; };
+	void BashButton(Character::PlayerNumber player) { m_buttonBashNum[static_cast<int>(player)]++; };
 
 	/// <summary>
 	/// ボタン連打を始めるタイミングで呼ぶ
@@ -246,6 +246,17 @@ public:
 	/// ボタン連打の状況を次に進める
 	/// </summary>
 	void SetBashingSituation(ButtonBashingSituation situation) { m_buttonBashingSituation = situation; }
+
+	/// <summary>
+	/// ボタン連打の状況を取得する
+	/// </summary>
+	ButtonBashingSituation GetBashingSituation() { return m_buttonBashingSituation; }
+
+	/// <summary>
+	/// 何のボタンを連打するのかを取得する
+	/// </summary>
+	/// <returns>連打するボタン</returns>
+	std::string GetBashingButton() { return m_bashingButton; }
 
 	/// <summary>
 	/// 非同期ロードを行うモデルを追加する
@@ -311,6 +322,8 @@ protected:
 	MyEngine::Vector3 m_poseCameraPos;
 	//フェードを行うときの変数
 	int m_alpha;
+	//連打を行うボタン
+	std::string m_bashingButton;
 	//ボタン連打を行っているかどうか
 	bool m_isButtonBashing;
 	//ボタン連打を行った回数

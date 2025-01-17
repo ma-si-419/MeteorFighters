@@ -32,6 +32,7 @@ namespace
 CharacterStateBase::CharacterStateBase(std::shared_ptr<Character> character)
 {
 	m_pCharacter = character;
+	m_pManager = m_pCharacter->m_pBattleManager;
 }
 
 void CharacterStateBase::OnCollide(std::shared_ptr<Collidable> collider)
@@ -69,7 +70,7 @@ void CharacterStateBase::UpdateCommon()
 	if (m_kind != CharacterStateKind::kButtonBashing)
 	{
 		//相手のStateがボタン連打だったらButtonBashingStateに変更する
-		if (GetTargetState() == CharacterStateKind::kButtonBashing)
+		if (static_cast<CharacterStateKind>(m_pManager->GetTargetState(m_pCharacter)) == CharacterStateKind::kButtonBashing)
 		{
 			auto next = std::make_shared<CharacterStateButtonBashing>(m_pCharacter);
 
@@ -92,27 +93,7 @@ void CharacterStateBase::ChangeState(std::shared_ptr<CharacterStateBase> nextSta
 
 std::shared_ptr<MyEngine::InputData> CharacterStateBase::GetCharacterInput()
 {
-	return m_pCharacter->GetInputData();
-}
-
-MyEngine::Vector3 CharacterStateBase::GetTargetPos()
-{
-	return m_pCharacter->m_pBattleManager->GetTargetPos(m_pCharacter);
-}
-
-MyEngine::Vector3 CharacterStateBase::GetTargetVelo()
-{
-	return m_pCharacter->m_pBattleManager->GetTargetVelo(m_pCharacter);
-}
-
-int CharacterStateBase::GetTargetHitReaction()
-{
-	return static_cast<int>(m_pCharacter->m_pBattleManager->GetTargetHitReaction(m_pCharacter));
-}
-
-CharacterStateBase::CharacterStateKind CharacterStateBase::GetTargetState()
-{
-	return static_cast<CharacterStateKind>(m_pCharacter->m_pBattleManager->GetTargetState(m_pCharacter));
+	return m_pCharacter->m_input;
 }
 
 void CharacterStateBase::SetCharacterVelo(MyEngine::Vector3 velo)
@@ -123,83 +104,6 @@ void CharacterStateBase::SetCharacterVelo(MyEngine::Vector3 velo)
 void CharacterStateBase::SetCharacterPos(MyEngine::Vector3 pos)
 {
 	m_pCharacter->m_rigidbody.SetPos(pos);
-}
-
-MyEngine::Vector3 CharacterStateBase::GetTargetBackPos(float distance)
-{
-	return m_pCharacter->m_pBattleManager->GetTargetBackPos(distance, m_pCharacter);
-}
-
-void CharacterStateBase::CreateAfterImage()
-{
-	m_pCharacter->CreateAfterImage();
-}
-
-int CharacterStateBase::GetAttackAnimKind(std::string animName)
-{
-	return static_cast<int>(m_pCharacter->GetAttackAnimKind(animName));
-}
-
-float CharacterStateBase::GetSpeed()
-{
-	return m_pCharacter->GetSpeed();
-}
-
-void CharacterStateBase::StopCameraCorrection()
-{
-	m_pCharacter->m_pBattleManager->StopCameraCorrection();
-}
-
-void CharacterStateBase::StopCamera(int time)
-{
-	m_pCharacter->m_pBattleManager->StopCamera(time);
-}
-
-void CharacterStateBase::StartCameraCorrection()
-{
-	m_pCharacter->m_pBattleManager->StartCameraCorrection();
-}
-
-void CharacterStateBase::ShakeCamera(int time)
-{
-	m_pCharacter->m_pBattleManager->ShakeCamera(time);
-}
-
-void CharacterStateBase::SwayCamera()
-{
-	m_pCharacter->m_pBattleManager->SwayCamera();
-}
-
-void CharacterStateBase::StartButtonBashing()
-{
-	m_pCharacter->m_pBattleManager->StartButtonBashing();
-}
-
-void CharacterStateBase::SetBashingSituation(int number)
-{
-	m_pCharacter->m_pBattleManager->SetBashingSituation(static_cast<GameManagerBase::ButtonBashingSituation>(number));
-}
-
-bool CharacterStateBase::IsButtonBashing()
-{
-	return m_pCharacter->m_pBattleManager->IsButtonBashing();
-}
-
-void CharacterStateBase::BashButton()
-{
-	m_pCharacter->m_pBattleManager->AddBashButtonNum(m_pCharacter->GetPlayerNumber());
-}
-
-bool CharacterStateBase::IsBashWin()
-{
-	auto winner = m_pCharacter->m_pBattleManager->GetButtonBashWinner();
-
-	if (winner == m_pCharacter->GetPlayerNumber())
-	{
-		return true;
-	}
-
-	return false;
 }
 
 void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack, CharacterStateBase::CharacterStateKind stateKind)
@@ -281,16 +185,6 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack, CharacterStat
 	m_pCharacter->SubHp(damage);
 
 	ChangeState(nextState);
-}
-
-void CharacterStateBase::EntryEffect(std::shared_ptr<Effect> effect)
-{
-	m_pCharacter->m_pBattleManager->EntryEffect(effect);
-}
-
-void CharacterStateBase::ExitEffect(std::shared_ptr<Effect> effect)
-{
-	m_pCharacter->m_pBattleManager->ExitEffect(effect);
 }
 
 void CharacterStateBase::SuccessTutorial(int tutorialNumber)

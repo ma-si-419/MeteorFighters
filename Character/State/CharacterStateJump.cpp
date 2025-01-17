@@ -195,7 +195,7 @@ void CharacterStateJump::Update()
 		//敵との距離からダッシュかステップか判断する
 		//(ステップかダッシュかの判定はDashStateの中でも行う)
 		//(ここではMPを消費するかしないか、DashStateにはいるかどうかを判断する)
-		if ((GetTargetPos() - m_pCharacter->GetPos()).Length() > GameSceneConstant::kNearLange)
+		if ((m_pManager->GetTargetPos(m_pCharacter) - m_pCharacter->GetPos()).Length() > GameSceneConstant::kNearLange)
 		{
 			//遠かった場合Mpを消費してダッシュする
 			if (m_pCharacter->SubMp(GameSceneConstant::kDashCost))

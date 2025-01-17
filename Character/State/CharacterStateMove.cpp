@@ -49,7 +49,7 @@ void CharacterStateMove::Enter()
 void CharacterStateMove::Update()
 {
 	//プレイヤーからエネミーへのベクトル
-	MyEngine::Vector3 playerToTarget = GetTargetPos() - m_pCharacter->GetPos();
+	MyEngine::Vector3 playerToTarget = m_pManager->GetTargetPos(m_pCharacter) - m_pCharacter->GetPos();
 
 	//インプットを管理しているクラスの参照
 	auto input = GetCharacterInput();
@@ -77,8 +77,8 @@ void CharacterStateMove::Update()
 		dir = inputDir;
 
 		//エネミーの方向に移動方向を回転させる
-		float vX = GetTargetPos().x - m_pCharacter->GetPos().x;
-		float vZ = GetTargetPos().z - m_pCharacter->GetPos().z;
+		float vX = m_pManager->GetTargetPos(m_pCharacter).x - m_pCharacter->GetPos().x;
+		float vZ = m_pManager->GetTargetPos(m_pCharacter).z - m_pCharacter->GetPos().z;
 
 		float yAngle = std::atan2f(vX, vZ);
 
@@ -90,7 +90,7 @@ void CharacterStateMove::Update()
 
 		dir = dir.MatTransform(mat);
 
-		MyEngine::Vector3 toTarget = (GetTargetPos() - m_pCharacter->GetPos());
+		MyEngine::Vector3 toTarget = (m_pManager->GetTargetPos(m_pCharacter) - m_pCharacter->GetPos());
 		MyEngine::Vector3 toTargetDir = toTarget.Normalize();
 
 		//空中にいて前入力されていたら
@@ -102,7 +102,7 @@ void CharacterStateMove::Update()
 		}
 
 		//移動速度
-		float speed = GetSpeed();
+		float speed = m_pCharacter->GetSpeed();
 
 		//一定以上敵に近くなると移動速度を遅くする
 		if (toTarget.Length() < GameSceneConstant::kNearLange)
@@ -161,7 +161,7 @@ void CharacterStateMove::Update()
 		//敵との距離からダッシュかステップか判断する
 		//(ステップかダッシュかの判定はDashStateの中でも行う)
 		//(ここではMPを消費するかしないか、DashStateにはいるかどうかを判断する)
-		if ((GetTargetPos() - m_pCharacter->GetPos()).Length() > GameSceneConstant::kNearLange)
+		if ((m_pManager->GetTargetPos(m_pCharacter) - m_pCharacter->GetPos()).Length() > GameSceneConstant::kNearLange)
 		{
 			//遠かった場合Mpを消費してダッシュする
 			if (m_pCharacter->SubMp(GameSceneConstant::kDashCost))
@@ -251,7 +251,7 @@ void CharacterStateMove::Update()
 		//上昇ボタンが押されたら
 		if (input->IsPress("RB"))
 		{
-			velo.y = GetSpeed();
+			velo.y = m_pCharacter->GetSpeed();
 			m_isFloat = true;
 
 			//上昇チュートリアルをクリアにする
@@ -260,7 +260,7 @@ void CharacterStateMove::Update()
 		//下降ボタンが押されたら
 		else if (input->IsPushTrigger(true))
 		{
-			velo.y = -GetSpeed();
+			velo.y = -m_pCharacter->GetSpeed();
 
 			//プレイ中のアニメーションがジャンプ中でなければ
 			if (!(m_pCharacter->GetPlayAnimKind() == Character::AnimKind::kJumping))
@@ -278,7 +278,7 @@ void CharacterStateMove::Update()
 		if (!m_isLastGround)
 		{
 			//敵の方向を向く(Y座標はプレイヤーと同じ座標にする)
-			auto frontPos = GetTargetPos();
+			auto frontPos = m_pManager->GetTargetPos(m_pCharacter);
 
 			frontPos.y = m_pCharacter->GetPos().y;
 
@@ -420,7 +420,7 @@ void CharacterStateMove::Update()
 	else
 	{
 		//敵との距離
-		auto distance = (GetTargetPos() - m_pCharacter->GetPos()).Length();
+		auto distance = (m_pManager->GetTargetPos(m_pCharacter) - m_pCharacter->GetPos()).Length();
 
 		//敵との距離が近いと判断したら移動チュートリアルクリアフラグを立てる
 		if (distance < GameSceneConstant::kNearLange)

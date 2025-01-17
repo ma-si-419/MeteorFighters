@@ -4,6 +4,8 @@
 #include "DxLib.h"
 #include "GameSceneConstant.h"
 #include "GameManagerBase.h"
+#include "Input.h"
+#include "Attack.h"
 
 
 namespace
@@ -37,6 +39,15 @@ namespace
 
 	//ブレンドスピード
 	constexpr float kBlendSpeed = 0.03f;
+
+	//終了時に発生する攻撃の名前
+	const std::string kAttackName = "ButtonBashingAttack";
+
+	//攻撃の大きさ
+	constexpr float kAttackRadius = 8.0f;
+
+	//攻撃の生存時間
+	constexpr int kAttackLifeTime = 2;
 }
 
 CharacterStateButtonBashing::CharacterStateButtonBashing(std::shared_ptr<Character> character) :
@@ -68,14 +79,14 @@ void CharacterStateButtonBashing::Enter()
 	m_pCharacter->ChangeAnim(Character::AnimKind::kButtonBashingHitBack, false);
 
 	//ボタン連打を始めるとマネージャーに伝える
-	StartButtonBashing();
+	m_pManager->StartButtonBashing();
 }
 
 void CharacterStateButtonBashing::Update()
 {
 
 	//もし相手のStateがButtonBashing出なければ早期リターン
-	if (GetTargetState() != CharacterStateKind::kButtonBashing) return;
+	if (static_cast<CharacterStateKind>(m_pManager->GetTargetState(m_pCharacter)) != CharacterStateKind::kButtonBashing) return;
 
 	//ぶつかってから何フレーム立ったかを保存する
 	m_bumpTime++;
@@ -132,7 +143,7 @@ void CharacterStateButtonBashing::Update()
 			if (m_pCharacter->GetPlayerNumber() == Character::PlayerNumber::kOnePlayer)
 			{
 				//二つ目のSituationに行く
-				SetBashingSituation(static_cast<int>(GameManagerBase::ButtonBashingSituation::kSecondHit));
+				m_pManager->SetBashingSituation(GameManagerBase::ButtonBashingSituation::kSecondHit);
 			}
 		}
 	}
@@ -148,7 +159,7 @@ void CharacterStateButtonBashing::Update()
 	m_moveSpeed = fmin(m_moveSpeed, kMaxMoveSpeed);
 
 	//敵との距離
-	float toEnemyLength = (GetTargetPos() - m_pCharacter->GetPos()).Length();
+	float toEnemyLength = (m_pManager->GetTargetPos(m_pCharacter) - m_pCharacter->GetPos()).Length();
 
 	//移動ベクトル
 	MyEngine::Vector3 moveVec;
@@ -157,7 +168,7 @@ void CharacterStateButtonBashing::Update()
 	bool isMove = true;
 
 	//敵とぶつかる距離になったら
-	if ((GetTargetPos() - m_pCharacter->GetPos()).Length() < (GameSceneConstant::kCharacterRadius * 2.0f) + 3.0f &&
+	if ((m_pManager->GetTargetPos(m_pCharacter) - m_pCharacter->GetPos()).Length() < (GameSceneConstant::kCharacterRadius * 2.0f) + 3.0f &&
 		m_moveSpeed >= 0.0f)
 	{
 		//一度ぶつかっていたら
@@ -168,7 +179,7 @@ void CharacterStateButtonBashing::Update()
 			SetCharacterVelo(MyEngine::Vector3(0, 0, 0));
 
 			//二つ目のSituationに行く
-			SetBashingSituation(static_cast<int>(GameManagerBase::ButtonBashingSituation::kFighting));
+			m_pManager->SetBashingSituation(GameManagerBase::ButtonBashingSituation::kFighting);
 
 			//座標を補正する
 			if (m_pCharacter->GetPlayerNumber() == Character::PlayerNumber::kOnePlayer)
@@ -232,21 +243,65 @@ void CharacterStateButtonBashing::Update()
 		}
 	}
 
-	//ボタン連打をやめるタイミングになったら
-	if (!IsButtonBashing())
+	//連打対決
+	if (static_cast<GameManagerBase::ButtonBashingSituation>(m_pManager->GetBashingSituation()) == GameManagerBase::ButtonBashingSituation::kFighting)
 	{
-		auto next = std::make_shared<CharacterStateIdle>(m_pCharacter);
+		auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
-		ChangeState(next);
-
-		//勝っていた場合
-		if (IsBashWin())
+		//指定されたボタンを押していたら
+		if (input->IsTrigger(m_pManager->GetBashingButton()))
 		{
-
+			m_pManager->BashButton(m_pCharacter->GetPlayerNumber());
 		}
+	}
+
+	//ボタン連打をやめるタイミングになったら
+	if (!m_pManager->IsButtonBashing())
+	{
+		//勝っていた場合
+		if (m_pManager->GetButtonBashWinner() == m_pCharacter->GetPlayerNumber())
+		{
+			//アイドル状態に戻る
+			auto next = std::make_shared<CharacterStateIdle>(m_pCharacter);
+
+			ChangeState(next);
+		}
+		//負けていた場合
 		else
 		{
+			//攻撃を受けるようにする
 
+			//タグを相手の攻撃にする
+			ObjectTag tag;
+			
+			if (m_pCharacter->GetPlayerNumber() == Character::PlayerNumber::kOnePlayer)
+			{
+				tag = ObjectTag::kTwoPlayerAttack;
+			}
+			else
+			{
+				tag = ObjectTag::kOnePlayerAttack;
+			}
+
+			//攻撃の情報を取得
+			auto attackData = m_pCharacter->GetNormalAttackData(kAttackName);
+
+			//攻撃に設定するステータス
+			Attack::AttackStatus status;
+			status.damage = attackData.damageRate * m_pCharacter->GetPower();
+			status.speed = attackData.attackMoveSpeed;
+			status.radius = kAttackRadius;
+			status.lifeTime = kAttackLifeTime;
+			status.attackKind = attackData.attackKind;
+			status.attackHitKind = attackData.attackHitKind;
+			status.targetPos = m_pManager->GetTargetPos(m_pCharacter);
+
+			//受ける攻撃
+			auto attack = std::make_shared<Attack>(tag,kTargetPos);
+
+			attack->Init(status,m_pManager->GetEffectManagerPointer());
+
+			m_pManager->AddAttack(attack);
 		}
 	}
 }
