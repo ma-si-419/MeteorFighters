@@ -366,11 +366,6 @@ void GameManagerBase::UpdateCommon()
 
 void GameManagerBase::DrawCommon()
 {
-	//ボタン連打状態だったら
-	if (m_isButtonBashing)
-	{
-		DrawButtonBashing();
-	}
 
 	for (auto& item : m_pAttacks)
 	{
@@ -392,6 +387,13 @@ void GameManagerBase::DrawCommon()
 	m_pGameUi->DrawMpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetMp(), true);
 	//2Pの気力を描画する
 	m_pGameUi->DrawMpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetMp(), false);
+	
+	//ボタン連打状態だったら
+	if (m_isButtonBashing)
+	{
+		//ボタン連打のUIを描画する
+		DrawButtonBashing();
+	}
 }
 
 void GameManagerBase::UpdateButtonBashing()
@@ -461,7 +463,10 @@ void GameManagerBase::UpdateButtonBashing()
 
 void GameManagerBase::DrawButtonBashing()
 {
+	//二回ぶつかるまでは表示しない
+	if (m_buttonBashingSituation != ButtonBashingSituation::kFighting) return;
 	//どのボタンを連打すればいいのかを表示する
+	m_pGameUi->DrawBashButton(m_bashingButton);
 }
 
 Character::CharacterStatus GameManagerBase::GetCharacterStatus(std::vector<std::string> statusData)

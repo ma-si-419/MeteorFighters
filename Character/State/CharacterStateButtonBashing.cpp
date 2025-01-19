@@ -264,6 +264,8 @@ void CharacterStateButtonBashing::Update()
 			//ƒAƒCƒhƒ‹ó‘Ô‚É–ß‚é
 			auto next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 
+			next->SetEndAnim(static_cast<int>(Character::AnimKind::kOnButtonBashing), 30);
+
 			ChangeState(next);
 		}
 		//•‰‚¯‚Ä‚¢‚½ê‡

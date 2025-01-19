@@ -118,6 +118,17 @@ namespace
 	//Mpバーの下に表示する灰色のボックスの大きさ
 	constexpr int kMpBarBackBoxHalfWidth = 280;
 	constexpr int kMpBarBackBoxHalfHeight = 30;
+
+	//連打するボタンを表示する座標
+	constexpr int kBashButtonPosX = Game::kWindowWidth / 2;
+	constexpr int kBashButtonPosY = 600;
+
+	//連打するボタンの画像の大きさ
+	constexpr int kBashButtonGraphWidth = 96;
+	constexpr int kBashButtonGraphHeight = 84;
+
+	//連打するボタンを切り替える時間
+	constexpr int kBashButtonChangeTime = 10;
 }
 
 GameUi::GameUi() :
@@ -125,7 +136,8 @@ GameUi::GameUi() :
 	m_lastHpBarNum(),
 	m_onHitDamageHp(),
 	m_hitDamageTime(),
-	m_onSubMp()
+	m_onSubMp(),
+	m_bashButtonChangeTime(0)
 {
 }
 
@@ -668,4 +680,28 @@ void GameUi::DrawFade(int color, int alpha)
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
 	DrawBox(0, 0, Game::kWindowWidth, Game::kWindowHeight, color, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+}
+
+void GameUi::DrawBashButton(std::string button)
+{
+	auto& graphManager = GraphManager::GetInstance();
+
+	int buttonHandle = graphManager.GetHandle("Bash" + button);
+
+	//ボタンを切り替える時間を図っておく
+	m_bashButtonChangeTime++;
+
+	int cutPos = kBashButtonGraphWidth;
+
+	if (m_bashButtonChangeTime % static_cast<int>(kBashButtonChangeTime * 2) < kBashButtonChangeTime)
+	{
+		cutPos = 0;
+	}
+
+	//ボタンの後ろの背景を表示する
+	DrawRotaGraph(kBashButtonPosX, kBashButtonPosY,1.0,0.0,graphManager.GetHandle("BashBack"),true);
+
+	//ボタンを描画する
+	DrawRectRotaGraph(kBashButtonPosX, kBashButtonPosY,cutPos,0,kBashButtonGraphWidth,kBashButtonGraphHeight,
+	1.0,0.0,buttonHandle,true);
 }

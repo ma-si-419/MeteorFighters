@@ -7,6 +7,11 @@ Loser,Loser,Game
 MpBar,MpBar,Game
 Menu,Menu,Game
 SelectItem,MenuSelectItem,Game
+BashA,BashAButton,Game
+BashB,BashBButton,Game
+BashX,BashXButton,Game
+BashY,BashYButton,Game
+BashBack,BashButtonBack,Game
 SelectItemBox,SelectItemBox,Menu
 ItemBox,ItemBox,Menu
 Mouse,MouseFace,Title

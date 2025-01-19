@@ -34,6 +34,11 @@ public:
 	/// <param name="alpha">アルファ値</param>
 	void DrawFade(int color,int alpha);
 
+	/// <summary>
+	/// 連打するボタンを表示する
+	/// </summary>
+	/// <param name="button">連打するボタンの名前</param>
+	void DrawBashButton(std::string button);
 private:
 
 	//1Pと2Pの二つのHpバーがあるので二つ持っておく
@@ -54,4 +59,6 @@ private:
 	//攻撃を受けてからのフレームを保存する
 	int m_hitDamageTime[2];
 
+	//連打するボタンを切り替える時間
+	int m_bashButtonChangeTime;
 };
