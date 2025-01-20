@@ -98,7 +98,7 @@ void SceneGame::Draw()
 
 	DrawString(0, 0, "SceneGame", kRedColor);
 
-	Physics::GetInstance().DebugDraw();
+	//Physics::GetInstance().DebugDraw();
 
 #endif // _DEBUG
 

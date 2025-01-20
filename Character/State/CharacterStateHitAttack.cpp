@@ -14,9 +14,9 @@ namespace
 		{Character::HitReactionKind::kLow,40},
 		{Character::HitReactionKind::kMiddle,40},
 		{Character::HitReactionKind::kWeakUpBurst,60},
-		{Character::HitReactionKind::kUpBurst,120},
-		{Character::HitReactionKind::kFarBurst,120},
-		{Character::HitReactionKind::kDownBurst,120},
+		{Character::HitReactionKind::kUpBurst,110},
+		{Character::HitReactionKind::kFarBurst,110},
+		{Character::HitReactionKind::kDownBurst,110},
 		{Character::HitReactionKind::kMiddleStan,60},
 		{Character::HitReactionKind::kBottomStan,60}
 	};

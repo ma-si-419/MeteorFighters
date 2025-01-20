@@ -70,7 +70,6 @@ void CharacterStateMove::Update()
 	//ˆÚ“®ƒxƒNƒgƒ‹‚ª0‚¶‚á‚È‚¯‚ê‚Î
 	if (inputDir.SqLength() > 0.001f)
 	{
-
 		inputDir = inputDir.Normalize();
 
 		//ˆÚ“®•ûŒü

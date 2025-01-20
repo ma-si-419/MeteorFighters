@@ -26,6 +26,7 @@ void CharacterStateGuard::Enter()
 	m_pNextState = shared_from_this();
 	m_kind = CharacterStateKind::kGuard;
 	m_pCharacter->ChangeAnim(Character::AnimKind::kGuardMiddle, true, kBlendSpeed);
+	m_guardKind = CharacterGuardKind::kMiddleGuard;
 }
 
 void CharacterStateGuard::Update()
@@ -37,9 +38,9 @@ void CharacterStateGuard::Update()
 	if (stickY < -kStickTiltPower)
 	{
 		//上ガードに変更する
-		//上ガードは下方向に向けての吹っ飛ばし攻撃をガードできる
+		m_guardKind = CharacterGuardKind::kUpGuard;
 
-		//TODO : 今はアニメーションだけ変更
+		//アニメーションを変更
 		if (m_pCharacter->GetPlayAnimKind() != Character::AnimKind::kGuardHigh)
 		{
 			m_pCharacter->ChangeAnim(Character::AnimKind::kGuardHigh, true, kGuardSwitchBlendSpeed);
@@ -50,9 +51,9 @@ void CharacterStateGuard::Update()
 	else if (stickY > kStickTiltPower)
 	{
 		//下ガードに変更する
-		//下ガードは上方向に向けての吹っ飛ばし攻撃と下段ため攻撃をガードできる
+		m_guardKind = CharacterGuardKind::kDownGuard;
 
-		//TODO : 今はアニメーションだけ変更
+		//アニメーションを変更
 		if (m_pCharacter->GetPlayAnimKind() != Character::AnimKind::kGuardLow)
 		{
 			m_pCharacter->ChangeAnim(Character::AnimKind::kGuardLow, true, kGuardSwitchBlendSpeed);
@@ -62,6 +63,10 @@ void CharacterStateGuard::Update()
 	//どちらにも傾いていなければ
 	else
 	{
+		//中段ガードに変更する
+		m_guardKind = CharacterGuardKind::kMiddleGuard;
+
+		//アニメーションを変更
 		if (m_pCharacter->GetPlayAnimKind() != Character::AnimKind::kGuardMiddle)
 		{
 			m_pCharacter->ChangeAnim(Character::AnimKind::kGuardMiddle, true, kGuardSwitchBlendSpeed);
@@ -88,4 +93,5 @@ void CharacterStateGuard::Update()
 }
 void CharacterStateGuard::Exit()
 {
+	m_guardKind = CharacterGuardKind::kNone;
 }

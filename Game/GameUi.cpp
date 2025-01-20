@@ -121,7 +121,7 @@ namespace
 
 	//連打するボタンを表示する座標
 	constexpr int kBashButtonPosX = Game::kWindowWidth / 2;
-	constexpr int kBashButtonPosY = 600;
+	constexpr int kBashButtonPosY = 650;
 
 	//連打するボタンの画像の大きさ
 	constexpr int kBashButtonGraphWidth = 96;

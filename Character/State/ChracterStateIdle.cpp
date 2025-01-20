@@ -39,6 +39,7 @@ void CharacterStateIdle::Enter()
 {
 	m_pNextState = shared_from_this();
 	m_kind = CharacterStateKind::kIdle;
+	m_pCharacter->SetHitReaction(Character::HitReactionKind::kNone);
 }
 
 void CharacterStateIdle::Update()

@@ -22,4 +22,4 @@ MiddleCharge,5,38,11,24,4,0,0,‰œ‚Á”ò‚Ñ,1,None,–³,MiddleChargeAttack,1.25
 DownCharge,5,38,11,24,4,0,0,‰º‚Á”ò‚Ñ,1,None,–³,DownChargeAttack,1.25
 EnergyCharge,3,38,19,24,0,5,0,’†,0,None,–³,EnergyChargeAttack,1.25
 DashAttack,5,38,11,24,2,0,0,ã,1,Low1,–³,DashAttack,1.25
-ButtonBashingAttack,15,1,1,1,0,0,0,‰œ‚Á”ò‚Ñ,1,None,–³,None,1.25
+ButtonBashingAttack,50,1,1,1,0,0,0,‰œ‚Á”ò‚Ñ,1,None,–³,None,1.25

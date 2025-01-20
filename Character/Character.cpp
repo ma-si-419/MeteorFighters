@@ -93,7 +93,8 @@ Character::Character(ObjectTag tag, CharacterKind kind) :
 	m_animBlendSpeed(kAnimBlendSpeed),
 	m_isEndAnimationBlend(true),
 	m_isEndAnim(false),
-	m_modelPath("empty")
+	m_modelPath("empty"),
+	m_nowHitReaction(Character::HitReactionKind::kNone)
 {
 	auto sphereData = std::dynamic_pointer_cast<SphereColliderData>(m_pColData);
 

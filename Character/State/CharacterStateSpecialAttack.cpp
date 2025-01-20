@@ -135,8 +135,6 @@ void CharacterStateSpecialAttack::Update()
 		{
 			m_pCharacter->ChangeAnim(Character::AnimKind::kEndSecondSpecialAttack, false);
 		}
-		//エフェクトを止める
-		m_pManager->ExitEffect(m_pEffect);
 	}
 	//エフェクトが設定されていたら
 	if (m_pEffect)
@@ -155,13 +153,13 @@ void CharacterStateSpecialAttack::Update()
 		if (m_pCharacter->GetPlayAnimKind() == Character::AnimKind::kStartFirstSpecialAttack)
 		{
 			m_pCharacter->ChangeAnim(Character::AnimKind::kOnFirstSpecialAttack, true, 0.15f);
-			//変更を行ったら位置フレーム待つ
+			//変更を行ったら1フレーム待つ
 			return;
 		}
 		else if (m_pCharacter->GetPlayAnimKind() == Character::AnimKind::kStartSecondSpecialAttack)
 		{
 			m_pCharacter->ChangeAnim(Character::AnimKind::kOnSecondSpecialAttack, true, 0.15f);
-			//変更を行ったら位置フレーム待つ
+			//変更を行ったら1フレーム待つ
 			return;
 		}
 

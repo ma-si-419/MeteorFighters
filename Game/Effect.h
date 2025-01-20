@@ -8,11 +8,15 @@ class Effect : public std::enable_shared_from_this<Effect>
 public:
 	enum class EffectKind
 	{
+		kNone,
 		kCharge,
 		kDash,
 		kDashEnd,
 		kEnergy,
+		kGuardHit,
 		kLowHit,
+		kMiddleHit,
+		kHighHit,
 		kEnergyHit,
 		kTeleportaion
 	};

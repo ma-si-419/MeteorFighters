@@ -6,6 +6,7 @@
 #include "GameManagerBase.h"
 #include "Input.h"
 #include "Attack.h"
+#include "Effect.h"
 
 
 namespace
@@ -48,6 +49,19 @@ namespace
 
 	//攻撃の生存時間
 	constexpr int kAttackLifeTime = 2;
+
+	//エフェクトのループ開始時間
+	constexpr float kEffectLoopStartTime = 9.0f;
+	constexpr float kEffectLoopEndTime = 11.0f;
+
+	//ぶつかった時のエフェクトの生存時間
+	constexpr float kBumpEffectLifeTime = 5.0f;
+
+	//ぶつかった時カメラを揺らす時間
+	constexpr int kBumpCameraShakeTime = 2;
+
+	//ぶつかった時カメラを揺らす大きさ
+	constexpr int kBumpCameraShakePower = 3;
 }
 
 CharacterStateButtonBashing::CharacterStateButtonBashing(std::shared_ptr<Character> character) :
@@ -80,6 +94,17 @@ void CharacterStateButtonBashing::Enter()
 
 	//ボタン連打を始めるとマネージャーに伝える
 	m_pManager->StartButtonBashing();
+
+	//エフェクトを再生する
+	auto effect = std::make_shared<Effect>(Effect::EffectKind::kMiddleHit);
+	//座標設定
+	effect->SetPos(kTargetPos);
+	//エフェクトの再生時間を設定
+	effect->SetLifeTime(kBumpEffectLifeTime);
+	//エフェクトを登録
+	m_pManager->EntryEffect(effect);
+	//カメラを揺らす
+	m_pManager->ShakeCamera(kBumpCameraShakeTime,kBumpCameraShakePower);
 }
 
 void CharacterStateButtonBashing::Update()
@@ -181,6 +206,19 @@ void CharacterStateButtonBashing::Update()
 			//二つ目のSituationに行く
 			m_pManager->SetBashingSituation(GameManagerBase::ButtonBashingSituation::kFighting);
 
+			//エフェクトを設定していなければ
+			if (!m_pEffect)
+			{
+				//エフェクトを再生する
+				m_pEffect = std::make_shared<Effect>(Effect::EffectKind::kLowHit);
+				//ループ設定
+				m_pEffect->SetLoop(kEffectLoopStartTime, kEffectLoopEndTime);
+				//座標設定
+				m_pEffect->SetPos(kTargetPos);
+				//エフェクトを登録
+				m_pManager->EntryEffect(m_pEffect);
+			}
+
 			//座標を補正する
 			if (m_pCharacter->GetPlayerNumber() == Character::PlayerNumber::kOnePlayer)
 			{
@@ -204,6 +242,17 @@ void CharacterStateButtonBashing::Update()
 			}
 			m_moveSpeed = kBumpSpeed;
 			m_pCharacter->ChangeAnim(Character::AnimKind::kButtonBashingHitBack, false);
+
+			//エフェクトを再生する
+			auto effect = std::make_shared<Effect>(Effect::EffectKind::kMiddleHit);
+			//座標設定
+			effect->SetPos(kTargetPos);
+			//エフェクトの再生時間を設定
+			effect->SetLifeTime(kBumpEffectLifeTime);
+			//エフェクトを登録
+			m_pManager->EntryEffect(effect);
+			//カメラを揺らす
+			m_pManager->ShakeCamera(kBumpCameraShakeTime, kBumpCameraShakePower);
 		}
 		m_bumpTime = 0;
 
@@ -275,7 +324,7 @@ void CharacterStateButtonBashing::Update()
 
 			//タグを相手の攻撃にする
 			ObjectTag tag;
-			
+
 			if (m_pCharacter->GetPlayerNumber() == Character::PlayerNumber::kOnePlayer)
 			{
 				tag = ObjectTag::kTwoPlayerAttack;
@@ -299,9 +348,9 @@ void CharacterStateButtonBashing::Update()
 			status.targetPos = m_pManager->GetTargetPos(m_pCharacter);
 
 			//受ける攻撃
-			auto attack = std::make_shared<Attack>(tag,kTargetPos);
+			auto attack = std::make_shared<Attack>(tag, kTargetPos);
 
-			attack->Init(status,m_pManager->GetEffectManagerPointer());
+			attack->Init(status, m_pManager->GetEffectManagerPointer());
 
 			m_pManager->AddAttack(attack);
 		}
@@ -309,4 +358,5 @@ void CharacterStateButtonBashing::Update()
 }
 void CharacterStateButtonBashing::Exit()
 {
+	m_pManager->ExitEffect(m_pEffect);
 }

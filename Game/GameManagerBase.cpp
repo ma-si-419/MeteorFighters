@@ -24,7 +24,7 @@ namespace
 	{
 		MyEngine::Vector3(-50,90,-100),
 		MyEngine::Vector3(-30,90,70),
-		MyEngine::Vector3(5,90,5)
+		MyEngine::Vector3(10,105,10)
 	};
 
 	//カメラ間を移動する時間
@@ -41,6 +41,9 @@ namespace
 	//カメラを回転させる速度
 	constexpr float kCameraRotaSpeed = 0.08f;
 
+	//回転中のカメラの距離
+	constexpr float kRotaCameraDistance = 30.0f;
+
 	//連打するボタンの種類数
 	constexpr int kBashingButtonNum = 4;
 
@@ -52,6 +55,13 @@ namespace
 		"X",
 		"Y"
 	};
+
+	//ボタン連打時のカメラを揺らす感覚
+	constexpr int kButtonBashingCameraShakeInterval = 6;
+
+	//ボタン連打時のカメラの揺れの大きさ
+	constexpr int kButtonBashingCameraShakePower = 1;
+
 }
 
 GameManagerBase::GameManagerBase(std::shared_ptr<GameCamera> camera, GameManagerBase::GameKind kind) :
@@ -256,6 +266,11 @@ void GameManagerBase::ShakeCamera(int time)
 	m_pCamera->ShakeCamera(time);
 }
 
+void GameManagerBase::ShakeCamera(int time, int power)
+{
+	m_pCamera->ShakeCamera(time,power);
+}
+
 void GameManagerBase::SwayCamera()
 {
 	m_pCamera->SwayCamera();
@@ -387,7 +402,7 @@ void GameManagerBase::DrawCommon()
 	m_pGameUi->DrawMpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetMp(), true);
 	//2Pの気力を描画する
 	m_pGameUi->DrawMpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetMp(), false);
-	
+
 	//ボタン連打状態だったら
 	if (m_isButtonBashing)
 	{
@@ -400,6 +415,15 @@ void GameManagerBase::UpdateButtonBashing()
 {
 	//行っている時間を計測する
 	m_buttonBashingTime++;
+
+	//カメラを揺らす
+	if (m_buttonBashingSituation == ButtonBashingSituation::kFighting)
+	{
+		if (m_buttonBashingTime % kButtonBashingCameraShakeInterval == 0)
+		{
+			m_pCamera->ShakeCamera(1, kButtonBashingCameraShakePower);
+		}
+	}
 
 	//カメラが目指す座標
 	MyEngine::Vector3 cameraGoalPos = kButtonBashingCameraPos[static_cast<int>(m_buttonBashingSituation)];
@@ -441,14 +465,19 @@ void GameManagerBase::UpdateButtonBashing()
 
 		auto mat = rota.GetRotationMat();
 
-		MyEngine::Vector3 targetToCamera = m_buttonBashingCameraPos - kButtonBashingCameraTargetPos;
+		MyEngine::Vector3 targetToCamera = kButtonBashingCameraPos[static_cast<int>(ButtonBashingSituation::kFighting)] - kButtonBashingCameraTargetPos;
 
-		MyEngine::Vector3 cameraPos = targetToCamera.MatTransform(mat) + kButtonBashingCameraTargetPos;
+		MyEngine::Vector3 moveVec = targetToCamera.MatTransform(mat).Normalize() * kRotaCameraDistance;
 
-		m_pCamera->SetCenterAndTarget(cameraPos,kButtonBashingCameraTargetPos);
+		MyEngine::Vector3 cameraPos = moveVec + kButtonBashingCameraTargetPos;
+
+		printfDx("%.3f\n", moveVec.Length());
+
+		m_pCamera->SetCenterAndTarget(cameraPos, kButtonBashingCameraTargetPos);
 	}
 
 	//カメラの設定
+	m_pCamera->SetLocalPos(MyEngine::Vector3(0, 0, 0));
 	m_pCamera->SetPoseCamera();
 	m_pCamera->SetFrontPos(kButtonBashingCameraTargetPos);
 	m_pCamera->Update();

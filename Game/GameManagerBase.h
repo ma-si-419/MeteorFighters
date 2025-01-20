@@ -173,10 +173,17 @@ public:
 	void StartCameraCorrection();
 
 	/// <summary>
-	/// ƒJƒƒ‰‚ğ—h‚ê‚ğİ’è‚·‚é
+	/// ƒJƒƒ‰‚É—h‚ê‚ğİ’è‚·‚é(—h‚ê‚Ì‘å‚«‚³ŒÅ’è)
 	/// </summary>
 	/// <param name="time">—h‚ç‚·ŠÔ</param>
 	void ShakeCamera(int time);
+
+	/// <summary>
+	/// ƒJƒƒ‰‚É—h‚ê‚ğİ’è‚·‚é(—h‚ê‚Ì‘å‚«‚³‰Â•Ï)
+	/// </summary>
+	/// <param name="time">—h‚ç‚·ŠÔ</param>
+	/// <param name="power">—h‚ç‚·‘å‚«‚³</param>
+	void ShakeCamera(int time, int power);
 
 	/// <summary>
 	/// ƒJƒƒ‰‚ğŠÉ‚â‚©‚É—h‚ç‚·

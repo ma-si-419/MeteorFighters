@@ -482,16 +482,10 @@ public:
 	int GetStateKind();
 
 	/// <summary>
-	/// ボタンを連打した回数を返す
-	/// </summary>
-	/// <returns>連打した回数</returns>
-	int GetButtonBashingNum();
-
-	/// <summary>
 	/// やられ状態を設定する
 	/// </summary>
 	/// <param name="kind">次のやられ状態</param>
-	void SetHitReaction(HitReactionKind kind) { m_nowHitReaction = kind; }
+	void SetHitReaction(HitReactionKind kind) {m_nowHitReaction = kind; }
 
 	/// <summary>
 	/// キャラクターが地上にいるかどうかを返す

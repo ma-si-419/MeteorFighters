@@ -176,6 +176,7 @@ void CharacterStateNormalAttack::Update()
 		//Ÿ‚ÉUŒ‚‚ğs‚¤‚ÆŒˆ’è‚µ‚Ä‚¢‚ê‚Î
 		if (m_isNextAttack)
 		{
+
 			//Ÿ‚ÌUŒ‚‚ª‚È‚¢UŒ‚‚¾‚Á‚½‚çUŒ‚‚ğs‚í‚È‚¢
 			if (m_nextAttackName == "None") return;
 

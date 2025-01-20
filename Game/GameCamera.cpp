@@ -135,9 +135,49 @@ void GameCamera::SetPlayerVelo(MyEngine::Vector3 velo)
 	m_playerVelo = velo;
 }
 
+void GameCamera::ShakeCamera(int time)
+{
+	ShakeCamera(time,kShakePower);
+}
+
+void GameCamera::ShakeCamera(int time, int power)
+{
+	m_shakeTime = time;
+	m_shakePower = power;
+}
+
 void GameCamera::PoseUpdate()
 {
-	SetCameraPositionAndTarget_UpVecY(m_localPos.GetWorldPos().CastVECTOR(), m_targetPos.CastVECTOR());
+	//揺らす大きさ(基本はゼロ)
+	MyEngine::Vector3 shiftVec;
+
+	//カメラを揺らす設定がされていたら
+	if (m_shakeTime > 0)
+	{
+		m_shakeTime--;
+
+		//マイナスにもなるようにランダムからランダムの大きさの半分減らす
+		int shakePowerHalf = static_cast<int>(m_shakePower * 0.5f);
+
+		//カメラのターゲット座標を揺らす
+		shiftVec.x = static_cast<float>(GetRand(m_shakePower) - shakePowerHalf);
+		shiftVec.y = static_cast<float>(GetRand(m_shakePower) - shakePowerHalf);
+		shiftVec.z = static_cast<float>(GetRand(m_shakePower) - shakePowerHalf);
+	}
+
+	//カメラを緩やかに揺らす設定がされていたら
+	if (m_isSway)
+	{
+		m_swayTime += kSwaySpeed;
+
+		//ターゲット座標を揺らす
+		shiftVec.y += sinf(m_swayTime) * kSwayPower;
+
+		//緩やかに揺らすのをやめる設定を毎フレームする
+		m_isSway = false;
+	}
+
+	SetCameraPositionAndTarget_UpVecY(m_localPos.GetWorldPos().CastVECTOR(), (m_targetPos + shiftVec).CastVECTOR());
 
 	SetLightDirectionHandle(m_lightHandle, (m_localPos.GetWorldPos() - m_targetPos).Normalize().CastVECTOR());
 }
@@ -292,15 +332,13 @@ void GameCamera::BattleUpdate()
 		m_shakeTime--;
 
 		//マイナスにもなるようにランダムからランダムの大きさの半分減らす
-		int shakePowerHalf = static_cast<int>(kShakePower * 0.5f);
+		int shakePowerHalf = static_cast<int>(m_shakePower * 0.5f);
 
 		//カメラのターゲット座標を揺らす
-		shakeVec.x = static_cast<float>(GetRand(kShakePower) - shakePowerHalf);
-		shakeVec.y = static_cast<float>(GetRand(kShakePower) - shakePowerHalf);
-		shakeVec.z = static_cast<float>(GetRand(kShakePower) - shakePowerHalf);
+		shakeVec.x = static_cast<float>(GetRand(m_shakePower) - shakePowerHalf);
+		shakeVec.y = static_cast<float>(GetRand(m_shakePower) - shakePowerHalf);
+		shakeVec.z = static_cast<float>(GetRand(m_shakePower) - shakePowerHalf);
 	}
-
-
 
 	//ターゲット座標の設定
 	MyEngine::Vector3 targetPos = (m_targetPos - m_localPos.GetCenterPos()) * kCameraTargetPosRate + m_localPos.GetCenterPos();

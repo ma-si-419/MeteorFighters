@@ -11,9 +11,12 @@ namespace
 		{Effect::EffectKind::kDash,"Dash"},
 		{Effect::EffectKind::kDashEnd,"DashEnd"},
 		{Effect::EffectKind::kEnergy,"Energy"},
+		{Effect::EffectKind::kGuardHit,"GuardHit"},
 		{Effect::EffectKind::kLowHit,"LowHit"},
+		{Effect::EffectKind::kMiddleHit,"MiddleHit"},
+		{Effect::EffectKind::kHighHit,"HighHit"},
 		{Effect::EffectKind::kEnergyHit,"EnergyHit"},
-		{Effect::EffectKind::kTeleportaion,"Teleportation"},
+		{Effect::EffectKind::kTeleportaion,"Teleportation"}
 	};
 
 	constexpr float kDefaultPlaySpeed = 1.0f;

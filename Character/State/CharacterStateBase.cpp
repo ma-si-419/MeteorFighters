@@ -12,8 +12,10 @@
 
 namespace
 {
+	//エネルギー攻撃をガードした時のダメージカット率
 	constexpr float kDamageCutRate = 0.2f;
 
+	//攻撃を受けた時に遷移する状態
 	const std::map<Character::AttackHitKind, Character::HitReactionKind> kHitKindMap =
 	{
 		{Character::AttackHitKind::kLow,Character::HitReactionKind::kLow},
@@ -26,7 +28,30 @@ namespace
 		{Character::AttackHitKind::kMiddleStan,Character::HitReactionKind::kMiddleStan}
 	};
 
+	//攻撃を受けた時に出すエフェクト
+	const std::map<Character::AttackHitKind, Effect::EffectKind> kPhysicalAttackHitEffectMap =
+	{
+		{Character::AttackHitKind::kLow,Effect::EffectKind::kLowHit},
+		{Character::AttackHitKind::kMiddle,Effect::EffectKind::kMiddleHit},
+		{Character::AttackHitKind::kWeakUpBurst,Effect::EffectKind::kMiddleHit},
+		{Character::AttackHitKind::kUpBurst,Effect::EffectKind::kHighHit},
+		{Character::AttackHitKind::kDownBurst,Effect::EffectKind::kHighHit},
+		{Character::AttackHitKind::kFarBurst,Effect::EffectKind::kHighHit},
+		{Character::AttackHitKind::kBottomStan,Effect::EffectKind::kMiddleHit},
+		{Character::AttackHitKind::kMiddleStan,Effect::EffectKind::kMiddleHit}
+	};
+
+	//ヒットエフェクトを残す時間
 	constexpr int kHitEffectLifeTime = 30;
+
+	//ガードできる可能性がある状態
+	const std::vector<Character::HitReactionKind> kCanGuardHitReactionKind =
+	{
+		Character::HitReactionKind::kGuard,
+		Character::HitReactionKind::kLow,
+		Character::HitReactionKind::kMiddle,
+		Character::HitReactionKind::kNone
+	};
 }
 
 CharacterStateBase::CharacterStateBase(std::shared_ptr<Character> character)
@@ -47,7 +72,7 @@ void CharacterStateBase::OnCollide(std::shared_ptr<Collidable> collider)
 
 			auto status = attack->GetStatus();
 
-			CharacterStateBase::HitAttack(attack, GetKind());
+			CharacterStateBase::HitAttack(attack);
 		}
 	}
 	//2P側の処理
@@ -60,7 +85,7 @@ void CharacterStateBase::OnCollide(std::shared_ptr<Collidable> collider)
 
 			auto status = attack->GetStatus();
 
-			CharacterStateBase::HitAttack(attack, GetKind());
+			CharacterStateBase::HitAttack(attack);
 		}
 	}
 }
@@ -106,66 +131,88 @@ void CharacterStateBase::SetCharacterPos(MyEngine::Vector3 pos)
 	m_pCharacter->m_rigidbody.SetPos(pos);
 }
 
-void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack, CharacterStateBase::CharacterStateKind stateKind)
+void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 {
 	std::shared_ptr<CharacterStateHitAttack> nextState = std::make_shared<CharacterStateHitAttack>(m_pCharacter);
 
 	//攻撃のステータス
 	auto status = attack->GetStatus();
 
-	Character::HitReactionKind kind = kHitKindMap.at(status.attackHitKind);
-
 	int damage = status.damage;
-	//ガード時であれば
-	if (stateKind == CharacterStateKind::kGuard)
+
+	//次の状態を取得する
+	auto hitReaction = static_cast<Character::HitReactionKind>(GetNextHitReactionKind(attack));
+
+	//再生するエフェクト
+	Effect::EffectKind effectKind = Effect::EffectKind::kNone;
+
+	//もし次の状態がガードであれば
+	if (hitReaction == Character::HitReactionKind::kGuard)
 	{
-		//基本的にガード状態にする
-		kind = Character::HitReactionKind::kGuard;
-
-		//ガードチュートリアルをクリアさせる
-		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kGuard));
-
-		//打撃系は0ダメージ
-		if (status.attackKind == Character::AttackKind::kPhysical)
-		{
-			damage = 0;
-		}
-		//気弾系の攻撃であればダメージカット
-		else if (status.attackKind == Character::AttackKind::kEnergy ||
-			status.attackKind == Character::AttackKind::kBeam)
+		//気弾攻撃系をダメージカットする
+		if (status.attackKind == Character::AttackKind::kBeam ||
+			status.attackKind == Character::AttackKind::kEnergy)
 		{
 			damage = static_cast<int>(damage * kDamageCutRate);
 		}
-		//必殺技のぶつかると演出に切り替わる技に当たった場合
-		else if (status.attackKind == Character::AttackKind::kRush ||
-			status.attackKind == Character::AttackKind::kAssault)
+		//打撃系はすべて0ダメージにする(投げは未実装)
+		else
 		{
-			//ダメージはない
 			damage = 0;
-			//ガードブレイク状態にする
-			kind = Character::HitReactionKind::kGuardBreak;
-		}
-		//投げ攻撃にぶつかった場合
-		else if (status.attackKind == Character::AttackKind::kThrow)
-		{
-			//ガード関係なく状態遷移する
-			kind = static_cast<Character::HitReactionKind>(status.attackHitKind);
-		}
-	}
-	//ガード時でなければ
-	else
-	{
-		//ヒットエフェクトを再生する
-		Effect::EffectKind effectKind = Effect::EffectKind::kEnergyHit;
-		if (status.attackKind == Character::AttackKind::kEnergy)
-		{
-			effectKind = Effect::EffectKind::kEnergyHit;
-		}
-		else if (status.attackKind == Character::AttackKind::kPhysical)
-		{
-			effectKind = Effect::EffectKind::kLowHit;
 		}
 
+		//基本的にガードエフェクト
+		effectKind = Effect::EffectKind::kGuardHit;
+
+		//ビーム攻撃の場合
+		if (status.attackKind == Character::AttackKind::kBeam)
+		{
+			//ガードに関係なくエフェクトを再生する
+			effectKind = Effect::EffectKind::kHighHit;
+		}
+	}
+	//ガードしていない場合
+	else
+	{
+		//ジャストガードできていた場合
+		if (m_guardKind == CharacterGuardKind::kJustGuard)
+		{
+			//瞬間移動のエフェクトを再生する
+			//effectKind = Effect::EffectKind::kTeleportaion;
+		}
+		//回避状態の場合
+		else if (m_guardKind == CharacterGuardKind::kDodge)
+		{
+			//特に何もエフェクトを再生しない
+		}
+		else
+		{
+			//攻撃に合わせたエフェクトを再生する
+
+			//格闘攻撃の場合
+			if (status.attackKind == Character::AttackKind::kPhysical)
+			{
+				effectKind = kPhysicalAttackHitEffectMap.at(status.attackHitKind);
+			}
+			//気弾攻撃の場合
+			else if (status.attackKind == Character::AttackKind::kEnergy)
+			{
+				effectKind = Effect::EffectKind::kLowHit;
+			}
+			//レーザー攻撃の場合
+			else if (status.attackKind == Character::AttackKind::kBeam)
+			{
+				effectKind = Effect::EffectKind::kHighHit;
+			}
+		}
+	}
+
+	//ガードチュートリアルをクリアさせる
+//	SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kGuard));
+
+	//エフェクトが設定されていれば
+	if (effectKind != Effect::EffectKind::kNone)
+	{
 		std::shared_ptr<Effect> hitEffect = std::make_shared<Effect>(effectKind);
 		hitEffect->SetLifeTime(kHitEffectLifeTime);
 		m_pCharacter->m_pBattleManager->GetEffectManagerPointer()->Entry(hitEffect, m_pCharacter->GetPos());
@@ -179,7 +226,8 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack, CharacterStat
 
 		hitEffect->SetRotation(rotation);
 	}
-	nextState->HitAttack(static_cast<int>(kind));
+
+	nextState->HitAttack(static_cast<int>(hitReaction));
 
 	//体力を減らす
 	m_pCharacter->SubHp(damage);
@@ -197,4 +245,198 @@ void CharacterStateBase::SuccessTutorial(int tutorialNumber)
 	auto clearKind = static_cast<TutorialManager::TutorialSuccessKind>(tutorialNumber);
 
 	manager->SuccessTutorial(clearKind);
+}
+
+int CharacterStateBase::GetNextHitReactionKind(std::shared_ptr<Attack> attack)
+{
+	auto status = attack->GetStatus();
+
+
+	//そもそもガードできる状態にいるのかを調べる
+	bool isGuard = false;
+
+	for (auto& hitReaction : kCanGuardHitReactionKind)
+	{
+		if (m_pCharacter->m_nowHitReaction == hitReaction)
+		{
+			isGuard = true;
+		}
+	}
+
+	//ガードできる状態にいなければ
+	if (!isGuard)
+	{
+		//ガード失敗
+		return static_cast<int>(kHitKindMap.at(status.attackHitKind));
+	}
+
+	//打撃攻撃の場合
+	if (status.attackKind == Character::AttackKind::kPhysical)
+	{
+		//上ガードをしている場合
+		if (m_guardKind == CharacterGuardKind::kUpGuard)
+		{
+			//下に吹き飛ばす攻撃なら
+			if (status.attackHitKind == Character::AttackHitKind::kDownBurst)
+			{
+				return static_cast<int>(Character::HitReactionKind::kGuard);
+			}
+			//弱攻撃か中攻撃なら
+			else if (status.attackHitKind == Character::AttackHitKind::kLow ||
+				status.attackHitKind == Character::AttackHitKind::kMiddle)
+			{
+				//攻撃を受けている状態ならば
+				if (m_kind == CharacterStateKind::kHitAttack)
+				{
+					//ガード失敗
+					return static_cast<int>(kHitKindMap.at(status.attackHitKind));
+				}
+				//攻撃を受けていない状態なら
+				else
+				{
+					//基本的にガード成功させる
+					return static_cast<int>(Character::HitReactionKind::kGuard);
+				}
+			}
+			//ほかの攻撃は基本的にガード失敗
+			else
+			{
+				return static_cast<int>(kHitKindMap.at(status.attackHitKind));
+			}
+		}
+		//中段ガードをしている場合
+		else if (m_guardKind == CharacterGuardKind::kMiddleGuard)
+		{
+			//奥に吹き飛ばす攻撃か中段スタンならば
+			if (status.attackHitKind == Character::AttackHitKind::kFarBurst ||
+				status.attackHitKind == Character::AttackHitKind::kMiddleStan)
+			{
+				return static_cast<int>(Character::HitReactionKind::kGuard);
+			}
+			//弱攻撃か中攻撃ならば
+			else if (status.attackHitKind == Character::AttackHitKind::kLow ||
+				status.attackHitKind == Character::AttackHitKind::kMiddle)
+			{
+				//攻撃を受けている状態ならば
+				if (m_kind == CharacterStateKind::kHitAttack)
+				{
+					//ガード失敗
+					return static_cast<int>(kHitKindMap.at(status.attackHitKind));
+				}
+				//攻撃を受けていない状態なら
+				else
+				{
+					//基本的にガード成功させる
+					return static_cast<int>(Character::HitReactionKind::kGuard);
+				}
+			}
+			//ほかの攻撃はガード失敗
+			else
+			{
+				return static_cast<int>(kHitKindMap.at(status.attackHitKind));
+			}
+		}
+		//下段ガードをしている場合
+		else if (m_guardKind == CharacterGuardKind::kDownGuard)
+		{
+			//上に吹き飛ばす攻撃か下段スタンならば
+			if (status.attackHitKind == Character::AttackHitKind::kUpBurst ||
+				status.attackHitKind == Character::AttackHitKind::kWeakUpBurst ||
+				status.attackHitKind == Character::AttackHitKind::kBottomStan)
+			{
+				return static_cast<int>(Character::HitReactionKind::kGuard);
+			}
+			//弱攻撃か中攻撃ならば
+			else if (status.attackHitKind == Character::AttackHitKind::kLow ||
+				status.attackHitKind == Character::AttackHitKind::kMiddle)
+			{
+				//攻撃を受けている状態ならば
+				if (m_kind == CharacterStateKind::kHitAttack)
+				{
+					//ガード失敗
+					return static_cast<int>(kHitKindMap.at(status.attackHitKind));
+				}
+				//攻撃を受けていない状態なら
+				else
+				{
+					//基本的にガード成功させる
+					return static_cast<int>(Character::HitReactionKind::kGuard);
+				}
+			}
+			//ほかの攻撃はガード失敗
+			else
+			{
+				return static_cast<int>(kHitKindMap.at(status.attackHitKind));
+			}
+		}
+		//ガードしていない場合
+		else
+		{
+			return static_cast<int>(kHitKindMap.at(status.attackHitKind));
+		}
+	}
+	//気弾系の攻撃の場合
+	else if (status.attackKind == Character::AttackKind::kEnergy ||
+		status.attackKind == Character::AttackKind::kBeam)
+	{
+		//攻撃を受けている状態ならば
+		if (m_kind == CharacterStateKind::kHitAttack)
+		{
+			//ガード失敗
+			return static_cast<int>(kHitKindMap.at(status.attackHitKind));
+		}
+		//攻撃を受けていない状態なら
+		else
+		{
+			//ガードしていたら
+			if (m_guardKind == CharacterGuardKind::kUpGuard ||
+				m_guardKind == CharacterGuardKind::kMiddleGuard ||
+				m_guardKind == CharacterGuardKind::kDownGuard)
+			{
+
+				//基本的にガード成功させる
+				return static_cast<int>(Character::HitReactionKind::kGuard);
+			}
+			//ガードしていなかったら
+			else
+			{
+				//ガード失敗
+				return static_cast<int>(kHitKindMap.at(status.attackHitKind));
+			}
+		}
+	}
+	//ぶつかると演出に切り替わる攻撃や突撃攻撃の場合(未実装)
+	else if (status.attackKind == Character::AttackKind::kRush ||
+		status.attackKind == Character::AttackKind::kAssault)
+	{
+		//攻撃を受けている状態ならば
+		if (m_kind == CharacterStateKind::kHitAttack)
+		{
+			//ガード失敗
+			return static_cast<int>(kHitKindMap.at(status.attackHitKind));
+		}
+		//攻撃を受けていない状態なら
+		else
+		{
+			//ガードしていたら
+			if (m_guardKind == CharacterGuardKind::kUpGuard ||
+				m_guardKind == CharacterGuardKind::kMiddleGuard ||
+				m_guardKind == CharacterGuardKind::kDownGuard)
+			{
+				//ガードブレイク状態にする
+				return static_cast<int>(Character::HitReactionKind::kGuardBreak);
+			}
+			//ガードしていない場合
+			else
+			{
+				return static_cast<int>(kHitKindMap.at(status.attackHitKind));
+			}
+		}
+	}
+	//投げ攻撃(未実装)
+	else if (status.attackKind == Character::AttackKind::kThrow)
+	{
+		//基本的にどの状態でも受ける
+		return static_cast<int>(kHitKindMap.at(status.attackHitKind));
+	}
 }

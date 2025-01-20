@@ -16,7 +16,7 @@ public:
 	/// <summary>
 	/// UŒ‚‚ğó‚¯‚½‚ÉŒÄ‚ÔŠÖ”
 	/// </summary>
-	/// <param name="reaction">UŒ‚‚ğó‚¯‚½‚Ì”½‰</param>
+	/// <param name="reaction">UŒ‚‚ğó‚¯‚½‚Ì”½‰(Character::HitReactionKind‚ğint‚ÉƒLƒƒƒXƒg‚·‚é)</param>
 	void HitAttack(int reaction);
 
 	/// <summary>

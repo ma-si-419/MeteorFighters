@@ -28,6 +28,19 @@ public:
 		kStateKindNum//Stateの数
 	};
 
+	/// <summary>
+	/// 攻撃を受けた時の状況
+	/// </summary>
+	enum class CharacterGuardKind
+	{
+		kNone,//何もない状況
+		kUpGuard,//上段ガード
+		kMiddleGuard,//中段ガード
+		kDownGuard,//下段ガード
+		kJustGuard,//ジャストガード
+		kDodge//回避
+	};
+
 public:
 
 	CharacterStateBase(std::shared_ptr<Character> character);
@@ -70,14 +83,23 @@ protected:
 	/// 攻撃を受けた時に呼ぶ関数
 	/// </summary>
 	/// <param name="attack">受けた攻撃のクラス</param>
-	/// <param name="stateKind">現在のState</param>
-	void HitAttack(std::shared_ptr<Attack> attack, CharacterStateBase::CharacterStateKind stateKind);
+	void HitAttack(std::shared_ptr<Attack> attack);
 
 	/// <summary>
 	/// チュートリアルクリア条件を達成したとする
 	/// </summary>
 	/// <param name="tutorialNumber">チュートリアルの番号(TutorialManager::TutorialSuccessKindをintにキャストする)</param>
 	void SuccessTutorial(int tutorialNumber);
+
+
+private:
+
+	/// <summary>
+	/// ガードが成功したかどうかを取得する(ジャストガードと回避はここで処理を行わない)
+	/// </summary>
+	/// <param name="attack">受けた攻撃のポインタ</param>
+	/// <returns>受けた時の状態を返す(Character::HitReactionKindをintにキャストして返す)</returns>
+	int GetNextHitReactionKind(std::shared_ptr<Attack> attack);
 
 protected:
 
@@ -95,5 +117,8 @@ protected:
 
 	//自分についているエフェクト(基本的に1つだけ再生するようにする)
 	std::shared_ptr<Effect> m_pEffect;
+
+	//ガードの状況を保存する
+	CharacterGuardKind m_guardKind = CharacterGuardKind::kNone;
 };
 
