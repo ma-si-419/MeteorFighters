@@ -53,6 +53,9 @@ void CharacterStateDash::Enter()
 		//回避行動をする
 		m_isDodge = true;
 
+		//回避状態にしておく
+		m_guardKind = CharacterGuardKind::kDodge;
+
 		//向きによってアニメーションを変える
 		//回避の場合は移動方向を前後左右の四通りに限定する(斜めをなくす)
 		if (m_moveDir.z >= 0.5f)
@@ -185,4 +188,5 @@ void CharacterStateDash::Update()
 void CharacterStateDash::Exit()
 {
 	m_pCharacter->SetAnimPlaySpeed();
+	m_guardKind = CharacterGuardKind::kNone;
 }

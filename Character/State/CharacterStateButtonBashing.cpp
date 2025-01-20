@@ -96,7 +96,7 @@ void CharacterStateButtonBashing::Enter()
 	m_pManager->StartButtonBashing();
 
 	//エフェクトを再生する
-	auto effect = std::make_shared<Effect>(Effect::EffectKind::kMiddleHit);
+	auto effect = std::make_shared<Effect>(Effect::EffectKind::kHighHit);
 	//座標設定
 	effect->SetPos(kTargetPos);
 	//エフェクトの再生時間を設定
@@ -244,7 +244,7 @@ void CharacterStateButtonBashing::Update()
 			m_pCharacter->ChangeAnim(Character::AnimKind::kButtonBashingHitBack, false);
 
 			//エフェクトを再生する
-			auto effect = std::make_shared<Effect>(Effect::EffectKind::kMiddleHit);
+			auto effect = std::make_shared<Effect>(Effect::EffectKind::kHighHit);
 			//座標設定
 			effect->SetPos(kTargetPos);
 			//エフェクトの再生時間を設定
@@ -259,7 +259,7 @@ void CharacterStateButtonBashing::Update()
 		m_isBump = true;
 	}
 
-
+	//移動すると設定されていたら
 	if (isMove)
 	{
 		moveVec = moveDir * m_moveSpeed;

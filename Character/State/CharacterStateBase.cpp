@@ -227,6 +227,13 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 		hitEffect->SetRotation(rotation);
 	}
 
+	//‰ñ”ðó‘Ô‚Å‚ ‚ê‚Î
+	if (m_guardKind == CharacterGuardKind::kDodge)
+	{
+		//ƒ_ƒ[ƒW‚ðŽó‚¯‚È‚¢
+		return;
+	}
+
 	nextState->HitAttack(static_cast<int>(hitReaction));
 
 	//‘Ì—Í‚ðŒ¸‚ç‚·
