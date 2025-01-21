@@ -17,7 +17,6 @@ public:
 	virtual void Update() override;
 
 	virtual void Exit() override;
-
 private:
 	int m_moveTime;
 

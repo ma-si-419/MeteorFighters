@@ -28,9 +28,6 @@ public:
 
 private:
 
-	//“®‚¯‚È‚¢ŠÔ
-	int m_downTime;
-
 	//“®‚©‚³‚ê‚éŠÔ
 	int m_moveTime;
 

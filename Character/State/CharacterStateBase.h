@@ -13,6 +13,7 @@ class GameManagerBase;
 class CharacterStateBase : public StateBase
 {
 public:
+
 	enum class CharacterStateKind
 	{
 		kIdle,//‰½‚à‚µ‚Ä‚¢‚È‚¢ó‘Ô
@@ -25,6 +26,7 @@ public:
 		kHitAttack,//UŒ‚‚ğó‚¯‚½
 		kButtonBashing,//“G‚Æ‚Ì‰Ÿ‚µ‡‚¢
 		kCharge,//ƒ`ƒƒ[ƒWó‘Ô
+		kTeleportation,//uŠÔˆÚ“®ó‘Ô
 		kStateKindNum//State‚Ì”
 	};
 
@@ -97,6 +99,12 @@ protected:
 	/// <param name="flag">•`‰æ‚·‚é‚È‚çtrue•`‰æ‚µ‚È‚¢‚È‚çfalse</param>
 	void SetDrawFlag(bool flag);
 
+	/// <summary>
+	/// “®‚¯‚È‚¢ŠÔ‚ğİ’è‚·‚é
+	/// </summary>
+	/// <param name="time">“®‚¯‚È‚¢ŠÔ</param>
+	void SetStopTime(int time) { m_stopTime = time; }
+
 private:
 
 	/// <summary>
@@ -125,5 +133,7 @@ protected:
 
 	//ƒK[ƒh‚Ìó‹µ‚ğ•Û‘¶‚·‚é
 	CharacterGuardKind m_guardKind = CharacterGuardKind::kNone;
-};
 
+	//“®‚¯‚È‚¢ŠÔ
+	int m_stopTime;
+};

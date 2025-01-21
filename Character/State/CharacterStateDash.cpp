@@ -15,7 +15,7 @@ namespace
 
 	constexpr int kDashTime = 15;
 
-	constexpr int kDodgeTime = 20;
+	constexpr int kJustGuardTime = 20;
 
 	constexpr float kAnimationBlendSpeed = 0.12f;
 
@@ -158,7 +158,7 @@ void CharacterStateDash::Update()
 		}
 
 		//ˆê’èŽžŠÔˆÚ“®‚µ‚½‚çƒAƒCƒhƒ‹State‚É–ß‚é
-		if (m_time > kDodgeTime)
+		if (m_time > kJustGuardTime)
 		{
 			auto next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 
@@ -187,6 +187,13 @@ void CharacterStateDash::Update()
 
 void CharacterStateDash::Exit()
 {
+	if (m_isDodge)
+	{
+		//“G‚Ì•ûŒü‚ðŒü‚­
+		m_pCharacter->LookTarget();
+		m_pCharacter->SetFrontPos(m_pManager->GetTargetPos(m_pCharacter));
+	}
+
 	m_pCharacter->SetAnimPlaySpeed();
 	m_guardKind = CharacterGuardKind::kNone;
 }

@@ -1,6 +1,8 @@
 #include "CharacterStateBase.h"
 #include "CharacterStateHitAttack.h"
+#include "CharacterStateGuard.h"
 #include "CharacterStateButtonBashing.h"
+#include "CharacterStateTeleportation.h"
 #include "Character.h"
 #include "GameManagerBase.h"
 #include "TutorialManager.h"
@@ -9,6 +11,8 @@
 #include "Effect.h"
 #include "EffectManager.h"
 #include <cmath>
+#include "GameSceneConstant.h"
+#include "LocalPos.h"
 
 namespace
 {
@@ -51,6 +55,26 @@ namespace
 		Character::HitReactionKind::kLow,
 		Character::HitReactionKind::kMiddle,
 		Character::HitReactionKind::kNone
+	};
+
+	//uŠÔˆÚ“®‚É‚©‚¯‚éŠÔ
+	constexpr int kTeleportationTime = 12;
+
+	//“G‚Ì”wŒã‚ÉuŠÔˆÚ“®‚·‚é‚Æ‚«‚Ì“G‚Æ‚Ì‹——£
+	constexpr float kTeleportationDistance = GameSceneConstant::kCharacterRadius + 5.0f;
+
+	//UŒ‚‚ğó‚¯‚½‚Ìd’¼ŠÔ
+	const std::map<Character::HitReactionKind, int> kDownTimeMap =
+	{
+		{Character::HitReactionKind::kGuard,10},
+		{Character::HitReactionKind::kLow,40},
+		{Character::HitReactionKind::kMiddle,40},
+		{Character::HitReactionKind::kWeakUpBurst,60},
+		{Character::HitReactionKind::kUpBurst,110},
+		{Character::HitReactionKind::kFarBurst,110},
+		{Character::HitReactionKind::kDownBurst,110},
+		{Character::HitReactionKind::kMiddleStan,60},
+		{Character::HitReactionKind::kBottomStan,60}
 	};
 }
 
@@ -237,6 +261,8 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 	{
 		MyEngine::Vector3 moveTargetPos;
 
+		auto nextState = std::make_shared<CharacterStateTeleportation>(m_pCharacter);
+
 		//‹C’eŒn‚ÌUŒ‚‚Å‚ ‚ê‚Î
 		if (attack->GetStatus().attackKind == Character::AttackKind::kEnergy ||
 			attack->GetStatus().attackKind == Character::AttackKind::kBeam)
@@ -246,27 +272,65 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 
 			local.SetCenterPos(attack->GetPos());
 
-			MyEngine::Vector3 frontPos = (attack->GetStatus().targetPos - attack->GetPos()) + attack->GetPos();
+			MyEngine::Vector3 frontPos = (attack->GetStatus().targetPos - attack->GetLastPos()).Normalize() + attack->GetPos();
 
-			local.SetFrontPos();
+			local.SetFrontPos(frontPos);
 
-			local.SetLocalPos(MyEngine::Vector3());
+			local.SetLocalPos(MyEngine::Vector3(attack->GetStatus().radius + kTeleportationDistance, 0.0f, 0.0f));
+
+			moveTargetPos = local.GetWorldPos();
+
+			//ˆÚ“®æ‚ÌÀ•W‚ğİ’è‚·‚é
+			nextState->Init(moveTargetPos, kTeleportationTime);
 		}
 		//‘ÅŒ‚Œn‚ÌUŒ‚‚Å‚ ‚ê‚Î
 		else
 		{
-
+			//“G‚ÌŒã‚ë‘¤‚ÉˆÚ“®‚·‚é
+			nextState->Init(m_pManager->GetTargetBackPos(kTeleportationDistance, m_pCharacter), kTeleportationTime);
 		}
 
+		//uŠÔˆÚ“®ó‘Ô‚É‘JˆÚ‚·‚é
+		ChangeState(nextState);
+
+		return;
 	}
 
+	//UŒ‚‚ğíœ‚·‚é
+	attack->DeleteAttack();
 
+	//“®‚¯‚È‚¢ŠÔ‚ğİ’è‚·‚é
+	SetStopTime(kDownTimeMap.at(hitReaction));
+
+	//ƒ_ƒ[ƒW‚ğó‚¯‚é
+	m_pCharacter->SubHp(damage);
+
+	//ƒK[ƒhó‘Ô
+	if (hitReaction == Character::HitReactionKind::kGuard)
+	{
+
+
+		//Œ»İ‚Ìó‘Ô‚ªƒK[ƒhó‘Ô‚Å‚ ‚ê‚ÎƒK[ƒhó‘Ô‚ğŒp‘±‚·‚é
+		if (m_kind == CharacterStateKind::kGuard) return;
+
+		//Œ»İ‚Ìó‘Ô‚ªƒK[ƒhó‘Ô‚Å‚È‚¯‚ê‚ÎƒK[ƒhó‘Ô‚É‘JˆÚ‚·‚é
+		auto nextState = std::make_shared<CharacterStateGuard>(m_pCharacter);
+
+		//“®‚¯‚È‚¢ŠÔ‚ğİ’è‚·‚é
+		nextState->SetStopTime(kDownTimeMap.at(hitReaction));
+
+		ChangeState(nextState);
+		return;
+	}
+
+	//‚±‚±‚Ü‚Å—ˆ‚½‚çƒqƒbƒgƒAƒ^ƒbƒNó‘Ô‚É‘JˆÚ‚·‚é
 	std::shared_ptr<CharacterStateHitAttack> nextState = std::make_shared<CharacterStateHitAttack>(m_pCharacter);
 
-	nextState->HitAttack(static_cast<int>(hitReaction));
+	//“®‚¯‚È‚¢ŠÔ‚ğİ’è‚·‚é
+	nextState->SetStopTime(kDownTimeMap.at(hitReaction));
 
-	//‘Ì—Í‚ğŒ¸‚ç‚·
-	m_pCharacter->SubHp(damage);
+	//UŒ‚‚ğó‚¯‚½‚Ìó‘Ô‚ğİ’è‚·‚é
+	nextState->HitAttack(static_cast<int>(hitReaction));
 
 	ChangeState(nextState);
 }

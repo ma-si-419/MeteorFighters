@@ -8,19 +8,6 @@
 
 namespace
 {
-	const std::map<Character::HitReactionKind, int> kDownTimeMap =
-	{
-		{Character::HitReactionKind::kGuard,10},
-		{Character::HitReactionKind::kLow,40},
-		{Character::HitReactionKind::kMiddle,40},
-		{Character::HitReactionKind::kWeakUpBurst,60},
-		{Character::HitReactionKind::kUpBurst,110},
-		{Character::HitReactionKind::kFarBurst,110},
-		{Character::HitReactionKind::kDownBurst,110},
-		{Character::HitReactionKind::kMiddleStan,60},
-		{Character::HitReactionKind::kBottomStan,60}
-	};
-
 	const std::map<Character::HitReactionKind, float> kMoveSpeedMap =
 	{
 		{Character::HitReactionKind::kGuard,0.2f},
@@ -73,7 +60,6 @@ namespace
 
 CharacterStateHitAttack::CharacterStateHitAttack(std::shared_ptr<Character> character) :
 	CharacterStateBase(character),
-	m_downTime(0),
 	m_moveTime(0),
 	m_isFrontHit(false)
 {
@@ -94,7 +80,7 @@ void CharacterStateHitAttack::Update()
 	if (m_pCharacter->GetHitReaction() == Character::HitReactionKind::kBottomStan ||
 		m_pCharacter->GetHitReaction() == Character::HitReactionKind::kMiddleStan)
 	{
-		int slowAnimTime = static_cast<int>(m_downTime * kSlowAnimTimeRate);
+		int slowAnimTime = static_cast<int>(m_stopTime * kSlowAnimTimeRate);
 
 		if (m_time < slowAnimTime)
 		{
@@ -109,9 +95,8 @@ void CharacterStateHitAttack::Update()
 	}
 
 	//設定した時間たったら
-	if (m_downTime <= m_time)
+	if (m_stopTime <= m_time)
 	{
-
 		std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 
 		//アイドル状態に戻る
@@ -119,7 +104,7 @@ void CharacterStateHitAttack::Update()
 	}
 
 	//移動する時間が終わったら
-	if (m_time > static_cast<int>(m_downTime * kMoveTimeRate))
+	if (m_time > static_cast<int>(m_stopTime * kMoveTimeRate))
 	{
 		m_moveVec = MyEngine::Vector3(0, 0, 0);
 		//TODO : 吹っ飛び状態であれば吹っ飛び状態から通常状態に戻るアニメーションを再生する
@@ -152,8 +137,6 @@ void CharacterStateHitAttack::HitAttack(int kind)
 		hitAttackKinds[item]++;
 	}
 
-	//動けない時間を設定する
-	m_downTime = kDownTimeMap.at(reaction);
 	//現在のやられ状態を設定する
 	m_pCharacter->SetHitReaction(reaction);
 	//動く方向を設定する

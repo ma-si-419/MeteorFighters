@@ -252,7 +252,7 @@ void EnemyInput::Update()
 					}
 
 					///////////////////////////////////////////
-					m_actionFunc = &EnemyInput::Rush;
+					m_actionFunc = &EnemyInput::SpecialAttack;
 					///////////////////////////////////////////
 
 					//ÉãÅ[ÉvÇ©ÇÁî≤ÇØÇÈ

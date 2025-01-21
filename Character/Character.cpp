@@ -235,6 +235,8 @@ void Character::Draw()
 		MV1DrawModel(item.handle);
 	}
 
+	MyEngine::Vector3 pos = (GetFrontPos() - m_rigidbody.GetPos()).Normalize() * 10.0f + m_rigidbody.GetPos();
+
 	//ï`âÊÇ∑ÇÈÇ∆Ç≥ÇÍÇƒÇ¢ÇΩÇÁ
 	if (m_isDrawCharacter)
 	{
@@ -490,6 +492,7 @@ void Character::SetNormalAttackData(std::vector<std::vector<std::string>> normal
 		pushData.targetHitReaction = item[static_cast<int>(NormalAttackDataSort::kTargetHitReaction)];
 		pushData.attackHitKind = kAttackHitKindMap.at(item[static_cast<int>(NormalAttackDataSort::kAttackHitKind)]);
 		pushData.animationSpeed = stof(item[static_cast<int>(NormalAttackDataSort::kAnimationSpeed)]);
+		pushData.effectName = item[static_cast<int>(NormalAttackDataSort::kEffectName)];
 
 		m_normalAttackData[item[static_cast<int>(NormalAttackDataSort::kAttackName)]] = pushData;
 	}
@@ -540,8 +543,15 @@ std::shared_ptr<Attack> Character::CreateAttack(AttackData attackData)
 		toTarget = targetPos - m_rigidbody.GetPos();
 	}
 
-	localPos.SetFrontPos(m_rigidbody.GetPos() + toTarget.Normalize());
-
+	//Ç‡ÇµìGÇ™ê≥ñ Ç…Ç¢ÇΩÇÁ
+	if (IsFrontTarget())
+	{
+		localPos.SetFrontPos(m_rigidbody.GetPos() + toTarget.Normalize());
+	}
+	else
+	{
+		localPos.SetFrontPos(GetFrontPos());
+	}
 	//Ç«ÇÃÇ≠ÇÁÇ¢Ç∏ÇÁÇ∑Ç©Çê›íË
 	MyEngine::Vector3 localAttackPos;
 
@@ -572,6 +582,7 @@ std::shared_ptr<Attack> Character::CreateAttack(AttackData attackData)
 	status.radius = attackData.radius;
 	status.attackHitKind = attackData.attackHitKind;
 	status.attackKind = attackData.attackKind;
+	status.effectName = attackData.effectName;
 
 	ans->Init(status, m_pBattleManager->GetEffectManagerPointer());
 
@@ -752,6 +763,7 @@ MyEngine::Vector3 Character::GetBackPos(float distance)
 	MyEngine::LocalPos local;
 
 	local.SetCenterPos(m_rigidbody.GetPos());
+
 	MyEngine::Vector3 pos = m_rigidbody.GetPos();
 
 	return ans;

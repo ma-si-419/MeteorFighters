@@ -38,13 +38,13 @@ void Attack::Init(AttackStatus status, std::shared_ptr<EffectManager> manager)
 	col->m_endPos = m_rigidbody.GetPos() + col->m_lange;
 
 	m_pEffectManager = manager;
+	//エフェクトが設定されていたら
+	if (status.effectName != "None")
+	{
+		m_pEffect = std::make_shared<Effect>(status.effectName);
 
-	//	if (status.attackKind == Character::AttackKind::kEnergy)
-	//	{
-	m_pEffect = std::make_shared<Effect>(Effect::EffectKind::kEnergy);
-
-	manager->Entry(m_pEffect, m_rigidbody.GetPos());
-	//	}
+		manager->Entry(m_pEffect, m_rigidbody.GetPos());
+	}
 
 	m_dir = (m_status.targetPos - m_rigidbody.GetPos()).Normalize();
 }
@@ -74,7 +74,11 @@ void Attack::Update()
 	//攻撃に速度があれば敵に向かって飛んでいく	
 	m_rigidbody.SetVelo(m_dir * m_status.speed);
 
-	m_pEffect->SetPos(m_rigidbody.GetPos());
+	//エフェクトの座標を更新
+	if (m_pEffect)
+	{
+		m_pEffect->SetPos(m_rigidbody.GetPos());
+	}
 
 	//シーンに出てからのフレーム数を数える
 	m_lifeTime++;
@@ -87,8 +91,11 @@ void Attack::Draw()
 void Attack::Final()
 {
 	Collidable::Final();
-	//自身の攻撃エフェクトの再生をやめる
-	m_pEffectManager->Exit(m_pEffect);
+	if (m_pEffect)
+	{
+		//自身の攻撃エフェクトの再生をやめる
+		m_pEffectManager->Exit(m_pEffect);
+	}
 }
 
 void Attack::OnCollide(std::shared_ptr<Collidable> collider)
@@ -99,7 +106,7 @@ void Attack::OnCollide(std::shared_ptr<Collidable> collider)
 		//エネミーにぶつかったら
 		if (collider->GetTag() == ObjectTag::kTwoPlayer)
 		{
-			m_isExist = false;
+
 		}
 	}
 	//自身がエネミーの攻撃で
@@ -108,7 +115,6 @@ void Attack::OnCollide(std::shared_ptr<Collidable> collider)
 		//プレイヤーにぶつかったら
 		if (collider->GetTag() == ObjectTag::kOnePlayer)
 		{
-			m_isExist = false;
 		}
 	}
 

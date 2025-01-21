@@ -23,9 +23,11 @@ void CharacterStateTeleportation::Init(MyEngine::Vector3 pos, int time)
 void CharacterStateTeleportation::Enter()
 {
 	m_pNextState = shared_from_this();
-	m_kind = CharacterStateKind::kButtonBashing;
+	m_kind = CharacterStateKind::kTeleportation;
 
 	SetDrawFlag(false);
+
+	m_pCharacter->SetIsTrigger(true);
 
 	m_guardKind = CharacterGuardKind::kDodge;
 }
@@ -47,5 +49,10 @@ void CharacterStateTeleportation::Update()
 
 void CharacterStateTeleportation::Exit()
 {
+	m_pCharacter->LookTarget();
+
 	SetDrawFlag(true);
+
+	m_pCharacter->SetIsTrigger(false);
 }
+

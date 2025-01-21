@@ -193,6 +193,7 @@ public:
 		std::string nextComboName = "empty";
 		std::string targetHitReaction = "empty";
 		std::string animationName = "empty";
+		std::string effectName = "empty";
 	};
 
 	/// <summary>
@@ -238,6 +239,7 @@ public:
 		int lifeTime = 0;
 		bool isPlayer = true;
 		float radius = 0;
+		std::string effectName = "empty";
 		AttackKind attackKind = AttackKind::kPhysical;
 		AttackHitKind attackHitKind = AttackHitKind::kLow;
 	};
@@ -583,7 +585,8 @@ private:
 		kNextComboName,//次に出る攻撃の名前
 		kTargetHitReaction,//敵の状態が何だったら攻撃を出せるか
 		kAnimationName,//アニメーションの名前
-		kAnimationSpeed//アニメーションの再生速度
+		kAnimationSpeed,//アニメーションの再生速度
+		kEffectName//攻撃のエフェクトの名前
 	};
 
 private:

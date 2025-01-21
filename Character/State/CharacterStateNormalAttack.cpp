@@ -92,7 +92,7 @@ void CharacterStateNormalAttack::Enter()
 	Character::AnimKind anim = static_cast<Character::AnimKind>(m_pCharacter->GetAttackAnimKind(animName));
 
 	//アニメーションの変更
-	m_pCharacter->ChangeAnim(anim, false,kAnimBlendSpeed);
+	m_pCharacter->ChangeAnim(anim, false, kAnimBlendSpeed);
 	m_pCharacter->SetAnimPlaySpeed(m_pCharacter->GetNormalAttackData(m_nowAttackName).animationSpeed);
 
 	//向かう方向の設定
@@ -256,7 +256,7 @@ void CharacterStateNormalAttack::Update()
 
 				teleportationPos += attackShiftVec.Normalize() * (kPhysicalAttackRadius);
 
-				SetCharacterPos(teleportationPos);
+				SetCharacterPos(teleportationPos);			
 			}
 
 			//時間のリセット
@@ -289,15 +289,22 @@ void CharacterStateNormalAttack::Update()
 
 			shiftVec.y = 0;
 
-			m_moveTargetPos = m_pManager->GetTargetPos(m_pCharacter) + shiftVec;
+			if (m_pCharacter->IsFrontTarget())
+			{
+				m_moveTargetPos = m_pManager->GetTargetPos(m_pCharacter) + shiftVec;
+			}
+
 			Character::AnimKind anim = static_cast<Character::AnimKind>(m_pCharacter->GetAttackAnimKind(nextAttack.animationName));
 
-			m_pCharacter->ChangeAnim(anim, false,kAnimBlendSpeed);
+			m_pCharacter->ChangeAnim(anim, false, kAnimBlendSpeed);
 			m_pCharacter->SetAnimPlaySpeed(nextAttack.animationSpeed);
 
 			m_isNextAttack = false;
 
-			m_pCharacter->LookTarget();
+			if (m_pCharacter->IsFrontTarget())
+			{
+				m_pCharacter->LookTarget();
+			}
 
 			//攻撃情報の更新
 			attackData = nextAttack;
@@ -399,6 +406,14 @@ void CharacterStateNormalAttack::Update()
 		m_isAttacked = true;
 		Character::AttackData attack;
 
+		//瞬間移動する攻撃であれば
+		if (attackData.isTeleportation)
+		{
+			//敵の方向を向く
+			m_pCharacter->LookTarget();
+			m_pCharacter->SetFrontPos(m_pManager->GetTargetPos(m_pCharacter));
+		}
+
 		//チャージした時のダメージ
 		if (m_chargeTime > 0.0f)
 		{
@@ -435,6 +450,7 @@ void CharacterStateNormalAttack::Update()
 			attack.radius = kEnergyAttackRadius;
 		}
 		attack.attackKind = attackData.attackKind;
+		attack.effectName = attackData.effectName;
 
 		//攻撃を作成
 		m_pCharacter->CreateAttack(attack);
@@ -538,4 +554,7 @@ void CharacterStateNormalAttack::Exit()
 {
 	//アニメーションの再生速度を戻しておく
 	m_pCharacter->SetAnimPlaySpeed();
+	//敵の方向を向く
+	m_pCharacter->LookTarget();
+	m_pCharacter->SetFrontPos(m_pManager->GetTargetPos(m_pCharacter));
 }

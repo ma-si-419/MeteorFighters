@@ -7,9 +7,9 @@
 namespace
 {
 	//攻撃を回避できる時間
-	constexpr float kDodgeTime = 15;
+	constexpr float kJustGuardTime = 10;
 	//アニメーションブレンドの速さ
-	constexpr float kBlendSpeed = 1.0f / kDodgeTime;
+	constexpr float kBlendSpeed = 1.0f / kJustGuardTime;
 	//スティックが傾いていると判断する傾きの大きさ
 	constexpr int kStickTiltPower = 300;
 	//上下を切り替えるときのブレンドの速さ
@@ -31,7 +31,14 @@ void CharacterStateGuard::Enter()
 
 void CharacterStateGuard::Update()
 {
+	//Stateにいる時間を計測する
 	m_time++;
+
+	//動けない時間を減らす
+	m_stopTime--;
+
+	//動かないようにする
+	SetCharacterVelo(MyEngine::Vector3(0,0,0));
 
 	//上下入力でガードの向きを変える
 	int stickY = GetCharacterInput()->GetStickInfo().leftStickY;
@@ -79,7 +86,7 @@ void CharacterStateGuard::Update()
 	}
 
 	//このStateに来てから一定時間以内であれば
-	if (m_time < kDodgeTime)
+	if (m_time < kJustGuardTime)
 	{
 		//ジャストガードにする
 		guardKind = CharacterGuardKind::kJustGuard;
@@ -89,7 +96,7 @@ void CharacterStateGuard::Update()
 	m_guardKind = guardKind;
 
 	//ガードボタンが押されている間このStateにいる
-	if (!GetCharacterInput()->IsPress("B"))
+	if (!GetCharacterInput()->IsPress("B") && m_stopTime < 0)
 	{
 		//ガードボタンが離されたら
 		std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);

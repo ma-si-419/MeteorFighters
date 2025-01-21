@@ -17,6 +17,7 @@ public:
 		float speed = 0;
 		int lifeTime = 0;
 		float radius = 0;
+		std::string effectName = "empty";
 		Character::AttackKind attackKind = Character::AttackKind::kPhysical;
 		Character::AttackHitKind attackHitKind = Character::AttackHitKind::kLow;
 	};
@@ -51,6 +52,11 @@ public:
 	/// </summary>
 	/// <returns>UŒ‚‚ª‘¶İ‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©</returns>
 	bool IsExist() { return m_isExist; }
+
+	/// <summary>
+	/// UŒ‚‚ğ‚¯‚·
+	/// </summary>
+	void DeleteAttack() { m_isExist = false; }
 
 	/// <summary>
 	/// UŒ‚‚ÌƒXƒe[ƒ^ƒX‚ğ•Ô‚·
