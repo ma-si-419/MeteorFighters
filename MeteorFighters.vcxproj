@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BattleUi.cpp" />
+    <ClCompile Include="CharacterStateTeleportation.cpp" />
     <ClCompile Include="Game\Attack.cpp" />
     <ClCompile Include="Game\Battle\BattleManager.cpp" />
     <ClCompile Include="Character\Character.cpp" />
@@ -203,6 +204,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BattleUi.h" />
+    <ClInclude Include="CharacterStateTeleportation.h" />
     <ClInclude Include="Game\Attack.h" />
     <ClInclude Include="Game\Battle\BattleManager.h" />
     <ClInclude Include="Character\Character.h" />

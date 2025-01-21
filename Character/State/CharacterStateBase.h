@@ -91,6 +91,11 @@ protected:
 	/// <param name="tutorialNumber">チュートリアルの番号(TutorialManager::TutorialSuccessKindをintにキャストする)</param>
 	void SuccessTutorial(int tutorialNumber);
 
+	/// <summary>
+	/// キャラクターを描画するかどうかを設定する
+	/// </summary>
+	/// <param name="flag">描画するならtrue描画しないならfalse</param>
+	void SetDrawFlag(bool flag);
 
 private:
 

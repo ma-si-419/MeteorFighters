@@ -683,7 +683,8 @@ private:
 	bool m_isEndAnimationBlend;
 	//ノックアウト時のベロシティ
 	MyEngine::Vector3 m_knockOutVelo;
-
+	//キャラクターを描画するかどうか
+	bool m_isDrawCharacter;
 
 	friend CharacterStateBase;
 };

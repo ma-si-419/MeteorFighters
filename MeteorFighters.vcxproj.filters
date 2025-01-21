@@ -252,6 +252,9 @@
     <ClCompile Include="SelectUi.cpp">
       <Filter>ソース ファイル\Select</Filter>
     </ClCompile>
+    <ClCompile Include="CharacterStateTeleportation.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -424,6 +427,9 @@
     </ClInclude>
     <ClInclude Include="BattleUi.h">
       <Filter>ヘッダー ファイル\Game\Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterStateTeleportation.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -133,8 +133,6 @@ void CharacterStateBase::SetCharacterPos(MyEngine::Vector3 pos)
 
 void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 {
-	std::shared_ptr<CharacterStateHitAttack> nextState = std::make_shared<CharacterStateHitAttack>(m_pCharacter);
-
 	//攻撃のステータス
 	auto status = attack->GetStatus();
 
@@ -178,12 +176,12 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 		if (m_guardKind == CharacterGuardKind::kJustGuard)
 		{
 			//瞬間移動のエフェクトを再生する
-			//effectKind = Effect::EffectKind::kTeleportaion;
+			effectKind = Effect::EffectKind::kTeleportaion;
 		}
 		//回避状態の場合
 		else if (m_guardKind == CharacterGuardKind::kDodge)
 		{
-			//特に何もエフェクトを再生しない
+			//特に何もエフェクトを再生しない			
 		}
 		else
 		{
@@ -234,6 +232,37 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 		return;
 	}
 
+	//ジャストガード時であれば
+	if (m_guardKind == CharacterGuardKind::kJustGuard)
+	{
+		MyEngine::Vector3 moveTargetPos;
+
+		//気弾系の攻撃であれば
+		if (attack->GetStatus().attackKind == Character::AttackKind::kEnergy ||
+			attack->GetStatus().attackKind == Character::AttackKind::kBeam)
+		{
+			//移動目標を攻撃の横の座標にする
+			MyEngine::LocalPos local;
+
+			local.SetCenterPos(attack->GetPos());
+
+			MyEngine::Vector3 frontPos = (attack->GetStatus().targetPos - attack->GetPos()) + attack->GetPos();
+
+			local.SetFrontPos();
+
+			local.SetLocalPos(MyEngine::Vector3());
+		}
+		//打撃系の攻撃であれば
+		else
+		{
+
+		}
+
+	}
+
+
+	std::shared_ptr<CharacterStateHitAttack> nextState = std::make_shared<CharacterStateHitAttack>(m_pCharacter);
+
 	nextState->HitAttack(static_cast<int>(hitReaction));
 
 	//体力を減らす
@@ -254,10 +283,14 @@ void CharacterStateBase::SuccessTutorial(int tutorialNumber)
 	manager->SuccessTutorial(clearKind);
 }
 
+void CharacterStateBase::SetDrawFlag(bool flag)
+{
+	m_pCharacter->m_isDrawCharacter = flag;
+}
+
 int CharacterStateBase::GetNextHitReactionKind(std::shared_ptr<Attack> attack)
 {
 	auto status = attack->GetStatus();
-
 
 	//そもそもガードできる状態にいるのかを調べる
 	bool isGuard = false;

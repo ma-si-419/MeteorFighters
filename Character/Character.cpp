@@ -202,7 +202,7 @@ void Character::Update()
 	if (m_pState != m_pState->m_pNextState)
 	{
 		m_pState = m_pState->m_pNextState;
-		
+
 		//敵側の処理
 		if (m_playerNumber == Character::PlayerNumber::kTwoPlayer)
 		{
@@ -215,7 +215,6 @@ void Character::Update()
 
 	//ローカル座標の中心座標の更新
 	m_lookPos.SetCenterPos(m_rigidbody.GetPos());
-
 
 	//描画座標の設定
 	SetDrawPos(m_rigidbody.GetPos());
@@ -236,8 +235,12 @@ void Character::Draw()
 		MV1DrawModel(item.handle);
 	}
 
-	//モデルの描画
-	MV1DrawModel(m_modelHandle);
+	//描画するとされていたら
+	if (m_isDrawCharacter)
+	{
+		//モデルの描画
+		MV1DrawModel(m_modelHandle);
+	}
 }
 
 void Character::OnCollide(std::shared_ptr<Collidable> collider)

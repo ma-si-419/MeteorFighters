@@ -31,14 +31,19 @@ void CharacterStateGuard::Enter()
 
 void CharacterStateGuard::Update()
 {
+	m_time++;
+
 	//上下入力でガードの向きを変える
 	int stickY = GetCharacterInput()->GetStickInfo().leftStickY;
+
+	//ガードの方向
+	auto guardKind = CharacterGuardKind::kMiddleGuard;
 
 	//上に傾いていたら
 	if (stickY < -kStickTiltPower)
 	{
 		//上ガードに変更する
-		m_guardKind = CharacterGuardKind::kUpGuard;
+		guardKind = CharacterGuardKind::kUpGuard;
 
 		//アニメーションを変更
 		if (m_pCharacter->GetPlayAnimKind() != Character::AnimKind::kGuardHigh)
@@ -51,7 +56,7 @@ void CharacterStateGuard::Update()
 	else if (stickY > kStickTiltPower)
 	{
 		//下ガードに変更する
-		m_guardKind = CharacterGuardKind::kDownGuard;
+		guardKind = CharacterGuardKind::kDownGuard;
 
 		//アニメーションを変更
 		if (m_pCharacter->GetPlayAnimKind() != Character::AnimKind::kGuardLow)
@@ -64,7 +69,7 @@ void CharacterStateGuard::Update()
 	else
 	{
 		//中段ガードに変更する
-		m_guardKind = CharacterGuardKind::kMiddleGuard;
+		guardKind = CharacterGuardKind::kMiddleGuard;
 
 		//アニメーションを変更
 		if (m_pCharacter->GetPlayAnimKind() != Character::AnimKind::kGuardMiddle)
@@ -73,6 +78,15 @@ void CharacterStateGuard::Update()
 		}
 	}
 
+	//このStateに来てから一定時間以内であれば
+	if (m_time < kDodgeTime)
+	{
+		//ジャストガードにする
+		guardKind = CharacterGuardKind::kJustGuard;
+	}
+
+	//ガードの状態を設定する
+	m_guardKind = guardKind;
 
 	//ガードボタンが押されている間このStateにいる
 	if (!GetCharacterInput()->IsPress("B"))
@@ -82,14 +96,6 @@ void CharacterStateGuard::Update()
 
 		ChangeState(next);
 	}
-
-
-#ifdef _DEBUG
-
-	DrawString(0, 16, "PlayerState:Guard", GetColor(255, 255, 255));
-
-#endif // _DEBUG
-
 }
 void CharacterStateGuard::Exit()
 {
