@@ -58,10 +58,10 @@ namespace
 	};
 
 	//最大何フレームキャラクターが頭を出すか
-	constexpr int kMaxCharacterMoveFrame = 100;
+	constexpr int kMaxCharacterMoveFrame = 60;
 
 	//最低何フレームキャラクターが頭を出すか
-	constexpr int kMinCharacterMoveFrame = 10;
+	constexpr int kMinCharacterMoveFrame = 30;
 
 	//最初何フレームキャラクターが頭を出すか
 	constexpr int kInitCharacterMoveFrame = 120;
@@ -111,11 +111,14 @@ namespace
 	//アップデートそれぞれの確率
 	constexpr int kUpdateProb[kUpdateKindNum] =
 	{
-		50,
-		10,
-		15,
-		25
+		50,//通常
+		5,//落ちる
+		10,//横っ飛び
+		8 //ジャンプ
 	};
+
+	//確率をすべて足した値
+	constexpr int kUpdateProbTotal = kUpdateProb[0] + kUpdateProb[1] + kUpdateProb[2] + kUpdateProb[3];
 }
 
 TitleUi::TitleUi() :
@@ -552,7 +555,7 @@ void TitleUi::NormalUpdate(int number)
 			//更新関数をランダムで設定
 			int random = 0;
 
-			int prob = GetRand(100);
+			int prob = GetRand(kUpdateProbTotal);
 
 			//ランダム処理
 			for (auto item : kUpdateProb)
@@ -595,7 +598,7 @@ void TitleUi::FallUpdate(int number)
 			//更新関数をランダムで設定
 			int random = 0;
 
-			int prob = GetRand(100);
+			int prob = GetRand(kUpdateProbTotal);
 
 			//ランダム処理
 			for (auto item : kUpdateProb)
@@ -630,7 +633,7 @@ void TitleUi::JumpUpdate(int number)
 			//更新関数をランダムで設定
 			int random = 0;
 
-			int prob = GetRand(100);
+			int prob = GetRand(kUpdateProbTotal);
 
 			//ランダム処理
 			for (auto item : kUpdateProb)
@@ -665,7 +668,7 @@ void TitleUi::SideJumpUpdate(int number)
 			//更新関数をランダムで設定
 			int random = 0;
 
-			int prob = GetRand(100);
+			int prob = GetRand(kUpdateProbTotal);
 
 
 			//ランダム処理
