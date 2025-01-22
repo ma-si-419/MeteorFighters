@@ -1,17 +1,56 @@
 #pragma once
 #include "Vector2.h"
-
+struct CharacterDrawInfo;
 class TitleUi
 {
-private:
+public:
 
-	enum class Side
+	/// <summary>
+	/// 描画するキャラクターの種類
+	/// </summary>
+	enum class DrawCharacterKind
+	{
+		kMouse,
+		kBlue,
+		kMouse2P,
+		kBlue2P,
+		kCharacterKindNum
+	};
+
+	/// <summary>
+	/// キャラクターの描画サイド
+	/// </summary>
+	enum class DrawCharacterSide
 	{
 		kUp,
 		kRight,
 		kDown,
 		kLeft,
 		kSideNum = kLeft
+	};
+
+private:
+
+	/// <summary>
+	/// キャラクターの画像の種類
+	/// </summary>
+	enum class CharacterGraphKind
+	{
+		kChoki,
+		kPar,
+		kKindNum = kPar
+	};
+
+	/// <summary>
+	/// キャラクターのアップデートの種類
+	/// </summary>
+	enum class CharacterUpdateKind
+	{
+		kNormal,
+		kFall,
+		kSideJump,
+		kJump,
+		kUpdateKindNum = kJump
 	};
 
 public:
@@ -28,15 +67,34 @@ public:
 
 private:
 
-	void DrawCharacter(Side side,MyEngine::Vector2 pos,int handle);
+	/// <summary>
+	/// キャラクターが画面に入ってくるときの移動ベクトルを取得する
+	/// </summary>
+	/// <param name="side">キャラクターのいるサイド</param>
+	/// <returns>移動ベクトル</returns>
+	MyEngine::Vector2 GetEnterMoveVec(DrawCharacterSide side);
 
-	MyEngine::Vector2 GetEnterMoveVec(Side side);
+	/// <summary>
+	/// キャラクターが画面から出ていくときの移動ベクトルを取得する
+	/// </summary>
+	/// <param name="side">キャラクターのいるサイド</param>
+	/// <returns>移動ベクトル</returns>
+	MyEngine::Vector2 GetReturnMoveVec(DrawCharacterSide side);
 
-	MyEngine::Vector2 GetReturnMoveVec(Side side);
+	/// <summary>
+	/// キャラクターの座標を制限する
+	/// </summary>
+	/// <param name="side">キャラクターのいるサイド</param>
+	/// <param name="pos">キャラクターの座標</param>
+	/// <returns>制限後のキャラクターの座標</returns>
+	MyEngine::Vector2 ClampPos(DrawCharacterSide side, MyEngine::Vector2 pos);
 
-	MyEngine::Vector2 ClampPos(Side side,MyEngine::Vector2 pos);
-
-	MyEngine::Vector2 SetRandomPos(Side side);
+	/// <summary>
+	/// 指定したサイドにランダムな座標を設定する
+	/// </summary>
+	/// <param name="side">キャラクターのサイド</param>
+	/// <returns>キャラクターの描画座標</returns>
+	MyEngine::Vector2 SetRandomPos(DrawCharacterSide side);
 
 	/// <summary>
 	/// 画面内にいるかどうかを返す
@@ -44,26 +102,119 @@ private:
 	/// <param name="pos">キャラクターの座標</param>
 	/// <returns>画面に移っているのならばtrueを返す</returns>
 	bool CheckPos(MyEngine::Vector2 pos);
+
+	/// <summary>
+	/// キャラクターの画像ハンドルを取得する
+	/// </summary>
+	/// <param name="characterKind">キャラクターの種類</param>
+	/// <param name="graphKind">画像の種類</param>
+	/// <returns>キャラクターの画像ハンドル</returns>
+	int GetCharacterHandle(DrawCharacterKind characterKind, CharacterGraphKind graphKind);
+
+	/// <summary>
+	/// キャラクターの更新を設定する
+	/// </summary>
+	/// <param name="kind">更新の種類</param>
+	/// <param name="character">キャラクターの種類</param>
+	void SetCharacterUpdateFunc(CharacterUpdateKind kind, DrawCharacterKind character);
+
 private:
 
+	using CharacterUpdateFunc = void(TitleUi::*)(int);
+
+private:
+
+	/// <summary>
+	/// キャラクターを描画する際に使用する構造体
+	/// </summary>
+	struct CharacterDrawInfo
+	{
+		//キャラクターのハンドル
+		int handle;
+		//キャラクターの座標
+		MyEngine::Vector2 pos;
+		//キャラクターの移動ベクトル
+		MyEngine::Vector2 moveVec;
+		//キャラクターの回転度
+		double rota;
+		//キャラクターの回転速度
+		double rotaSpeed;
+		//キャラクターのサイド
+		DrawCharacterSide side;
+		//キャラクターの移動時間
+		int moveTime;
+		//キャラクターの種類
+		DrawCharacterKind kind;
+		//キャラクターの更新関数
+		CharacterUpdateFunc updateFunc;
+	};
+
+private:
+
+	/// <summary>
+	/// 通常時の初期化
+	/// </summary>
+	/// <param name="number">初期化を行うキャラクター</param>
+	void InitNormal(int number);
+
+	/// <summary>
+	/// 上から落ちてくるときの初期化
+	/// </summary>
+	/// <param name="number">初期化を行うキャラクター</param>
+	void InitFall(int number);
+
+	/// <summary>
+	/// 下からジャンプするときの初期化
+	/// </summary>
+	/// <param name="number">初期化を行うキャラクター</param>
+	void InitJump(int number);
+
+	/// <summary>
+	/// 横っ飛びするときの初期化
+	/// </summary>
+	/// <param name="number">初期化を行うキャラクター</param>
+	void InitSideJump(int number);
+
+	/// <summary>
+	/// 通常時のアップデート
+	/// </summary>
+	/// <param name="character">アップデートを行うキャラクター</param>
+	void NormalUpdate(int number);
+
+	/// <summary>
+	/// 上から落ちてくるときのアップデート
+	/// </summary>
+	/// <param name="character">アップデートを行うキャラクター</param>
+	void FallUpdate(int number);
+
+	/// <summary>
+	/// 下からジャンプするときのアップデート
+	/// </summary>
+	/// <param name="character">アップデートを行うキャラクター</param>
+	void JumpUpdate(int number);
+
+	/// <summary>
+	/// 横っ飛びするときのアップデート
+	/// </summary>
+	/// <param name="number">アップデートを行うキャラクター</param>
+	void SideJumpUpdate(int number);
+
+private:
+
+
+	//文字がついている時間
 	int m_time;
 
+	//文字が表示されているかどうか
 	bool m_isExistString;
 
+	//フォントのハンドル
 	int m_fontHandle;
 
+	//スカイドームのハンドル
 	int m_skyDomeHandle;
 
-	int m_mouseMoveTime;
-
-	int m_blueHeadMoveTime;
-
-	Side m_mouseSide;
-
-	Side m_blueHeadSide;
-
-	MyEngine::Vector2 m_mousePos;
-
-	MyEngine::Vector2 m_blueHeadPos;
+	//キャラクターの描画情報
+	CharacterDrawInfo m_characterDrawInfo[static_cast<int>(DrawCharacterKind::kCharacterKindNum)];
 };
 

@@ -2,6 +2,7 @@
 #include "DxLib.h"
 #include <string>
 #include "GraphManager.h"
+#include "SoundManager.h"
 #include "Game.h"
 
 namespace
@@ -29,32 +30,100 @@ namespace
 	//文字がついていない時間
 	constexpr int kStringNotExistTime = 15;
 
-	//マウスを表示する最初の座標
-	const MyEngine::Vector2 kMouseInitPos(900, 0);
+	//キャラクターを描画する座標
+	const MyEngine::Vector2 kCharacterDrawPos[static_cast<int>(TitleUi::DrawCharacterKind::kCharacterKindNum)] =
+	{
+		{1100,0},
+		{Game::kWindowWidth,350},
+		{0,600},
+		{500,Game::kWindowHeight}
+	};
 
-	//ブルーヘッドを表示する最初の座標
-	const MyEngine::Vector2 kBigBlueInitPos(Game::kWindowWidth, 150);
+	//キャラクターの初期サイド
+	const TitleUi::DrawCharacterSide kCharacterSide[static_cast<int>(TitleUi::DrawCharacterKind::kCharacterKindNum)] =
+	{
+		TitleUi::DrawCharacterSide::kUp,
+		TitleUi::DrawCharacterSide::kRight,
+		TitleUi::DrawCharacterSide::kLeft,
+		TitleUi::DrawCharacterSide::kDown
+	};
+
+	//サイドごとの回転度
+	const double kSideRota[4] =
+	{
+		DX_PI,//180
+		DX_PI + DX_PI / 2 ,//270
+		0,//0
+		DX_PI / 2//90
+	};
 
 	//最大何フレームキャラクターが頭を出すか
 	constexpr int kMaxCharacterMoveFrame = 100;
 
+	//最低何フレームキャラクターが頭を出すか
+	constexpr int kMinCharacterMoveFrame = 10;
+
+	//最初何フレームキャラクターが頭を出すか
+	constexpr int kInitCharacterMoveFrame = 120;
+
 	//キャラクターの移動速度
-	constexpr int kCharacterMoveSpeed = 10;
+	constexpr int kCharacterMoveSpeed = 20;
+
+	//落下速度の最大値
+	constexpr int kMaxFallSpeed = 20;
+	//落下速度の最小値
+	constexpr int kMinFallSpeed = 10;
+
+	//落下時の回転速度の最大値
+	constexpr double kMaxFallRotaSpeed = 0.3;
+	//落下時の回転速度の最小値
+	constexpr double kMinFallRotaSpeed = 0.05;
+
+	//ジャンプ時の移動速度の最大値
+	constexpr int kMaxJumpSpeed = 40;
+	//ジャンプ時の移動速度の最小値
+	constexpr int kMinJumpSpeed = 30;
+
+	//ジャンプ時にかける重力
+	constexpr float kJumpGravity = 0.65f;
+
+	//横っ飛び時の横移動速度の最大値
+	constexpr int kMaxSideJumpSpeed = 30;
+	//横っ飛び時の横移動速度の最小値
+	constexpr int kMinSideJumpSpeed = 20;
+	//横っ飛び時の初期上昇速度の最大値
+	constexpr int kMaxSideJumpUpSpeed = 15;
+	//横っ飛び時の初期上昇速度の最小値
+	constexpr int kMinSideJumpUpSpeed = 5;
+	//横っ飛び時にかける重力
+	constexpr float kSideJumpGravity = 0.3f;
 
 	//キャラクターの画像の幅
-	constexpr int kCharacterSize = 120;
+	constexpr int kCharacterWidth = 350;
+	constexpr int kCharacterHeight = 200;
+
+	//キャラクターのハンドルの種類
+	constexpr int kCharacterHandleKind = 1;
+
+	//アップデートの種類の数
+	constexpr int kUpdateKindNum = 4;
+
+	//アップデートそれぞれの確率
+	constexpr int kUpdateProb[kUpdateKindNum] =
+	{
+		50,
+		10,
+		15,
+		25
+	};
 }
 
 TitleUi::TitleUi() :
 	m_skyDomeHandle(-1),
 	m_time(0),
-	m_mouseMoveTime(-1),
-	m_blueHeadMoveTime(-1),
-	m_isExistString(true)
+	m_isExistString(true),
+	m_fontHandle(-1)
 {
-	m_mouseSide = Side::kUp;
-	m_blueHeadSide = Side::kRight;
-
 	m_fontHandle = CreateFontToHandle(kFontName, kFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
 }
 
@@ -77,14 +146,33 @@ void TitleUi::Init()
 	//スカイドームの設定
 	MV1SetPosition(m_skyDomeHandle, VGet(0, 0, 0));
 
-	//キャラクターの座標設定
-	m_mousePos = kMouseInitPos;
-	m_blueHeadPos = kBigBlueInitPos;
+	//キャラクターの初期設定
+	for (auto& item : m_characterDrawInfo)
+	{
+		//キャラクターの種類設定
+		item.kind = static_cast<DrawCharacterKind>(&item - &m_characterDrawInfo[0]);
 
+		//キャラクターの初期座標設定
+		item.pos = kCharacterDrawPos[static_cast<int>(item.kind)];
 
-	//キャラクターが移動するまでの時間設定
-	m_mouseMoveTime = GetRand(kMaxCharacterMoveFrame);
-	m_blueHeadMoveTime = GetRand(kMaxCharacterMoveFrame);
+		//キャラクターの初期回転速度設定
+		item.rotaSpeed = 0.0;
+
+		//キャラクターの初期移動時間設定
+		item.moveTime = kInitCharacterMoveFrame;
+
+		//キャラクターの初期サイド設定
+		item.side = kCharacterSide[static_cast<int>(item.kind)];
+
+		//キャラクターの初期回転度設定
+		item.rota = kSideRota[static_cast<int>(item.side)];
+
+		//キャラクターの初期ハンドル設定
+		item.handle = GetCharacterHandle(item.kind, static_cast<CharacterGraphKind>(GetRand(kCharacterHandleKind)));
+
+		//キャラクターの初期更新関数設定
+		item.updateFunc = &TitleUi::NormalUpdate;
+	}
 }
 
 void TitleUi::Update()
@@ -117,71 +205,12 @@ void TitleUi::Update()
 		}
 	}
 
-
-	//キャラクターの時間計測関係
-	m_mouseMoveTime--;
-	m_blueHeadMoveTime--;
-
-	//移動する時間になったら
-	if (m_mouseMoveTime < 0)
+	//キャラクターの更新を行う
+	for (auto& item : m_characterDrawInfo)
 	{
-		MyEngine::Vector2 moveVec = GetReturnMoveVec(m_mouseSide);
-
-		m_mousePos += moveVec;
-
-		//画面外に出たかどうかをチェック
-
-		//出ていたら座標をランダムで画面外に設定する
-		if (!CheckPos(m_mousePos))
-		{
-
-			m_mouseSide = static_cast<Side>(GetRand(static_cast<int>(Side::kSideNum)));
-
-			m_mousePos = SetRandomPos(m_mouseSide);
-
-			m_mouseMoveTime = GetRand(kMaxCharacterMoveFrame);
-		}
+		//キャラクターの更新関数を呼ぶ
+		(this->*item.updateFunc)(static_cast<int>(item.kind));
 	}
-	//それ以外
-	else
-	{
-		MyEngine::Vector2 moveVec = GetEnterMoveVec(m_mouseSide);
-
-		m_mousePos += moveVec;
-	}
-
-	//移動する時間になったら
-	if (m_blueHeadMoveTime < 0)
-	{
-		MyEngine::Vector2 moveVec = GetReturnMoveVec(m_blueHeadSide);
-
-		m_blueHeadPos += moveVec;
-
-		//画面外に出たかどうかをチェック
-
-		//出ていたら座標をランダムで画面外に設定する
-		if (!CheckPos(m_blueHeadPos))
-		{
-			m_blueHeadSide = static_cast<Side>(GetRand(static_cast<int>(Side::kSideNum)));
-
-			m_blueHeadPos = SetRandomPos(m_blueHeadSide);
-
-			m_blueHeadMoveTime = GetRand(kMaxCharacterMoveFrame);
-		}
-	}
-	//それ以外
-	else
-	{
-		MyEngine::Vector2 moveVec = GetEnterMoveVec(m_blueHeadSide);
-
-		m_blueHeadPos += moveVec;
-	}
-
-	m_mousePos = ClampPos(m_mouseSide, m_mousePos);
-
-	m_blueHeadPos = ClampPos(m_blueHeadSide, m_blueHeadPos);
-
-
 }
 
 void TitleUi::Draw()
@@ -196,55 +225,33 @@ void TitleUi::Draw()
 		DrawStringToHandle(kStringPosX, kStringPosY, kUiString.c_str(), GetColor(255, 255, 255), m_fontHandle, GetColor(0, 0, 0));
 	}
 
+	//タイトルロゴの描画
 	DrawGraph(0, 0, manager.GetHandle("TitleLogo"), true);
 
-	DrawCharacter(m_mouseSide, m_mousePos, manager.GetHandle("Mouse"));
-	DrawCharacter(m_blueHeadSide, m_blueHeadPos, manager.GetHandle("BlueHead"));
+	//キャラクターの描画
+	for (auto& item : m_characterDrawInfo)
+	{
+		DrawRotaGraph(item.pos.x, item.pos.y, 1.0, item.rota, item.handle, true);
+	}
 
 }
 
-void TitleUi::DrawCharacter(Side side, MyEngine::Vector2 pos, int handle)
+
+MyEngine::Vector2 TitleUi::GetEnterMoveVec(DrawCharacterSide side)
 {
-	double rota = 0.0;
-
-	if (side == Side::kUp)
-	{
-		//180度回転
-		rota = DX_PI;
-	}
-	else if (side == Side::kRight)
-	{
-		//270度回転
-		rota = (DX_PI / 180) * 270;
-	}
-	else if (side == Side::kLeft)
-	{
-		//90度回転
-		rota = (DX_PI / 2);
-	}
-	else if (side == Side::kDown)
-	{
-		rota = 0.0;
-	}
-
-	DrawRotaGraph(pos.x, pos.y, 1.0, rota, handle, true);
-}
-
-MyEngine::Vector2 TitleUi::GetEnterMoveVec(Side side)
-{
-	if (side == Side::kUp)
+	if (side == DrawCharacterSide::kUp)
 	{
 		return MyEngine::Vector2(0, kCharacterMoveSpeed);
 	}
-	else if (side == Side::kRight)
+	else if (side == DrawCharacterSide::kRight)
 	{
 		return MyEngine::Vector2(-kCharacterMoveSpeed, 0);
 	}
-	else if (side == Side::kLeft)
+	else if (side == DrawCharacterSide::kLeft)
 	{
 		return MyEngine::Vector2(kCharacterMoveSpeed, 0);
 	}
-	else if (side == Side::kDown)
+	else if (side == DrawCharacterSide::kDown)
 	{
 		return MyEngine::Vector2(0, -kCharacterMoveSpeed);
 	}
@@ -252,21 +259,21 @@ MyEngine::Vector2 TitleUi::GetEnterMoveVec(Side side)
 	return MyEngine::Vector2(0, 0);
 }
 
-MyEngine::Vector2 TitleUi::GetReturnMoveVec(Side side)
+MyEngine::Vector2 TitleUi::GetReturnMoveVec(DrawCharacterSide side)
 {
-	if (side == Side::kUp)
+	if (side == DrawCharacterSide::kUp)
 	{
 		return MyEngine::Vector2(0, -kCharacterMoveSpeed);
 	}
-	else if (side == Side::kRight)
+	else if (side == DrawCharacterSide::kRight)
 	{
 		return MyEngine::Vector2(kCharacterMoveSpeed, 0);
 	}
-	else if (side == Side::kLeft)
+	else if (side == DrawCharacterSide::kLeft)
 	{
 		return MyEngine::Vector2(-kCharacterMoveSpeed, 0);
 	}
-	else if (side == Side::kDown)
+	else if (side == DrawCharacterSide::kDown)
 	{
 		return MyEngine::Vector2(0, kCharacterMoveSpeed);
 	}
@@ -274,53 +281,56 @@ MyEngine::Vector2 TitleUi::GetReturnMoveVec(Side side)
 	return MyEngine::Vector2(0, 0);
 }
 
-MyEngine::Vector2 TitleUi::ClampPos(Side side, MyEngine::Vector2 pos)
+MyEngine::Vector2 TitleUi::ClampPos(DrawCharacterSide side, MyEngine::Vector2 pos)
 {
 	MyEngine::Vector2 ans = pos;
 
-	if (side == Side::kUp)
+	if (side == DrawCharacterSide::kUp)
 	{
-		ans.y = min(pos.y, kCharacterSize);
+		ans.y = min(pos.y, kCharacterHeight / 2);
 	}
-	else if (side == Side::kRight)
+	else if (side == DrawCharacterSide::kRight)
 	{
-		ans.x = max(pos.x, Game::kWindowWidth - kCharacterSize);
+		ans.x = max(pos.x, Game::kWindowWidth - kCharacterHeight / 2);
 	}
-	else if (side == Side::kLeft)
+	else if (side == DrawCharacterSide::kLeft)
 	{
-		ans.x = min(pos.x, kCharacterSize);
+		ans.x = min(pos.x, kCharacterHeight / 2);
 	}
-	else if (side == Side::kDown)
+	else if (side == DrawCharacterSide::kDown)
 	{
-		ans.y = max(pos.y, Game::kWindowHeight - kCharacterSize);
+		ans.y = max(pos.y, Game::kWindowHeight - kCharacterHeight / 2);
 	}
 
 	return ans;
 }
 
-MyEngine::Vector2 TitleUi::SetRandomPos(Side side)
+MyEngine::Vector2 TitleUi::SetRandomPos(DrawCharacterSide side)
 {
-	if (side == Side::kUp)
+	//上方向から出る場合
+	if (side == DrawCharacterSide::kUp)
 	{
-		int randomX = GetRand(Game::kWindowWidth - (kCharacterSize / 2)) + kCharacterSize;
-		return MyEngine::Vector2(randomX, -kCharacterSize);
+		int randomX = GetRand(Game::kWindowWidth - kCharacterWidth) + kCharacterWidth / 2;
+		return MyEngine::Vector2(randomX, -kCharacterWidth);
 	}
-	else if (side == Side::kRight)
+	//右方向から出る場合
+	else if (side == DrawCharacterSide::kRight)
 	{
-		int randomY = GetRand(Game::kWindowHeight - (kCharacterSize / 2)) + kCharacterSize;
-		return MyEngine::Vector2(Game::kWindowWidth + kCharacterSize, randomY);
+		int randomY = GetRand(Game::kWindowHeight - kCharacterWidth) + kCharacterWidth / 2;
+		return MyEngine::Vector2(Game::kWindowWidth + kCharacterWidth, randomY);
 	}
-	else if (side == Side::kLeft)
+	//左方向から出る場合
+	else if (side == DrawCharacterSide::kLeft)
 	{
-		int randomY = GetRand(Game::kWindowHeight - (kCharacterSize / 2)) + kCharacterSize;
-		return MyEngine::Vector2(-kCharacterSize, randomY);
+		int randomY = GetRand(Game::kWindowHeight - kCharacterWidth) + kCharacterWidth / 2;
+		return MyEngine::Vector2(-kCharacterWidth, randomY);
 	}
-	else if (side == Side::kDown)
+	//下方向から出る場合
+	else if (side == DrawCharacterSide::kDown)
 	{
-		int randomX = GetRand(Game::kWindowWidth - (kCharacterSize / 2)) + kCharacterSize;
-		return MyEngine::Vector2(randomX, Game::kWindowHeight + kCharacterSize);
+		int randomX = GetRand(Game::kWindowWidth - kCharacterWidth) + kCharacterWidth / 2;
+		return MyEngine::Vector2(randomX, Game::kWindowHeight + kCharacterWidth);
 	}
-
 
 	return MyEngine::Vector2(0, 0);
 }
@@ -328,12 +338,352 @@ MyEngine::Vector2 TitleUi::SetRandomPos(Side side)
 bool TitleUi::CheckPos(MyEngine::Vector2 pos)
 {
 
-	if (pos.x >= -kCharacterSize &&
-		pos.x <= Game::kWindowWidth + kCharacterSize &&
-		pos.y >= -kCharacterSize &&
-		pos.y <= Game::kWindowHeight + kCharacterSize)
+	if (pos.x >= -kCharacterHeight &&
+		pos.x <= Game::kWindowWidth + kCharacterHeight &&
+		pos.y >= -kCharacterHeight &&
+		pos.y <= Game::kWindowHeight + kCharacterHeight)
 	{
 		return true;
 	}
 	return false;
+}
+
+int TitleUi::GetCharacterHandle(DrawCharacterKind characterKind, CharacterGraphKind graphKind)
+{
+	//返すハンドル
+	int ans = -1;
+
+	//グラフィックマネージャーの取得
+	auto& manager = GraphManager::GetInstance();
+
+	//ハンドル名
+	std::string handleName;
+
+	if (characterKind == DrawCharacterKind::kMouse)
+	{
+		handleName = "Mouse1P";
+	}
+	else if (characterKind == DrawCharacterKind::kBlue)
+	{
+		handleName = "Blue1P";
+	}
+	else if (characterKind == DrawCharacterKind::kMouse2P)
+	{
+		handleName = "Mouse2P";
+	}
+	else if (characterKind == DrawCharacterKind::kBlue2P)
+	{
+		handleName = "Blue2P";
+	}
+
+	if (graphKind == CharacterGraphKind::kChoki)
+	{
+		handleName += "Choki";
+	}
+	else if (graphKind == CharacterGraphKind::kPar)
+	{
+		handleName += "Par";
+	}
+
+	ans = manager.GetHandle(handleName);
+
+	if (ans == -1)
+	{
+		printfDx("ハンドルが取得できませんでした\n");
+	}
+
+	return ans;
+}
+
+void TitleUi::SetCharacterUpdateFunc(CharacterUpdateKind kind, DrawCharacterKind character)
+{
+
+	//通常の更新
+	if (kind == CharacterUpdateKind::kNormal)
+	{
+		InitNormal(static_cast<int>(character));
+		m_characterDrawInfo[static_cast<int>(character)].updateFunc = &TitleUi::NormalUpdate;
+	}
+	//落下の更新
+	else if (kind == CharacterUpdateKind::kFall)
+	{
+		InitFall(static_cast<int>(character));
+		m_characterDrawInfo[static_cast<int>(character)].updateFunc = &TitleUi::FallUpdate;
+	}
+	//ジャンプの更新
+	else if (kind == CharacterUpdateKind::kJump)
+	{
+		InitJump(static_cast<int>(character));
+		m_characterDrawInfo[static_cast<int>(character)].updateFunc = &TitleUi::JumpUpdate;
+	}
+	//横っ飛びの更新
+	else if (kind == CharacterUpdateKind::kSideJump)
+	{
+		InitSideJump(static_cast<int>(character));
+		m_characterDrawInfo[static_cast<int>(character)].updateFunc = &TitleUi::SideJumpUpdate;
+	}
+}
+
+void TitleUi::InitNormal(int number)
+{
+	//サイドをランダムで設定
+	m_characterDrawInfo[number].side = static_cast<DrawCharacterSide>(GetRand(static_cast<int>(DrawCharacterSide::kSideNum)));
+
+	//座標をランダムで設定
+	m_characterDrawInfo[number].pos = SetRandomPos(m_characterDrawInfo[number].side);
+
+	//移動時間をランダムで設定
+	m_characterDrawInfo[number].moveTime = GetRand(kMaxCharacterMoveFrame) + kMinCharacterMoveFrame;
+
+	//ハンドルをランダムで設定
+	m_characterDrawInfo[number].handle = GetCharacterHandle(m_characterDrawInfo[number].kind, static_cast<CharacterGraphKind>(GetRand(kCharacterHandleKind)));
+
+	//回転度を設定
+	m_characterDrawInfo[number].rota = kSideRota[static_cast<int>(m_characterDrawInfo[number].side)];
+
+	//回転速度を設定
+	m_characterDrawInfo[number].rotaSpeed = 0.0;
+
+}
+
+void TitleUi::InitFall(int number)
+{
+	//落ちるサウンドを再生
+	SoundManager::GetInstance().OncePlaySound("Fall");
+	//移動時間を設定
+	m_characterDrawInfo[number].moveTime = kMinCharacterMoveFrame;
+
+	//サイドを上に設定
+	m_characterDrawInfo[number].side = DrawCharacterSide::kUp;
+
+	//座標をランダムで設定
+	m_characterDrawInfo[number].pos = SetRandomPos(m_characterDrawInfo[number].side);
+
+	//ハンドルをランダムで設定
+	m_characterDrawInfo[number].handle = GetCharacterHandle(m_characterDrawInfo[number].kind, static_cast<CharacterGraphKind>(GetRand(kCharacterHandleKind)));
+
+	//移動ベクトルを設定
+	m_characterDrawInfo[number].moveVec = MyEngine::Vector2(0, GetRand(kMaxFallSpeed - kMinFallSpeed) + kMinFallSpeed);
+
+	//回転速度を設定
+	float randomRota = static_cast<float>(GetRand(static_cast<int>((kMaxFallRotaSpeed - kMinFallRotaSpeed) * 100)));
+
+	m_characterDrawInfo[number].rotaSpeed = (randomRota / 100) + kMinFallRotaSpeed;
+}
+
+void TitleUi::InitJump(int number)
+{
+	//落ちるサウンドを再生
+	SoundManager::GetInstance().OncePlaySound("Jump");
+	//移動時間を設定
+	m_characterDrawInfo[number].moveTime = kMinCharacterMoveFrame;
+	//サイドを下に設定
+	m_characterDrawInfo[number].side = DrawCharacterSide::kDown;
+	//座標をランダムで設定
+	m_characterDrawInfo[number].pos = SetRandomPos(m_characterDrawInfo[number].side);
+	//ハンドルをランダムで設定
+	m_characterDrawInfo[number].handle = GetCharacterHandle(m_characterDrawInfo[number].kind, static_cast<CharacterGraphKind>(GetRand(kCharacterHandleKind)));
+	//移動ベクトルを設定
+	m_characterDrawInfo[number].moveVec = MyEngine::Vector2(0, -(GetRand(kMaxJumpSpeed - kMinJumpSpeed) + kMinJumpSpeed));
+	//回転速度を設定
+	m_characterDrawInfo[number].rotaSpeed = 0.0;
+	//回転度を変更
+	m_characterDrawInfo[number].rota = 0.0;
+}
+
+void TitleUi::InitSideJump(int number)
+{
+	//横っ飛びのサウンドを再生
+	SoundManager::GetInstance().OncePlaySound("SideJump");
+
+	//移動時間を設定
+	m_characterDrawInfo[number].moveTime = kMinCharacterMoveFrame;
+
+	//サイドを左右どちらかで設定
+	int random = GetRand(1);
+
+	//左右どちらか出るかをランダムで設定
+	if (random == 0)
+	{
+		//サイドを設定
+		m_characterDrawInfo[number].side = DrawCharacterSide::kLeft;
+		//初期移動ベクトルを設定
+		m_characterDrawInfo[number].moveVec = MyEngine::Vector2(GetRand(kMaxSideJumpSpeed - kMinSideJumpSpeed) + kMinSideJumpSpeed, -GetRand(kMaxSideJumpUpSpeed - kMinSideJumpUpSpeed) - kMinSideJumpUpSpeed);
+		//回転度を設定
+		m_characterDrawInfo[number].rota = kSideRota[static_cast<int>(DrawCharacterSide::kLeft)];
+	}
+	else
+	{
+		//サイドを設定
+		m_characterDrawInfo[number].side = DrawCharacterSide::kRight;
+		//初期移動ベクトルを設定
+		m_characterDrawInfo[number].moveVec = MyEngine::Vector2(-(GetRand(kMaxSideJumpSpeed - kMinSideJumpSpeed) + kMinSideJumpSpeed), -GetRand(kMaxSideJumpUpSpeed - kMinSideJumpUpSpeed) - kMinSideJumpUpSpeed);
+		//回転度を設定
+		m_characterDrawInfo[number].rota = kSideRota[static_cast<int>(DrawCharacterSide::kRight)];
+	}
+
+	//座標をランダムで設定
+	m_characterDrawInfo[number].pos = SetRandomPos(m_characterDrawInfo[number].side);
+
+	//ハンドルをランダムで設定
+	m_characterDrawInfo[number].handle = GetCharacterHandle(m_characterDrawInfo[number].kind, static_cast<CharacterGraphKind>(GetRand(kCharacterHandleKind)));
+
+}
+
+void TitleUi::NormalUpdate(int number)
+{
+	m_characterDrawInfo[number].moveTime--;
+
+	//移動する時間になったら
+	if (m_characterDrawInfo[number].moveTime < 0)
+	{
+		//外側に向かう移動ベクトルを取得
+		MyEngine::Vector2 moveVec = GetReturnMoveVec(m_characterDrawInfo[number].side);
+
+		//座標を移動
+		m_characterDrawInfo[number].pos += moveVec;
+
+		//画面外に出たかどうかをチェック
+
+		//出ていたら座標をランダムで画面外に設定する
+		if (!CheckPos(m_characterDrawInfo[number].pos))
+		{
+
+			//更新関数をランダムで設定
+			int random = 0;
+
+			int prob = GetRand(100);
+
+			//ランダム処理
+			for (auto item : kUpdateProb)
+			{
+				prob -= item;
+				if (prob <= 0)
+				{
+					//ここで決定
+					SetCharacterUpdateFunc(static_cast<CharacterUpdateKind>(random), m_characterDrawInfo[number].kind);
+					break;
+				}
+				random++;
+			}
+		}
+	}
+	//それ以外
+	else
+	{
+		//内側に向かう移動ベクトルを取得
+		MyEngine::Vector2 moveVec = GetEnterMoveVec(m_characterDrawInfo[number].side);
+
+		//座標を移動
+		m_characterDrawInfo[number].pos += moveVec;
+	}
+
+	m_characterDrawInfo[number].pos = ClampPos(m_characterDrawInfo[number].side, m_characterDrawInfo[number].pos);
+}
+
+void TitleUi::FallUpdate(int number)
+{
+	m_characterDrawInfo[number].moveTime--;
+
+	//一定時間が画面外の判定をしない
+	if (m_characterDrawInfo[number].moveTime < 0)
+	{
+		//画面外に出たら
+		if (!CheckPos(m_characterDrawInfo[number].pos))
+		{
+			//更新関数をランダムで設定
+			//更新関数をランダムで設定
+			int random = 0;
+
+			int prob = GetRand(100);
+
+			//ランダム処理
+			for (auto item : kUpdateProb)
+			{
+				prob -= item;
+				if (prob <= 0)
+				{
+					//ここで決定
+					SetCharacterUpdateFunc(static_cast<CharacterUpdateKind>(random), m_characterDrawInfo[number].kind);
+					break;
+				}
+				random++;
+			}
+		}
+	}
+	//座標を移動
+	m_characterDrawInfo[number].pos += m_characterDrawInfo[number].moveVec;
+	//回転度を変更
+	m_characterDrawInfo[number].rota += m_characterDrawInfo[number].rotaSpeed;
+
+}
+
+void TitleUi::JumpUpdate(int number)
+{
+	m_characterDrawInfo[number].moveTime--;
+	//一定時間が画面外の判定をしない
+	if (m_characterDrawInfo[number].moveTime < 0)
+	{
+		//画面外に出たら
+		if (!CheckPos(m_characterDrawInfo[number].pos))
+		{
+			//更新関数をランダムで設定
+			int random = 0;
+
+			int prob = GetRand(100);
+
+			//ランダム処理
+			for (auto item : kUpdateProb)
+			{
+				prob -= item;
+				if (prob <= 0)
+				{
+					//ここで決定
+					SetCharacterUpdateFunc(static_cast<CharacterUpdateKind>(random), m_characterDrawInfo[number].kind);
+					break;
+				}
+				random++;
+			}
+
+		}
+	}
+	//座標を移動
+	m_characterDrawInfo[number].pos += m_characterDrawInfo[number].moveVec;
+	//重力をかける
+	m_characterDrawInfo[number].moveVec.y += kJumpGravity;
+}
+
+void TitleUi::SideJumpUpdate(int number)
+{
+	m_characterDrawInfo[number].moveTime--;
+	//一定時間が画面外の判定をしない
+	if (m_characterDrawInfo[number].moveTime < 0)
+	{
+		//画面外に出たら
+		if (!CheckPos(m_characterDrawInfo[number].pos))
+		{
+			//更新関数をランダムで設定
+			int random = 0;
+
+			int prob = GetRand(100);
+
+
+			//ランダム処理
+			for (auto item : kUpdateProb)
+			{
+				prob -= item;
+				if (prob <= 0)
+				{
+					//ここで決定
+					SetCharacterUpdateFunc(static_cast<CharacterUpdateKind>(random), m_characterDrawInfo[number].kind);
+					break;
+				}
+				random++;
+			}
+		}
+	}
+	//座標を移動
+	m_characterDrawInfo[number].pos += m_characterDrawInfo[number].moveVec;
+	//重力をかける
+	m_characterDrawInfo[number].moveVec.y += kSideJumpGravity;
 }

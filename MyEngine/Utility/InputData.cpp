@@ -214,6 +214,22 @@ bool MyEngine::InputData::IsTrigger(const std::string& action) const
 	}
 }
 
+bool MyEngine::InputData::IsAnyPress() const
+{
+	//全てのボタンを調べる
+	for (auto& item : m_currentInput)
+	{
+		//押されていたらtrueを返す
+		if (item.second)
+		{
+			return true;
+		}
+	}
+
+	//押されているボタンがなければfalseを返す
+	return false;
+}
+
 bool MyEngine::InputData::IsRelease(const std::string& action) const
 {
 	//まず押されているか判定

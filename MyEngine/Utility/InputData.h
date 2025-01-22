@@ -142,6 +142,12 @@ namespace MyEngine
 		bool IsTrigger(const std::string& action)const;
 
 		/// <summary>
+		/// 何かキーを押したかどうか
+		/// </summary>
+		/// <returns>登録されているキーのどれかが押されたらtrueを返す</returns>
+		bool IsAnyPress()const;
+
+		/// <summary>
 		/// キーが離された瞬間を取得する
 		/// </summary>
 		/// <param name="action">判定したいキー</param>

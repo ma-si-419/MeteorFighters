@@ -34,19 +34,32 @@ void SceneTitle::Init()
 	SoundManager::GetInstance().LoadSceneSound("Title");
 
 	m_pTitleUi->Init();
+
+	//BGMを再生
+	m_bgmPlayHandle = SoundManager::GetInstance().LoopPlaySound("Bgm");
 }
 
 void SceneTitle::Update()
 {
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
+	
+	//タイトルUIの更新
+	m_pTitleUi->Update();
 
-	if (input->IsTrigger("A"))
+	//何かキーが押されたら
+	if (input->IsAnyPress())
 	{
-		SoundManager::GetInstance().OncePlaySound("Ok");
+		//シーン遷移中なら何もしない
+		if (m_sceneManager.IsChangeScene()) return;
+		auto& soundManager = SoundManager::GetInstance();
+		//SE再生
+		soundManager.OncePlaySound("Ok");
+		//BGMを止める
+		soundManager.StopLoopSound(m_bgmPlayHandle);
+		//シーン遷移
 		m_sceneManager.ChangeScene(std::make_shared<SceneMenu>(m_sceneManager));
 	}
 
-	m_pTitleUi->Update();
 }
 
 void SceneTitle::UpdateAsyncLoad()

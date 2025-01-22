@@ -1,5 +1,13 @@
 画像の名前,パス,使うシーン
 TitleLogo,TitleLogo,Title
+Mouse1PChoki,Mouse1PChoki,Title
+Mouse2PChoki,Mouse2PChoki,Title
+Mouse1PPar,Mouse1PPar,Title
+Mouse2PPar,Mouse2PPar,Title
+Blue1PChoki,Blue1PChoki,Title
+Blue2PChoki,Blue2PChoki,Title
+Blue1PPar,Blue1PPar,Title
+Blue2PPar,Blue2PPar,Title
 HpBar,HpBar,Game
 HpBarNum,HpBarNumBox,Game
 Winner,Winner,Game
@@ -14,8 +22,6 @@ BashY,BashYButton,Game
 BashBack,BashButtonBack,Game
 SelectItemBox,SelectItemBox,Menu
 ItemBox,ItemBox,Menu
-Mouse,MouseFace,Title
-BlueHead,BlueHeadFace,Title
 HpBar,HpBar,Tutorial
 HpBarNum,HpBarNumBox,Tutorial
 MpBar,MpBar,Tutorial

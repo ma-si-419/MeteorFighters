@@ -308,8 +308,6 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 	//ƒK[ƒhó‘Ô
 	if (hitReaction == Character::HitReactionKind::kGuard)
 	{
-
-
 		//Œ»İ‚Ìó‘Ô‚ªƒK[ƒhó‘Ô‚Å‚ ‚ê‚ÎƒK[ƒhó‘Ô‚ğŒp‘±‚·‚é
 		if (m_kind == CharacterStateKind::kGuard) return;
 
