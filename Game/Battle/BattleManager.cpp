@@ -57,11 +57,8 @@ namespace
 BattleManager::BattleManager(std::shared_ptr<GameCamera> camera) :
 	GameManagerBase(camera, GameManagerBase::GameKind::kBattle)
 {
-	m_pStage = std::make_shared<Stage>();
-	m_pStage->Init();
 	m_pCamera = camera;
 
-	m_pEffectManager = std::make_shared<EffectManager>();
 	m_pGameUi = std::make_shared<GameUi>();
 
 	m_pBattleUi = std::make_shared<BattleUi>();

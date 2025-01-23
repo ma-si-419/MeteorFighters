@@ -842,6 +842,13 @@ void Character::SetModelHandle(int handle)
 	MV1SetScale(m_modelHandle, VGet(GameSceneConstant::kModelScale, GameSceneConstant::kModelScale, GameSceneConstant::kModelScale));
 }
 
+MyEngine::Vector3 Character::GetNearStagePos()
+{
+	MyEngine::Vector3 pos = m_rigidbody.GetPos();
+	pos.y = 0;
+	return pos;
+}
+
 void Character::InitStart()
 {
 	//‰ŠúÀ•W‚ÌŒˆ’è

@@ -34,6 +34,9 @@ private:
 	//移動ベクトル
 	MyEngine::Vector3 m_moveVec;
 
+	//減速ベクトル
+	MyEngine::Vector3 m_decelerationVec;
+
 	//今まで受けた攻撃
 	std::list<int> m_hitReactions;
 

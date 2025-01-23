@@ -27,6 +27,7 @@ public:
 		kButtonBashing,//敵との押し合い
 		kCharge,//チャージ状態
 		kTeleportation,//瞬間移動状態
+		kDown,//ダウン状態
 		kStateKindNum//Stateの数
 	};
 

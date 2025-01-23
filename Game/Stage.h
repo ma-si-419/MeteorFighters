@@ -1,11 +1,14 @@
 #pragma once
 #include "Vector3.h"
 #include <string>
+#include <memory>
 
+class EffectManager;
+class Effect;
 class Stage
 {
 public:
-	Stage();
+	Stage(std::shared_ptr<EffectManager> manager);
 	virtual ~Stage();
 
 	void Init();
@@ -25,6 +28,9 @@ public:
 	std::string GetSkyDomePath() { return m_skyDomePath; }
 private:
 	
+	//エフェクトマネージャー
+	std::shared_ptr<EffectManager> m_pEffectManager;
+
 	int m_stageHandle;
 	
 	int m_skyDomeHandle;
@@ -32,5 +38,7 @@ private:
 	std::string m_stagePath;
 
 	std::string m_skyDomePath;
+
+	std::shared_ptr<Effect> m_pEffect;
 };
 

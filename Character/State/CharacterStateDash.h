@@ -13,6 +13,11 @@ public:
 
 	virtual void Exit() override;
 
+	/// <summary>
+	/// ‹——£‚ÉŠÖŒW‚È‚­‰ñ”ğ‚ğs‚¤‚Æ‚«‚Ég—p‚·‚é
+	/// </summary>
+	void SetDodge() { m_isDodge = true; }
+
 private:
 	MyEngine::Vector3 m_moveDir;
 

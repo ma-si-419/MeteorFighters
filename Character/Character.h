@@ -115,7 +115,9 @@ public:
 		kGuardHigh,
 		kButtonBashingHitBack,
 		kButtonBashingAttack,
-		kOnButtonBashing
+		kOnButtonBashing,
+		kFrontDown,
+		kBackDown
 	};
 
 	enum class CharacterKind
@@ -496,6 +498,11 @@ public:
 	bool IsGround() { return m_pColData->IsGround(); }
 
 	/// <summary>
+	/// キャラクターが壁にいるかどうかを返す
+	/// </summary>
+	bool IsWall() { return m_pColData->IsWall(); }
+
+	/// <summary>
 	/// ターゲットの方向を向くようにする
 	/// </summary>
 	void LookTarget();
@@ -564,6 +571,12 @@ public:
 	/// </summary>
 	/// <param name="handle">モデルのハンドル</param>
 	void SetModelHandle(int handle);
+
+	/// <summary>
+	/// 一番近いステージのポリゴンの座標を取得する
+	/// </summary>
+	/// <returns>ステージのポリゴンの座標</returns>
+	MyEngine::Vector3 GetNearStagePos();	
 
 private:
 

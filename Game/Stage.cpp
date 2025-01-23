@@ -1,21 +1,25 @@
 #include "Stage.h"
 #include "Physics.h"
+#include "EffectManager.h"
+#include "Effect.h"
 
 namespace
 {
-	const VECTOR kStagePos = VGet(0, -50, 0);
+	const VECTOR kStagePos = VGet(0, -150, 0);
 
-	const VECTOR kSkyDomeScale = VGet(10.0f, 10.0f, 10.0f);
+	const VECTOR kSkyDomeScale = VGet(50.0f, 50.0f, 50.0f);
 
-	const VECTOR kStageScale = VGet(0.1f, 0.1f, 0.1f);
+	const VECTOR kStageScale = VGet(0.3f, 0.3f, 0.3f);
 
 	constexpr float kSkyDomeRotaSpeed = 0.001f;
 }
 
-Stage::Stage():
+Stage::Stage(std::shared_ptr<EffectManager> manager):
 	m_skyDomeHandle(-1),
 	m_stageHandle(-1)
 {
+	m_pEffectManager = manager;
+
 	m_stagePath = "data/model/Stage.mv1";
 	m_skyDomePath = "data/model/Dome.mv1";
 }
@@ -27,11 +31,17 @@ Stage::~Stage()
 
 void Stage::Init()
 {
+    m_pEffect= std::make_shared<Effect>("StageEdge");
 
+	m_pEffect->SetLoop(1.0f, 240.0f);
+	m_pEffect->SetPos(MyEngine::Vector3());
+
+	m_pEffect->Init(m_pEffectManager, VGet(0, 0, 0));
 }
 
 void Stage::Update()
 {
+
 	auto rota = MV1GetRotationXYZ(m_skyDomeHandle);
 
 	rota.y += kSkyDomeRotaSpeed;
@@ -48,6 +58,8 @@ void Stage::Draw()
 
 void Stage::Final()
 {
+	m_pEffect->End();
+
 	MV1DeleteModel(m_skyDomeHandle);
 	MV1DeleteModel(m_stageHandle);
 	Physics::GetInstance().DeleteStage();

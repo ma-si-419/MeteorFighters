@@ -82,10 +82,12 @@ public:
 	/// <param name="pos">設定したい座標</param>
 	void SetPos(MyEngine::Vector3 pos) { m_pos = pos; }
 
+
 	/// <summary>
 	/// ループの設定をする
 	/// </summary>
-	/// <param name="time">ループする時間</param>
+	/// <param name="loopStart">ループの開始フレーム</param>
+	/// <param name="loopEnd">ループの終了フレーム</param>
 	void SetLoop(float loopStart,float loopEnd);
 
 	/// <summary>

@@ -15,7 +15,13 @@ namespace
 
 	//カメラのNearFar
 	constexpr float kCameraNear = 0.1f;
-	constexpr float kCameraFar = 100.0f;
+	constexpr float kCameraFar = 400.0f;
+
+	//スカイドームの拡大率
+	constexpr float kSkyDomeScale = 3.0f;
+
+	//スカイドームの回転速度
+	constexpr float kSkyDomeRotaSpeed = 0.001f;
 
 	//PRESSANYBUTTONを表示する座標
 	constexpr int kStringPosX = 70;
@@ -47,6 +53,7 @@ namespace
 		TitleUi::DrawCharacterSide::kLeft,
 		TitleUi::DrawCharacterSide::kDown
 	};
+
 
 	//サイドごとの回転度
 	const double kSideRota[4] =
@@ -98,6 +105,22 @@ namespace
 	//横っ飛び時にかける重力
 	constexpr float kSideJumpGravity = 0.3f;
 
+	//後ろを飛んでいくキャラクターの移動速度
+	constexpr int kBackCharacterMoveSpeed = 10;
+	//後ろを飛んでいくキャラクターのY座標(画面中央)
+	constexpr int kBackCharacterPosY = Game::kWindowHeight / 2;
+	//後ろを飛んでいくキャラクターの拡大率
+	constexpr double kBackCharacterScale = 0.3;
+	//後ろを飛んでいくキャラクターの移動速度の最大値
+	constexpr int kMaxBackCharacterMoveSpeed = 15;
+	//後ろを飛んでいくキャラクターの移動速度の最小値
+	constexpr int kMinBackCharacterMoveSpeed = 5;
+	//後ろを飛んでいくキャラクターの回転速度の最大値
+	constexpr double kMaxBackCharacterRotaSpeed = 0.35;
+	//後ろを飛んでいくキャラクターの回転速度の最小値
+	constexpr double kMinBackCharacterRotaSpeed = 0.15;
+
+
 	//キャラクターの画像の幅
 	constexpr int kCharacterWidth = 350;
 	constexpr int kCharacterHeight = 200;
@@ -106,19 +129,20 @@ namespace
 	constexpr int kCharacterHandleKind = 1;
 
 	//アップデートの種類の数
-	constexpr int kUpdateKindNum = 4;
+	constexpr int kUpdateKindNum = 5;
 
 	//アップデートそれぞれの確率
 	constexpr int kUpdateProb[kUpdateKindNum] =
 	{
-		50,//通常
-		5,//落ちる
-		10,//横っ飛び
-		8 //ジャンプ
+		100,//通常
+		10,//落ちる
+		20,//横っ飛び
+		20,//後ろを飛んでいく
+		16 //ジャンプ
 	};
 
 	//確率をすべて足した値
-	constexpr int kUpdateProbTotal = kUpdateProb[0] + kUpdateProb[1] + kUpdateProb[2] + kUpdateProb[3];
+	constexpr int kUpdateProbTotal = kUpdateProb[0] + kUpdateProb[1] + kUpdateProb[2] + kUpdateProb[3] + kUpdateProb[4];
 }
 
 TitleUi::TitleUi() :
@@ -127,6 +151,7 @@ TitleUi::TitleUi() :
 	m_isExistString(true),
 	m_fontHandle(-1)
 {
+	//フォントのハンドルの取得
 	m_fontHandle = CreateFontToHandle(kFontName, kFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
 }
 
@@ -149,6 +174,9 @@ void TitleUi::Init()
 	//スカイドームの設定
 	MV1SetPosition(m_skyDomeHandle, VGet(0, 0, 0));
 
+	//スカイドームの拡大率設定
+	MV1SetScale(m_skyDomeHandle, VGet(kSkyDomeScale, kSkyDomeScale, kSkyDomeScale));
+
 	//キャラクターの初期設定
 	for (auto& item : m_characterDrawInfo)
 	{
@@ -169,6 +197,9 @@ void TitleUi::Init()
 
 		//キャラクターの初期回転度設定
 		item.rota = kSideRota[static_cast<int>(item.side)];
+
+		//キャラクターの初期拡大率設定
+		item.scale = 1.0;
 
 		//キャラクターの初期ハンドル設定
 		item.handle = GetCharacterHandle(item.kind, static_cast<CharacterGraphKind>(GetRand(kCharacterHandleKind)));
@@ -208,6 +239,9 @@ void TitleUi::Update()
 		}
 	}
 
+	//スカイドームを回転させる
+	MV1SetRotationXYZ(m_skyDomeHandle, VGet(0, MV1GetRotationXYZ(m_skyDomeHandle).y + kSkyDomeRotaSpeed, 0));
+
 	//キャラクターの更新を行う
 	for (auto& item : m_characterDrawInfo)
 	{
@@ -223,6 +257,16 @@ void TitleUi::Draw()
 	//スカイドームの描画
 	MV1DrawModel(m_skyDomeHandle);
 
+	//後ろを飛んでいくキャラクターの描画
+	for (auto& item : m_characterDrawInfo)
+	{
+		if (item.updateFunc == &TitleUi::BackFryUpdate)
+		{
+			DrawRotaGraph(static_cast<int>(item.pos.x), static_cast<int>(item.pos.y), item.scale, item.rota, item.handle, true);
+		}
+	}
+
+	//文字列の描画
 	if (m_isExistString)
 	{
 		DrawStringToHandle(kStringPosX, kStringPosY, kUiString.c_str(), GetColor(255, 255, 255), m_fontHandle, GetColor(0, 0, 0));
@@ -231,12 +275,14 @@ void TitleUi::Draw()
 	//タイトルロゴの描画
 	DrawGraph(0, 0, manager.GetHandle("TitleLogo"), true);
 
-	//キャラクターの描画
+	//後ろを飛んでいくキャラクター以外の描画
 	for (auto& item : m_characterDrawInfo)
 	{
-		DrawRotaGraph(item.pos.x, item.pos.y, 1.0, item.rota, item.handle, true);
+		if (item.updateFunc != &TitleUi::BackFryUpdate)
+		{
+			DrawRotaGraph(static_cast<int>(item.pos.x), static_cast<int>(item.pos.y), 1.0, item.rota, item.handle, true);
+		}
 	}
-
 }
 
 
@@ -425,6 +471,12 @@ void TitleUi::SetCharacterUpdateFunc(CharacterUpdateKind kind, DrawCharacterKind
 		InitSideJump(static_cast<int>(character));
 		m_characterDrawInfo[static_cast<int>(character)].updateFunc = &TitleUi::SideJumpUpdate;
 	}
+	//後ろを飛んでいくキャラクターの更新
+	else if (kind == CharacterUpdateKind::kBackFry)
+	{
+		InitBackFry(static_cast<int>(character));
+		m_characterDrawInfo[static_cast<int>(character)].updateFunc = &TitleUi::BackFryUpdate;
+	}
 }
 
 void TitleUi::InitNormal(int number)
@@ -447,6 +499,9 @@ void TitleUi::InitNormal(int number)
 	//回転速度を設定
 	m_characterDrawInfo[number].rotaSpeed = 0.0;
 
+	//拡大率を設定
+	m_characterDrawInfo[number].scale = kBackCharacterScale;
+
 }
 
 void TitleUi::InitFall(int number)
@@ -467,6 +522,9 @@ void TitleUi::InitFall(int number)
 
 	//移動ベクトルを設定
 	m_characterDrawInfo[number].moveVec = MyEngine::Vector2(0, GetRand(kMaxFallSpeed - kMinFallSpeed) + kMinFallSpeed);
+
+	//拡大率を設定
+	m_characterDrawInfo[number].scale = kBackCharacterScale;
 
 	//回転速度を設定
 	float randomRota = static_cast<float>(GetRand(static_cast<int>((kMaxFallRotaSpeed - kMinFallRotaSpeed) * 100)));
@@ -492,6 +550,8 @@ void TitleUi::InitJump(int number)
 	m_characterDrawInfo[number].rotaSpeed = 0.0;
 	//回転度を変更
 	m_characterDrawInfo[number].rota = 0.0;
+	//拡大率を設定
+	m_characterDrawInfo[number].scale = kBackCharacterScale;
 }
 
 void TitleUi::InitSideJump(int number)
@@ -531,6 +591,28 @@ void TitleUi::InitSideJump(int number)
 	//ハンドルをランダムで設定
 	m_characterDrawInfo[number].handle = GetCharacterHandle(m_characterDrawInfo[number].kind, static_cast<CharacterGraphKind>(GetRand(kCharacterHandleKind)));
 
+	//拡大率を設定
+	m_characterDrawInfo[number].scale = kBackCharacterScale;
+}
+
+void TitleUi::InitBackFry(int number)
+{
+	//移動時間を設定
+	m_characterDrawInfo[number].moveTime = kMinCharacterMoveFrame;
+	//サイドを右側に設定
+	m_characterDrawInfo[number].side = static_cast<DrawCharacterSide>(GetRand(static_cast<int>(DrawCharacterSide::kSideNum)));
+	//座標をランダムで設定
+	m_characterDrawInfo[number].pos = MyEngine::Vector2(Game::kWindowWidth + kCharacterWidth, kBackCharacterPosY);
+	//ハンドルをランダムで設定
+	m_characterDrawInfo[number].handle = GetCharacterHandle(m_characterDrawInfo[number].kind, static_cast<CharacterGraphKind>(GetRand(kCharacterHandleKind)));
+	//移動ベクトルを設定
+	m_characterDrawInfo[number].moveVec = MyEngine::Vector2(-(GetRand(kMaxBackCharacterMoveSpeed - kMinBackCharacterMoveSpeed) + kMinBackCharacterMoveSpeed), 0);
+	//回転速度を設定
+	m_characterDrawInfo[number].rotaSpeed = -static_cast<float>(GetRand(static_cast<int>((kMaxBackCharacterRotaSpeed - kMinBackCharacterRotaSpeed) * 100)) / 100 + kMinBackCharacterRotaSpeed);
+	//回転度を設定
+	m_characterDrawInfo[number].rota = kSideRota[static_cast<int>(m_characterDrawInfo[number].side)];
+	//拡大率を設定
+	m_characterDrawInfo[number].scale = kBackCharacterScale;
 }
 
 void TitleUi::NormalUpdate(int number)
@@ -689,4 +771,37 @@ void TitleUi::SideJumpUpdate(int number)
 	m_characterDrawInfo[number].pos += m_characterDrawInfo[number].moveVec;
 	//重力をかける
 	m_characterDrawInfo[number].moveVec.y += kSideJumpGravity;
+}
+
+void TitleUi::BackFryUpdate(int number)
+{
+	m_characterDrawInfo[number].moveTime--;
+	//一定時間が画面外の判定をしない
+	if (m_characterDrawInfo[number].moveTime < 0)
+	{
+		//画面外に出たら
+		if (!CheckPos(m_characterDrawInfo[number].pos))
+		{
+			//更新関数をランダムで設定
+			int random = 0;
+			int prob = GetRand(kUpdateProbTotal);
+			//ランダム処理
+			for (auto item : kUpdateProb)
+			{
+				prob -= item;
+				if (prob <= 0)
+				{
+					//ここで決定
+					SetCharacterUpdateFunc(static_cast<CharacterUpdateKind>(random), m_characterDrawInfo[number].kind);
+					break;
+				}
+				random++;
+			}
+		}
+	}
+
+	//座標を移動
+	m_characterDrawInfo[number].pos += m_characterDrawInfo[number].moveVec;
+	//回転度を変更
+	m_characterDrawInfo[number].rota += m_characterDrawInfo[number].rotaSpeed;
 }

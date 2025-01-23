@@ -479,8 +479,13 @@ void Physics::CheckWallAndFloor(std::shared_ptr<Collidable> collider)
 void Physics::FixPositionWithWall(std::shared_ptr<Collidable> collider)
 {
 	//壁ポリゴンがない場合は何もしない
-	if (collider->m_wallNum == 0) return;
+	if (collider->m_wallNum == 0)
+	{
+		//壁に当たっていないフラグを立てる
+		collider->m_pColData->SetIsWall(false);
 
+		return;
+	}
 	//壁ポリゴンとの当たり判定
 	//ステージに当たったかどうかフラグをfalseにしておく
 	collider->m_isHitPoly = false;
@@ -594,6 +599,8 @@ void Physics::FixPositionWithWall(std::shared_ptr<Collidable> collider)
 	if (collider->m_isHitPoly)
 	{
 		FixPositionWithWallInternal(collider);
+
+		collider->m_pColData->SetIsWall(true);
 	}
 }
 
@@ -857,7 +864,8 @@ void Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable> collider)
 			}
 		}
 
-		//床ポリゴンの当たり判定かつ、yベクトルが0よりも小さいかどうかで処理を分岐
+
+		//接触したポリゴンがあれば
 		if (collider->m_isHitPoly)
 		{
 			if (collider->m_pColData->GetKind() == ColliderData::Kind::kCapsule)
@@ -876,6 +884,7 @@ void Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable> collider)
 				collider->m_nextPos.y = polyMaxPosY + sphere->m_radius;
 			}
 
+			//床に当たっているフラグを立てる
 			collider->m_pColData->SetIsGround(true);
 		}
 	}

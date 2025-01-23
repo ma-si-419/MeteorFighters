@@ -8,6 +8,20 @@ public:
 		kCapsule
 	};
 
+public:
+
+	struct float3
+	{
+		float3() { x = 0; y = 0; z = 0; }
+		float3(float x, float y, float z) { this->x = x; this->y = y; this->z = z; }
+
+		float x;
+		float y;
+		float z;
+	};
+
+public:
+
 	ColliderData(Kind kind) { m_kind = kind; m_isTrigger = false; m_isGround = false; }
 	virtual ~ColliderData() {}
 
@@ -35,6 +49,21 @@ public:
 	/// <param name="flag">ステージの床に触れていたらtrue</param>
 	void SetIsGround(bool flag) { m_isGround = flag; }
 
+	/// <summary>
+	/// ステージの壁に触れているかどうかを設定する
+	/// </summary>
+	/// <param name="flag">ステージの壁に触れていたらtrue</param>
+	void SetIsWall(bool flag) { m_isWall = flag; }
+
+	/// <summary>
+	/// ステージの壁に触れているかどうかを返す
+	///	</summary>
+	/// <returns>ステージの壁に触れていたらtrue</returns>
+	bool IsWall() { return m_isWall; }
+
+	/// <summary>
+	/// 物理挙動をしないかどうかを返す
+	/// </summary>
 	bool GetIsTrigger() { return m_isTrigger; }
 
 private:
@@ -44,6 +73,7 @@ private:
 	bool m_isTrigger;
 	//地面とぶつかってるときにtrueにする
 	bool m_isGround;
-
+	//壁とぶつかってるときにtrueにする
+	bool m_isWall;
 };
 

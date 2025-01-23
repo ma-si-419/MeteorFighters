@@ -83,6 +83,8 @@ public:
 	/// <param name="tag">‰½‚Æ‚Ô‚Â‚©‚Á‚½‚çtrue‚ð•Ô‚·‚©</param>
 	/// <returns>Žw’è‚µ‚½ƒ^ƒO‚Ì“–‚½‚è”»’è‚Æ‚Ô‚Â‚©‚Á‚½‚©‚Ç‚¤‚©</returns>
 	bool GetHitObject(MyEngine::Vector3 pos, std::shared_ptr<ColliderData> collider, ObjectTag tag);
+	
+
 private:
 
 	/// <summary>

@@ -76,12 +76,12 @@ GameManagerBase::GameManagerBase(std::shared_ptr<GameCamera> camera, GameManager
 	m_buttonBashingCameraRota(0.0f),
 	m_bashingButton("empty")
 {
-	m_pStage = std::make_shared<Stage>();
-	m_pStage->Init();
 	m_pCamera = camera;
 
 	m_pEffectManager = std::make_shared<EffectManager>();
 	m_pGameUi = std::make_shared<GameUi>();
+	m_pStage = std::make_shared<Stage>(m_pEffectManager);
+	m_pStage->Init();
 
 }
 

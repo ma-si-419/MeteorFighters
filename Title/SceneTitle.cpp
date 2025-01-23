@@ -18,7 +18,8 @@ namespace
 }
 
 SceneTitle::SceneTitle(SceneManager& sceneManager) :
-	SceneBase(sceneManager)
+	SceneBase(sceneManager),
+	m_bgmPlayHandle(-1)
 {
 	m_pTitleUi = std::make_shared<TitleUi>();
 }

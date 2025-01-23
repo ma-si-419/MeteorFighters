@@ -1,5 +1,6 @@
 #include "CharacterStateHitAttack.h"
 #include "CharacterStateIdle.h"
+#include "CharacterStateDown.h"
 #include "LocalPos.h"
 #include "DxLib.h"
 #include "Character.h"
@@ -49,13 +50,23 @@ namespace
 		{Character::HitReactionKind::kMiddleStan,Character::AnimKind::kBackMiddleStan}
 	};
 
-	//移動する時間の割合
-	constexpr float kMoveTimeRate = 0.7f;
-
 	//スタン時のアニメーションをゆっくり再生する時間の割合
 	constexpr float kSlowAnimTimeRate = 0.4f;
 	//スタン時のアニメーションをゆっくり再生するときの再生速度
 	constexpr float kSlowAnimPlaySpeed = 0.3f;
+
+	//移動速度を減速させていくタイミング
+	constexpr float kMoveSpeedDecelerationTime = 0.7f;
+
+	//吹っ飛び中にかける重力
+	constexpr float kBurstGravity = 0.1f;
+
+	//地面とぶつかると判定する移動ベクトルのyの値
+	constexpr float kGroundHitY = 3.0f;
+
+	//壁とぶつかると判定する移動ベクトルの長さ
+	constexpr float kWallHitLength = 10.0f;
+
 }
 
 CharacterStateHitAttack::CharacterStateHitAttack(std::shared_ptr<Character> character) :
@@ -94,20 +105,99 @@ void CharacterStateHitAttack::Update()
 		}
 	}
 
-	//設定した時間たったら
-	if (m_stopTime <= m_time)
+	//吹っ飛び状態であれば
+	if (m_pCharacter->GetHitReaction() == Character::HitReactionKind::kUpBurst ||
+		m_pCharacter->GetHitReaction() == Character::HitReactionKind::kDownBurst ||
+		m_pCharacter->GetHitReaction() == Character::HitReactionKind::kFarBurst)
 	{
-		std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
+		//移動ベクトルが一定以上下を向いていて地面とぶつかっていたら
+		if (m_pCharacter->IsGround() &&
+			m_moveVec.y < -kGroundHitY)
+		{
+			//次の状態をダウン状態に設定する
+			std::shared_ptr<CharacterStateDown> next = std::make_shared<CharacterStateDown>(m_pCharacter);
+			//ダウンの方向を設定する
+			next->SetFrontHit(m_isFrontHit);
+			//向いている方向を飛んでいる方向と逆方向にする
+			m_pCharacter->SetFrontPos(m_pCharacter->GetPos() - m_moveVec);
+			//ダウン状態に遷移する
+			ChangeState(next);
 
-		//アイドル状態に戻る
-		ChangeState(next);
+			return;
+		}
+
+		//壁とぶつかっていたら
+		if (m_pCharacter->IsWall() &&
+			m_moveVec.Length() < kWallHitLength)
+		{
+			//次の状態をダウン状態に設定する
+			std::shared_ptr<CharacterStateDown> next = std::make_shared<CharacterStateDown>(m_pCharacter);
+			//ダウンの方向を設定する
+			next->SetFrontHit(m_isFrontHit);
+			//向いている方向を飛んでいる方向と逆方向にする
+			m_pCharacter->SetFrontPos(m_pCharacter->GetPos() - m_moveVec);
+			//ダウン状態に遷移する
+			ChangeState(next);
+			return;
+		}
+
+
+		//設定した時間たったら
+		if (m_stopTime <= m_time)
+		{
+			//次の状態をアイドル状態に設定する
+			std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
+			//アイドル状態に遷移する
+			ChangeState(next);
+			
+			return;
+		}
+	}
+	//それ以外の状態であれば
+	else
+	{
+		//設定した時間たったら
+		if (m_stopTime <= m_time)
+		{
+			//次の状態をアイドル状態に設定する
+			std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
+			//アイドル状態に遷移する
+			ChangeState(next);
+
+			return;
+		}
 	}
 
-	//移動する時間が終わったら
-	if (m_time > static_cast<int>(m_stopTime * kMoveTimeRate))
+	//減速させていく時間になっていたら
+	if (m_stopTime * kMoveSpeedDecelerationTime < m_time)
 	{
-		m_moveVec = MyEngine::Vector3(0, 0, 0);
-		//TODO : 吹っ飛び状態であれば吹っ飛び状態から通常状態に戻るアニメーションを再生する
+		//減速ベクトルが設定されていなければ
+		if (m_decelerationVec.SqLength() < 0.01f)
+		{
+			//減速ベクトルを計算する
+			m_decelerationVec = m_moveVec / static_cast<float>(m_stopTime * kMoveSpeedDecelerationTime);
+		}
+
+		//減速ベクトルよりも移動ベクトルの長さが大きければ
+		if (m_moveVec.SqLength() > m_decelerationVec.SqLength())
+		{
+			//減速ベクトルを移動ベクトルに加算する
+			m_moveVec += m_decelerationVec;
+		}
+		//減速ベクトルよりも移動ベクトルの長さが小さければ
+		else
+		{
+			//減速ベクトルを0にする
+			m_decelerationVec = MyEngine::Vector3();
+		}
+
+		//吹っ飛び中は重力をかける
+		if (m_pCharacter->GetHitReaction() == Character::HitReactionKind::kUpBurst ||
+			m_pCharacter->GetHitReaction() == Character::HitReactionKind::kDownBurst ||
+			m_pCharacter->GetHitReaction() == Character::HitReactionKind::kFarBurst)
+		{
+			m_moveVec.y -= kBurstGravity;
+		}
 	}
 
 	SetCharacterVelo(m_moveVec);
@@ -293,7 +383,7 @@ int CharacterStateHitAttack::GetNextAnimKind(int kind)
 		else if (animKind == Character::AnimKind::kLowHit2)
 		{
 			ans = Character::AnimKind::kLowHit3;
-		}	
+		}
 	}
 
 	return static_cast<int>(ans);

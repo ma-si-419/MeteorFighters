@@ -49,6 +49,7 @@ private:
 		kNormal,
 		kFall,
 		kSideJump,
+		kBackFry,
 		kJump,
 		kUpdateKindNum = kJump
 	};
@@ -130,23 +131,25 @@ private:
 	struct CharacterDrawInfo
 	{
 		//キャラクターのハンドル
-		int handle;
+		int handle = -1;
 		//キャラクターの座標
 		MyEngine::Vector2 pos;
 		//キャラクターの移動ベクトル
 		MyEngine::Vector2 moveVec;
 		//キャラクターの回転度
-		double rota;
+		double rota = 0.0;
+		//キャラクターの拡大率
+		double scale = 1.0;
 		//キャラクターの回転速度
-		double rotaSpeed;
+		double rotaSpeed = 0.0;
 		//キャラクターのサイド
-		DrawCharacterSide side;
+		DrawCharacterSide side = DrawCharacterSide::kUp;
 		//キャラクターの移動時間
-		int moveTime;
+		int moveTime = 0;
 		//キャラクターの種類
-		DrawCharacterKind kind;
+		DrawCharacterKind kind = DrawCharacterKind::kMouse;
 		//キャラクターの更新関数
-		CharacterUpdateFunc updateFunc;
+		CharacterUpdateFunc updateFunc = &TitleUi::NormalUpdate;
 	};
 
 private:
@@ -176,6 +179,12 @@ private:
 	void InitSideJump(int number);
 
 	/// <summary>
+	/// 後ろを飛んでいくキャラクター
+	/// </summary>
+	/// <param name="number">初期化を行うキャラクター</param>
+	void InitBackFry(int number);
+
+	/// <summary>
 	/// 通常時のアップデート
 	/// </summary>
 	/// <param name="character">アップデートを行うキャラクター</param>
@@ -199,9 +208,13 @@ private:
 	/// <param name="number">アップデートを行うキャラクター</param>
 	void SideJumpUpdate(int number);
 
+	/// <summary>
+	/// 後ろを飛んでいくときのアップデート
+	/// </summary>
+	/// <param name="number">アップデートを行うキャラクター</param>
+	void BackFryUpdate(int number);
+
 private:
-
-
 	//文字がついている時間
 	int m_time;
 

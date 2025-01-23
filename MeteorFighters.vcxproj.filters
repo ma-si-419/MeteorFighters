@@ -129,7 +129,7 @@
     <ClCompile Include="MyEngine\Utility\LocalPos.cpp">
       <Filter>ソース ファイル\MyEngine\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="Character\State\ChracterStateIdle.cpp">
+    <ClCompile Include="Character\State\CharacterStateIdle.cpp">
       <Filter>ソース ファイル\Character\State</Filter>
     </ClCompile>
     <ClCompile Include="Character\State\CharacterStateCharge.cpp">
@@ -253,6 +253,9 @@
       <Filter>ソース ファイル\Select</Filter>
     </ClCompile>
     <ClCompile Include="CharacterStateTeleportation.cpp">
+      <Filter>ソース ファイル\Character\State</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterStateDown.cpp">
       <Filter>ソース ファイル\Character\State</Filter>
     </ClCompile>
   </ItemGroup>
@@ -429,6 +432,9 @@
       <Filter>ヘッダー ファイル\Game\Battle</Filter>
     </ClInclude>
     <ClInclude Include="CharacterStateTeleportation.h">
+      <Filter>ヘッダー ファイル\Character\State</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterStateDown.h">
       <Filter>ヘッダー ファイル\Character\State</Filter>
     </ClInclude>
   </ItemGroup>
