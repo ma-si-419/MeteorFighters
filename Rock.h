@@ -1,7 +1,7 @@
 #pragma once
-#include "Collidable.h"
+#include "ObjectBase.h"
 
-class Rock : public Collidable
+class Rock : public ObjectBase
 {
 public:
 	
@@ -9,30 +9,20 @@ public:
 	
 	virtual ~Rock();
 
-	/// <summary>
-	/// 初期化処理
-	/// </summary>
-	/// <param name="handle">モデルハンドル</param>
-	void Init(int handle);
+	void Init() override;
 
-	void Update();
-	
-	void Draw();
-
-	void End();
+	void Update() override;
 
 	/// <summary>
 	/// キャラクターの座標とぶつかった場所をセットする
 	/// </summary>
 	/// <param name="bumpPos">ぶつかった場所</param>
 	/// <param name="characterPos">キャラクターの座標</param>
-	void SetBumpPosAndCharacterPos(MyEngine::Vector3 bumpPos, MyEngine::Vector3 characterPos);
+	void SetMoveVec(MyEngine::Vector3 bumpPos, MyEngine::Vector3 characterPos);
 	
 private:
 
-	int m_alpha;
-
-	int m_handle;
+	int m_time;
 
 	MyEngine::Vector3 m_moveVec;
 };

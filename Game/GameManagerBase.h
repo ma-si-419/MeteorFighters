@@ -19,6 +19,7 @@ class Stage;
 class EffectManager;
 class Effect;
 class GameUi;
+class Rock;
 class GameManagerBase : public std::enable_shared_from_this<GameManagerBase>
 {
 public:
@@ -208,6 +209,12 @@ public:
 	void ExitEffect(std::shared_ptr<Effect> effect);
 
 	/// <summary>
+	/// 表示する石を登録する
+	/// </summary>
+	/// <param name="rock"></param>
+	void EntryRock(std::shared_ptr<Rock> rock);
+
+	/// <summary>
 	/// セレクトシーンに戻るときにtrueを返す
 	/// </summary>
 	/// <returns>セレクトシーンに戻る時にtrueになる</returns>
@@ -324,6 +331,8 @@ protected:
 	std::shared_ptr<EffectManager> m_pEffectManager;
 	//ゲームシーンのUI管理クラス
 	std::shared_ptr<GameUi> m_pGameUi;
+	//表示している石のポインタ
+	std::shared_ptr<Rock> m_pRock;
 	//ゲームの状況
 	BattleSituation m_situation;
 	//何を行っているのか

@@ -136,7 +136,9 @@ void GameManagerBase::UpdateAsyncLoad()
 		m_pStage->SetStageModelHandle(m_modelHandles.at("Stage"));
 		m_pStage->SetSkyDomeModelHandle(m_modelHandles.at("SkyDome"));
 
-
+		m_rockModelHandle[0] = m_modelHandles.at("Rock1");
+		m_rockModelHandle[1] = m_modelHandles.at("Rock2");
+		m_rockModelHandle[2] = m_modelHandles.at("Rock3");
 
 		//非同期ロードが終了したタイミングでInitを呼ぶ
 		Init();
