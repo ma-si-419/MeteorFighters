@@ -34,6 +34,9 @@ private:
 	//移動ベクトル
 	MyEngine::Vector3 m_moveVec;
 
+	//移動距離
+	float m_moveLength;
+
 	//減速ベクトル
 	MyEngine::Vector3 m_decelerationVec;
 
@@ -42,5 +45,8 @@ private:
 
 	//前方から殴られたかどうか
 	bool m_isFrontHit;
+
+	//ステージとぶつかるかどうか
+	bool m_isStageBump;
 };
 

@@ -2,6 +2,8 @@
 #include "Character.h"
 #include "CharacterStateIdle.h"
 #include "CharacterStateDash.h"
+#include "GameManagerBase.h"
+
 
 namespace
 {
@@ -63,6 +65,8 @@ void CharacterStateDown::Update()
 
 void CharacterStateDown::Exit()
 {
+	//‘O•ûŒü‚ð“G‚ÌÀ•W‚ÌY¬•ª‚ð”²‚¢‚½‚à‚Ì‚É‚·‚é
+	m_pCharacter->SetFrontPos(MyEngine::Vector3(m_pManager->GetTargetPos(m_pCharacter).x, m_pCharacter->GetPos().y, m_pManager->GetTargetPos(m_pCharacter).z));
 }
 
 void CharacterStateDown::SetFrontHit(bool front)

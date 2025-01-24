@@ -6,6 +6,7 @@
 #include "Character.h"
 #include "Attack.h"
 #include "GameManagerBase.h"
+#include "Effect.h"
 
 namespace
 {
@@ -56,23 +57,29 @@ namespace
 	constexpr float kSlowAnimPlaySpeed = 0.3f;
 
 	//移動速度を減速させていくタイミング
-	constexpr float kMoveSpeedDecelerationTime = 0.7f;
+	constexpr float kMoveSpeedDecelerationTime = 0.6f;
 
 	//吹っ飛び中にかける重力
 	constexpr float kBurstGravity = 0.1f;
 
 	//地面とぶつかると判定する移動ベクトルのyの値
-	constexpr float kGroundHitY = 3.0f;
+	constexpr float kGroundHitY = 1.8f;
 
 	//壁とぶつかると判定する移動ベクトルの長さ
-	constexpr float kWallHitLength = 10.0f;
+	constexpr float kWallHitLength = 1.8f;
 
+	//ぶつかった時のエフェクトの再生時間
+	constexpr int kBumpEffectLifeTime = 90;
+
+	//ステージとぶつかった時にエフェクトをたくようにする距離(一定距離移動しないとエフェクトをたかないようにする)
+	constexpr float kStageBumpEffectPopLength = 10.0f;
 }
 
 CharacterStateHitAttack::CharacterStateHitAttack(std::shared_ptr<Character> character) :
 	CharacterStateBase(character),
 	m_moveTime(0),
-	m_isFrontHit(false)
+	m_isFrontHit(false),
+	m_moveLength(0.0f)
 {
 }
 
@@ -102,69 +109,6 @@ void CharacterStateHitAttack::Update()
 		{
 			//再生速度を初期値に戻す
 			m_pCharacter->SetAnimPlaySpeed();
-		}
-	}
-
-	//吹っ飛び状態であれば
-	if (m_pCharacter->GetHitReaction() == Character::HitReactionKind::kUpBurst ||
-		m_pCharacter->GetHitReaction() == Character::HitReactionKind::kDownBurst ||
-		m_pCharacter->GetHitReaction() == Character::HitReactionKind::kFarBurst)
-	{
-		//移動ベクトルが一定以上下を向いていて地面とぶつかっていたら
-		if (m_pCharacter->IsGround() &&
-			m_moveVec.y < -kGroundHitY)
-		{
-			//次の状態をダウン状態に設定する
-			std::shared_ptr<CharacterStateDown> next = std::make_shared<CharacterStateDown>(m_pCharacter);
-			//ダウンの方向を設定する
-			next->SetFrontHit(m_isFrontHit);
-			//向いている方向を飛んでいる方向と逆方向にする
-			m_pCharacter->SetFrontPos(m_pCharacter->GetPos() - m_moveVec);
-			//ダウン状態に遷移する
-			ChangeState(next);
-
-			return;
-		}
-
-		//壁とぶつかっていたら
-		if (m_pCharacter->IsWall() &&
-			m_moveVec.Length() < kWallHitLength)
-		{
-			//次の状態をダウン状態に設定する
-			std::shared_ptr<CharacterStateDown> next = std::make_shared<CharacterStateDown>(m_pCharacter);
-			//ダウンの方向を設定する
-			next->SetFrontHit(m_isFrontHit);
-			//向いている方向を飛んでいる方向と逆方向にする
-			m_pCharacter->SetFrontPos(m_pCharacter->GetPos() - m_moveVec);
-			//ダウン状態に遷移する
-			ChangeState(next);
-			return;
-		}
-
-
-		//設定した時間たったら
-		if (m_stopTime <= m_time)
-		{
-			//次の状態をアイドル状態に設定する
-			std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
-			//アイドル状態に遷移する
-			ChangeState(next);
-			
-			return;
-		}
-	}
-	//それ以外の状態であれば
-	else
-	{
-		//設定した時間たったら
-		if (m_stopTime <= m_time)
-		{
-			//次の状態をアイドル状態に設定する
-			std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
-			//アイドル状態に遷移する
-			ChangeState(next);
-
-			return;
 		}
 	}
 
@@ -200,14 +144,115 @@ void CharacterStateHitAttack::Update()
 		}
 	}
 
+	//減速を行っておらず一定以上移動していたら
+	if (m_decelerationVec.SqLength() < 0.01f &&
+		m_moveLength > kStageBumpEffectPopLength)
+	{
+		//地面にぶつかった時エフェクトを再生するフラグを立てる
+		m_isStageBump = true;
+	}
+	//それ以外であれば
+	else
+	{
+		//地面にぶつかった時エフェクトを再生するフラグを下げる
+		m_isStageBump = false;
+	}
+
+	//吹っ飛び状態であれば
+	if (m_pCharacter->GetHitReaction() == Character::HitReactionKind::kUpBurst ||
+		m_pCharacter->GetHitReaction() == Character::HitReactionKind::kDownBurst ||
+		m_pCharacter->GetHitReaction() == Character::HitReactionKind::kFarBurst)
+	{
+		//移動ベクトルが一定以上下を向いていて地面とぶつかっていたら
+		if (m_pCharacter->IsGround() &&
+			m_moveVec.y < -kGroundHitY)
+		{
+			//次の状態をダウン状態に設定する
+			std::shared_ptr<CharacterStateDown> next = std::make_shared<CharacterStateDown>(m_pCharacter);
+			//ダウンの方向を設定する
+			next->SetFrontHit(m_isFrontHit);
+			//向いている方向を飛んでいる方向と逆方向にする
+			m_pCharacter->SetFrontPos(m_pCharacter->GetPos() - m_moveVec);
+			//ダウン状態に遷移する
+			ChangeState(next);
+
+			//ステージとぶつかるフラグが立っていたら
+			if (m_isStageBump)
+			{
+				//地面にぶつかったエフェクトを再生する
+				auto effect = std::make_shared<Effect>(Effect::EffectKind::kStageHit);
+				//エフェクトの位置を設定する
+				effect->SetPos(m_pCharacter->GetPos() + m_moveVec);
+				effect->SetLifeTime(kBumpEffectLifeTime);
+				m_pManager->EntryEffect(effect);
+			}
+
+
+			return;
+		}
+
+		//移動ベクトルのXZ成分の長さ
+		float moveXZLength = MyEngine::Vector3(m_moveVec.x, 0.0f, m_moveVec.z).Length();
+
+		//壁とぶつかっていたら
+		if (m_pCharacter->IsWall() &&
+			moveXZLength > kWallHitLength)
+		{
+			//次の状態をダウン状態に設定する
+			std::shared_ptr<CharacterStateDown> next = std::make_shared<CharacterStateDown>(m_pCharacter);
+			//ダウンの方向を設定する
+			next->SetFrontHit(m_isFrontHit);
+			//向いている方向を飛んでいる方向と逆方向にする
+			m_pCharacter->SetFrontPos(m_pCharacter->GetPos() - m_moveVec);
+			//ダウン状態に遷移する
+			ChangeState(next);
+
+			//ステージとぶつかるフラグが立っていたら
+			if (m_isStageBump)
+			{
+				//壁にぶつかったエフェクトを再生する
+				auto effect = std::make_shared<Effect>(Effect::EffectKind::kStageHit);
+				//エフェクトの位置を設定する
+				effect->SetPos(m_pCharacter->GetPos());
+				effect->SetLifeTime(kBumpEffectLifeTime);
+				m_pManager->EntryEffect(effect);
+			}
+
+			return;
+		}
+
+
+		//設定した時間たったら
+		if (m_stopTime <= m_time)
+		{
+			//次の状態をアイドル状態に設定する
+			std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
+			//アイドル状態に遷移する
+			ChangeState(next);
+
+			return;
+		}
+	}
+	//それ以外の状態であれば
+	else
+	{
+		//設定した時間たったら
+		if (m_stopTime <= m_time)
+		{
+			//次の状態をアイドル状態に設定する
+			std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
+			//アイドル状態に遷移する
+			ChangeState(next);
+
+			return;
+		}
+	}
+	
+	m_moveLength += m_moveVec.Length();
+
 	SetCharacterVelo(m_moveVec);
 
 
-#ifdef _DEBUG
-
-	DrawString(0, 32, "PlayerState:HitAttack", GetColor(255, 255, 255));
-
-#endif // _DEBUG
 }
 
 void CharacterStateHitAttack::Exit()

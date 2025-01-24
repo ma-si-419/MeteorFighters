@@ -22,7 +22,7 @@ public:
 
 public:
 
-	ColliderData(Kind kind) { m_kind = kind; m_isTrigger = false; m_isGround = false; }
+	ColliderData(Kind kind) { m_kind = kind; m_isTrigger = false; m_isGround = false; m_isWall = false; }
 	virtual ~ColliderData() {}
 
 	/// <summary>

@@ -55,7 +55,8 @@ namespace
 }
 
 BattleManager::BattleManager(std::shared_ptr<GameCamera> camera) :
-	GameManagerBase(camera, GameManagerBase::GameKind::kBattle)
+	GameManagerBase(camera, GameManagerBase::GameKind::kBattle),
+	m_menuSelectNumber(0)
 {
 	m_pCamera = camera;
 
@@ -413,7 +414,6 @@ void BattleManager::UpdateKnockOut()
 
 void BattleManager::UpdateResult()
 {
-
 	//フェードインしていく
 	if (m_alpha > 0)
 	{
@@ -450,6 +450,13 @@ void BattleManager::UpdateResult()
 		else
 		{
 			cameraVelo = cameraVelo.Normalize() * (kResultCameraEndPos - m_poseCameraPos).Length();
+		
+			//何かボタンが押されたら
+			if (MyEngine::Input::GetInstance().GetInputData(0)->IsAnyPress())
+			{
+				//Uiの状況を変更
+				m_pBattleUi->SetResultMenuDisplay(true);
+			}
 		}
 		//1Pの座標
 		MyEngine::Vector3 onePlayerPos = m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetPos();

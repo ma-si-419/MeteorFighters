@@ -7,5 +7,6 @@ enum class ObjectTag
 	kTwoPlayer,			//2P
 	kOnePlayerAttack,	//1Pの攻撃
 	kTwoPlayerAttack,	//2Pの攻撃
-	kStage				//ステージ
+	kStage,				//ステージ
+	kStageObject		//ステージとしかぶつからないもの
 };

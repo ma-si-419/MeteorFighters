@@ -118,6 +118,13 @@ void Physics::Update()
 	//当たった当たり判定の当たった時の処理を呼ぶ
 	for (auto& hitCol : hitData)
 	{
+		//ステージとしか当たり判定を行わないものであればスキップ
+		if (hitCol.owner->GetTag() == ObjectTag::kStageObject ||
+			hitCol.colider->GetTag() == ObjectTag::kStageObject)
+		{
+			continue;
+		}
+
 		hitCol.OnCollide();
 		//物理挙動をするものだけ座標修正を行う
 		if (!hitCol.owner->m_pColData->GetIsTrigger() &&

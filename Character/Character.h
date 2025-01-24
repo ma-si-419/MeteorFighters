@@ -116,8 +116,8 @@ public:
 		kButtonBashingHitBack,
 		kButtonBashingAttack,
 		kOnButtonBashing,
-		kFrontDown,
-		kBackDown
+		kBackDown,
+		kFrontDown
 	};
 
 	enum class CharacterKind

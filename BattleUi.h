@@ -55,6 +55,14 @@ public:
 	/// </summary>
 	/// <returns>選択した項目,何も選択していなければ-1</returns>
 	int GetDecisionItem() { return m_decisionItem; }
+
+
+	/// <summary>
+	/// リザルトメニューが表示されているかどうかを設定する
+	///	</summary>
+	/// <param name= "flag">リザルトメニューを表示するならtrue</param>
+	void SetResultMenuDisplay(bool flag) { m_isResultMenuDisplay = flag; }
+
 private:
 
 	void UpdateMenu();
@@ -106,6 +114,9 @@ private:
 
 	//勝ったかどうかを設定する
 	bool m_isWin;
+
+	//リザルトメニューが表示されているかどうか
+	bool m_isResultMenuDisplay;
 
 	//前回カーソルを動かしてから何フレーム立ったか
 	int m_selectItemMoveTime;

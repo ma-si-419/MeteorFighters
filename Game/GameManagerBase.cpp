@@ -74,7 +74,8 @@ GameManagerBase::GameManagerBase(std::shared_ptr<GameCamera> camera, GameManager
 	m_buttonBashNum(),
 	m_isButtonBashing(false),
 	m_buttonBashingCameraRota(0.0f),
-	m_bashingButton("empty")
+	m_bashingButton("empty"),
+	m_buttonBashingSituation(ButtonBashingSituation::kFirstHit)
 {
 	m_pCamera = camera;
 
@@ -82,7 +83,6 @@ GameManagerBase::GameManagerBase(std::shared_ptr<GameCamera> camera, GameManager
 	m_pGameUi = std::make_shared<GameUi>();
 	m_pStage = std::make_shared<Stage>(m_pEffectManager);
 	m_pStage->Init();
-
 }
 
 GameManagerBase::~GameManagerBase()
@@ -135,6 +135,8 @@ void GameManagerBase::UpdateAsyncLoad()
 
 		m_pStage->SetStageModelHandle(m_modelHandles.at("Stage"));
 		m_pStage->SetSkyDomeModelHandle(m_modelHandles.at("SkyDome"));
+
+
 
 		//非同期ロードが終了したタイミングでInitを呼ぶ
 		Init();
@@ -234,6 +236,8 @@ int GameManagerBase::GetTargetState(std::shared_ptr<Character> character)
 	{
 		return m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetStateKind();
 	}
+
+	return 0;
 }
 
 void GameManagerBase::AddAttack(std::shared_ptr<Attack> attack)

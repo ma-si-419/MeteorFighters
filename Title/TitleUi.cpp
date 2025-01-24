@@ -11,8 +11,11 @@ namespace
 	const TCHAR* kFontName = "GN-キルゴUかなNB";
 
 	//文字の大きさ
-	constexpr int kFontSize = 64;
+	constexpr int kFontSize = 50;
 
+	//文字の色(グレー)
+	const unsigned int kFontColor = GetColor(192, 192, 192);
+	 
 	//カメラのNearFar
 	constexpr float kCameraNear = 0.1f;
 	constexpr float kCameraFar = 400.0f;
@@ -24,11 +27,12 @@ namespace
 	constexpr float kSkyDomeRotaSpeed = 0.001f;
 
 	//PRESSANYBUTTONを表示する座標
-	constexpr int kStringPosX = 70;
-	constexpr int kStringPosY = 700;
+	constexpr int kStringPosX = 56;
+	constexpr int kStringPosY = 710;
 
 	//表示する文字列
-	const std::string kUiString = "PRESS \n    ANY BUTTON";
+	//const std::string kUiString = "PRESS \n    ANY BUTTON";
+	const std::string kUiString = "PRESS ANY BUTTON";
 
 	//文字がついている時間
 	constexpr int kStringExistTime = 90;
@@ -266,12 +270,6 @@ void TitleUi::Draw()
 		}
 	}
 
-	//文字列の描画
-	if (m_isExistString)
-	{
-		DrawStringToHandle(kStringPosX, kStringPosY, kUiString.c_str(), GetColor(255, 255, 255), m_fontHandle, GetColor(0, 0, 0));
-	}
-
 	//タイトルロゴの描画
 	DrawGraph(0, 0, manager.GetHandle("TitleLogo"), true);
 
@@ -283,6 +281,14 @@ void TitleUi::Draw()
 			DrawRotaGraph(static_cast<int>(item.pos.x), static_cast<int>(item.pos.y), 1.0, item.rota, item.handle, true);
 		}
 	}
+
+	//文字列の描画
+	if (m_isExistString)
+	{
+		DrawStringToHandle(kStringPosX, kStringPosY, kUiString.c_str(), kFontColor, m_fontHandle, GetColor(0, 0, 0));
+	}
+
+
 }
 
 

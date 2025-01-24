@@ -170,6 +170,7 @@
     <ClCompile Include="Character\EnemyInput.cpp" />
     <ClCompile Include="Game\GameCamera.cpp" />
     <ClCompile Include="Game\GameManagerBase.cpp" />
+    <ClCompile Include="Rock.cpp" />
     <ClCompile Include="SelectManager.cpp" />
     <ClCompile Include="SelectUi.cpp" />
     <ClCompile Include="Singleton\GraphManager.cpp" />
@@ -229,6 +230,7 @@
     <ClInclude Include="Game\GameCamera.h" />
     <ClInclude Include="Game\GameManagerBase.h" />
     <ClInclude Include="Game\GameSceneConstant.h" />
+    <ClInclude Include="Rock.h" />
     <ClInclude Include="SelectManager.h" />
     <ClInclude Include="SelectUi.h" />
     <ClInclude Include="Singleton\GraphManager.h" />

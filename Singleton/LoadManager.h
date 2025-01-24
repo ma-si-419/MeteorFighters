@@ -82,16 +82,16 @@ public:
 private:
 
 	int Load(std::string path, FileKind kind);
-
+	
 private:
 
-	bool m_isAsyncLoad;
+	bool m_isAsyncLoad = false;
 
 	std::map<std::string, LoadData> m_handles;
 
-	int m_alpha;
+	int m_alpha = 0;
 
-	int m_fontHandle;
+	int m_fontHandle = -1;
 
 	BallData m_ballGraphs[static_cast<int>(BallKind::kBallNum)];
 };

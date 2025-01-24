@@ -18,7 +18,8 @@ public:
 		kMiddleHit,
 		kHighHit,
 		kEnergyHit,
-		kTeleportaion
+		kTeleportaion,
+		kStageHit
 	};
 
 public:

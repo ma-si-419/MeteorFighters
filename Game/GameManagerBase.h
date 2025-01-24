@@ -6,6 +6,11 @@
 #include "Character.h"
 #include "Game.h"
 
+namespace
+{
+	constexpr int kRockKindNum = 3;
+}
+
 class Player;
 class Enemy;
 class GameCamera;
@@ -323,6 +328,8 @@ protected:
 	BattleSituation m_situation;
 	//何を行っているのか
 	GameKind m_gameKind;
+	//石のモデルハンドル
+	int m_rockModelHandle[kRockKindNum];
 	//時間を計る際に使用する変数
 	int m_time;
 	//演出時のカメラ座標

@@ -17,7 +17,7 @@ namespace
 	constexpr int kResultDisplayStartTime = 90;
 
 	//リザルトのメニューを表示するまでの時間
-	constexpr int kResultMenuDisplayStartTime = 180;
+	constexpr int kResultMenuDisplayStartTime = 360;
 
 	//リザルトのメニューのフェードインの速度
 	constexpr int kMenuFadeinSpeed = 20;
@@ -113,7 +113,8 @@ BattleUi::BattleUi() :
 	m_resultMenuAlpha(0),
 	m_menuFontHandle(-1),
 	m_selectItemBoxScale(kSelectItemBoxMaxScale),
-	m_menuAlpha(0)
+	m_menuAlpha(0),
+	m_isResultMenuDisplay(false)
 {
 	//最初は何もしないように設定しておく
 	m_updateFunc = &BattleUi::None;
@@ -146,6 +147,9 @@ void BattleUi::ChangeSituation(UiSituation situation)
 	m_resultMenuAlpha = 0;
 	m_resultTime = 0;
 	m_resultLogoScale = kResultLogoInitScale;
+	m_shakeTime = 0;
+	m_selectItemBoxScale = kSelectItemBoxMaxScale;
+	m_isResultMenuDisplay = false;
 
 	switch (situation)
 	{
@@ -386,7 +390,7 @@ void BattleUi::DrawResult()
 		}
 	}
 	//さらに一定時間たったら
-	if (m_resultTime > kResultMenuDisplayStartTime)
+	if (m_resultTime > kResultMenuDisplayStartTime || m_isResultMenuDisplay)
 	{
 		//メニューをフェードインさせる
 		m_resultMenuAlpha += kMenuFadeinSpeed;

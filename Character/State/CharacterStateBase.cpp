@@ -78,10 +78,15 @@ namespace
 	};
 }
 
-CharacterStateBase::CharacterStateBase(std::shared_ptr<Character> character)
+CharacterStateBase::CharacterStateBase(std::shared_ptr<Character> character) :
+	m_pCharacter(character),
+	m_pManager(m_pCharacter->m_pBattleManager),
+	m_pNextState(nullptr),
+	m_kind(CharacterStateKind::kIdle),
+	m_time(0.0f),
+	m_guardKind(CharacterGuardKind::kNone),
+	m_stopTime(0)
 {
-	m_pCharacter = character;
-	m_pManager = m_pCharacter->m_pBattleManager;
 }
 
 void CharacterStateBase::OnCollide(std::shared_ptr<Collidable> collider)
@@ -541,4 +546,9 @@ int CharacterStateBase::GetNextHitReactionKind(std::shared_ptr<Attack> attack)
 		//Šî–{“I‚É‚Ç‚Ìó‘Ô‚Å‚àó‚¯‚é
 		return static_cast<int>(kHitKindMap.at(status.attackHitKind));
 	}
+
+	//‚½‚Ô‚ñ‚±‚±‚Ü‚Å—ˆ‚È‚¢‚Í‚¸‚¾‚¯‚Çˆê‰
+	//Œx‚¯‚µ‚Ì‚½‚ß‚É•Ô‚è’l‚ğİ’è‚µ‚Ä‚¨‚­
+	return static_cast<int>(kHitKindMap.at(status.attackHitKind));
+	
 }

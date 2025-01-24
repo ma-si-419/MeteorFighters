@@ -46,9 +46,13 @@ TutorialManager::~TutorialManager()
 
 void TutorialManager::Init()
 {
+	//カメラの初期化
 	m_pCamera->SetBattleCamera();
+	
+	//チュートリアルUIの初期化
 	m_pTutorialUi->Init();
 
+	//situationの変更
 	ChangeSituation(TutorialSituation::kMenu);
 }
 

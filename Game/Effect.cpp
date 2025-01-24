@@ -16,7 +16,8 @@ namespace
 		{Effect::EffectKind::kMiddleHit,"MiddleHit"},
 		{Effect::EffectKind::kHighHit,"HighHit"},
 		{Effect::EffectKind::kEnergyHit,"EnergyHit"},
-		{Effect::EffectKind::kTeleportaion,"Teleportation"}
+		{Effect::EffectKind::kTeleportaion,"Teleportation"},
+		{Effect::EffectKind::kStageHit,"StageHit"},
 	};
 
 	constexpr float kDefaultPlaySpeed = 1.0f;

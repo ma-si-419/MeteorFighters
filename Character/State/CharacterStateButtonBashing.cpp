@@ -181,7 +181,7 @@ void CharacterStateButtonBashing::Update()
 	}
 
 	//移動速度のクランプ
-	m_moveSpeed = fmin(m_moveSpeed, kMaxMoveSpeed);
+	m_moveSpeed = static_cast<float>(fmin(m_moveSpeed, kMaxMoveSpeed));
 
 	//敵との距離
 	float toEnemyLength = (m_pManager->GetTargetPos(m_pCharacter) - m_pCharacter->GetPos()).Length();
@@ -339,7 +339,7 @@ void CharacterStateButtonBashing::Update()
 
 			//攻撃に設定するステータス
 			Attack::AttackStatus status;
-			status.damage = attackData.damageRate * m_pCharacter->GetPower();
+			status.damage = static_cast<int>(attackData.damageRate * m_pCharacter->GetPower());
 			status.speed = attackData.attackMoveSpeed;
 			status.radius = kAttackRadius;
 			status.lifeTime = kAttackLifeTime;

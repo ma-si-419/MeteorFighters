@@ -110,7 +110,8 @@ TutorialUi::TutorialUi() :
 	m_successTime(0),
 	m_isSuccessEnd(false),
 	m_selectTutorialNumber(0),
-	m_selectTutorialStringArrowPos(0)
+	m_selectTutorialStringArrowPos(0),
+	m_isSuccessTutorial(false)
 {
 	LoadCsv load;
 
@@ -213,7 +214,7 @@ void TutorialUi::InitPlaying(int number)
 
 	auto button = stringFunc.Split(buttonString, '/');
 
-	m_drawButtonNum = button.size();
+	m_drawButtonNum = static_cast<int>(button.size());
 
 	//ボタンの描画数が1個であれば
 	if (m_drawButtonNum == 1)
@@ -296,7 +297,7 @@ void TutorialUi::DrawMenu()
 	//アルファ値変更
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, menu.alpha);
 
-	DrawRotaGraph(menu.pos.x, menu.pos.y, menu.scale, 0.0, menu.handle, true);
+	DrawRotaGraph(static_cast<int>(menu.pos.x), static_cast<int>(menu.pos.y), menu.scale, 0.0, menu.handle, true);
 
 	//ブレンドモードを元に戻す
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
@@ -304,7 +305,7 @@ void TutorialUi::DrawMenu()
 	//選択している項目の後ろのボックスを表示する
 	GraphData itemBox = m_drawGraphs["SelectItemBox"];
 
-	DrawRotaGraph(itemBox.pos.x, itemBox.pos.y, itemBox.scale, 0.0, itemBox.handle, true);
+	DrawRotaGraph(static_cast<int>(itemBox.pos.x), static_cast<int>(itemBox.pos.y), itemBox.scale, 0.0, itemBox.handle, true);
 
 	//文字列を表示する
 	for (int i = 0; i < static_cast<int>(TutorialUi::MenuItem::kItemNum); i++)
@@ -337,15 +338,15 @@ void TutorialUi::DrawMenu()
 	MyEngine::Vector2 leftArrowPos = MyEngine::Vector2(selectTutorialPos.x - leftGap - static_cast<float>(kMenuFontSize), selectTutorialPos.y - static_cast<float>(kMenuFontSize / 2));
 	MyEngine::Vector2 rightArrowPos = MyEngine::Vector2(selectTutorialPos.x + rightGap, selectTutorialPos.y - static_cast<float>(kMenuFontSize / 2));
 
-	DrawStringToHandle(leftArrowPos.x, leftArrowPos.y, "＜", GetColor(0, 0, 0), m_menuFontHandle, GetColor(255, 255, 255));
-	DrawStringToHandle(rightArrowPos.x, rightArrowPos.y, "＞", GetColor(0, 0, 0), m_menuFontHandle, GetColor(255, 255, 255));
+	DrawStringToHandle(static_cast<int>(leftArrowPos.x), static_cast<int>(leftArrowPos.y), "＜", GetColor(0, 0, 0), m_menuFontHandle, GetColor(255, 255, 255));
+	DrawStringToHandle(static_cast<int>(rightArrowPos.x), static_cast<int>(rightArrowPos.y), "＞", GetColor(0, 0, 0), m_menuFontHandle, GetColor(255, 255, 255));
 }
 
 void TutorialUi::DrawStart(int number)
 {
 	GraphData backBox = m_drawGraphs["BackBox"];
 
-	DrawRotaGraph(backBox.pos.x, backBox.pos.y, backBox.scale, 0.0, backBox.handle, true);
+	DrawRotaGraph(static_cast<int>(backBox.pos.x), static_cast<int>(backBox.pos.y), backBox.scale, 0.0, backBox.handle, true);
 
 	std::string startWord = m_tutorialData[number][static_cast<int>(TutorialManager::TutorialDataIndex::kStartString)];
 
@@ -382,7 +383,7 @@ void TutorialUi::DrawPlaying(int number)
 	GraphData frameData = m_drawGraphs["ButtonFrame"];
 
 	//ボタンを表示するフレーム
-	DrawRotaGraph(frameData.pos.x, frameData.pos.y, frameData.scale, 0.0, frameData.handle, true);
+	DrawRotaGraph(static_cast<int>(frameData.pos.x), static_cast<int>(frameData.pos.y), frameData.scale, 0.0, frameData.handle, true);
 
 	//プレイ中の説明
 	auto playingString = m_tutorialData[number][static_cast<int>(TutorialManager::TutorialDataIndex::kPlayingString)];
@@ -397,7 +398,7 @@ void TutorialUi::DrawPlaying(int number)
 
 		GraphData buttonData = m_drawGraphs[name];
 
-		DrawRotaGraph(buttonData.pos.x, buttonData.pos.y, buttonData.scale, 0.0, buttonData.handle, true);
+		DrawRotaGraph(static_cast<int>(buttonData.pos.x), static_cast<int>(buttonData.pos.y), buttonData.scale, 0.0, buttonData.handle, true);
 	}
 }
 
@@ -406,7 +407,7 @@ void TutorialUi::DrawSuccess(int number)
 	GraphData frameData = m_drawGraphs["ButtonFrame"];
 
 	//ボタンを表示するフレーム
-	DrawRotaGraph(frameData.pos.x, frameData.pos.y, frameData.scale, 0.0, frameData.handle, true);
+	DrawRotaGraph(static_cast<int>(frameData.pos.x), static_cast<int>(frameData.pos.y), frameData.scale, 0.0, frameData.handle, true);
 
 	//プレイ中の説明
 	auto playingString = m_tutorialData[number][static_cast<int>(TutorialManager::TutorialDataIndex::kPlayingString)];
@@ -421,13 +422,13 @@ void TutorialUi::DrawSuccess(int number)
 
 		GraphData buttonData = m_drawGraphs[name];
 
-		DrawRotaGraph(buttonData.pos.x, buttonData.pos.y, buttonData.scale, 0.0, buttonData.handle, true);
+		DrawRotaGraph(static_cast<int>(buttonData.pos.x), static_cast<int>(buttonData.pos.y), buttonData.scale, 0.0, buttonData.handle, true);
 	}
 
 	GraphData success = m_drawGraphs["Success"];
 
 	//クリア時の画像表示
-	DrawRotaGraph(success.pos.x, success.pos.y, success.scale, 0.0, success.handle, true);
+	DrawRotaGraph(static_cast<int>(success.pos.x), static_cast<int>(success.pos.y), success.scale, 0.0, success.handle, true);
 }
 
 void TutorialUi::DrawStringCenter(std::string string, MyEngine::Vector2 centerPos, int font, int color, int edgeColor)
@@ -621,8 +622,8 @@ void TutorialUi::UpdateSuccess()
 		//少し揺らす
 		if (m_successTime < kSuccessGraphShakeTime)
 		{
-			success.pos.x = (kButtonPosX + GetRand(kSuccessGraphShakeScale)) - kSuccessGraphShakeHalfScale;
-			success.pos.y = (kButtonPosY + GetRand(kSuccessGraphShakeScale)) - kSuccessGraphShakeHalfScale;
+			success.pos.x = static_cast<float>((kButtonPosX + GetRand(kSuccessGraphShakeScale)) - kSuccessGraphShakeHalfScale);
+			success.pos.y = static_cast<float>((kButtonPosY + GetRand(kSuccessGraphShakeScale)) - kSuccessGraphShakeHalfScale);
 		}
 
 		if (m_successTime > kSuccessEndTime)
