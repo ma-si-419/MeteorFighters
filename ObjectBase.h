@@ -27,6 +27,9 @@ public:
 
 	virtual void Final();
 
+	// ‰½‚Æ‚à‚Ô‚Â‚©‚ç‚È‚¢‚æ‚¤‚É‚·‚é‚Ì‚Å‹óŽÀ‘•
+	virtual void OnCollide(std::shared_ptr<Collidable> collider) override {};
+
 protected:
 
 	bool m_isExist;

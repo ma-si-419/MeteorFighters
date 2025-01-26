@@ -7,7 +7,7 @@ Low5,5,41,10,26,1,0,0,’†,1,Low6,–³,LowAttack5,1.25,None
 Low6,3,41,10,19,1,0,1,ã,1,Low7,’†,LowAttack6,1.25,None
 Low7,5,34,10,19,1,0,0,ã‚Á”ò‚Ñ,1,Low8,–³,LowAttack7,1.25,None
 Low8,7,60,24,40,0.5,0,1,‰º‚Á”ò‚Ñ,1,None,‚Á”ò‚Ñ,LowAttack8,1.25,None
-Teleportation,5,40,24,30,0.5,0,1,‰œ‚Á”ò‚Ñ,1,None,‚Á”ò‚Ñ,MiddleChargeAttack,1.25,None
+Teleportation,5,55,30,45,0.5,0,1,‰œ‚Á”ò‚Ñ,1,None,‚Á”ò‚Ñ,MiddleChargeAttack,1.25,None
 Energy1,1,30,9,13,0,5,0,ã,0,Energy2,–³,EnergyAttackRight,1.25,Energy
 Energy2,1,30,9,13,0,5,0,ã,0,Energy3,–³,EnergyAttackLeft,1.25,Energy
 Energy3,1,30,9,13,0,5,0,ã,0,Energy4,–³,EnergyAttackRight,1.25,Energy

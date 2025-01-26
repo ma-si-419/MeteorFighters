@@ -5,9 +5,9 @@
 namespace
 {
 	//飛んでいくときの初速の最大速度
-	constexpr float kMaxSpeed = 5.0f;
+	constexpr float kMaxSpeed = 20.0f;
 	//飛んでいくときの初速の最小速度
-	constexpr float kMinSpeed = 2.0f;
+	constexpr float kMinSpeed = 10.0f;
 
 	//飛んでいくときの初速の最大角度
 	constexpr int kMaxAngle = 120;
@@ -17,22 +17,25 @@ namespace
 	constexpr float kToRadian = DX_PI_F / 180;
 
 	//消えていくまでの時間
-	constexpr int kAlphaSubStartTime = 90;
+	constexpr int kAlphaSubStartTime = 180;
 
 	//消えていく速さ
-	constexpr int kAlphaSubSpeed = 15;
+	constexpr int kAlphaSubSpeed = 10;
 
 	//当たり判定のサイズ
 	constexpr float kColliderSize = 1.0f;
 
 	//重力をかけ始める時間
-	constexpr int kGravityStartTime = 30;
+	constexpr int kGravityStartTime = 15;
 
 	//重力の大きさ
-	constexpr float kGravity = 0.1f;
+	constexpr float kGravity = 0.5f;
 
 	//減速率
 	constexpr float kDeceleration = 0.9f;
+
+	//石の大きさ
+	constexpr float kRockSize = 0.2f;
 
 }
 
@@ -41,6 +44,8 @@ Rock::Rock() :
 	m_moveVec(0.0f, 0.0f, 0.0f),
 	m_time(0)
 {
+	m_alpha = 255;
+	m_isExist = true;
 }
 
 Rock::~Rock()
@@ -53,6 +58,11 @@ void Rock::Init()
 	//当たり判定のサイズを初期化
 	auto sphere = std::dynamic_pointer_cast<SphereColliderData>(m_pColData);
 	sphere->m_radius = kColliderSize;
+
+	//モデルのサイズを変更
+	MV1SetScale(m_handle, VGet(kRockSize, kRockSize, kRockSize));
+
+	Collidable::Init();
 }
 
 void Rock::Update()
@@ -93,8 +103,8 @@ void Rock::SetMoveVec(MyEngine::Vector3 bumpPos, MyEngine::Vector3 characterPos)
 	//正規化
 	m_moveVec = m_moveVec.Normalize();
 	//ランダムでベクトルの角度を変える
-	MATRIX randomX = MGetRotX(static_cast<float>((GetRand(kMaxAngle - kMinAngle) + kMinAngle) * kToRadian));
-	MATRIX randomY = MGetRotY(static_cast<float>((GetRand(kMaxAngle - kMinAngle) + kMinAngle) * kToRadian));
+	MATRIX randomX = MGetRotX(static_cast<float>((GetRand(kMaxAngle) - kMinAngle) * kToRadian));
+	MATRIX randomY = MGetRotY(static_cast<float>((GetRand(kMaxAngle) - kMinAngle) * kToRadian));
 	MATRIX mat = MMult(randomX, randomY);
 	//ベクトルを変換
 	m_moveVec = m_moveVec.MatTransform(mat);

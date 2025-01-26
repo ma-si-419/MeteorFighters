@@ -123,7 +123,7 @@ void Character::Init()
 	}
 	else if (m_playerNumber == Character::PlayerNumber::kTwoPlayer)
 	{
-		m_input = MyEngine::Input::GetInstance().GetInputData(1);
+		m_input = MyEngine::Input::GetInstance().GetInputData(0);
 
 		m_pEnemyInput = std::make_shared<EnemyInput>(m_input);
 
@@ -167,12 +167,14 @@ void Character::Init()
 	if (m_playerNumber == PlayerNumber::kOnePlayer)
 	{
 		m_rigidbody.SetPos(kOnePlayerInitPos);
+		m_targetLocalPos.SetCenterPos(kOnePlayerInitPos);
 		m_lookPos.SetCenterPos(kOnePlayerInitPos);
 		SetFrontPos(kTwoPlayerInitPos);
 	}
 	else if (m_playerNumber == PlayerNumber::kTwoPlayer)
 	{
 		m_rigidbody.SetPos(kTwoPlayerInitPos);
+		m_targetLocalPos.SetCenterPos(kTwoPlayerInitPos);
 		m_lookPos.SetCenterPos(kTwoPlayerInitPos);
 		SetFrontPos(kOnePlayerInitPos);
 	}
@@ -243,6 +245,32 @@ void Character::Draw()
 		//モデルの描画
 		MV1DrawModel(m_modelHandle);
 	}
+
+#ifdef _DEBUG	
+
+
+	//プレイヤーの前方向の座標
+	MyEngine::Vector3 frontPos = GetFrontPos();
+
+	//プレイヤーの前方向を球で表示
+	DrawSphere3D(frontPos.CastVECTOR(), 2.0f, 10, GetColor(255, 0, 0), GetColor(255, 0, 0), true);
+
+	//2Pだったら
+	if (m_playerNumber == PlayerNumber::kTwoPlayer)
+	{
+		if (IsFrontTarget())
+		{
+			printfDx("2Pの前方向に1Pがいる\n");
+		}
+		else
+		{
+			printfDx("2Pの前方向に1Pがいない\n");
+		}
+	}
+	
+
+#endif
+
 }
 
 void Character::OnCollide(std::shared_ptr<Collidable> collider)
@@ -693,8 +721,13 @@ void Character::LookTarget()
 {
 	auto pointer = std::dynamic_pointer_cast<Character>(shared_from_this());
 
+
+	//ターゲットの方向を向く
 	MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - m_pBattleManager->GetTargetPos(pointer)).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
 	m_lookPos.SetLocalPos(m_lookPos.ChangeWorldToLocal(m_pBattleManager->GetTargetPos(pointer)));
+	
+	//正面方向を設定
+	SetFrontPos(m_pBattleManager->GetTargetPos(pointer));
 }
 
 void Character::CreateAfterImage()

@@ -6,11 +6,6 @@
 #include "Character.h"
 #include "Game.h"
 
-namespace
-{
-	constexpr int kRockKindNum = 3;
-}
-
 class Player;
 class Enemy;
 class GameCamera;
@@ -19,7 +14,7 @@ class Stage;
 class EffectManager;
 class Effect;
 class GameUi;
-class Rock;
+class ObjectBase;
 class GameManagerBase : public std::enable_shared_from_this<GameManagerBase>
 {
 public:
@@ -209,12 +204,6 @@ public:
 	void ExitEffect(std::shared_ptr<Effect> effect);
 
 	/// <summary>
-	/// 表示する石を登録する
-	/// </summary>
-	/// <param name="rock"></param>
-	void EntryRock(std::shared_ptr<Rock> rock);
-
-	/// <summary>
 	/// セレクトシーンに戻るときにtrueを返す
 	/// </summary>
 	/// <returns>セレクトシーンに戻る時にtrueになる</returns>
@@ -288,6 +277,19 @@ public:
 	/// </summary>
 	GameKind GetGameKind() { return m_gameKind; }
 
+	/// <summary>
+	/// オブジェクトを登録する
+	/// </summary>
+	/// <param name="">オブジェクトのポインタ</param>
+	void EntryObject(std::shared_ptr<ObjectBase> object);
+	
+	/// <summary>
+	/// 石のモデルハンドルを取得する
+	/// </summary>
+	///	<param name="kind">石の種類</param>
+	/// <returns>石のモデルハンドル</returns>
+	int GetRockModelHandle(int kind) { return m_rockModelHandle[kind]; }
+
 protected:
 
 	/// <summary>
@@ -331,14 +333,14 @@ protected:
 	std::shared_ptr<EffectManager> m_pEffectManager;
 	//ゲームシーンのUI管理クラス
 	std::shared_ptr<GameUi> m_pGameUi;
-	//表示している石のポインタ
-	std::shared_ptr<Rock> m_pRock;
+	//表示している触れないオブジェクトのポインタ
+	std::vector<std::shared_ptr<ObjectBase>> m_pObjects;
 	//ゲームの状況
 	BattleSituation m_situation;
 	//何を行っているのか
 	GameKind m_gameKind;
-	//石のモデルハンドル
-	int m_rockModelHandle[kRockKindNum];
+	//石のモデルハンドル(マジックナンバーどうにかする)
+	int m_rockModelHandle[3];
 	//時間を計る際に使用する変数
 	int m_time;
 	//演出時のカメラ座標

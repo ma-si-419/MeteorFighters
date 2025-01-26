@@ -27,6 +27,9 @@ void CharacterStateGuard::Enter()
 	m_kind = CharacterStateKind::kGuard;
 	m_pCharacter->ChangeAnim(Character::AnimKind::kGuardMiddle, true, kBlendSpeed);
 	m_guardKind = CharacterGuardKind::kMiddleGuard;
+
+	//“G‚Ì•ûŒü‚ðŒü‚­
+	m_pCharacter->LookTarget();
 }
 
 void CharacterStateGuard::Update()

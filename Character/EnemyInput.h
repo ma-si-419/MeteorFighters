@@ -22,7 +22,8 @@ public:
 		Dash,
 		Rush,
 		SpecialAttack,
-		EnergyCharge
+		EnergyCharge,
+		Guard
 	};
 
 	enum class DataIndex
@@ -69,6 +70,12 @@ private:
 
 	void Guard();
 
+	/// <summary>
+	/// アクションを変更する
+	/// </summary>
+	/// <param name="action">次に行うアクション</param>
+	void ChangeAction(Action action);
+
 	//何もしない
 	void None() {};
 
@@ -85,28 +92,45 @@ private:
 
 private:
 
+	//移動関数
 	using MoveFunc = void(EnemyInput::*)();
 
+	//アクション関数
 	using ActionFunc = void(EnemyInput::*)();
 
+private:
+
+	//移動関数
 	MoveFunc m_moveFunc;
 
+	//アクション関数
 	ActionFunc m_actionFunc;
 
+	//行動時間
 	int m_actionTime;
 
+	//次の行動までの時間を計測するかどうか
 	bool m_isCountActionTime;
 
+	//移動時間
 	int m_moveTime;
 
+	//ガードを行う時間
+	int m_guardTime;
+
+	//ゲームマネージャ
 	std::shared_ptr<GameManagerBase> m_pManager;
 
+	//入力データ
 	std::shared_ptr<MyEngine::InputData> m_pInputData;
 
+	//ステートにいる時間
 	int m_stateTime;
 
+	//ステート
 	std::shared_ptr<CharacterStateBase> m_pEnemyState;
 
+	//AIデータ
 	std::vector<AiData> m_aiData;
 
 };

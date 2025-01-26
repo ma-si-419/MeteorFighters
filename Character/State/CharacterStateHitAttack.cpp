@@ -7,6 +7,7 @@
 #include "Attack.h"
 #include "GameManagerBase.h"
 #include "Effect.h"
+#include "Rock.h"
 
 namespace
 {
@@ -59,6 +60,9 @@ namespace
 	//移動速度を減速させていくタイミング
 	constexpr float kMoveSpeedDecelerationTime = 0.6f;
 
+	//受け身がとれるようになる時間(動けない時間の割合)
+	constexpr float kStopTimeRate = 0.7f;
+
 	//吹っ飛び中にかける重力
 	constexpr float kBurstGravity = 0.1f;
 
@@ -72,14 +76,30 @@ namespace
 	constexpr int kBumpEffectLifeTime = 90;
 
 	//ステージとぶつかった時にエフェクトをたくようにする距離(一定距離移動しないとエフェクトをたかないようにする)
-	constexpr float kStageBumpEffectPopLength = 10.0f;
+	constexpr float kStageBumpEffectPopLength = 20.0f;
+
+	//石の種類数
+	constexpr int kRockKindNum = 2;
+
+	//ぶつかったときに出す石の数
+	constexpr int kRockNum = 15;
+
+	//受け身を取るときのアニメーションブレンドの速さ
+	constexpr float kFallsBlendSpeed = 0.2f;
+
+	//受け身を取るときのアニメーションの再生速度
+	constexpr float kFallsPlaySpeed = 2.5f;
+
+	//受け身にかかる時間
+	constexpr int kFallsStopTime = 10;
 }
 
 CharacterStateHitAttack::CharacterStateHitAttack(std::shared_ptr<Character> character) :
 	CharacterStateBase(character),
 	m_moveTime(0),
 	m_isFrontHit(false),
-	m_moveLength(0.0f)
+	m_moveLength(0.0f),
+	m_isStageBump(false)
 {
 }
 
@@ -91,8 +111,11 @@ void CharacterStateHitAttack::Enter()
 
 void CharacterStateHitAttack::Update()
 {
-
+	//時間計測
 	m_time++;
+
+	//入力マネージャー
+	auto input = GetCharacterInput();
 
 	//今受けている攻撃がスタン攻撃だったら
 	if (m_pCharacter->GetHitReaction() == Character::HitReactionKind::kBottomStan ||
@@ -113,7 +136,7 @@ void CharacterStateHitAttack::Update()
 	}
 
 	//減速させていく時間になっていたら
-	if (m_stopTime * kMoveSpeedDecelerationTime < m_time)
+	if (m_time > m_stopTime * kMoveSpeedDecelerationTime)
 	{
 		//減速ベクトルが設定されていなければ
 		if (m_decelerationVec.SqLength() < 0.01f)
@@ -144,9 +167,15 @@ void CharacterStateHitAttack::Update()
 		}
 	}
 
-	//減速を行っておらず一定以上移動していたら
-	if (m_decelerationVec.SqLength() < 0.01f &&
-		m_moveLength > kStageBumpEffectPopLength)
+
+	//下吹っ飛びの状態であれば基本的にエフェクトを再生する
+	if (m_pCharacter->GetHitReaction() == Character::HitReactionKind::kDownBurst)
+	{
+		m_isStageBump = true;
+	}
+
+	//一定以上移動していたら
+	if (m_moveLength > kStageBumpEffectPopLength)
 	{
 		//地面にぶつかった時エフェクトを再生するフラグを立てる
 		m_isStageBump = true;
@@ -157,6 +186,18 @@ void CharacterStateHitAttack::Update()
 		//地面にぶつかった時エフェクトを再生するフラグを下げる
 		m_isStageBump = false;
 	}
+
+	//減速している場合
+	if (m_time > m_stopTime * kMoveSpeedDecelerationTime)
+	{
+		//下吹っ飛び以外はエフェクトを再生しない
+		if (m_pCharacter->GetHitReaction() == Character::HitReactionKind::kFarBurst ||
+			m_pCharacter->GetHitReaction() == Character::HitReactionKind::kUpBurst)
+		{
+			m_isStageBump = false;
+		}
+	}
+
 
 	//吹っ飛び状態であれば
 	if (m_pCharacter->GetHitReaction() == Character::HitReactionKind::kUpBurst ||
@@ -185,6 +226,21 @@ void CharacterStateHitAttack::Update()
 				effect->SetPos(m_pCharacter->GetPos() + m_moveVec);
 				effect->SetLifeTime(kBumpEffectLifeTime);
 				m_pManager->EntryEffect(effect);
+
+				//石の数だけループ
+				for (int i = 0; i < kRockNum; i++)
+				{
+					//石のオブジェクト作成する
+					auto rock = std::make_shared<Rock>();
+					//石のモデルハンドルを設定する
+					rock->SetHandle(m_pManager->GetRockModelHandle(GetRand(kRockKindNum)));
+					//石の移動ベクトルを設定する
+					rock->SetMoveVec(m_pCharacter->GetPos() + m_moveVec, m_pCharacter->GetPos());
+					//石の初期化
+					rock->Init();
+					//石を登録する
+					m_pManager->EntryObject(rock);
+				}
 			}
 
 
@@ -216,17 +272,39 @@ void CharacterStateHitAttack::Update()
 				effect->SetPos(m_pCharacter->GetPos());
 				effect->SetLifeTime(kBumpEffectLifeTime);
 				m_pManager->EntryEffect(effect);
+
+				//石の数だけループ
+				for (int i = 0; i < kRockNum; i++)
+				{
+					//石のオブジェクト作成する
+					auto rock = std::make_shared<Rock>();
+					//石のモデルハンドルを設定する
+					rock->SetHandle(m_pManager->GetRockModelHandle(GetRand(kRockKindNum)));
+					//石の移動ベクトルを設定する
+					rock->SetMoveVec(m_pCharacter->GetPos() + m_moveVec, m_pCharacter->GetPos());
+					//石の初期化
+					rock->Init();
+					//石を登録する
+					m_pManager->EntryObject(rock);
+				}
 			}
 
 			return;
 		}
 
 
-		//設定した時間たったら
-		if (m_stopTime <= m_time)
+		//設定した時間たって受け身ボタンが押されたら
+		if (m_time >= static_cast<float>(m_stopTime * kStopTimeRate) &&
+			input->IsTrigger("B"))
 		{
 			//次の状態をアイドル状態に設定する
 			std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
+		
+			//受け身アニメを再生する
+			next->SetEndAnim(static_cast<int>(Character::AnimKind::kBottomStan), kFallsStopTime,kFallsBlendSpeed);
+			
+			m_pCharacter->SetAnimPlaySpeed(kFallsPlaySpeed);
+
 			//アイドル状態に遷移する
 			ChangeState(next);
 
@@ -237,7 +315,7 @@ void CharacterStateHitAttack::Update()
 	else
 	{
 		//設定した時間たったら
-		if (m_stopTime <= m_time)
+		if (m_time >= m_stopTime)
 		{
 			//次の状態をアイドル状態に設定する
 			std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
@@ -247,7 +325,7 @@ void CharacterStateHitAttack::Update()
 			return;
 		}
 	}
-	
+
 	m_moveLength += m_moveVec.Length();
 
 	SetCharacterVelo(m_moveVec);

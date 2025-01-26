@@ -25,6 +25,12 @@ namespace
 	//移動方向のランダムの数
 	constexpr int kMoveDirRandomNum = 3;
 
+	//最大何フレームガードを行うか
+	constexpr int kMaxGuardTime = 240;
+
+	//最低何フレームガードを行うか
+	constexpr int kMinGuardTime = 120;
+
 	//近距離で選択できる移動方向
 	const EnemyInput::MoveDir kNearMoveDir[kMoveDirRandomNum] =
 	{
@@ -226,34 +232,12 @@ void EnemyInput::Update()
 				//行動が決まったら
 				if (actionNum <= 0)
 				{
-					switch (action)
-					{
-					case EnemyInput::Action::PhysicalAttack:
-						m_actionFunc = &EnemyInput::PhysicalAttack;
-						break;
-					case EnemyInput::Action::EnergyAttack:
-						m_actionFunc = &EnemyInput::EnergyAttack;
-						break;
-					case EnemyInput::Action::Dash:
-						m_actionFunc = &EnemyInput::Dash;
-						break;
-					case EnemyInput::Action::Rush:
-						m_actionFunc = &EnemyInput::Rush;
-						break;
-					case EnemyInput::Action::SpecialAttack:
-						m_actionFunc = &EnemyInput::SpecialAttack;
-						break;
-					case EnemyInput::Action::EnergyCharge:
-						m_actionFunc = &EnemyInput::EnergyCharge;
-						break;
-					default:
-						m_actionFunc = &EnemyInput::None;
-						break;
-					}
+					//行動を変更する
+					ChangeAction(action);
 
-					///////////////////////////////////////////
-//					m_actionFunc = &EnemyInput::SpecialAttack;
-					///////////////////////////////////////////
+					///////////////////////////////////
+					m_actionFunc = &EnemyInput::Guard;
+					///////////////////////////////////
 
 					//ループから抜ける
 					break;
@@ -273,10 +257,10 @@ void EnemyInput::Update()
 	if (m_pManager->GetGameKind() == GameManagerBase::GameKind::kBattle)
 	{
 		//移動処理
-	//	(this->*m_moveFunc)();
+//		(this->*m_moveFunc)();
 
 		//アクション処理
-	//	(this->*m_actionFunc)();
+//		(this->*m_actionFunc)();
 	}
 }
 
@@ -408,5 +392,62 @@ void EnemyInput::EnergyAttack()
 
 void EnemyInput::Guard()
 {
+	m_stateTime++;
+	
 	m_pInputData->PushButton("B");
+
+	//ガードをやめる
+	if (m_stateTime > m_guardTime)
+	{
+		m_isCountActionTime = true;
+		m_stateTime = 0;
+	}
+}
+
+void EnemyInput::ChangeAction(Action action)
+{
+	switch (action)
+	{
+		//格闘攻撃
+	case EnemyInput::Action::PhysicalAttack:
+		m_actionFunc = &EnemyInput::PhysicalAttack;
+		break;
+
+		//エネルギー攻撃
+	case EnemyInput::Action::EnergyAttack:
+		m_actionFunc = &EnemyInput::EnergyAttack;
+		break;
+
+		//ダッシュ
+	case EnemyInput::Action::Dash:
+		m_actionFunc = &EnemyInput::Dash;
+		break;
+
+		//ラッシュ
+	case EnemyInput::Action::Rush:
+		m_actionFunc = &EnemyInput::Rush;
+		break;
+
+		//必殺技
+	case EnemyInput::Action::SpecialAttack:
+		m_actionFunc = &EnemyInput::SpecialAttack;
+		break;
+
+		//エネルギーチャージ
+	case EnemyInput::Action::EnergyCharge:
+		m_actionFunc = &EnemyInput::EnergyCharge;
+		break;
+
+		//ガード
+	case EnemyInput::Action::Guard:
+		m_actionFunc = &EnemyInput::Guard;
+		//ガードを行う時間を設定
+		m_guardTime = GetRand(kMaxGuardTime - kMinGuardTime) + kMinGuardTime;
+		break;
+
+		//何もしない
+	default:
+		m_actionFunc = &EnemyInput::None;
+		break;
+	}
 }

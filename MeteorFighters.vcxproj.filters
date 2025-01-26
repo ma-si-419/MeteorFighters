@@ -258,11 +258,11 @@
     <ClCompile Include="CharacterStateDown.cpp">
       <Filter>ソース ファイル\Character\State</Filter>
     </ClCompile>
-    <ClCompile Include="Rock.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="ObjectBase.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Rock.cpp">
+      <Filter>ソース ファイル\Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

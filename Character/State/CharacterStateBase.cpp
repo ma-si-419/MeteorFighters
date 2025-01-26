@@ -313,6 +313,9 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 	//ƒK[ƒhó‘Ô
 	if (hitReaction == Character::HitReactionKind::kGuard)
 	{
+		//“G‚Ì•ûŒü‚ğŒü‚­
+		m_pCharacter->LookTarget();
+
 		//Œ»İ‚Ìó‘Ô‚ªƒK[ƒhó‘Ô‚Å‚ ‚ê‚ÎƒK[ƒhó‘Ô‚ğŒp‘±‚·‚é
 		if (m_kind == CharacterStateKind::kGuard) return;
 
@@ -362,12 +365,20 @@ int CharacterStateBase::GetNextHitReactionKind(std::shared_ptr<Attack> attack)
 	//‚»‚à‚»‚àƒK[ƒh‚Å‚«‚éó‘Ô‚É‚¢‚é‚Ì‚©‚ğ’²‚×‚é
 	bool isGuard = false;
 
+	//ƒK[ƒh‚Å‚«‚éó‘Ô‚©‚ğ’²‚×‚é
 	for (auto& hitReaction : kCanGuardHitReactionKind)
 	{
 		if (m_pCharacter->m_nowHitReaction == hitReaction)
 		{
 			isGuard = true;
 		}
+	}
+
+	//“G‚ªŒã‚ë‘¤‚É‚¢‚é‚È‚ç‚Î
+	if (!m_pCharacter->IsFrontTarget())
+	{
+		//â‘Î‚ÉƒK[ƒh‚Å‚«‚È‚¢
+		isGuard = false;
 	}
 
 	//ƒK[ƒh‚Å‚«‚éó‘Ô‚É‚¢‚È‚¯‚ê‚Î

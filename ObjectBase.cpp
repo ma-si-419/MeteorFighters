@@ -5,7 +5,9 @@
 
 ObjectBase::ObjectBase(ColliderData::Kind colKind) :
 	Collidable(ObjectTag::kStageObject, colKind),
-	m_handle(-1)
+	m_handle(-1),
+	m_alpha(255),
+	m_isExist(true)
 {
 	if (colKind == ColliderData::Kind::kSphere)
 	{
@@ -18,9 +20,6 @@ ObjectBase::ObjectBase(ColliderData::Kind colKind) :
 		capsuleData->m_radius = 1.0f;
 		capsuleData->m_lange = MyEngine::Vector3(1.0f,1.0f,1.0f);
 	}
-
-	Collidable::Init();
-
 }
 
 ObjectBase::~ObjectBase()

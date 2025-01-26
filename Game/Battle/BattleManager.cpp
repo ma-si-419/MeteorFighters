@@ -76,6 +76,7 @@ void BattleManager::Init()
 	m_pCamera->SetPoseCamera();
 	m_poseCameraPos = kStartCameraStartPos;
 	ChangeSituation(BattleSituation::kStart1P);
+
 #ifdef _DEBUG
 	//	m_situation = Situation::kBattle;
 	//	m_updateSituationFunc = &BattleManager::UpdateBattle;

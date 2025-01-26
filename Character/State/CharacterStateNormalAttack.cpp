@@ -256,7 +256,7 @@ void CharacterStateNormalAttack::Update()
 
 				teleportationPos += attackShiftVec.Normalize() * (kPhysicalAttackRadius);
 
-				SetCharacterPos(teleportationPos);			
+				SetCharacterPos(teleportationPos);
 			}
 
 			//ŠÔ‚ÌƒŠƒZƒbƒg
@@ -521,10 +521,16 @@ void CharacterStateNormalAttack::Update()
 					kind == Character::HitReactionKind::kFarBurst ||
 					kind == Character::HitReactionKind::kDownBurst)
 				{
-					m_nextAttackName = kTeleportationAttack;
-					//uŠÔˆÚ“®UŒ‚‚¾‚¯ƒ`ƒƒ[ƒW‚ª‚Å‚«‚È‚¢
-					m_isNextCharge = false;
-					m_isNextAttack = true;
+					//‘O‚ÌUŒ‚‚ª‚Á”ò‚Î‚µUŒ‚‚Å‚ ‚ê‚ÎuŠÔˆÚ“®UŒ‚‚ÉˆÚs‚·‚é
+					if (attackData.attackHitKind == Character::AttackHitKind::kUpBurst ||
+						attackData.attackHitKind == Character::AttackHitKind::kFarBurst ||
+						attackData.attackHitKind == Character::AttackHitKind::kDownBurst)
+					{
+						m_nextAttackName = kTeleportationAttack;
+						//uŠÔˆÚ“®UŒ‚‚¾‚¯ƒ`ƒƒ[ƒW‚ª‚Å‚«‚È‚¢
+						m_isNextCharge = false;
+						m_isNextAttack = true;
+					}
 				}
 				m_attackKey = "Y";
 			}

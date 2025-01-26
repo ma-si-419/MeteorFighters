@@ -9,9 +9,9 @@ public:
 	
 	virtual ~Rock();
 
-	void Init() override;
+	virtual void Init() override;
 
-	void Update() override;
+	virtual void Update() override;
 
 	/// <summary>
 	/// キャラクターの座標とぶつかった場所をセットする

@@ -10,6 +10,7 @@
 #include "Effect.h"
 #include "GameUi.h"
 #include "Game.h"
+#include "ObjectBase.h"
 #include <cmath>
 
 namespace
@@ -83,6 +84,7 @@ GameManagerBase::GameManagerBase(std::shared_ptr<GameCamera> camera, GameManager
 	m_pGameUi = std::make_shared<GameUi>();
 	m_pStage = std::make_shared<Stage>(m_pEffectManager);
 	m_pStage->Init();
+
 }
 
 GameManagerBase::~GameManagerBase()
@@ -274,7 +276,7 @@ void GameManagerBase::ShakeCamera(int time)
 
 void GameManagerBase::ShakeCamera(int time, int power)
 {
-	m_pCamera->ShakeCamera(time,power);
+	m_pCamera->ShakeCamera(time, power);
 }
 
 void GameManagerBase::SwayCamera()
@@ -348,6 +350,12 @@ void GameManagerBase::StartButtonBashing()
 	m_bashingButton = kBashingButtonKind[GetRand(kBashingButtonNum - 1)];
 }
 
+void GameManagerBase::EntryObject(std::shared_ptr<ObjectBase> object)
+{
+	//オブジェクトを登録する
+	m_pObjects.push_back(object);
+}
+
 void GameManagerBase::UpdateCommon()
 {
 	//ボタン連打状態だったら
@@ -359,6 +367,12 @@ void GameManagerBase::UpdateCommon()
 	//ステージの更新を行う
 	m_pStage->Update();
 
+	//オブジェクトの更新を行う
+	for (auto& item : m_pObjects)
+	{
+		item->Update();
+	}
+
 	//攻撃クラスの更新を行う
 	for (auto& item : m_pAttacks)
 	{
@@ -367,20 +381,38 @@ void GameManagerBase::UpdateCommon()
 	}
 
 	//攻撃の削除
-	auto iterator = std::remove_if(m_pAttacks.begin(), m_pAttacks.end(),
-		[](const auto& item)
-		{
-			if (!item->IsExist())
+	{
+		auto iterator = std::remove_if(m_pAttacks.begin(), m_pAttacks.end(),
+			[](const auto& item)
 			{
-				item->Final();
+				if (!item->IsExist())
+				{
+					item->Final();
 
-				return true;
-			}
+					return true;
+				}
 
-	return false;
-		});
-	m_pAttacks.erase(iterator, m_pAttacks.end());
+				return false;
+			});
+		m_pAttacks.erase(iterator, m_pAttacks.end());
+	}
 
+	//オブジェクトの削除
+	{
+		auto iterator = std::remove_if(m_pObjects.begin(), m_pObjects.end(),
+			[](const auto& item)
+			{
+				if (!item->IsExist())
+				{
+					item->Final();
+
+					return true;
+				}
+
+				return false;
+			});
+		m_pObjects.erase(iterator, m_pObjects.end());
+	}
 	//エフェクトの更新
 	m_pEffectManager->Update();
 }
@@ -388,9 +420,15 @@ void GameManagerBase::UpdateCommon()
 void GameManagerBase::DrawCommon()
 {
 
+	//オブジェクトの描画
+	for (auto& item : m_pObjects)
+	{
+		item->Draw();
+	}
+
+	//攻撃の描画
 	for (auto& item : m_pAttacks)
 	{
-		//攻撃の描画
 		item->Draw();
 	}
 

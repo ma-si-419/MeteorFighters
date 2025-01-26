@@ -5,7 +5,7 @@
 #include "CharacterStateJump.h"
 #include "CharacterStateCharge.h"
 #include "CharacterStateNormalAttack.h"
-#include "CharacterStateJump.h"
+#include "CharacterStateGuard.h"
 #include "GameSceneConstant.h"
 #include "TutorialManager.h"
 #include "DxLib.h"
@@ -403,6 +403,16 @@ void CharacterStateMove::Update()
 		//次のStateのポインタ作成
 		auto next = std::make_shared<CharacterStateCharge>(m_pCharacter);
 		//StateをChargeに変更する
+		ChangeState(next);
+		return;
+	}
+
+	//ガード入力がされていたら
+	if (input->IsPress("B"))
+	{
+		//次のStateのポインタ作成
+		auto next = std::make_shared<CharacterStateGuard>(m_pCharacter);
+		//StateをGuardに変更する
 		ChangeState(next);
 		return;
 	}
