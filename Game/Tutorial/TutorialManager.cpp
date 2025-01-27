@@ -12,19 +12,20 @@
 namespace
 {
 	//チュートリアルをクリアする条件
-	const std::vector<TutorialManager::TutorialSuccessKind> kTutorialSuccessTerms[static_cast<int>(TutorialManager::TutorialKind::kTutorialNum)] =
+	const std::map<TutorialManager::TutorialKind, std::vector<TutorialManager::TutorialSuccessKind>> kTutorialSuccessTerms =
 	{
-		{TutorialManager::TutorialSuccessKind::kMove},
-		{TutorialManager::TutorialSuccessKind::kStep},
-		{TutorialManager::TutorialSuccessKind::kJump},
-		{TutorialManager::TutorialSuccessKind::kUp,TutorialManager::TutorialSuccessKind::kDown },
-		{TutorialManager::TutorialSuccessKind::kPhysicalAttack},
-		{TutorialManager::TutorialSuccessKind::kChargePhysicalAttack},
-		{TutorialManager::TutorialSuccessKind::kEnergyCharge},
-		{TutorialManager::TutorialSuccessKind::kEnergyAttack},
-		{TutorialManager::TutorialSuccessKind::kChargeEnergyAttack},
-		{TutorialManager::TutorialSuccessKind::kGuard},
-		{TutorialManager::TutorialSuccessKind::kSpecialAttack}
+
+		{TutorialManager::TutorialKind::kMove,{TutorialManager::TutorialSuccessKind::kMove}},
+		{TutorialManager::TutorialKind::kStep,{TutorialManager::TutorialSuccessKind::kStep}},
+		{TutorialManager::TutorialKind::kSkyMove,{TutorialManager::TutorialSuccessKind::kUp,TutorialManager::TutorialSuccessKind::kDown} },
+		{TutorialManager::TutorialKind::kJump,{TutorialManager::TutorialSuccessKind::kJump}},
+		{TutorialManager::TutorialKind::kPhysicalAttack,{TutorialManager::TutorialSuccessKind::kPhysicalAttack }},
+		{TutorialManager::TutorialKind::kChargePhysicalAttack,{TutorialManager::TutorialSuccessKind::kChargePhysicalAttack }},
+		{TutorialManager::TutorialKind::kEnergyCharge,{TutorialManager::TutorialSuccessKind::kEnergyCharge }},
+		{TutorialManager::TutorialKind::kEnergyAttack,{TutorialManager::TutorialSuccessKind::kEnergyAttack }},
+		{TutorialManager::TutorialKind::kChargeEnergyAttack,{TutorialManager::TutorialSuccessKind::kChargeEnergyAttack }},
+		{TutorialManager::TutorialKind::kGuard,{TutorialManager::TutorialSuccessKind::kGuard }},
+		{TutorialManager::TutorialKind::kSpecialAttack,{TutorialManager::TutorialSuccessKind::kSpecialAttack }}
 	};
 }
 
@@ -48,12 +49,12 @@ void TutorialManager::Init()
 {
 	//カメラの初期化
 	m_pCamera->SetBattleCamera();
-	
+
 	//チュートリアルUIの初期化
 	m_pTutorialUi->Init();
 
 	//situationの変更
-	ChangeSituation(TutorialSituation::kMenu);
+	ChangeSituation(TutorialSituation::kStart);
 }
 
 void TutorialManager::Update()
@@ -161,6 +162,10 @@ void TutorialManager::UpdateStart()
 	{
 		ChangeSituation(TutorialSituation::kPlaying);
 	}
+
+	//カメラの更新を行う
+	m_pCamera->Update();
+
 }
 
 void TutorialManager::UpdatePlaying()
@@ -175,7 +180,7 @@ void TutorialManager::UpdatePlaying()
 	//チュートリアルが成功したかどうか
 	bool isSuccess = true;
 
-	auto& terms = kTutorialSuccessTerms[static_cast<int>(m_nowTutorial)];
+	auto& terms = kTutorialSuccessTerms.at(m_nowTutorial);
 
 	for (auto item : terms)
 	{
@@ -196,6 +201,9 @@ void TutorialManager::UpdatePlaying()
 		ChangeSituation(TutorialSituation::kSuccess);
 	}
 
+	//カメラの更新を行う
+	m_pCamera->Update();
+
 }
 
 void TutorialManager::UpdateSuccess()
@@ -212,6 +220,9 @@ void TutorialManager::UpdateSuccess()
 
 		ChangeSituation(TutorialSituation::kStart);
 	}
+
+	//カメラの更新を行う
+	m_pCamera->Update();
 }
 
 void TutorialManager::DrawMenu()

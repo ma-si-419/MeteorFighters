@@ -94,7 +94,8 @@ Character::Character(ObjectTag tag, CharacterKind kind) :
 	m_isEndAnimationBlend(true),
 	m_isEndAnim(false),
 	m_modelPath("empty"),
-	m_nowHitReaction(Character::HitReactionKind::kNone)
+	m_nowHitReaction(Character::HitReactionKind::kNone),
+	m_isDrawCharacter(true)
 {
 	auto sphereData = std::dynamic_pointer_cast<SphereColliderData>(m_pColData);
 
@@ -106,7 +107,7 @@ Character::Character(ObjectTag tag, CharacterKind kind) :
 
 	SetNormalAttackData(data);
 
-	m_playAnimKind = AnimKind::kSkyIdle;
+	m_playAnimKind = AnimKind::kIdle;
 }
 
 Character::~Character()
@@ -123,7 +124,7 @@ void Character::Init()
 	}
 	else if (m_playerNumber == Character::PlayerNumber::kTwoPlayer)
 	{
-		m_input = MyEngine::Input::GetInstance().GetInputData(0);
+		m_input = MyEngine::Input::GetInstance().GetInputData(1);
 
 		m_pEnemyInput = std::make_shared<EnemyInput>(m_input);
 
@@ -245,50 +246,11 @@ void Character::Draw()
 		//モデルの描画
 		MV1DrawModel(m_modelHandle);
 	}
-
-#ifdef _DEBUG	
-
-
-	//プレイヤーの前方向の座標
-	MyEngine::Vector3 frontPos = GetFrontPos();
-
-	//プレイヤーの前方向を球で表示
-	DrawSphere3D(frontPos.CastVECTOR(), 2.0f, 10, GetColor(255, 0, 0), GetColor(255, 0, 0), true);
-
-	//2Pだったら
-	if (m_playerNumber == PlayerNumber::kTwoPlayer)
-	{
-		if (IsFrontTarget())
-		{
-			printfDx("2Pの前方向に1Pがいる\n");
-		}
-		else
-		{
-			printfDx("2Pの前方向に1Pがいない\n");
-		}
-	}
-	
-
-#endif
-
 }
 
 void Character::OnCollide(std::shared_ptr<Collidable> collider)
 {
 	m_pState->OnCollide(collider);
-
-#ifdef _DEBUG
-
-	if (m_playerNumber == PlayerNumber::kOnePlayer)
-	{
-		DrawString(0, 64, "1Pがなにかとぶつかった", GetColor(255, 255, 255));
-	}
-	else
-	{
-		DrawString(0, 80, "2Pがなにかとぶつかった", GetColor(255, 255, 255));
-	}
-
-#endif // _DEBUG
 }
 
 void Character::Final()

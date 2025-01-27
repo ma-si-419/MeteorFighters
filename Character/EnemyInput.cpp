@@ -236,7 +236,7 @@ void EnemyInput::Update()
 					ChangeAction(action);
 
 					///////////////////////////////////
-					m_actionFunc = &EnemyInput::Guard;
+//					m_actionFunc = &EnemyInput::Guard;
 					///////////////////////////////////
 
 					//ループから抜ける
@@ -257,10 +257,10 @@ void EnemyInput::Update()
 	if (m_pManager->GetGameKind() == GameManagerBase::GameKind::kBattle)
 	{
 		//移動処理
-//		(this->*m_moveFunc)();
+		(this->*m_moveFunc)();
 
 		//アクション処理
-//		(this->*m_actionFunc)();
+		(this->*m_actionFunc)();
 	}
 }
 

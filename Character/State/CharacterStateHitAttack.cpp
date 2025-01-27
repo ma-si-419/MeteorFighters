@@ -20,6 +20,7 @@ namespace
 		{Character::HitReactionKind::kUpBurst,2.0f},
 		{Character::HitReactionKind::kFarBurst,2.0f},
 		{Character::HitReactionKind::kDownBurst,2.0f},
+		{Character::HitReactionKind::kWeakBurst,1.8f},
 		{Character::HitReactionKind::kMiddleStan,0.1f},
 		{Character::HitReactionKind::kBottomStan,0.1f}
 	};
@@ -34,6 +35,7 @@ namespace
 		{Character::HitReactionKind::kUpBurst,Character::AnimKind::kFrontBurst},
 		{Character::HitReactionKind::kDownBurst,Character::AnimKind::kFrontBurst},
 		{Character::HitReactionKind::kFarBurst,Character::AnimKind::kFrontBurst},
+		{Character::HitReactionKind::kWeakBurst,Character::AnimKind::kFrontBurst},
 		{Character::HitReactionKind::kBottomStan,Character::AnimKind::kBottomStan},
 		{Character::HitReactionKind::kMiddleStan,Character::AnimKind::kFrontMiddleStan}
 	};
@@ -48,6 +50,7 @@ namespace
 		{Character::HitReactionKind::kUpBurst,Character::AnimKind::kBackBurst},
 		{Character::HitReactionKind::kDownBurst,Character::AnimKind::kBackBurst},
 		{Character::HitReactionKind::kFarBurst,Character::AnimKind::kBackBurst},
+		{Character::HitReactionKind::kWeakBurst,Character::AnimKind::kBackBurst},
 		{Character::HitReactionKind::kBottomStan,Character::AnimKind::kBottomStan},
 		{Character::HitReactionKind::kMiddleStan,Character::AnimKind::kBackMiddleStan}
 	};
@@ -161,7 +164,9 @@ void CharacterStateHitAttack::Update()
 		//吹っ飛び中は重力をかける
 		if (m_pCharacter->GetHitReaction() == Character::HitReactionKind::kUpBurst ||
 			m_pCharacter->GetHitReaction() == Character::HitReactionKind::kDownBurst ||
-			m_pCharacter->GetHitReaction() == Character::HitReactionKind::kFarBurst)
+			m_pCharacter->GetHitReaction() == Character::HitReactionKind::kFarBurst ||
+			m_pCharacter->GetHitReaction() == Character::HitReactionKind::kWeakBurst ||
+			m_pCharacter->GetHitReaction() == Character::HitReactionKind::kWeakUpBurst)
 		{
 			m_moveVec.y -= kBurstGravity;
 		}
@@ -197,7 +202,6 @@ void CharacterStateHitAttack::Update()
 			m_isStageBump = false;
 		}
 	}
-
 
 	//吹っ飛び状態であれば
 	if (m_pCharacter->GetHitReaction() == Character::HitReactionKind::kUpBurst ||
@@ -299,12 +303,42 @@ void CharacterStateHitAttack::Update()
 		{
 			//次の状態をアイドル状態に設定する
 			std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
-		
+
 			//受け身アニメを再生する
-			next->SetEndAnim(static_cast<int>(Character::AnimKind::kBottomStan), kFallsStopTime,kFallsBlendSpeed);
-			
+			next->SetEndAnim(static_cast<int>(Character::AnimKind::kBottomStan), kFallsStopTime, kFallsBlendSpeed);
+
 			m_pCharacter->SetAnimPlaySpeed(kFallsPlaySpeed);
 
+			//アイドル状態に遷移する
+			ChangeState(next);
+
+			return;
+		}
+	}
+	//弱吹っ飛びであれば
+	else if (m_pCharacter->GetHitReaction() == Character::HitReactionKind::kWeakUpBurst ||
+		m_pCharacter->GetHitReaction() == Character::HitReactionKind::kWeakBurst)
+	{
+
+		//設定した時間たって受け身ボタンが押されたら
+		if (m_time >= static_cast<float>(m_stopTime * kStopTimeRate) &&
+			input->IsTrigger("B"))
+		{
+			//次の状態をアイドル状態に設定する
+			std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
+			//受け身アニメを再生する
+			next->SetEndAnim(static_cast<int>(Character::AnimKind::kFrontBurst), kFallsStopTime, kFallsBlendSpeed);
+			m_pCharacter->SetAnimPlaySpeed(kFallsPlaySpeed);
+			//アイドル状態に遷移する
+			ChangeState(next);
+			return;
+		}
+
+		//設定した時間たったら
+		if (m_time >= m_stopTime)
+		{
+			//次の状態をアイドル状態に設定する
+			std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 			//アイドル状態に遷移する
 			ChangeState(next);
 
@@ -326,8 +360,10 @@ void CharacterStateHitAttack::Update()
 		}
 	}
 
+	//移動した距離を保存する
 	m_moveLength += m_moveVec.Length();
 
+	//キャラクターの移動ベクトルを設定する
 	SetCharacterVelo(m_moveVec);
 
 
@@ -339,6 +375,8 @@ void CharacterStateHitAttack::Exit()
 
 void CharacterStateHitAttack::HitAttack(int kind)
 {
+	//時間を初期化する
+	m_time = 0;
 
 	Character::HitReactionKind reaction = static_cast<Character::HitReactionKind>(kind);
 
@@ -350,8 +388,6 @@ void CharacterStateHitAttack::HitAttack(int kind)
 		hitAttackKinds[item]++;
 	}
 
-	//現在のやられ状態を設定する
-	m_pCharacter->SetHitReaction(reaction);
 	//動く方向を設定する
 	MyEngine::Vector3 moveDir;
 	//攻撃されたキャラクターの座標を中心としたローカル座標を作成する
@@ -360,6 +396,29 @@ void CharacterStateHitAttack::HitAttack(int kind)
 	//ローカル座標の前方向を攻撃したものから攻撃されたものに向ける
 	MyEngine::Vector3 centerFrontPos = (m_pCharacter->GetPos() - m_pManager->GetTargetPos(m_pCharacter)).Normalize() + m_pCharacter->GetPos();
 	local.SetFrontPos(centerFrontPos);
+
+	//コンボとやられ状態の確認
+	
+	//下段スタン攻撃
+	if (reaction == Character::HitReactionKind::kBottomStan)
+	{
+		//二度受けていたら
+		if (hitAttackKinds[static_cast<int>(kind)] > 0)
+		{
+			//やられ状態を変化させる
+			reaction = Character::HitReactionKind::kWeakBurst;
+		}
+	}
+	//中段スタン攻撃
+	else if (reaction == Character::HitReactionKind::kMiddleStan)
+	{
+		//二度受けていたら
+		if (hitAttackKinds[static_cast<int>(kind)] > 0)
+		{
+			//やられ状態を変化させる
+			reaction = Character::HitReactionKind::kWeakBurst;
+		}
+	}
 
 
 	//上方向に吹っ飛ばすもの
@@ -385,39 +444,6 @@ void CharacterStateHitAttack::HitAttack(int kind)
 
 	//やられ状態によって移動速度を変更する
 	m_moveVec = moveDir * kMoveSpeedMap.at(reaction);
-
-	//コンボとやられ状態の確認
-
-	//軽い吹き飛ばし攻撃
-	if (reaction == Character::HitReactionKind::kMiddle)
-	{
-		//二度受けていたら
-		if (hitAttackKinds[static_cast<int>(kind)] > 0)
-		{
-			//やられ状態を変化させる
-		}
-
-	}
-	//下段スタン攻撃
-	else if (reaction == Character::HitReactionKind::kBottomStan)
-	{
-		//二度受けていたら
-		if (hitAttackKinds[static_cast<int>(kind)] > 0)
-		{
-			//やられ状態を変化させる
-
-		}
-	}
-	//中段スタン攻撃
-	else if (reaction == Character::HitReactionKind::kMiddleStan)
-	{
-		//二度受けていたら
-		if (hitAttackKinds[static_cast<int>(kind)] > 0)
-		{
-			//やられ状態を変化させる
-
-		}
-	}
 
 	//前方から殴られたかどうかを取得する
 	m_isFrontHit = m_pCharacter->IsFrontTarget();
@@ -456,6 +482,9 @@ void CharacterStateHitAttack::HitAttack(int kind)
 
 		m_pCharacter->SetFrontPos(frontPos);
 	}
+
+	//現在のやられ状態を設定する
+	m_pCharacter->SetHitReaction(reaction);
 
 	//今まで受けた攻撃を保存しておく
 	m_hitReactions.push_back(kind);

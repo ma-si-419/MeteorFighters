@@ -13,6 +13,7 @@ public:
 		kDash,
 		kDashEnd,
 		kEnergy,
+		kBigEnergy,
 		kGuardHit,
 		kLowHit,
 		kMiddleHit,

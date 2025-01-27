@@ -47,4 +47,6 @@ Icon0,SelectIcon0,Select
 Icon1,SelectIcon1,Select
 IconRandom,SelectIconRandom,Select
 Vs,SelectVs,Select
-IconFrame,SelectIconFrame,Select
+IconFrame1P,SelectIconFrame1P,Select
+IconFrame2P,SelectIconFrame2P,Select
+IconFrameBoth,SelectIconFrameBoth,Select

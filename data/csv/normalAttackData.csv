@@ -20,6 +20,6 @@ LegSweep,5,38,9,24,1,0,0,‰ºƒXƒ^ƒ“,1,Low1,–³,LegSweepAttack,1.25,None
 UpCharge,5,38,11,24,4,0,0,ã‚Á”ò‚Ñ,1,None,–³,UpChargeAttack,1.25,None
 MiddleCharge,5,38,11,24,4,0,0,‰œ‚Á”ò‚Ñ,1,None,–³,MiddleChargeAttack,1.25,None
 DownCharge,5,38,11,24,4,0,0,‰º‚Á”ò‚Ñ,1,None,–³,DownChargeAttack,1.25,None
-EnergyCharge,3,38,19,24,0,5,0,’†,0,None,–³,EnergyChargeAttack,1.25,None
+EnergyCharge,7,38,19,24,0,5,0,’†,0,None,–³,EnergyChargeAttack,1.25,BigEnergy
 DashAttack,5,38,11,24,2,0,0,ã,1,Low1,–³,DashAttack,1.25,None
 ButtonBashingAttack,50,1,1,1,0,0,0,‰œ‚Á”ò‚Ñ,1,None,–³,None,1.25,None

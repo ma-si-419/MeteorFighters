@@ -61,13 +61,30 @@ void CharacterStateIdle::Update()
 	if (m_time > m_endAnimTime)
 	{
 		m_isPlayEndAnim = false;
-		//アイドルアニメーションでなければ
-		if (m_pCharacter->GetPlayAnimKind() != Character::AnimKind::kIdle)
+
+		//地上にいる場合
+		if (m_pCharacter->IsGround())
 		{
-			//アイドルアニメーションに変える
-			m_pCharacter->ChangeAnim(Character::AnimKind::kIdle, true);
-			//一応再生速度をリセットしておく
-			m_pCharacter->SetAnimPlaySpeed();
+			//地上待機アニメーションでなければ
+			if (m_pCharacter->GetPlayAnimKind() != Character::AnimKind::kIdle)
+			{
+				//地上待機アニメーションに変える
+				m_pCharacter->ChangeAnim(Character::AnimKind::kIdle, true);
+				//一応再生速度をリセットしておく
+				m_pCharacter->SetAnimPlaySpeed();
+			}
+		}
+		//空中にいる場合
+		else
+		{
+			//アニメーションが空中待機でなければ
+			if (m_pCharacter->GetPlayAnimKind() != Character::AnimKind::kSkyIdle)
+			{
+				//空中待機アニメーションに変更
+				m_pCharacter->ChangeAnim(Character::AnimKind::kSkyIdle, true);
+				//一応再生速度をリセットしておく
+				m_pCharacter->SetAnimPlaySpeed();
+			}
 		}
 	}
 

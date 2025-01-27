@@ -515,8 +515,6 @@ void GameManagerBase::UpdateButtonBashing()
 
 		MyEngine::Vector3 cameraPos = moveVec + kButtonBashingCameraTargetPos;
 
-		printfDx("%.3f\n", moveVec.Length());
-
 		m_pCamera->SetCenterAndTarget(cameraPos, kButtonBashingCameraTargetPos);
 	}
 

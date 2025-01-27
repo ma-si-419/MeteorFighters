@@ -2,6 +2,13 @@
 #include <map>
 class SelectUi
 {
+public:
+	enum class UiSituation
+	{
+		kSelect1P,
+		kSelect2P
+	};
+
 private:
 	enum class GraphName
 	{
@@ -12,7 +19,9 @@ private:
 		kIcon0,
 		kIcon1,
 		kIcon2,
-		kIconFrame,
+		kIconFrame1P,
+		kIconFrame2P,
+		kIconFrameBoth,
 		kHeadSet,
 		kVs
 	};
@@ -48,15 +57,27 @@ public:
 	/// どのアイコンを選択しているかを設定する
 	/// </summary>
 	/// <param name="number">選択しているアイコン</param>
-	void SetIconFrame(int number);
+	/// <param name="isPlayer">1P側ならtrue</param>
+	void SetIconFrame(int number,bool isPlayer);
 
 	/// <summary>
-	/// 選択しているアイコンを示すフレームを描画するかどうかを設定する
+	/// 現在の状況を設定する
 	/// </summary>
-	/// <param name="flag">描画するならtrue</param>
-	void SetDrawIconFrame(bool flag);
+	/// <param name="situation">次の状況</param>
+	void ChangeSituation(UiSituation situation);
 
 private:
+
+	void Update1P();
+
+	void Update2P();
+
+private:
+
+	using UpdateFunc = void (SelectUi::*)();
+
+	//更新関数
+	UpdateFunc m_updateFunc;
 
 	std::map<GraphName,GraphData> m_drawGraphs;
 
@@ -77,5 +98,8 @@ private:
 
 	//選択しているアイコンのフレームの拡縮のための変数
 	float m_iconFrameScalling;
+
+	//現在の状況
+	UiSituation m_situation;
 };
 

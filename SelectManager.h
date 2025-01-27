@@ -48,8 +48,6 @@ private:
 
 	void SelectTwoPlayer();
 
-	void ConfirmCharacter();
-
 private:
 
 	using UpdateSelectFunc = void (SelectManager::*)();

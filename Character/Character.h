@@ -44,6 +44,7 @@ public:
 		kUpBurst,//上吹っ飛び
 		kDownBurst,//下吹っ飛び
 		kFarBurst,//奥吹っ飛び
+		kWeakBurst,//弱吹っ飛び
 		kBottomStan,//下段スタン
 		kMiddleStan,//中段スタン
 		kGuard,//ガード状態

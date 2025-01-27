@@ -51,11 +51,17 @@ void SceneTutorial::Init()
 	m_pGameManager->AddLoadModel("Player2");
 	m_pGameManager->AddLoadModel("Stage");
 	m_pGameManager->AddLoadModel("SkyDome");
+	m_pGameManager->AddLoadModel("Rock1");
+	m_pGameManager->AddLoadModel("Rock2");
+	m_pGameManager->AddLoadModel("Rock3");
 
 	loadManager.LoadHandle("Player1", m_pCharacters[0]->GetModelPath(), LoadManager::FileKind::kModel);
 	loadManager.LoadHandle("Player2", m_pCharacters[1]->GetModelPath(), LoadManager::FileKind::kModel);
 	loadManager.LoadHandle("Stage", m_pGameManager->GetStagePath(), LoadManager::FileKind::kModel);
 	loadManager.LoadHandle("SkyDome", m_pGameManager->GetSkyDomePath(), LoadManager::FileKind::kModel);
+	loadManager.LoadHandle("Rock1", "data/model/Rock1.mv1", LoadManager::FileKind::kModel);
+	loadManager.LoadHandle("Rock2", "data/model/Rock2.mv1", LoadManager::FileKind::kModel);
+	loadManager.LoadHandle("Rock3", "data/model/Rock3.mv1", LoadManager::FileKind::kModel);
 
 }
 

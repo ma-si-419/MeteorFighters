@@ -69,10 +69,11 @@ namespace
 		{Character::HitReactionKind::kGuard,10},
 		{Character::HitReactionKind::kLow,40},
 		{Character::HitReactionKind::kMiddle,40},
-		{Character::HitReactionKind::kWeakUpBurst,60},
+		{Character::HitReactionKind::kWeakUpBurst,30},
 		{Character::HitReactionKind::kUpBurst,110},
 		{Character::HitReactionKind::kFarBurst,110},
 		{Character::HitReactionKind::kDownBurst,110},
+		{Character::HitReactionKind::kWeakBurst,30},
 		{Character::HitReactionKind::kMiddleStan,60},
 		{Character::HitReactionKind::kBottomStan,60}
 	};
@@ -329,16 +330,31 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 		return;
 	}
 
-	//‚±‚±‚Ü‚Å—ˆ‚½‚çƒqƒbƒgƒAƒ^ƒbƒNó‘Ô‚É‘JˆÚ‚·‚é
-	std::shared_ptr<CharacterStateHitAttack> nextState = std::make_shared<CharacterStateHitAttack>(m_pCharacter);
+	//¡‚Ìó‘Ô‚ªUŒ‚‚ğó‚¯‚½ó‘Ô‚Å‚È‚¢‚È‚ç‚Î
+	if (m_kind != CharacterStateKind::kHitAttack)
+	{
+		//‚±‚±‚Ü‚Å—ˆ‚½‚çƒqƒbƒgƒAƒ^ƒbƒNó‘Ô‚É‘JˆÚ‚·‚é
+		std::shared_ptr<CharacterStateHitAttack> nextState = std::make_shared<CharacterStateHitAttack>(m_pCharacter);
 
-	//“®‚¯‚È‚¢ŠÔ‚ğİ’è‚·‚é
-	nextState->SetStopTime(kDownTimeMap.at(hitReaction));
+		//“®‚¯‚È‚¢ŠÔ‚ğİ’è‚·‚é
+		nextState->SetStopTime(kDownTimeMap.at(hitReaction));
 
-	//UŒ‚‚ğó‚¯‚½‚Ìó‘Ô‚ğİ’è‚·‚é
-	nextState->HitAttack(static_cast<int>(hitReaction));
+		//UŒ‚‚ğó‚¯‚½‚Ìó‘Ô‚ğİ’è‚·‚é
+		nextState->HitAttack(static_cast<int>(hitReaction));
 
-	ChangeState(nextState);
+		ChangeState(nextState);
+	}
+	else
+	{
+		auto nowState = std::dynamic_pointer_cast<CharacterStateHitAttack>(m_pCharacter->m_pState);
+
+		//“®‚¯‚È‚¢ŠÔ‚ğİ’è‚·‚é
+		nowState->SetStopTime(kDownTimeMap.at(hitReaction));
+
+		nowState->HitAttack(static_cast<int>(hitReaction));
+
+		return;
+	}
 }
 
 void CharacterStateBase::SuccessTutorial(int tutorialNumber)
@@ -561,5 +577,5 @@ int CharacterStateBase::GetNextHitReactionKind(std::shared_ptr<Attack> attack)
 	//‚½‚Ô‚ñ‚±‚±‚Ü‚Å—ˆ‚È‚¢‚Í‚¸‚¾‚¯‚Çˆê‰
 	//Œx‚¯‚µ‚Ì‚½‚ß‚É•Ô‚è’l‚ğİ’è‚µ‚Ä‚¨‚­
 	return static_cast<int>(kHitKindMap.at(status.attackHitKind));
-	
+
 }

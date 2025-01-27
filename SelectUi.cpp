@@ -52,9 +52,9 @@ namespace
 
 SelectUi::SelectUi() :
 	m_lastPlayerNumber(0),
-	m_lastEnemyNumber(0),
+	m_lastEnemyNumber(static_cast<int>(SelectManager::CharacterNumber::kBlueHead)),
 	m_playerNumber(0),
-	m_enemyNumber(0),
+	m_enemyNumber(static_cast<int>(SelectManager::CharacterNumber::kBlueHead)),
 	m_skyDomeHandle(-1),
 	m_iconFrameScalling(0.0f)
 {
@@ -79,6 +79,10 @@ void SelectUi::Init()
 	//スカイドームの設定
 	MV1SetPosition(m_skyDomeHandle, VGet(0, 0, 0));
 
+	//更新関数の設定
+	m_updateFunc = &SelectUi::Update1P;
+
+	//グラフマネージャー
 	auto& graphManager = GraphManager::GetInstance();
 
 	//プレイヤーの画像設定
@@ -122,12 +126,30 @@ void SelectUi::Init()
 	icon.handle = graphManager.GetHandle("Icon1");
 	m_drawGraphs[GraphName::kIcon2] = icon;
 
-	//選択しているアイコンのフレーム
-	GraphData iconFrame;
-	iconFrame.posX = kIconPosX;
-	iconFrame.posY = kIconPosY;
-	iconFrame.handle = graphManager.GetHandle("IconFrame");
-	m_drawGraphs[GraphName::kIconFrame] = iconFrame;
+	//選択している1Pのアイコンのフレーム
+	GraphData iconFrame1P;
+	iconFrame1P.posX = kIconPosX;
+	iconFrame1P.posY = kIconPosY;
+	iconFrame1P.handle = graphManager.GetHandle("IconFrame1P");
+	m_drawGraphs[GraphName::kIconFrame1P] = iconFrame1P;
+
+	//選択している2Pのアイコンのフレーム
+	GraphData iconFrame2P;
+	iconFrame2P.posX = kIconPosX;
+	iconFrame2P.posY = kIconPosY;
+	iconFrame2P.handle = graphManager.GetHandle("IconFrame2P");
+	//アルファ値を0にして非表示にする
+	iconFrame2P.alpha = 0;
+	m_drawGraphs[GraphName::kIconFrame2P] = iconFrame2P;
+
+	//どちらもが選択しているアイコンのフレームは非表示
+	GraphData iconFrameBoth;
+	iconFrameBoth.posX = kIconPosX;
+	iconFrameBoth.posY = kIconPosY;
+	iconFrameBoth.handle = graphManager.GetHandle("IconFrameBoth");
+	//アルファ値を0にして非表示にする
+	iconFrameBoth.alpha = 0;
+	m_drawGraphs[GraphName::kIconFrameBoth] = iconFrameBoth;
 
 	//HeadSetの画像設定
 	GraphData headSet;
@@ -147,30 +169,7 @@ void SelectUi::Init()
 
 void SelectUi::Update()
 {
-	auto& graphManager = GraphManager::GetInstance();
-
-	//前のフレーム選んでいた画像を徐々にフェードアウトさせる
-	m_drawGraphs[GraphName::kLastPlayer].posX -= kLastCharacterGraphMoveSpeed;
-	m_drawGraphs[GraphName::kLastPlayer].alpha -= kLastCharacterGraphFadeSpeed;
-	m_drawGraphs[GraphName::kLastEnemy].posX -= kLastCharacterGraphMoveSpeed;
-	m_drawGraphs[GraphName::kLastEnemy].alpha -= kLastCharacterGraphFadeSpeed;
-
-	//現在選んでいる画像をフェードインさせる
-	m_drawGraphs[GraphName::kPlayer].posX -= kLastCharacterGraphMoveSpeed;
-	m_drawGraphs[GraphName::kPlayer].posX = max(m_drawGraphs[GraphName::kPlayer].posX, kPlayerCharacterPosX);
-
-	m_drawGraphs[GraphName::kPlayer].alpha += kLastCharacterGraphFadeSpeed;
-
-	//2P側
-	m_drawGraphs[GraphName::kEnemy].posX = kLastCharacterGraphMoveSpeed;
-	m_drawGraphs[GraphName::kEnemy].posX = max(m_drawGraphs[GraphName::kEnemy].posX, kEnemyCharacterPosX);
-
-	m_drawGraphs[GraphName::kEnemy].alpha += kLastCharacterGraphFadeSpeed;
-
-	//選択しているアイコンのフレームを拡縮させる
-	m_iconFrameScalling += kIconFrameScallingSpeed;
-	m_drawGraphs[GraphName::kIconFrame].scale = (sinf(m_iconFrameScalling) * kIconFrameAddScaleMax) + 1.0f;
-
+	(this->*m_updateFunc)();
 }
 
 void SelectUi::Draw()
@@ -246,19 +245,112 @@ void SelectUi::SetNumber(int number, bool isPlayer)
 	}
 }
 
-void SelectUi::SetIconFrame(int number)
+void SelectUi::SetIconFrame(int number, bool isPlayer)
 {
-	m_drawGraphs[GraphName::kIconFrame].posX = kIconPosX + (kIconDistance * number);
-}
-
-void SelectUi::SetDrawIconFrame(bool flag)
-{
-	if (flag)
+	if (isPlayer)
 	{
-		m_drawGraphs[GraphName::kIconFrame].alpha = 255;
+		m_drawGraphs[GraphName::kIconFrame1P].posX = kIconPosX + (kIconDistance * number);
 	}
 	else
 	{
-		m_drawGraphs[GraphName::kIconFrame].alpha = 0;
+		m_drawGraphs[GraphName::kIconFrame2P].posX = kIconPosX + (kIconDistance * number);
+	}
+}
+
+void SelectUi::ChangeSituation(UiSituation situation)
+{
+	switch (situation)
+	{
+	case UiSituation::kSelect1P:
+
+		//1Pのアイコンのフレームを表示する
+		m_drawGraphs[GraphName::kIconFrame1P].alpha = 255;
+
+		//2Pのアイコンのフレームを非表示にする
+		m_drawGraphs[GraphName::kIconFrame2P].alpha = 0;
+
+		//どちらとも選択しているアイコンのフレームを非表示にする
+		m_drawGraphs[GraphName::kIconFrameBoth].alpha = 0;
+
+		m_updateFunc = &SelectUi::Update1P;
+		break;
+	case UiSituation::kSelect2P:
+
+		//2Pのアイコンのフレームを表示する
+		m_drawGraphs[GraphName::kIconFrame2P].alpha = 255;
+
+		m_updateFunc = &SelectUi::Update2P;
+		break;
+	}
+}
+
+void SelectUi::Update1P()
+{
+	auto& graphManager = GraphManager::GetInstance();
+
+	//前のフレーム選んでいた画像を徐々にフェードアウトさせる
+	m_drawGraphs[GraphName::kLastPlayer].posX -= kLastCharacterGraphMoveSpeed;
+	m_drawGraphs[GraphName::kLastPlayer].alpha -= kLastCharacterGraphFadeSpeed;
+
+	//現在選んでいる画像をフェードインさせる
+	m_drawGraphs[GraphName::kPlayer].posX -= kLastCharacterGraphMoveSpeed;
+	m_drawGraphs[GraphName::kPlayer].posX = max(m_drawGraphs[GraphName::kPlayer].posX, kPlayerCharacterPosX);
+
+	m_drawGraphs[GraphName::kPlayer].alpha += kLastCharacterGraphFadeSpeed;
+
+	//前のフレーム選んでいた画像を徐々にフェードアウトさせる
+	m_drawGraphs[GraphName::kLastEnemy].posX -= kLastCharacterGraphMoveSpeed;
+	m_drawGraphs[GraphName::kLastEnemy].alpha -= kLastCharacterGraphFadeSpeed;
+	//現在選んでいる画像をフェードインさせる
+	m_drawGraphs[GraphName::kEnemy].posX -= kLastCharacterGraphMoveSpeed;
+	m_drawGraphs[GraphName::kEnemy].posX = max(m_drawGraphs[GraphName::kEnemy].posX, kEnemyCharacterPosX);
+	m_drawGraphs[GraphName::kEnemy].alpha += kLastCharacterGraphFadeSpeed;
+
+	//選択しているアイコンのフレームを拡縮させる
+	m_iconFrameScalling += kIconFrameScallingSpeed;
+	m_drawGraphs[GraphName::kIconFrame1P].scale = (sinf(m_iconFrameScalling) * kIconFrameAddScaleMax) + 1.0f;
+}
+
+void SelectUi::Update2P()
+{
+	auto& graphManager = GraphManager::GetInstance();
+
+	//前のフレーム選んでいた画像を徐々にフェードアウトさせる
+	m_drawGraphs[GraphName::kLastPlayer].posX -= kLastCharacterGraphMoveSpeed;
+	m_drawGraphs[GraphName::kLastPlayer].alpha -= kLastCharacterGraphFadeSpeed;
+
+	//現在選んでいる画像をフェードインさせる
+	m_drawGraphs[GraphName::kPlayer].posX -= kLastCharacterGraphMoveSpeed;
+	m_drawGraphs[GraphName::kPlayer].posX = max(m_drawGraphs[GraphName::kPlayer].posX, kPlayerCharacterPosX);
+
+	m_drawGraphs[GraphName::kPlayer].alpha += kLastCharacterGraphFadeSpeed;
+
+	//前のフレーム選んでいた画像を徐々にフェードアウトさせる
+	m_drawGraphs[GraphName::kLastEnemy].posX -= kLastCharacterGraphMoveSpeed;
+	m_drawGraphs[GraphName::kLastEnemy].alpha -= kLastCharacterGraphFadeSpeed;
+	//現在選んでいる画像をフェードインさせる
+	m_drawGraphs[GraphName::kEnemy].posX -= kLastCharacterGraphMoveSpeed;
+	m_drawGraphs[GraphName::kEnemy].posX = max(m_drawGraphs[GraphName::kEnemy].posX, kEnemyCharacterPosX);
+	m_drawGraphs[GraphName::kEnemy].alpha += kLastCharacterGraphFadeSpeed;
+	//選択しているアイコンのフレームを拡縮させる
+	m_iconFrameScalling += kIconFrameScallingSpeed;
+	m_drawGraphs[GraphName::kIconFrame2P].scale = (sinf(m_iconFrameScalling) * kIconFrameAddScaleMax) + 1.0f;
+
+	//もし選択が被っていたら
+	if (m_playerNumber == m_enemyNumber)
+	{
+		m_drawGraphs[GraphName::kIconFrameBoth].alpha = 255;
+		m_drawGraphs[GraphName::kIconFrameBoth].posX = kIconPosX + (kIconDistance * m_playerNumber);
+		m_drawGraphs[GraphName::kIconFrameBoth].scale = m_drawGraphs[GraphName::kIconFrame2P].scale;
+		
+		//1Pの表示を消す
+		m_drawGraphs[GraphName::kIconFrame1P].alpha = 0;
+	}
+	else
+	{
+		m_drawGraphs[GraphName::kIconFrameBoth].alpha = 0;
+		//1Pのフレームの拡縮を元に戻す
+		m_drawGraphs[GraphName::kIconFrame1P].scale = 1.0f;
+		m_drawGraphs[GraphName::kIconFrame1P].alpha = 255;
 	}
 }

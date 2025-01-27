@@ -11,6 +11,7 @@ namespace
 		{Effect::EffectKind::kDash,"Dash"},
 		{Effect::EffectKind::kDashEnd,"DashEnd"},
 		{Effect::EffectKind::kEnergy,"Energy"},
+		{Effect::EffectKind::kBigEnergy,"BigEnergy"},
 		{Effect::EffectKind::kGuardHit,"GuardHit"},
 		{Effect::EffectKind::kLowHit,"LowHit"},
 		{Effect::EffectKind::kMiddleHit,"MiddleHit"},

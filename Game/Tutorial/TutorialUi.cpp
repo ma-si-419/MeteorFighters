@@ -365,7 +365,7 @@ void TutorialUi::DrawStart(int number)
 		{
 			MyEngine::Vector2 shift = MyEngine::Vector2(0, static_cast<int>(-GetFontSizeToHandle(m_startFontHandle) * 0.5f));
 
-			shift.y += GetFontSizeToHandle(m_startFontHandle) * i;
+			shift.y += (GetFontSizeToHandle(m_startFontHandle) * 2) * i;
 
 			stringPos += shift;
 

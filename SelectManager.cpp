@@ -18,7 +18,7 @@ namespace
 
 SelectManager::SelectManager() :
 	m_playerNumber(0),
-	m_enemyNumber(0),
+	m_enemyNumber(static_cast<int>(CharacterNumber::kBlueHead)),
 	m_nextScene(-1)
 {
 	m_updateSelectFunc = &SelectManager::SelectOnePlayer;
@@ -82,7 +82,7 @@ void SelectManager::SelectOnePlayer()
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
 	//選択しているアイコンをUiに渡す
-	m_pUi->SetIconFrame(m_playerNumber);
+	m_pUi->SetIconFrame(m_playerNumber,true);
 
 	//キャラクター選択
 	if (input->IsTrigger("Right"))
@@ -103,6 +103,9 @@ void SelectManager::SelectOnePlayer()
 	{
 		SoundManager::GetInstance().OncePlaySound("Ok");
 		m_updateSelectFunc = &SelectManager::SelectTwoPlayer;
+
+		m_pUi->ChangeSituation(SelectUi::UiSituation::kSelect2P);
+
 	}
 	//Bボタンを押したらメニュー選択に戻る
 	else if (input->IsTrigger("B"))
@@ -118,7 +121,7 @@ void SelectManager::SelectTwoPlayer()
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
 	//選択しているアイコンをUiに渡す
-	m_pUi->SetIconFrame(m_enemyNumber);
+	m_pUi->SetIconFrame(m_enemyNumber,false);
 
 	//キャラクターの選択
 	if (input->IsTrigger("Right"))
@@ -134,39 +137,19 @@ void SelectManager::SelectTwoPlayer()
 		m_enemyNumber = max(m_enemyNumber, 0);
 	}
 
-	//Aボタンを押したら確定画面に行く
-	if (input->IsTrigger("A"))
-	{
-		SoundManager::GetInstance().OncePlaySound("Ok");
-		m_updateSelectFunc = &SelectManager::ConfirmCharacter;
-
-		m_pUi->SetDrawIconFrame(false);
-	}
-	//Bボタンを押したら1プレイヤーのキャラクター選択画面に戻る
-	else if (input->IsTrigger("B"))
-	{
-		SoundManager::GetInstance().OncePlaySound("Cancel");
-		m_updateSelectFunc = &SelectManager::SelectOnePlayer;
-	}
-}
-
-void SelectManager::ConfirmCharacter()
-{
-	auto input = MyEngine::Input::GetInstance().GetInputData(0);
-
-	//Aボタンを押したらゲームシーンに移動
+	//Aボタンを押したらゲームシーンに行く
 	if (input->IsTrigger("A"))
 	{
 		SoundManager::GetInstance().OncePlaySound("Confirm");
 
 		m_nextScene = static_cast<int>(Game::Scene::kGame);
 	}
-	//Bボタンを押したら2プレイヤーのキャラクター選択画面に戻る
+	//Bボタンを押したら1プレイヤーのキャラクター選択画面に戻る
 	else if (input->IsTrigger("B"))
 	{
 		SoundManager::GetInstance().OncePlaySound("Cancel");
-		m_updateSelectFunc = &SelectManager::SelectTwoPlayer;
+		m_updateSelectFunc = &SelectManager::SelectOnePlayer;
 
-		m_pUi->SetDrawIconFrame(true);
+		m_pUi->ChangeSituation(SelectUi::UiSituation::kSelect1P);
 	}
 }

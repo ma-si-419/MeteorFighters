@@ -9,15 +9,15 @@ public:
 	{
 		kMove,
 		kStep,
-		kJump,
 		kSkyMove,
+		kJump,
 		kPhysicalAttack,
 		kChargePhysicalAttack,
 		kEnergyCharge,
 		kEnergyAttack,
 		kChargeEnergyAttack,
-		kGuard,
 		kSpecialAttack,
+		kGuard,
 		kTutorialNum
 	};
 
