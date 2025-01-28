@@ -83,7 +83,9 @@ void CharacterStateJump::Update()
 	//ジャンプボタンをもう一度押したら空中に止まる(ステートも変更する)
 	if (input->IsTrigger("RB"))
 	{
-		auto next = std::make_shared<CharacterStateMove>(m_pCharacter);
+		auto next = std::make_shared<CharacterStateIdle>(m_pCharacter);
+
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kSkyIdle));
 
 		ChangeState(next);
 	}

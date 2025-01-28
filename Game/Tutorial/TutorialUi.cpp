@@ -29,7 +29,7 @@ namespace
 	constexpr int kButtonPosY = 745;
 
 	//ボタンを表示する間隔
-	constexpr int kButtonInterval = 80;
+	constexpr int kButtonInterval = 100;
 
 	//メニューが出てくるときのフェードインの速さ
 	constexpr int kMenuFadeSpeed = 20;
@@ -115,9 +115,9 @@ TutorialUi::TutorialUi() :
 {
 	LoadCsv load;
 
-	m_tutorialData = load.LoadFile("data/csv/tutorialData.csv");
+	m_tutorialStartMenuData = load.LoadFile("data/csv/tutorialStartMenuData.csv");
 
-	m_updateFunc = &TutorialUi::UpdateMenu;
+	m_updateFunc = &TutorialUi::UpdatePlayMenu;
 
 	m_startFontHandle = CreateFontToHandle(kFontName, kStartFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, 0, 3);
 	m_playingFontHandle = CreateFontToHandle(kFontName, kPlayingFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, 0, 3);
@@ -144,7 +144,11 @@ void TutorialUi::Final()
 	DeleteFontToHandle(m_menuFontHandle);
 }
 
-void TutorialUi::InitMenu()
+void TutorialUi::InitStartMenu()
+{
+}
+
+void TutorialUi::InitPlayMenu()
 {
 	//登録している画像をすべて消す
 	m_drawGraphs.clear();
@@ -160,7 +164,7 @@ void TutorialUi::InitMenu()
 	m_drawGraphs["Menu"] = menu;
 
 	//アップデートを変更する
-	m_updateFunc = &TutorialUi::UpdateMenu;
+	m_updateFunc = &TutorialUi::UpdatePlayMenu;
 
 	//メニュー画面で選択している項目を示す画像を登録する
 	GraphData selectItemBox;
@@ -210,7 +214,7 @@ void TutorialUi::InitPlaying(int number)
 
 	m_drawGraphs["ButtonFrame"] = frame;
 
-	auto buttonString = m_tutorialData[number][static_cast<int>(TutorialManager::TutorialDataIndex::kButton)];
+	auto buttonString = m_tutorialPlayData[number][static_cast<int>(TutorialManager::TutorialPlayDataIndex::kButton)];
 
 	auto button = stringFunc.Split(buttonString, '/');
 
@@ -231,8 +235,21 @@ void TutorialUi::InitPlaying(int number)
 	else if (m_drawButtonNum % 2 == 0)
 	{
 		//描画開始位置を計算する
-		int posX = kButtonPosX - (kButtonInterval * m_drawButtonNum / 2);
-		posX += kButtonInterval / 2;
+		int startPosX = kButtonPosX - (kButtonInterval * m_drawButtonNum / 2);
+		startPosX += kButtonInterval / 2;
+
+		//描画するボタンを見て
+		for (auto item : button)
+		{
+			//+ボタンの場合は座標をずらす
+			if (item == "+")
+			{
+				startPosX += kButtonInterval / 2;
+			}
+		}
+
+
+		int buttonNum = 0;
 
 		//描画数だけループ
 		for (int i = 0; i < m_drawButtonNum; i++)
@@ -241,19 +258,74 @@ void TutorialUi::InitPlaying(int number)
 
 			buttonData.handle = manager.GetHandle(button[i]);
 
+			int posX = startPosX;
+
+			posX += kButtonInterval * buttonNum;
+
+			//+ボタンの場合は座標をずらす
+			if (button[i] == "+")
+			{
+				posX -= kButtonInterval / 2;
+
+				buttonNum--;
+			}
+
 			buttonData.pos = MyEngine::Vector2(posX, kButtonPosY);
 
 			std::string name = "Button" + std::to_string(i);
 
 			m_drawGraphs[name] = buttonData;
 
-			posX += kButtonInterval;
+			buttonNum++;
 		}
 	}
 	//奇数の場合
 	else
 	{
+		//描画開始位置を計算する
+		int startPosX = kButtonPosX;
 
+		startPosX -= kButtonInterval * ((m_drawButtonNum - 1) / 2);
+
+		//描画するボタンを見て
+		for (auto item : button)
+		{
+			//+ボタンの場合は座標をずらす
+			if (item == "+")
+			{
+				startPosX += kButtonInterval / 2;
+			}
+		}
+
+		int buttonNum = 0;
+
+		//描画数だけループ
+		for (int i = 0; i < m_drawButtonNum; i++)
+		{
+			GraphData buttonData;
+
+			buttonData.handle = manager.GetHandle(button[i]);
+
+			int posX = startPosX;
+
+			posX += kButtonInterval * buttonNum;
+
+			//+ボタンの場合は座標をずらす
+			if (button[i] == "+")
+			{
+				posX -= kButtonInterval / 2;
+
+				buttonNum--;
+			}
+
+			buttonData.pos = MyEngine::Vector2(posX, kButtonPosY);
+
+			std::string name = "Button" + std::to_string(i);
+
+			m_drawGraphs[name] = buttonData;
+
+			buttonNum++;
+		}
 	}
 
 }
@@ -279,7 +351,11 @@ void TutorialUi::InitSuccess()
 
 }
 
-void TutorialUi::DrawMenu()
+void TutorialUi::DrawStartMenu()
+{
+}
+
+void TutorialUi::DrawPlayMenu()
 {
 	GraphData menu = m_drawGraphs["Menu"];
 
@@ -328,7 +404,7 @@ void TutorialUi::DrawMenu()
 
 	//選択しているチュートリアルを表示する
 	MyEngine::Vector2 selectTutorialPos = MyEngine::Vector2(kMenuTutorialNamePosX, kMenuStringPosY + kMenuStringDistanceY);
-	std::string selectTutorialName = m_tutorialData[m_selectTutorialNumber][static_cast<int>(TutorialManager::TutorialDataIndex::kTutorialName)];
+	std::string selectTutorialName = m_tutorialPlayData[m_selectTutorialNumber][static_cast<int>(TutorialManager::TutorialPlayDataIndex::kTutorialName)];
 	DrawStringCenter(selectTutorialName, selectTutorialPos, m_menuFontHandle, GetColor(0, 0, 0), GetColor(255, 255, 255));
 
 	//選択しているチュートリアルの左右の矢印を表示する
@@ -348,7 +424,7 @@ void TutorialUi::DrawStart(int number)
 
 	DrawRotaGraph(static_cast<int>(backBox.pos.x), static_cast<int>(backBox.pos.y), backBox.scale, 0.0, backBox.handle, true);
 
-	std::string startWord = m_tutorialData[number][static_cast<int>(TutorialManager::TutorialDataIndex::kStartString)];
+	std::string startWord = m_tutorialPlayData[number][static_cast<int>(TutorialManager::TutorialPlayDataIndex::kDescription)];
 
 	//TODO : ファイルロードと文字列の便利関数を分けるようにする(リファクタリング)
 	LoadCsv load;
@@ -386,7 +462,7 @@ void TutorialUi::DrawPlaying(int number)
 	DrawRotaGraph(static_cast<int>(frameData.pos.x), static_cast<int>(frameData.pos.y), frameData.scale, 0.0, frameData.handle, true);
 
 	//プレイ中の説明
-	auto playingString = m_tutorialData[number][static_cast<int>(TutorialManager::TutorialDataIndex::kPlayingString)];
+	auto playingString = m_tutorialPlayData[number][static_cast<int>(TutorialManager::TutorialPlayDataIndex::kPlayingString)];
 
 	//プレイ中の説明を描画
 	DrawStringCenter(playingString, MyEngine::Vector2(kPlayingStringPosX, kPlayingStringPosY), m_playingFontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
@@ -410,7 +486,7 @@ void TutorialUi::DrawSuccess(int number)
 	DrawRotaGraph(static_cast<int>(frameData.pos.x), static_cast<int>(frameData.pos.y), frameData.scale, 0.0, frameData.handle, true);
 
 	//プレイ中の説明
-	auto playingString = m_tutorialData[number][static_cast<int>(TutorialManager::TutorialDataIndex::kPlayingString)];
+	auto playingString = m_tutorialPlayData[number][static_cast<int>(TutorialManager::TutorialPlayDataIndex::kPlayingString)];
 
 	//プレイ中の説明を描画
 	DrawStringCenter(playingString, MyEngine::Vector2(kPlayingStringPosX, kPlayingStringPosY), m_playingFontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
@@ -478,7 +554,11 @@ void TutorialUi::DrawStringCenter(std::string string, MyEngine::Vector2 centerPo
 	DrawStringToHandle(static_cast<int>(pos.x), static_cast<int>(pos.y), string.c_str(), color, font, edgeColor);
 }
 
-void TutorialUi::UpdateMenu()
+void TutorialUi::UpdateStartMenu()
+{
+}
+
+void TutorialUi::UpdatePlayMenu()
 {
 	//入力
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);

@@ -9,36 +9,22 @@
 #include "Input.h"
 #include "EnemyInput.h"
 
-namespace
-{
-	//チュートリアルをクリアする条件
-	const std::map<TutorialManager::TutorialKind, std::vector<TutorialManager::TutorialSuccessKind>> kTutorialSuccessTerms =
-	{
-
-		{TutorialManager::TutorialKind::kMove,{TutorialManager::TutorialSuccessKind::kMove}},
-		{TutorialManager::TutorialKind::kStep,{TutorialManager::TutorialSuccessKind::kStep}},
-		{TutorialManager::TutorialKind::kSkyMove,{TutorialManager::TutorialSuccessKind::kUp,TutorialManager::TutorialSuccessKind::kDown} },
-		{TutorialManager::TutorialKind::kJump,{TutorialManager::TutorialSuccessKind::kJump}},
-		{TutorialManager::TutorialKind::kPhysicalAttack,{TutorialManager::TutorialSuccessKind::kPhysicalAttack }},
-		{TutorialManager::TutorialKind::kChargePhysicalAttack,{TutorialManager::TutorialSuccessKind::kChargePhysicalAttack }},
-		{TutorialManager::TutorialKind::kEnergyCharge,{TutorialManager::TutorialSuccessKind::kEnergyCharge }},
-		{TutorialManager::TutorialKind::kEnergyAttack,{TutorialManager::TutorialSuccessKind::kEnergyAttack }},
-		{TutorialManager::TutorialKind::kChargeEnergyAttack,{TutorialManager::TutorialSuccessKind::kChargeEnergyAttack }},
-		{TutorialManager::TutorialKind::kGuard,{TutorialManager::TutorialSuccessKind::kGuard }},
-		{TutorialManager::TutorialKind::kSpecialAttack,{TutorialManager::TutorialSuccessKind::kSpecialAttack }}
-	};
-}
-
 TutorialManager::TutorialManager(std::shared_ptr<GameCamera> camera) :
 	GameManagerBase(camera, GameManagerBase::GameKind::kTutorial),
 	m_nowTutorial(TutorialKind::kMove),
-	m_drawSituationFunc(&TutorialManager::DrawMenu),
-	m_updateSituationFunc(&TutorialManager::UpdateMenu),
-	m_tutorialSituation(TutorialSituation::kMenu)
+	m_drawSituationFunc(&TutorialManager::DrawPlayMenu),
+	m_updateSituationFunc(&TutorialManager::UpdatePlayMenu),
+	m_tutorialSituation(TutorialSituation::kPlayMenu)
 {
 	m_pTutorialUi = std::make_shared<TutorialUi>();
 
 	m_pGameUi = std::make_shared<GameUi>();
+
+	LoadCsv load;
+
+	m_tutorialPlayData = load.LoadFile("data/csv/tutorialPlayData.csv");
+
+	m_pTutorialUi->SetTutorialPlayData(m_tutorialPlayData);
 }
 
 TutorialManager::~TutorialManager()
@@ -111,15 +97,20 @@ void TutorialManager::Final()
 	m_pEffectManager->Final();
 }
 
-void TutorialManager::UpdateMenu()
+void TutorialManager::UpdateStartMenu()
+{
+}
+
+void TutorialManager::UpdatePlayMenu()
 {
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
 	TutorialUi::MenuItem selectItem = m_pTutorialUi->GetSelectItem();
 
+	bool isEnd = false;
+
 	if (input->IsTrigger("A"))
 	{
-		bool isEnd = false;
 
 		//状況をリセットするを押されたら
 		if (selectItem == TutorialUi::MenuItem::kReset)
@@ -145,12 +136,22 @@ void TutorialManager::UpdateMenu()
 			//メインメニューに戻る
 			m_nextScene = Game::Scene::kMenu;
 		}
-
-		//メニュー画面を閉じる選択肢が選ばれていたら
-		if (isEnd)
+	}
+	else if (input->IsTrigger("B"))
+	{
+		isEnd = true;
+		//今行っているチュートリアルと選択しているチュートリアルが異なっていたら
+		if (m_nowTutorial != static_cast<TutorialKind>(m_pTutorialUi->GetTutorialNumber()))
 		{
-			ChangeSituation(TutorialSituation::kStart);
+			m_nowTutorial = static_cast<TutorialKind>(m_pTutorialUi->GetTutorialNumber());
+			RetryInit();
 		}
+	}
+
+	//メニュー画面を閉じる選択肢が選ばれていたら
+	if (isEnd)
+	{
+		ChangeSituation(TutorialSituation::kStart);
 	}
 }
 
@@ -174,15 +175,50 @@ void TutorialManager::UpdatePlaying()
 
 	if (input->IsTrigger("Pause"))
 	{
-		ChangeSituation(TutorialSituation::kMenu);
+		ChangeSituation(TutorialSituation::kPlayMenu);
 	}
 
 	//チュートリアルが成功したかどうか
 	bool isSuccess = true;
 
-	auto& terms = kTutorialSuccessTerms.at(m_nowTutorial);
+	//成功条件
+	std::vector<TutorialSuccessKind> successTerms;
 
-	for (auto item : terms)
+	//外部データから成功条件を取得
+	for (auto& data : m_tutorialPlayData)
+	{
+		//チュートリアルの名前が違う場合は次のデータに移る
+		if (m_nowTutorial != ChangeStringToTutorialKind(data[static_cast<int>(TutorialPlayDataIndex::kTutorialName)]))continue;
+
+		int loopCount = 0;
+
+		//データの中身を取得
+		for (auto item : data)
+		{
+			//ループ回数が一定数以下だったら
+			if (loopCount <= static_cast<int>(TutorialManager::TutorialPlayDataIndex::kButton))
+			{
+				loopCount++;
+				continue;
+			}
+
+			if (item == "")continue;
+
+			//成功条件を取得
+			successTerms.push_back(ChangeStringToSuccessKind(item));
+		}
+	}
+
+#ifdef _DEBUG
+
+	for (auto item : successTerms)
+	{
+		printfDx("%d,", static_cast<int>(item));
+	}
+	printfDx("\n");
+
+#endif // _DEBUG
+	for (auto item : successTerms)
 	{
 		//ここでクリアしているかを確認
 		if (!m_successTutorialKinds[item])
@@ -225,9 +261,13 @@ void TutorialManager::UpdateSuccess()
 	m_pCamera->Update();
 }
 
-void TutorialManager::DrawMenu()
+void TutorialManager::DrawStartMenu()
 {
-	m_pTutorialUi->DrawMenu();
+}
+
+void TutorialManager::DrawPlayMenu()
+{
+	m_pTutorialUi->DrawPlayMenu();
 }
 
 void TutorialManager::DrawStart()
@@ -251,18 +291,18 @@ void TutorialManager::ChangeSituation(TutorialSituation next)
 	m_tutorialSituation = next;
 
 	//メニュー時
-	if (next == TutorialSituation::kMenu)
+	if (next == TutorialSituation::kPlayMenu)
 	{
 		//プレイヤーの状況を変更
 		for (auto& player : m_pCharacters) player->ChangeSituationUpdate(static_cast<int>(BattleSituation::kMenu));
 
 		//初期化を行う
 		m_pTutorialUi->SetNowTutorialNumber(static_cast<int>(m_nowTutorial));
-		m_pTutorialUi->InitMenu();
+		m_pTutorialUi->InitPlayMenu();
 		//更新処理の変更
-		m_updateSituationFunc = &TutorialManager::UpdateMenu;
+		m_updateSituationFunc = &TutorialManager::UpdatePlayMenu;
 		//描画処理の変更
-		m_drawSituationFunc = &TutorialManager::DrawMenu;
+		m_drawSituationFunc = &TutorialManager::DrawPlayMenu;
 	}
 	//開始時
 	else if (next == TutorialSituation::kStart)
@@ -307,4 +347,248 @@ void TutorialManager::ChangeSituation(TutorialSituation next)
 
 	}
 
+}
+
+TutorialManager::TutorialSuccessKind TutorialManager::ChangeStringToSuccessKind(std::string kind)
+{
+	if (kind == "移動")
+	{
+		return TutorialSuccessKind::kMove;
+	}
+	else if (kind == "ステップ")
+	{
+		return TutorialSuccessKind::kStep;
+	}
+	else if (kind == "ダッシュ")
+	{
+		return TutorialSuccessKind::kDash;
+	}
+	else if (kind == "空中待機")
+	{
+		return TutorialSuccessKind::kSkyIdle;
+	}
+	else if (kind == "上昇")
+	{
+		return TutorialSuccessKind::kUp;
+	}
+	else if (kind == "下降")
+	{
+		return TutorialSuccessKind::kDown;
+	}
+	else if (kind == "ジャンプ")
+	{
+		return TutorialSuccessKind::kJump;
+	}
+	else if (kind == "格闘攻撃1")
+	{
+		return TutorialSuccessKind::kPhysicalAttack1;
+	}
+	else if (kind == "格闘攻撃2")
+	{
+		return TutorialSuccessKind::kPhysicalAttack2;
+	}
+	else if (kind == "格闘攻撃3")
+	{
+		return TutorialSuccessKind::kPhysicalAttack3;
+	}
+	else if (kind == "格闘攻撃4")
+	{
+		return TutorialSuccessKind::kPhysicalAttack4;
+	}
+	else if (kind == "格闘攻撃5")
+	{
+		return TutorialSuccessKind::kPhysicalAttack5;
+	}
+	else if (kind == "格闘攻撃6")
+	{
+		return TutorialSuccessKind::kPhysicalAttack6;
+	}
+	else if (kind == "格闘攻撃7")
+	{
+		return TutorialSuccessKind::kPhysicalAttack7;
+	}
+	else if (kind == "格闘攻撃8")
+	{
+		return TutorialSuccessKind::kPhysicalAttack8;
+	}
+	else if (kind == "スマッシュ格闘")
+	{
+		return TutorialSuccessKind::kChargePhysicalAttack;
+	}
+	else if (kind == "追い打ち")
+	{
+		return TutorialSuccessKind::kChaseAttack;
+	}
+	else if (kind == "気力チャージ")
+	{
+		return TutorialSuccessKind::kEnergyCharge;
+	}
+	else if (kind == "気弾攻撃")
+	{
+		return TutorialSuccessKind::kEnergyAttack;
+	}
+	else if (kind == "スマッシュ気弾")
+	{
+		return TutorialSuccessKind::kChargeEnergyAttack;
+	}
+	else if (kind == "必殺技")
+	{
+		return TutorialSuccessKind::kSpecialAttack;
+	}
+	else if (kind == "ガード")
+	{
+		return TutorialSuccessKind::kGuard;
+	}
+	else if (kind == "ジャストガード")
+	{
+		return TutorialSuccessKind::kJustGuard;
+	}
+	else if (kind == "受け身")
+	{
+		return TutorialSuccessKind::kFalls;
+	}
+	else if (kind == "復帰")
+	{
+		return TutorialSuccessKind::kReturn;
+	}
+	else if (kind == "スーパーダッシュ")
+	{
+		return TutorialSuccessKind::kSuperDash;
+	}
+	else if (kind == "ロケットダッシュ")
+	{
+		return TutorialSuccessKind::kRocketDash;
+	}
+	else if (kind == "ラッシュ対決")
+	{
+		return TutorialSuccessKind::kButtonBashing;
+	}
+	else if (kind == "派生攻撃上")
+	{
+		return TutorialSuccessKind::kUpperAttack;
+	}
+	else if (kind == "派生攻撃中")
+	{
+		return TutorialSuccessKind::kDekaKick;
+	}
+	else if (kind == "派生攻撃下")
+	{
+		return TutorialSuccessKind::kCycloneKick;
+	}
+	else if (kind == "上ガード")
+	{
+		return TutorialSuccessKind::kUpGuard;
+	}
+	else if (kind == "下ガード")
+	{
+		return TutorialSuccessKind::kDownGuard;
+	}
+	else
+	{
+		//ここまで来ないはず
+		return TutorialSuccessKind::kMove;
+	}
+}
+
+TutorialManager::TutorialKind TutorialManager::ChangeStringToTutorialKind(std::string kind)
+{
+	if (kind == "移動")
+	{
+		return TutorialKind::kMove;
+	}
+	else if (kind == "ステップ")
+	{
+		return TutorialKind::kStep;
+	}
+	else if (kind == "ダッシュ")
+	{
+		return TutorialKind::kDash;
+	}
+	else if (kind == "空中移動")
+	{
+		return TutorialKind::kSkyMove;
+	}
+	else if (kind == "ラッシュ格闘")
+	{
+		return TutorialKind::kPhysicalAttack;
+	}
+	else if (kind == "スマッシュ格闘")
+	{
+		return TutorialKind::kChargePhysicalAttack;
+	}
+	else if (kind == "追い打ち")
+	{
+		return TutorialKind::kChaseAttack;
+	}
+	else if (kind == "気力チャージ")
+	{
+		return TutorialKind::kEnergyCharge;
+	}
+	else if (kind == "ラッシュ気弾")
+	{
+		return TutorialKind::kEnergyAttack;
+	}
+	else if (kind == "スマッシュ気弾")
+	{
+		return TutorialKind::kChargeEnergyAttack;
+	}
+	else if (kind == "ガード")
+	{
+		return TutorialKind::kGuard;
+	}
+	else if (kind == "必殺技")
+	{
+		return TutorialKind::kSpecialAttack;
+	}
+	else if (kind == "高速回避")
+	{
+		return TutorialKind::kJustGuard;
+	}
+	else if (kind == "受け身")
+	{
+		return TutorialKind::kFalls;
+	}
+	else if (kind == "復帰")
+	{
+		return TutorialKind::kReturn;
+	}
+	else if (kind == "スーパーダッシュ")
+	{
+		return TutorialKind::kSuperDash;
+	}
+	else if (kind == "ロケットダッシュ")
+	{
+		return TutorialKind::kRocketDash;
+	}
+	else if (kind == "ラッシュ対決")
+	{
+		return TutorialKind::kButtonBasging;
+	}
+	else if (kind == "アッパーアタック")
+	{
+		return TutorialKind::kUpperAttack;
+	}
+	else if (kind == "デカキック")
+	{
+		return TutorialKind::kMiddleAttack;
+	}
+	else if (kind == "サイクロンキック")
+	{
+		return TutorialKind::kDownAttack;
+	}
+	else if (kind == "上ガード")
+	{
+		return TutorialKind::kGuardUp;
+	}
+	else if (kind == "下ガード")
+	{
+		return TutorialKind::kGuardDown;
+	}
+	else
+	{
+		//ここまで来ないはず
+		return TutorialKind::kMove;
+	}
+
+	return TutorialKind();
 }

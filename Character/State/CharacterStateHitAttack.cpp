@@ -14,7 +14,7 @@ namespace
 	const std::map<Character::HitReactionKind, float> kMoveSpeedMap =
 	{
 		{Character::HitReactionKind::kGuard,0.2f},
-		{Character::HitReactionKind::kLow,0.4f},
+		{Character::HitReactionKind::kLow,0.2f},
 		{Character::HitReactionKind::kMiddle,0.8f},
 		{Character::HitReactionKind::kWeakUpBurst,1.2f},
 		{Character::HitReactionKind::kUpBurst,2.0f},
@@ -125,7 +125,7 @@ void CharacterStateHitAttack::Update()
 		m_pCharacter->GetHitReaction() == Character::HitReactionKind::kMiddleStan)
 	{
 		int slowAnimTime = static_cast<int>(m_stopTime * kSlowAnimTimeRate);
-
+		
 		if (m_time < slowAnimTime)
 		{
 			//Ä¶‘¬“x‚ð‚ä‚Á‚­‚è‚É‚·‚é

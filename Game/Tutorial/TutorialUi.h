@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 
+
 class TutorialUi
 {
 public:
@@ -30,7 +31,9 @@ public:
 
 	void Final();
 
-	void InitMenu();
+	void InitStartMenu();
+
+	void InitPlayMenu();
 
 	void InitStart();
 
@@ -38,7 +41,9 @@ public:
 
 	void InitSuccess();
 
-	void DrawMenu();
+	void DrawStartMenu();
+
+	void DrawPlayMenu();
 
 	void DrawStart(int number);
 
@@ -74,11 +79,19 @@ public:
 	/// </summary>
 	bool IsSuccessEnd() { return m_isSuccessEnd; }
 
+	/// <summary>
+	/// チュートリアルのデータを設定する
+	/// </summary>
+	/// <param name="data">外部から読み込んだデータ</param>
+	void SetTutorialPlayData(std::vector<std::vector<std::string>> data) { m_tutorialPlayData = data; }
+
 private:
 
 	void DrawStringCenter(std::string string, MyEngine::Vector2 centerPos, int fontHandle, int color, int edgeColor);
 
-	void UpdateMenu();
+	void UpdateStartMenu();
+
+	void UpdatePlayMenu();
 
 	void UpdateStart();
 
@@ -102,8 +115,11 @@ private:
 
 	UpdateFunc m_updateFunc;
 
-	//チュートリアルのUIデータ
-	std::vector<std::vector<std::string>> m_tutorialData;
+	//チュートリアルのプレイデータ
+	std::vector<std::vector<std::string>> m_tutorialPlayData;
+
+	//チュートリアルのスタートメニューのデータ
+	std::vector<std::vector<std::string>> m_tutorialStartMenuData;
 
 	//開始時の文字のフォントハンドル
 	int m_startFontHandle;

@@ -17,6 +17,7 @@ public:
 		float speed = 0;
 		int lifeTime = 0;
 		float radius = 0;
+		std::string attackName = "empty";
 		std::string effectName = "empty";
 		Character::AttackKind attackKind = Character::AttackKind::kPhysical;
 		Character::AttackHitKind attackHitKind = Character::AttackHitKind::kLow;
@@ -108,4 +109,3 @@ private:
 	//エフェクトマネージャーを持っておく
 	std::shared_ptr<EffectManager> m_pEffectManager;
 };
-

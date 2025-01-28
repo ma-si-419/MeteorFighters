@@ -573,6 +573,7 @@ std::shared_ptr<Attack> Character::CreateAttack(AttackData attackData)
 	status.attackHitKind = attackData.attackHitKind;
 	status.attackKind = attackData.attackKind;
 	status.effectName = attackData.effectName;
+	status.animationName = attackData.animationName;
 
 	ans->Init(status, m_pBattleManager->GetEffectManagerPointer());
 

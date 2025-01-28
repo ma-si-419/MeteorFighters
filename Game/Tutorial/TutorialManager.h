@@ -9,15 +9,27 @@ public:
 	{
 		kMove,
 		kStep,
+		kDash,
 		kSkyMove,
-		kJump,
 		kPhysicalAttack,
 		kChargePhysicalAttack,
+		kChaseAttack,
 		kEnergyCharge,
 		kEnergyAttack,
 		kChargeEnergyAttack,
 		kSpecialAttack,
 		kGuard,
+		kJustGuard,
+		kFalls,
+		kReturn,
+		kSuperDash,
+		kRocketDash,
+		kButtonBashing,
+		kUpperAttack,
+		kMiddleAttack,
+		kDownAttack,
+		kGuardUp,
+		kGuardDown,
 		kTutorialNum
 	};
 
@@ -25,23 +37,47 @@ public:
 	{
 		kMove,
 		kStep,
+		kDash,
 		kJump,
+		kSkyIdle,
 		kUp,
 		kDown,
-		kPhysicalAttack,
+		kPhysicalAttack1,
+		kPhysicalAttack2,
+		kPhysicalAttack3,
+		kPhysicalAttack4,
+		kPhysicalAttack5,
+		kPhysicalAttack6,
+		kPhysicalAttack7,
+		kPhysicalAttack8,
 		kChargePhysicalAttack,
+		kChaseAttack,
+		kEnergyCharge,
 		kEnergyAttack,
 		kChargeEnergyAttack,
-		kEnergyCharge,
+		kSpecialAttack,
 		kGuard,
-		kSpecialAttack
+		kJustGuard,
+		kFalls,
+		kReturn,
+		kSuperDash,
+		kRocketDash,
+		kButtonBashing,
+		kUpperAttack,
+		kDekaKick,
+		kCycloneKick,
+		kUpGuard,
+		kDownGuard
 	};
 
-	enum class TutorialDataIndex
+	enum class TutorialPlayDataIndex
 	{
 		kTutorialName,
-		kStartString,
+		kDescription,
 		kPlayingString,
+		kEnemySituation,
+		kStartDistance,
+		kIsGround,
 		kButton
 	};
 
@@ -49,7 +85,8 @@ private:
 
 	enum class TutorialSituation
 	{
-		kMenu,
+		kStartMenu,
+		kPlayMenu,
 		kStart,
 		kPlaying,
 		kSuccess
@@ -73,7 +110,9 @@ public:
 
 private:
 
-	void UpdateMenu();
+	void UpdateStartMenu();
+
+	void UpdatePlayMenu();
 
 	void UpdateStart();
 
@@ -81,7 +120,9 @@ private:
 
 	void UpdateSuccess();
 
-	void DrawMenu();
+	void DrawStartMenu();
+
+	void DrawPlayMenu();
 
 	void DrawStart();
 	 
@@ -94,6 +135,20 @@ private:
 	/// </summary>
 	/// <param name="next">次の状況</param>
 	void ChangeSituation(TutorialSituation next);
+
+	/// <summary>
+	/// string型のクリア条件をTutorialSuccessKindに変更する
+	/// </summary>
+	/// <param name="kind">外部データに書いてあるクリア条件</param>
+	/// <returns>変更後のクリア条件</returns>
+	TutorialSuccessKind ChangeStringToSuccessKind(std::string kind);
+
+	/// <summary>
+	/// string型のチュートリアルの種類をTutorialKindに変更する
+	/// </summary>
+	/// <param name="kind">外部データに書いてあるクリア条件</param>
+	/// <returns>変更後のチュートリアルの種類</returns>
+	TutorialKind ChangeStringToTutorialKind(std::string kind);
 
 private:
 
@@ -118,4 +173,7 @@ private:
 
 	//チュートリアルのクリア条件で何をクリアしたかを保存する
 	std::map<TutorialSuccessKind, bool> m_successTutorialKinds;
+
+	//チュートリアルのデータ
+	std::vector<std::vector<std::string>> m_tutorialPlayData;
 };

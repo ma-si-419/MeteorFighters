@@ -352,9 +352,75 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 		nowState->SetStopTime(kDownTimeMap.at(hitReaction));
 
 		nowState->HitAttack(static_cast<int>(hitReaction));
-
-		return;
 	}
+
+	//ここまで来たら攻撃を受けているので
+
+	//特定の攻撃を行っていたらチュートリアルをクリアさせる
+	if (status.animationName == "LowAttack1")
+	{
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kPhysicalAttack1));
+	}
+	else if (status.animationName == "LowAttack2")
+	{
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kPhysicalAttack2));
+	}
+	else if (status.animationName == "LowAttack3")
+	{
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kPhysicalAttack3));
+	}
+	else if (status.animationName == "LowAttack4")
+	{
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kPhysicalAttack4));
+	}
+	else if (status.animationName == "LowAttack5")
+	{
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kPhysicalAttack5));
+	}
+	else if (status.animationName == "LowAttack6")
+	{
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kPhysicalAttack6));
+	}
+	else if (status.animationName == "LowAttack7")
+	{
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kPhysicalAttack7));
+	}
+	else if (status.animationName == "LowAttack8")
+	{
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kPhysicalAttack8));
+	}
+	//チャージ格闘攻撃をしていたらチャージ格闘攻撃チュートリアルをクリアさせる
+	else if (status.animationName == "UpChargeAttack" ||
+		status.animationName == "MiddleChargeAttack" ||
+		status.animationName == "DownChargeAttack")
+	{
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kChargePhysicalAttack));
+	}
+	else if (status.animationName == "Upper")
+	{
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kUpperAttack));
+	}
+	else if (status.animationName == "Stan")
+	{
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kDekaKick));
+	}
+	else if (status.animationName == "LegSweep")
+	{
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kCycloneKick));
+	}
+	else if (status.animationName == "EnergyAttackRight")
+	{
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kEnergyAttack));
+	}
+	else if (status.animationName == "EnergyChargeAttack")
+	{
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kChargeEnergyAttack));
+	}
+	else if (status.animationName == "SpecialAttack")
+	{
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kSpecialAttack));
+	}
+	else if(status.animationName == "Te")
 }
 
 void CharacterStateBase::SuccessTutorial(int tutorialNumber)

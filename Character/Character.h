@@ -193,6 +193,7 @@ public:
 		bool isTeleportation = false;
 		AttackHitKind attackHitKind = AttackHitKind::kLow;
 		AttackKind attackKind = AttackKind::kPhysical;
+		std::string attackName = "empty";
 		std::string nextComboName = "empty";
 		std::string targetHitReaction = "empty";
 		std::string animationName = "empty";
@@ -242,6 +243,7 @@ public:
 		int lifeTime = 0;
 		bool isPlayer = true;
 		float radius = 0;
+		std::string attackName = "empty";
 		std::string effectName = "empty";
 		AttackKind attackKind = AttackKind::kPhysical;
 		AttackHitKind attackHitKind = AttackHitKind::kLow;

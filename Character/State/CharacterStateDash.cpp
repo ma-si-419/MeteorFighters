@@ -82,9 +82,6 @@ void CharacterStateDash::Enter()
 
 	m_pCharacter->SetAnimPlaySpeed(kAnimPlaySpeed);
 
-	//ダッシュチュートリアルクリア判定をtrueにする
-	SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kStep));
-
 }
 
 void CharacterStateDash::Update()
@@ -178,21 +175,27 @@ void CharacterStateDash::Update()
 			return;
 		}
 	}
-#ifdef _DEBUG
-
-	DrawString(0, 16, "PlayerState:DashW", GetColor(255, 255, 255));
-
-#endif // _DEBUG
 }
 
 void CharacterStateDash::Exit()
 {
+	//回避の場合
 	if (m_isDodge)
 	{
 		//敵の方向を向く
 		m_pCharacter->LookTarget();
 		m_pCharacter->SetFrontPos(m_pManager->GetTargetPos(m_pCharacter));
+
+		//ステップチュートリアルクリア判定をtrueにする
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kStep));
 	}
+	//ダッシュの場合
+	else
+	{
+		//ダッシュチュートリアルクリア判定をtrueにする
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kDash));
+	}
+
 
 	m_pCharacter->SetAnimPlaySpeed();
 	m_guardKind = CharacterGuardKind::kNone;

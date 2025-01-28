@@ -36,6 +36,9 @@ LB,TutorialLB,Tutorial
 RT,TutorialRT,Tutorial
 LT,TutorialLT,Tutorial
 Stick,TutorialLStick,Tutorial
+StickUp,TutorialLStickUp,Tutorial
+StickDown,TutorialLStickDown,Tutorial
++,TutorialPlus,Tutorial
 Menu,Menu,Tutorial
 SelectItem,MenuSelectItem,Tutorial
 Success,TutorialSuccess,Tutorial
