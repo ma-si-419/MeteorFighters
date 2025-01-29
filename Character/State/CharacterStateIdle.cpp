@@ -18,8 +18,8 @@ CharacterStateIdle::CharacterStateIdle(std::shared_ptr<Character> character) :
 	m_attackButtonPushTime(0),
 	m_isPlayEndAnim(false),
 	m_endAnimTime(0),
-	m_isReleaseX(false),
-	m_isReleaseY(false)
+	m_isReleaseX(true),
+	m_isReleaseY(true)
 {
 }
 
@@ -35,6 +35,14 @@ void CharacterStateIdle::SetEndAnim(int kind, int time, float blendSpeed)
 	m_pCharacter->ChangeAnim(static_cast<Character::AnimKind>(kind), false, blendSpeed);
 	m_endAnimTime = time;
 	m_isPlayEndAnim = true;
+}
+
+void CharacterStateIdle::SetLastAttackState()
+{
+	m_attackKey = "empty";
+	m_attackButtonPushTime = 0;
+	m_isReleaseX = false;
+	m_isReleaseY = false;
 }
 
 void CharacterStateIdle::Enter()

@@ -7,6 +7,7 @@
 #include "Input.h"
 #include "Attack.h"
 #include "Effect.h"
+#include "TutorialManager.h"
 
 
 namespace
@@ -359,4 +360,7 @@ void CharacterStateButtonBashing::Update()
 void CharacterStateButtonBashing::Exit()
 {
 	m_pManager->ExitEffect(m_pEffect);
+
+	//ボタン連打対決のチュートリアルをクリアする
+	SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kButtonBashing));
 }

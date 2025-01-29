@@ -390,9 +390,6 @@ void CharacterStateRush::Update()
 
 			ChangeState(next);
 
-			//ボタン連打対決のチュートリアルをクリアする
-			SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kButtonBashing));
-		
 			return;
 		}
 

@@ -17,9 +17,9 @@ Energy6,1,30,9,13,0,5,0,弱,0,None,無,EnergyAttackLeft,1.25,Energy
 Upper,5,38,9,24,1,0,0,上吹っ飛び,1,Low1,無,UpperAttack,1.25,None
 Stan,5,38,9,24,1,0,0,中スタン,1,Low1,無,StanAttack,1.25,None
 LegSweep,5,38,9,24,1,0,0,下スタン,1,Low1,無,LegSweepAttack,1.25,None
-UpCharge,5,38,11,24,4,0,0,上吹っ飛び,1,None,無,UpChargeAttack,1.25,None
-MiddleCharge,5,38,11,24,4,0,0,奥吹っ飛び,1,None,無,MiddleChargeAttack,1.25,None
-DownCharge,5,38,11,24,4,0,0,下吹っ飛び,1,None,無,DownChargeAttack,1.25,None
+UpCharge,5,38,15,24,4,0,0,上吹っ飛び,1,None,無,UpChargeAttack,1.25,None
+MiddleCharge,5,38,15,24,4,0,0,奥吹っ飛び,1,None,無,MiddleChargeAttack,1.25,None
+DownCharge,5,38,15,24,4,0,0,下吹っ飛び,1,None,無,DownChargeAttack,1.25,None
 EnergyCharge,7,38,19,24,0,5,0,中,0,None,無,EnergyChargeAttack,1.25,BigEnergy
 DashAttack,5,38,11,24,2,0,0,弱,1,Low1,無,DashAttack,1.25,None
 ButtonBashingAttack,50,1,1,1,0,0,0,奥吹っ飛び,1,None,無,None,1.25,None

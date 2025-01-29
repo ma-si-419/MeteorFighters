@@ -7,7 +7,7 @@
 namespace
 {
 	//攻撃を回避できる時間
-	constexpr float kJustGuardTime = 10;
+	constexpr float kJustGuardTime = 15;
 	//アニメーションブレンドの速さ
 	constexpr float kBlendSpeed = 1.0f / kJustGuardTime;
 	//スティックが傾いていると判断する傾きの大きさ

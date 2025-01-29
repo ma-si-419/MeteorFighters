@@ -14,7 +14,7 @@ namespace
 	constexpr int kChargeTime = 120;
 
 	//最大何フレーム攻撃を行うか
-	constexpr int kMaxAttackTime = 240;
+	constexpr int kMaxAttackTime = 180;
 
 	//中距離と判断する距離
 	constexpr float kMiddleDistance = 150.0f;
@@ -104,13 +104,6 @@ EnemyInput::~EnemyInput()
 
 }
 
-void EnemyInput::SetAction(Action action)
-{
-	m_stateTime = 0;
-
-	ChangeAction(action);
-}
-
 void EnemyInput::Update()
 {
 	auto player = m_pManager->GetOnePlayerPointer();
@@ -170,11 +163,8 @@ void EnemyInput::Update()
 	{
 		m_actionTime++;
 
-		//バトル中であれば行動をしないようにする
-		if (m_pManager->GetGameKind() == GameManagerBase::GameKind::kBattle)
-		{
-			m_actionFunc = &EnemyInput::None;
-		}
+		m_actionFunc = &EnemyInput::None;
+
 
 		//行う行動を選択するとき
 		if (m_actionTime > kActionTime)
@@ -252,12 +242,15 @@ void EnemyInput::Update()
 				if (actionNum <= 0)
 				{
 					//チュートリアルの時は行動を変更しない
-					if (m_pManager->GetGameKind() == GameManagerBase::GameKind::kTutorial)break;
+					if (m_pManager->GetGameKind() == GameManagerBase::GameKind::kTutorial)
+					{
+						action = m_tutorialAction;
+					}
 
 					m_stateTime = 0;
 
 					//行動を変更する
-					ChangeAction(action);
+					SetAction(action);
 
 					//ループから抜ける
 					break;
@@ -304,10 +297,16 @@ void EnemyInput::MoveBack()
 
 void EnemyInput::Dash()
 {
-
 	m_pInputData->PushButton("A");
 
 	m_isCountActionTime = true;
+#ifdef _DEBUG
+
+	printfDx("ダッシュ\n");
+
+#endif // _DEBUG
+
+
 }
 
 void EnemyInput::SuperDash()
@@ -332,6 +331,13 @@ void EnemyInput::SuperDash()
 		m_isCountActionTime = true;
 	}
 
+#ifdef _DEBUG
+
+	printfDx("スーパーダッシュ\n");
+
+#endif // _DEBUG
+
+
 }
 
 void EnemyInput::RocketDash()
@@ -351,6 +357,13 @@ void EnemyInput::RocketDash()
 	{
 		m_isCountActionTime = true;
 	}
+
+#ifdef _DEBUG
+
+	printfDx("ロケットダッシュ\n");
+
+#endif // _DEBUG
+
 }
 
 void EnemyInput::SpecialAttack()
@@ -364,6 +377,12 @@ void EnemyInput::SpecialAttack()
 
 		m_isCountActionTime = true;
 	}
+
+#ifdef _DEBUG
+
+	printfDx("必殺技\n");
+
+#endif // _DEBUG
 }
 
 void EnemyInput::EnergyCharge()
@@ -383,6 +402,12 @@ void EnemyInput::EnergyCharge()
 		//チャージをやめる
 		m_isCountActionTime = true;
 	}
+
+#ifdef _DEBUG
+
+	printfDx("気力チャージ\n");
+
+#endif // _DEBUG
 
 }
 
@@ -421,6 +446,12 @@ void EnemyInput::PhysicalAttack()
 		m_isCountActionTime = true;
 	}
 
+#ifdef _DEBUG
+
+	printfDx("格闘攻撃\n");
+
+#endif // _DEBUG
+
 }
 
 void EnemyInput::EnergyAttack()
@@ -437,6 +468,12 @@ void EnemyInput::EnergyAttack()
 			m_isCountActionTime = true;
 		}
 	}
+
+#ifdef _DEBUG
+
+	printfDx("気弾攻撃\n");
+
+#endif // _DEBUG
 }
 
 void EnemyInput::Guard()
@@ -450,10 +487,18 @@ void EnemyInput::Guard()
 	{
 		m_isCountActionTime = true;
 	}
+#ifdef _DEBUG
+
+	printfDx("ガード\n");
+
+#endif // _DEBUG
 }
 
 void EnemyInput::UpChargeAttack()
 {
+	//時間計測
+	m_stateTime++;
+
 	m_pInputData->TiltStick(MyEngine::Vector2(0, -1000), true);
 
 	m_pInputData->PushButton("X");
@@ -464,13 +509,27 @@ void EnemyInput::UpChargeAttack()
 		auto attackState = std::dynamic_pointer_cast<CharacterStateNormalAttack>(m_pEnemyState);
 		if (attackState->GetNowAttackName() == "UpCharge" || attackState->GetEndAttack())
 		{
-			m_isCountActionTime = true;
+			//m_isCountActionTime = true;
 		}
 	}
+
+	//一定時間以上攻撃を行っていたら
+	if (m_stateTime > kMaxAttackTime)
+	{
+		m_isCountActionTime = true;
+	}
+
+#ifdef _DEBUG
+
+	printfDx("上ため攻撃\n");
+
+#endif // _DEBUG
 }
 
 void EnemyInput::MiddleChargeAttack()
 {
+	m_stateTime++;
+
 	m_pInputData->TiltStick(MyEngine::Vector2(0, 0), true);
 	m_pInputData->PushButton("X");
 	//ミドル攻撃を行っていたら
@@ -482,10 +541,24 @@ void EnemyInput::MiddleChargeAttack()
 			m_isCountActionTime = true;
 		}
 	}
+
+	//一定時間以上攻撃を行っていたら
+	if (m_stateTime > kMaxAttackTime)
+	{
+		m_isCountActionTime = true;
+	}
+
+#ifdef _DEBUG
+
+	printfDx("中ため攻撃\n");
+
+#endif // _DEBUG
 }
 
 void EnemyInput::DownChargeAttack()
 {
+	m_stateTime++;
+
 	m_pInputData->TiltStick(MyEngine::Vector2(0, 1000), true);
 	m_pInputData->PushButton("X");
 	//ダウン攻撃を行っていたら
@@ -497,9 +570,42 @@ void EnemyInput::DownChargeAttack()
 			m_isCountActionTime = true;
 		}
 	}
+
+	//一定時間以上攻撃を行っていたら
+	if (m_stateTime > kMaxAttackTime)
+	{
+		m_isCountActionTime = true;
+	}
+
+#ifdef _DEBUG
+
+	printfDx("下ため攻撃\n");
+
+#endif // _DEBUG
 }
 
-void EnemyInput::ChangeAction(Action action)
+void EnemyInput::None()
+{
+	//時間計測
+	m_stateTime++;
+
+	m_pInputData->TiltStick(MyEngine::Vector2(0, 0), true);
+
+	if (m_stateTime > kActionTime)
+	{
+		m_isCountActionTime = true;
+	}
+
+#ifdef _DEBUG
+
+	printfDx("何もしない\n");
+
+#endif // _DEBUG
+
+}
+
+
+void EnemyInput::SetAction(Action action)
 {
 	switch (action)
 	{
@@ -547,21 +653,31 @@ void EnemyInput::ChangeAction(Action action)
 		break;
 
 		//何もしない
+	case EnemyInput::Action::kNone:
+		m_actionFunc = &EnemyInput::None;
+		break;
+
+		//中段チャージ攻撃
+	case EnemyInput::Action::kMiddleChargeAttack:
+		m_actionFunc = &EnemyInput::MiddleChargeAttack;
+		break;
+
+		//下チャージ攻撃
+	case EnemyInput::Action::kDownChargeAttack:
+		m_actionFunc = &EnemyInput::DownChargeAttack;
+		break;
+
+		//上チャージ攻撃
+	case EnemyInput::Action::kUpChargeAttack:
+		m_actionFunc = &EnemyInput::UpChargeAttack;
+		break;
+		//ロケットダッシュ
+	case EnemyInput::Action::kRocketDash:
+		m_actionFunc = &EnemyInput::RocketDash;
+		break;
+		//それ以外
 	default:
 		m_actionFunc = &EnemyInput::None;
 		break;
-	}
-}
-
-void EnemyInput::None()
-{
-	m_stateTime++;
-
-	m_pInputData->TiltStick(MyEngine::Vector2(0, 0), true);
-
-	if (m_stateTime > kNoneTime)
-	{
-		m_stateTime = 0;
-		m_isCountActionTime = true;
 	}
 }

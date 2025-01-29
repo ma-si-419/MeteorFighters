@@ -20,7 +20,8 @@ public:
 		kHighHit,
 		kEnergyHit,
 		kTeleportaion,
-		kStageHit
+		kStageHit,
+		kLaserHit
 	};
 
 public:

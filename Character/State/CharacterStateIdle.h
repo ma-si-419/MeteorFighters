@@ -20,6 +20,11 @@ public:
 	/// <param name="blendSpeed">アニメーションブレンドの速さ</param>
 	void SetEndAnim(int kind, int time, float blendSpeed);
 
+	/// <summary>
+	/// 前の状態が攻撃だった場合呼ぶ
+	/// </summary>
+	void SetLastAttackState();
+
 	virtual void Enter() override;
 
 	virtual void Update() override;

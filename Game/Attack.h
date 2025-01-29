@@ -49,6 +49,17 @@ public:
 	void Final();
 
 	/// <summary>
+	/// エフェクトの再生を止める
+	/// </summary>
+	void StopEffect();
+
+	/// <summary>
+	/// エフェクトの再生時間を設定する
+	/// </summary>
+	/// <param name="time">再生時間</param>
+	void SetEffectLifeTime(int time);
+
+	/// <summary>
 	/// 存在しているかを返す
 	/// </summary>
 	/// <returns>攻撃が存在しているかどうか</returns>

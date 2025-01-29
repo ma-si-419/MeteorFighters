@@ -166,6 +166,8 @@ void CharacterStateNormalAttack::Update()
 		//ƒAƒCƒhƒ‹ó‘Ô‚É–ß‚é
 		std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 
+		next->SetLastAttackState();
+
 		ChangeState(next);
 		return;
 	}

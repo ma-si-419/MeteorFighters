@@ -2,16 +2,17 @@
 #include "Character.h"
 #include "CharacterStateIdle.h"
 #include "CharacterStateDash.h"
+#include "TutorialManager.h"
 #include "GameManagerBase.h"
 
 
 namespace
 {
 	//ダウンする時間
-	constexpr int kDownTime = 120;
+	constexpr int kDownTime = 90;
 
 	//動けるようになる時間
-	constexpr int kMoveTime = 45;
+	constexpr int kMoveTime = 30;
 }
 
 CharacterStateDown::CharacterStateDown(std::shared_ptr<Character> character) :
@@ -47,15 +48,20 @@ void CharacterStateDown::Update()
 		//入力データを取得
 		auto input = m_pCharacter->GetInputData();
 
-		//回避入力があったら
-		if (input->IsTrigger("A"))
+		//復帰入力があったら
+		if (input->IsTrigger("B"))
 		{
 			//次の状態をダッシュ状態に設定する
 			std::shared_ptr<CharacterStateDash> next = std::make_shared<CharacterStateDash>(m_pCharacter);
-			//ダッシュ状態に遷移
-			ChangeState(next);
 			//回避になるように設定
 			next->SetDodge();
+			//移動方向を設定
+			next->SetMoveDir(MyEngine::Vector3(0.0f, 0.0f, -1.0f));
+			//ダッシュ状態に遷移
+			ChangeState(next);
+			//復帰チュートリアルをクリア
+			SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kReturn));
+			return;
 		}
 	}
 

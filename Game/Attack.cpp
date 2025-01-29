@@ -98,6 +98,16 @@ void Attack::Final()
 	}
 }
 
+void Attack::StopEffect()
+{
+	m_pEffectManager->Exit(m_pEffect);
+}
+
+void Attack::SetEffectLifeTime(int time)
+{
+	m_pEffect->SetLifeTime(time);
+}
+
 void Attack::OnCollide(std::shared_ptr<Collidable> collider)
 {
 	//自身がプレイヤーの攻撃で

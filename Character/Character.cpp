@@ -294,6 +294,11 @@ void Character::RetryInit()
 
 	m_rigidbody.SetVelo(MyEngine::Vector3(0, 0, 0));
 
+	if (m_pState)
+	{
+		//Stateの終了処理
+		m_pState->Exit();
+	}
 	//初期ステートの設定
 	m_pState = std::make_shared<CharacterStateIdle>(thisPointer);
 	m_pState->Enter();
@@ -695,7 +700,7 @@ void Character::LookTarget()
 	//ターゲットの方向を向く
 	MV1SetRotationZYAxis(m_modelHandle, (m_rigidbody.GetPos() - m_pBattleManager->GetTargetPos(pointer)).CastVECTOR(), VGet(0.0f, 1.0f, 0.0f), 0.0f);
 	m_lookPos.SetLocalPos(m_lookPos.ChangeWorldToLocal(m_pBattleManager->GetTargetPos(pointer)));
-	
+
 	//正面方向を設定
 	SetFrontPos(m_pBattleManager->GetTargetPos(pointer));
 }

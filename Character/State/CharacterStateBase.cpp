@@ -46,7 +46,7 @@ namespace
 	};
 
 	//ヒットエフェクトを残す時間
-	constexpr int kHitEffectLifeTime = 30;
+	constexpr int kHitEffectLifeTime = 180;
 
 	//ガードできる可能性がある状態
 	const std::vector<Character::HitReactionKind> kCanGuardHitReactionKind =
@@ -196,7 +196,7 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 		if (status.attackKind == Character::AttackKind::kBeam)
 		{
 			//ガードに関係なくエフェクトを再生する
-			effectKind = Effect::EffectKind::kHighHit;
+			effectKind = Effect::EffectKind::kLaserHit;
 		}
 	}
 	//ガードしていない場合
@@ -230,7 +230,7 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 			//レーザー攻撃の場合
 			else if (status.attackKind == Character::AttackKind::kBeam)
 			{
-				effectKind = Effect::EffectKind::kHighHit;
+				effectKind = Effect::EffectKind::kLaserHit;
 			}
 		}
 	}
@@ -243,6 +243,7 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 	{
 		std::shared_ptr<Effect> hitEffect = std::make_shared<Effect>(effectKind);
 		hitEffect->SetLifeTime(kHitEffectLifeTime);
+		hitEffect->SetPos(m_pCharacter->GetPos());
 		m_pCharacter->m_pBattleManager->GetEffectManagerPointer()->Entry(hitEffect, m_pCharacter->GetPos());
 
 		MyEngine::Vector3 rotation;
@@ -296,6 +297,9 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 			nextState->Init(m_pManager->GetTargetBackPos(kTeleportationDistance, m_pCharacter), kTeleportationTime);
 		}
 
+		//ジャストガードチュートリアルをクリアさせる
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kJustGuard));
+
 		//瞬間移動状態に遷移する
 		ChangeState(nextState);
 
@@ -316,6 +320,9 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 	{
 		//敵の方向を向く
 		m_pCharacter->LookTarget();
+
+		//ガードチュートリアルをクリアさせる
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kGuard));
 
 		//現在の状態がガード状態であればガード状態を継続する
 		if (m_kind == CharacterStateKind::kGuard) return;

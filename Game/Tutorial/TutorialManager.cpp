@@ -137,6 +137,9 @@ void TutorialManager::Update()
 {
 	(this->*m_updateSituationFunc)();
 
+	//常にエネミーの入力を更新する
+	ChangeEnemyAction(m_tutorialPlayData[m_pTutorialUi->GetTutorialNumber()][static_cast<int>(TutorialPlayDataIndex::kEnemySituation)]);
+
 	//UIのアップデート
 	m_pTutorialUi->Update();
 
@@ -389,8 +392,11 @@ void TutorialManager::ChangeSituation(TutorialSituation next)
 	else if (next == TutorialSituation::kStart)
 	{
 		//プレイヤーの状況を変更
-		for (auto& player : m_pCharacters) player->ChangeSituationUpdate(static_cast<int>(BattleSituation::kMenu));
-
+		for (auto& player : m_pCharacters)
+		{
+			player->ChangeSituationUpdate(static_cast<int>(BattleSituation::kMenu));
+			player->RetryInit();
+		}
 		//初期化を行う
 		m_pTutorialUi->InitStart();
 		//更新処理の変更
@@ -408,10 +414,9 @@ void TutorialManager::ChangeSituation(TutorialSituation next)
 			player->ChangeSituationUpdate(static_cast<int>(BattleSituation::kBattle));
 		}
 
-		m_pEnemyInput->SetAction(kActionMap.at(m_tutorialPlayData[m_pTutorialUi->GetTutorialNumber()][static_cast<int>(TutorialPlayDataIndex::kEnemySituation)]));
-
 		//初期化を行う
 		m_pTutorialUi->InitPlaying(static_cast<int>(m_nowTutorial));
+		m_pTutorialUi->SetNowTutorialNumber(static_cast<int>(m_nowTutorial));
 		//更新処理の変更
 		m_updateSituationFunc = &TutorialManager::UpdatePlaying;
 		//描画処理の変更
@@ -446,5 +451,5 @@ TutorialManager::TutorialKind TutorialManager::ChangeStringToTutorialKind(std::s
 void TutorialManager::ChangeEnemyAction(std::string action)
 {
 	//エネミーの行動を変更する
-	m_pEnemyInput->SetAction(kActionMap.at(action));
+	m_pEnemyInput->SetTutorialAction(kActionMap.at(action));
 }

@@ -19,6 +19,7 @@ namespace
 		{Effect::EffectKind::kEnergyHit,"EnergyHit"},
 		{Effect::EffectKind::kTeleportaion,"Teleportation"},
 		{Effect::EffectKind::kStageHit,"StageHit"},
+		{Effect::EffectKind::kLaserHit,"LaserHit"}
 	};
 
 	constexpr float kDefaultPlaySpeed = 1.0f;

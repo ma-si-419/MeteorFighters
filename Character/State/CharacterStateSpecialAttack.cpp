@@ -11,6 +11,8 @@
 
 namespace
 {
+	//Å’á‰½ƒtƒŒ[ƒ€UŒ‚‚ğs‚¤‚©
+	constexpr int kMinAttackTime = 60;
 
 	const std::map<Character::AttackKind, int> kAttackTimeMap =
 	{
@@ -26,17 +28,29 @@ namespace
 	{
 		{Character::AttackKind::kEnergy,Character::AttackHitKind::kWeakUpBurst},
 		{Character::AttackKind::kPhysical,Character::AttackHitKind::kFarBurst},
-		{Character::AttackKind::kBeam,Character::AttackHitKind::kWeakUpBurst},
+		{Character::AttackKind::kBeam,Character::AttackHitKind::kFarBurst},
 		{Character::AttackKind::kRush,Character::AttackHitKind::kFarBurst},
 		{Character::AttackKind::kThrow,Character::AttackHitKind::kFarBurst},
 		{Character::AttackKind::kAssault,Character::AttackHitKind::kWeakUpBurst}
+	};
+
+	const std::map<Character::AttackHitKind, Character::HitReactionKind> kHitReactionMap =
+	{
+		{Character::AttackHitKind::kLow,Character::HitReactionKind::kLow},
+		{Character::AttackHitKind::kMiddle,Character::HitReactionKind::kMiddle},
+		{Character::AttackHitKind::kWeakUpBurst,Character::HitReactionKind::kWeakUpBurst},
+		{Character::AttackHitKind::kUpBurst,Character::HitReactionKind::kUpBurst},
+		{Character::AttackHitKind::kDownBurst,Character::HitReactionKind::kDownBurst},
+		{Character::AttackHitKind::kFarBurst,Character::HitReactionKind::kFarBurst},
+		{Character::AttackHitKind::kBottomStan,Character::HitReactionKind::kBottomStan},
+		{Character::AttackHitKind::kMiddleStan,Character::HitReactionKind::kMiddleStan}
 	};
 
 	const std::map<Character::AttackKind, float> kAttackSpeedMap =
 	{
 		{Character::AttackKind::kEnergy,6.0f},
 		{Character::AttackKind::kPhysical,0.0f},
-		{Character::AttackKind::kBeam,6.0f},
+		{Character::AttackKind::kBeam,11.0f},
 		{Character::AttackKind::kRush,0.0f},
 		{Character::AttackKind::kThrow,0.0f},
 		{Character::AttackKind::kAssault,0.0f},
@@ -117,7 +131,7 @@ void CharacterStateSpecialAttack::Update()
 
 	//•KE‹Z‚ğó‚¯‚½‚Ìó‘Ô‚Æ“G‚Ìó‘Ô‚ªˆê’v‚µ‚½‚ç
 	if (m_endHitReaction == static_cast<int>(m_pManager->GetTargetHitReaction(m_pCharacter)) &&
-		m_time < attackEndFrame)
+		m_time < attackEndFrame && m_time > kMinAttackTime)
 	{
 		//UŒ‚‚ğ‚â‚ß‚éƒtƒŒ[ƒ€‚Ü‚Åi‚ß‚é
 		m_time = attackEndFrame;
@@ -208,7 +222,7 @@ void CharacterStateSpecialAttack::Update()
 		attack.lifeTime = kAttackTimeMap.at(attackData.kind);
 
 		//“G‚Ìó‘Ô‚ª‰½‚É‚È‚Á‚½‚çUŒ‚‚ğ‚â‚ß‚é‚©‚ğİ’è
-		m_endHitReaction = static_cast<int>(kHitKindMap.at(attackData.kind));
+		m_endHitReaction = static_cast<int>(kHitReactionMap.at(kHitKindMap.at(attackData.kind)));
 
 		//UŒ‚‚ğì¬
 		m_pAttack = m_pCharacter->CreateAttack(attack);
@@ -235,10 +249,7 @@ void CharacterStateSpecialAttack::Update()
 
 void CharacterStateSpecialAttack::Exit()
 {
-	if (m_pEffect)
-	{
-		m_pManager->ExitEffect(m_pEffect);
-	}
+	m_pManager->ExitEffect(m_pEffect);
 
 	//•KE‹Z”­“®‚Ìƒ`ƒ…[ƒgƒŠƒAƒ‹‚ğƒNƒŠƒA‚³‚¹‚é
 	SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kSpecialAttack));

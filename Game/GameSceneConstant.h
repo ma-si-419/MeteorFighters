@@ -37,7 +37,7 @@ namespace GameSceneConstant
 	//突撃するとき移動ベクトルの向きの変えやすさ
 	constexpr float kRushMoveDirChangeRate = 0.4f;
 	//何フレームレフトショルダーボタンを押していたらチャージ状態に移行するか
-	constexpr float kChargeStateChangeTime = 20;
+	constexpr float kChargeStateChangeTime = 5;
 	//突撃中にカメラが高速移動を始める距離
 	constexpr float kCameraMoveDistance = 200.0f;
 	//敵の背後に行くときにどれだけ離れるか

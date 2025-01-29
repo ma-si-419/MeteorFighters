@@ -8,6 +8,7 @@
 #include "GameManagerBase.h"
 #include "Effect.h"
 #include "Rock.h"
+#include "TutorialManager.h"
 
 namespace
 {
@@ -307,6 +308,9 @@ void CharacterStateHitAttack::Update()
 			//受け身アニメを再生する
 			next->SetEndAnim(static_cast<int>(Character::AnimKind::kBottomStan), kFallsStopTime, kFallsBlendSpeed);
 
+			//受け身チュートリアルをクリアさせる
+			SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kFalls));
+
 			m_pCharacter->SetAnimPlaySpeed(kFallsPlaySpeed);
 
 			//アイドル状態に遷移する
@@ -329,6 +333,8 @@ void CharacterStateHitAttack::Update()
 			//受け身アニメを再生する
 			next->SetEndAnim(static_cast<int>(Character::AnimKind::kFrontBurst), kFallsStopTime, kFallsBlendSpeed);
 			m_pCharacter->SetAnimPlaySpeed(kFallsPlaySpeed);
+			//受け身チュートリアルをクリアさせる
+			SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kFalls));
 			//アイドル状態に遷移する
 			ChangeState(next);
 			return;

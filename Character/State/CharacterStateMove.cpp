@@ -28,8 +28,8 @@ CharacterStateMove::CharacterStateMove(std::shared_ptr<Character> character) :
 	m_isFloat(false),
 	m_gravityPower(0.0f),
 	m_isLastGround(false),
-	m_isReleaseX(false),
-	m_isReleaseY(false)
+	m_isReleaseX(true),
+	m_isReleaseY(true)
 {
 	m_pCharacter->ChangeAnim(Character::AnimKind::kSkyIdle, true);
 }

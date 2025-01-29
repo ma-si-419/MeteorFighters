@@ -49,7 +49,7 @@ public:
 
 	void SetState(std::shared_ptr<CharacterStateBase> state) { m_pEnemyState = state; }
 
-	void SetAction(Action action);
+	void SetTutorialAction(Action action) { m_tutorialAction = action; }
 
 	void Update();
 
@@ -89,7 +89,7 @@ private:
 	/// アクションを変更する
 	/// </summary>
 	/// <param name="action">次に行うアクション</param>
-	void ChangeAction(Action action);
+	void SetAction(Action action);
 
 	//何もしない
 	void None();
@@ -120,6 +120,9 @@ private:
 
 	//アクション関数
 	ActionFunc m_actionFunc;
+
+	//チュートリアルアクション
+	Action m_tutorialAction;
 
 	//行動時間
 	int m_actionTime;
