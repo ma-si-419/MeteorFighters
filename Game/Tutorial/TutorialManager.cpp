@@ -9,6 +9,93 @@
 #include "Input.h"
 #include "EnemyInput.h"
 
+namespace
+{
+	//stringからSuccessKindに変換するためのmap
+	const std::map<std::string, TutorialManager::TutorialSuccessKind> kSuccessKindMap =
+	{
+		{"移動",TutorialManager::TutorialSuccessKind::kMove},
+		{"ジャンプ",TutorialManager::TutorialSuccessKind::kJump},
+		{"ステップ",TutorialManager::TutorialSuccessKind::kStep},
+		{"ダッシュ",TutorialManager::TutorialSuccessKind::kDash},
+		{"空中待機",TutorialManager::TutorialSuccessKind::kSkyIdle},
+		{"上昇",TutorialManager::TutorialSuccessKind::kUp},
+		{"下降",TutorialManager::TutorialSuccessKind::kDown},
+		{"格闘攻撃1",TutorialManager::TutorialSuccessKind::kPhysicalAttack1},
+		{"格闘攻撃2",TutorialManager::TutorialSuccessKind::kPhysicalAttack2},
+		{"格闘攻撃3",TutorialManager::TutorialSuccessKind::kPhysicalAttack3},
+		{"格闘攻撃4",TutorialManager::TutorialSuccessKind::kPhysicalAttack4},
+		{"格闘攻撃5",TutorialManager::TutorialSuccessKind::kPhysicalAttack5},
+		{"格闘攻撃6",TutorialManager::TutorialSuccessKind::kPhysicalAttack6},
+		{"格闘攻撃7",TutorialManager::TutorialSuccessKind::kPhysicalAttack7},
+		{"格闘攻撃8",TutorialManager::TutorialSuccessKind::kPhysicalAttack8},
+		{"スマッシュ格闘",TutorialManager::TutorialSuccessKind::kChargePhysicalAttack},
+		{"追い打ち",TutorialManager::TutorialSuccessKind::kChaseAttack},
+		{"気力チャージ",TutorialManager::TutorialSuccessKind::kEnergyCharge},
+		{"気弾攻撃",TutorialManager::TutorialSuccessKind::kEnergyAttack},
+		{"スマッシュ気弾",TutorialManager::TutorialSuccessKind::kChargeEnergyAttack},
+		{"必殺技",TutorialManager::TutorialSuccessKind::kSpecialAttack},
+		{"ガード",TutorialManager::TutorialSuccessKind::kGuard},
+		{"ジャストガード",TutorialManager::TutorialSuccessKind::kJustGuard},
+		{"受け身",TutorialManager::TutorialSuccessKind::kFalls},
+		{"復帰",TutorialManager::TutorialSuccessKind::kReturn},
+		{"スーパーダッシュ",TutorialManager::TutorialSuccessKind::kSuperDash},
+		{"ロケットダッシュ",TutorialManager::TutorialSuccessKind::kRocketDash},
+		{"ラッシュ対決",TutorialManager::TutorialSuccessKind::kButtonBashing},
+		{"派生攻撃上",TutorialManager::TutorialSuccessKind::kUpperAttack},
+		{"派生攻撃中",TutorialManager::TutorialSuccessKind::kDekaKick},
+		{"派生攻撃下",TutorialManager::TutorialSuccessKind::kCycloneKick},
+		{"上ガード",TutorialManager::TutorialSuccessKind::kUpGuard},
+		{"下ガード",TutorialManager::TutorialSuccessKind::kDownGuard}
+	};
+
+	//stringからTutorialKindに変換するためのmap
+	const std::map<std::string, TutorialManager::TutorialKind> kTutorialKindMap =
+	{
+		{"移動",TutorialManager::TutorialKind::kMove},
+		{"ステップ",TutorialManager::TutorialKind::kStep},
+		{"ダッシュ",TutorialManager::TutorialKind::kDash},
+		{"空中移動",TutorialManager::TutorialKind::kSkyMove},
+		{"ラッシュ格闘",TutorialManager::TutorialKind::kPhysicalAttack},
+		{"スマッシュ格闘",TutorialManager::TutorialKind::kChargePhysicalAttack},
+		{"追い打ち",TutorialManager::TutorialKind::kChaseAttack},
+		{"気力チャージ",TutorialManager::TutorialKind::kEnergyCharge},
+		{"ラッシュ気弾",TutorialManager::TutorialKind::kEnergyAttack},
+		{"スマッシュ気弾",TutorialManager::TutorialKind::kChargeEnergyAttack},
+		{"ガード",TutorialManager::TutorialKind::kGuard},
+		{"必殺技",TutorialManager::TutorialKind::kSpecialAttack},
+		{"高速回避",TutorialManager::TutorialKind::kJustGuard},
+		{"受け身",TutorialManager::TutorialKind::kFalls},
+		{"復帰",TutorialManager::TutorialKind::kReturn},
+		{"スーパーダッシュ",TutorialManager::TutorialKind::kSuperDash},
+		{"ロケットダッシュ",TutorialManager::TutorialKind::kRocketDash},
+		{"ラッシュ対決",TutorialManager::TutorialKind::kButtonBashing},
+		{"アッパーアタック",TutorialManager::TutorialKind::kUpperAttack},
+		{"デカキック",TutorialManager::TutorialKind::kMiddleAttack},
+		{"サイクロンキック",TutorialManager::TutorialKind::kDownAttack},
+		{"上ガード",TutorialManager::TutorialKind::kGuardUp},
+		{"下ガード",TutorialManager::TutorialKind::kGuardDown}
+	};
+
+	//stringからEnemyInput::Actionに変換するためのmap
+	const std::map<std::string, EnemyInput::Action> kActionMap =
+	{
+		{"Idle",EnemyInput::Action::kNone},
+		{"EnergyAttack",EnemyInput::Action::kEnergyAttack},
+		{"PhysicalAttack",EnemyInput::Action::kPhysicalAttack},
+		{"Dash",EnemyInput::Action::kDash},
+		{"SuperDash",EnemyInput::Action::kSuperDash},
+		{"SpecialAttack",EnemyInput::Action::kSpecialAttack},
+		{"EnergyCharge",EnemyInput::Action::kEnergyCharge},
+		{"Guard",EnemyInput::Action::kGuard},
+		{"MiddleChargeAttack",EnemyInput::Action::kMiddleChargeAttack},
+		{"DownChargeAttack",EnemyInput::Action::kDownChargeAttack},
+		{"UpChargeAttack",EnemyInput::Action::kUpChargeAttack},
+		{"RocketDash",EnemyInput::Action::kRocketDash},
+		{"None",EnemyInput::Action::kNone}
+	};
+}
+
 TutorialManager::TutorialManager(std::shared_ptr<GameCamera> camera) :
 	GameManagerBase(camera, GameManagerBase::GameKind::kTutorial),
 	m_nowTutorial(TutorialKind::kMove),
@@ -41,6 +128,9 @@ void TutorialManager::Init()
 
 	//situationの変更
 	ChangeSituation(TutorialSituation::kStart);
+
+	//エネミーのインプットデータを持っておく
+	m_pEnemyInput = m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetEnemyInput();
 }
 
 void TutorialManager::Update()
@@ -209,15 +299,6 @@ void TutorialManager::UpdatePlaying()
 		}
 	}
 
-#ifdef _DEBUG
-
-	for (auto item : successTerms)
-	{
-		printfDx("%d,", static_cast<int>(item));
-	}
-	printfDx("\n");
-
-#endif // _DEBUG
 	for (auto item : successTerms)
 	{
 		//ここでクリアしているかを確認
@@ -326,6 +407,9 @@ void TutorialManager::ChangeSituation(TutorialSituation next)
 			player->LookTarget();
 			player->ChangeSituationUpdate(static_cast<int>(BattleSituation::kBattle));
 		}
+
+		m_pEnemyInput->SetAction(kActionMap.at(m_tutorialPlayData[m_pTutorialUi->GetTutorialNumber()][static_cast<int>(TutorialPlayDataIndex::kEnemySituation)]));
+
 		//初期化を行う
 		m_pTutorialUi->InitPlaying(static_cast<int>(m_nowTutorial));
 		//更新処理の変更
@@ -351,244 +435,16 @@ void TutorialManager::ChangeSituation(TutorialSituation next)
 
 TutorialManager::TutorialSuccessKind TutorialManager::ChangeStringToSuccessKind(std::string kind)
 {
-	if (kind == "移動")
-	{
-		return TutorialSuccessKind::kMove;
-	}
-	else if (kind == "ステップ")
-	{
-		return TutorialSuccessKind::kStep;
-	}
-	else if (kind == "ダッシュ")
-	{
-		return TutorialSuccessKind::kDash;
-	}
-	else if (kind == "空中待機")
-	{
-		return TutorialSuccessKind::kSkyIdle;
-	}
-	else if (kind == "上昇")
-	{
-		return TutorialSuccessKind::kUp;
-	}
-	else if (kind == "下降")
-	{
-		return TutorialSuccessKind::kDown;
-	}
-	else if (kind == "ジャンプ")
-	{
-		return TutorialSuccessKind::kJump;
-	}
-	else if (kind == "格闘攻撃1")
-	{
-		return TutorialSuccessKind::kPhysicalAttack1;
-	}
-	else if (kind == "格闘攻撃2")
-	{
-		return TutorialSuccessKind::kPhysicalAttack2;
-	}
-	else if (kind == "格闘攻撃3")
-	{
-		return TutorialSuccessKind::kPhysicalAttack3;
-	}
-	else if (kind == "格闘攻撃4")
-	{
-		return TutorialSuccessKind::kPhysicalAttack4;
-	}
-	else if (kind == "格闘攻撃5")
-	{
-		return TutorialSuccessKind::kPhysicalAttack5;
-	}
-	else if (kind == "格闘攻撃6")
-	{
-		return TutorialSuccessKind::kPhysicalAttack6;
-	}
-	else if (kind == "格闘攻撃7")
-	{
-		return TutorialSuccessKind::kPhysicalAttack7;
-	}
-	else if (kind == "格闘攻撃8")
-	{
-		return TutorialSuccessKind::kPhysicalAttack8;
-	}
-	else if (kind == "スマッシュ格闘")
-	{
-		return TutorialSuccessKind::kChargePhysicalAttack;
-	}
-	else if (kind == "追い打ち")
-	{
-		return TutorialSuccessKind::kChaseAttack;
-	}
-	else if (kind == "気力チャージ")
-	{
-		return TutorialSuccessKind::kEnergyCharge;
-	}
-	else if (kind == "気弾攻撃")
-	{
-		return TutorialSuccessKind::kEnergyAttack;
-	}
-	else if (kind == "スマッシュ気弾")
-	{
-		return TutorialSuccessKind::kChargeEnergyAttack;
-	}
-	else if (kind == "必殺技")
-	{
-		return TutorialSuccessKind::kSpecialAttack;
-	}
-	else if (kind == "ガード")
-	{
-		return TutorialSuccessKind::kGuard;
-	}
-	else if (kind == "ジャストガード")
-	{
-		return TutorialSuccessKind::kJustGuard;
-	}
-	else if (kind == "受け身")
-	{
-		return TutorialSuccessKind::kFalls;
-	}
-	else if (kind == "復帰")
-	{
-		return TutorialSuccessKind::kReturn;
-	}
-	else if (kind == "スーパーダッシュ")
-	{
-		return TutorialSuccessKind::kSuperDash;
-	}
-	else if (kind == "ロケットダッシュ")
-	{
-		return TutorialSuccessKind::kRocketDash;
-	}
-	else if (kind == "ラッシュ対決")
-	{
-		return TutorialSuccessKind::kButtonBashing;
-	}
-	else if (kind == "派生攻撃上")
-	{
-		return TutorialSuccessKind::kUpperAttack;
-	}
-	else if (kind == "派生攻撃中")
-	{
-		return TutorialSuccessKind::kDekaKick;
-	}
-	else if (kind == "派生攻撃下")
-	{
-		return TutorialSuccessKind::kCycloneKick;
-	}
-	else if (kind == "上ガード")
-	{
-		return TutorialSuccessKind::kUpGuard;
-	}
-	else if (kind == "下ガード")
-	{
-		return TutorialSuccessKind::kDownGuard;
-	}
-	else
-	{
-		//ここまで来ないはず
-		return TutorialSuccessKind::kMove;
-	}
+	return kSuccessKindMap.at(kind);
 }
 
 TutorialManager::TutorialKind TutorialManager::ChangeStringToTutorialKind(std::string kind)
 {
-	if (kind == "移動")
-	{
-		return TutorialKind::kMove;
-	}
-	else if (kind == "ステップ")
-	{
-		return TutorialKind::kStep;
-	}
-	else if (kind == "ダッシュ")
-	{
-		return TutorialKind::kDash;
-	}
-	else if (kind == "空中移動")
-	{
-		return TutorialKind::kSkyMove;
-	}
-	else if (kind == "ラッシュ格闘")
-	{
-		return TutorialKind::kPhysicalAttack;
-	}
-	else if (kind == "スマッシュ格闘")
-	{
-		return TutorialKind::kChargePhysicalAttack;
-	}
-	else if (kind == "追い打ち")
-	{
-		return TutorialKind::kChaseAttack;
-	}
-	else if (kind == "気力チャージ")
-	{
-		return TutorialKind::kEnergyCharge;
-	}
-	else if (kind == "ラッシュ気弾")
-	{
-		return TutorialKind::kEnergyAttack;
-	}
-	else if (kind == "スマッシュ気弾")
-	{
-		return TutorialKind::kChargeEnergyAttack;
-	}
-	else if (kind == "ガード")
-	{
-		return TutorialKind::kGuard;
-	}
-	else if (kind == "必殺技")
-	{
-		return TutorialKind::kSpecialAttack;
-	}
-	else if (kind == "高速回避")
-	{
-		return TutorialKind::kJustGuard;
-	}
-	else if (kind == "受け身")
-	{
-		return TutorialKind::kFalls;
-	}
-	else if (kind == "復帰")
-	{
-		return TutorialKind::kReturn;
-	}
-	else if (kind == "スーパーダッシュ")
-	{
-		return TutorialKind::kSuperDash;
-	}
-	else if (kind == "ロケットダッシュ")
-	{
-		return TutorialKind::kRocketDash;
-	}
-	else if (kind == "ラッシュ対決")
-	{
-		return TutorialKind::kButtonBasging;
-	}
-	else if (kind == "アッパーアタック")
-	{
-		return TutorialKind::kUpperAttack;
-	}
-	else if (kind == "デカキック")
-	{
-		return TutorialKind::kMiddleAttack;
-	}
-	else if (kind == "サイクロンキック")
-	{
-		return TutorialKind::kDownAttack;
-	}
-	else if (kind == "上ガード")
-	{
-		return TutorialKind::kGuardUp;
-	}
-	else if (kind == "下ガード")
-	{
-		return TutorialKind::kGuardDown;
-	}
-	else
-	{
-		//ここまで来ないはず
-		return TutorialKind::kMove;
-	}
+	return kTutorialKindMap.at(kind);
+}
 
-	return TutorialKind();
+void TutorialManager::ChangeEnemyAction(std::string action)
+{
+	//エネミーの行動を変更する
+	m_pEnemyInput->SetAction(kActionMap.at(action));
 }

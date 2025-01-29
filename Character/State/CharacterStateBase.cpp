@@ -357,70 +357,74 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 	//ここまで来たら攻撃を受けているので
 
 	//特定の攻撃を行っていたらチュートリアルをクリアさせる
-	if (status.animationName == "LowAttack1")
+	if (status.attackName == "Low1")
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kPhysicalAttack1));
 	}
-	else if (status.animationName == "LowAttack2")
+	else if (status.attackName == "Low2")
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kPhysicalAttack2));
 	}
-	else if (status.animationName == "LowAttack3")
+	else if (status.attackName == "Low3")
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kPhysicalAttack3));
 	}
-	else if (status.animationName == "LowAttack4")
+	else if (status.attackName == "Low4")
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kPhysicalAttack4));
 	}
-	else if (status.animationName == "LowAttack5")
+	else if (status.attackName == "Low5")
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kPhysicalAttack5));
 	}
-	else if (status.animationName == "LowAttack6")
+	else if (status.attackName == "Low6")
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kPhysicalAttack6));
 	}
-	else if (status.animationName == "LowAttack7")
+	else if (status.attackName == "Low7")
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kPhysicalAttack7));
 	}
-	else if (status.animationName == "LowAttack8")
+	else if (status.attackName == "Low8")
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kPhysicalAttack8));
 	}
 	//チャージ格闘攻撃をしていたらチャージ格闘攻撃チュートリアルをクリアさせる
-	else if (status.animationName == "UpChargeAttack" ||
-		status.animationName == "MiddleChargeAttack" ||
-		status.animationName == "DownChargeAttack")
+	else if (status.attackName == "UpCharge" ||
+		status.attackName == "MiddleCharge" ||
+		status.attackName == "DownCharge")
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kChargePhysicalAttack));
 	}
-	else if (status.animationName == "Upper")
+	else if (status.attackName == "Upper")
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kUpperAttack));
 	}
-	else if (status.animationName == "Stan")
+	else if (status.attackName == "Stan")
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kDekaKick));
 	}
-	else if (status.animationName == "LegSweep")
+	else if (status.attackName == "LegSweep")
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kCycloneKick));
 	}
-	else if (status.animationName == "EnergyAttackRight")
+	else if (status.attackName == "Energy1")
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kEnergyAttack));
 	}
-	else if (status.animationName == "EnergyChargeAttack")
+	else if (status.attackName == "EnergyCharge")
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kChargeEnergyAttack));
 	}
-	else if (status.animationName == "SpecialAttack")
+	else if(status.attackName == "Teleportation")
+	{
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kChaseAttack));
+	}
+	//必殺技を受けていたら必殺技チュートリアルをクリアさせる
+	else if (status.attackKind == Character::AttackKind::kBeam)
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kSpecialAttack));
 	}
-	else if(status.animationName == "Te")
 }
 
 void CharacterStateBase::SuccessTutorial(int tutorialNumber)
@@ -479,6 +483,10 @@ int CharacterStateBase::GetNextHitReactionKind(std::shared_ptr<Attack> attack)
 			//下に吹き飛ばす攻撃なら
 			if (status.attackHitKind == Character::AttackHitKind::kDownBurst)
 			{
+				//上ガードのチュートリアルをクリアさせる
+				SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kUpGuard));
+
+				//ガード成功
 				return static_cast<int>(Character::HitReactionKind::kGuard);
 			}
 			//弱攻撃か中攻撃なら
@@ -511,6 +519,7 @@ int CharacterStateBase::GetNextHitReactionKind(std::shared_ptr<Attack> attack)
 			if (status.attackHitKind == Character::AttackHitKind::kFarBurst ||
 				status.attackHitKind == Character::AttackHitKind::kMiddleStan)
 			{
+				//ガード成功
 				return static_cast<int>(Character::HitReactionKind::kGuard);
 			}
 			//弱攻撃か中攻撃ならば
@@ -544,6 +553,10 @@ int CharacterStateBase::GetNextHitReactionKind(std::shared_ptr<Attack> attack)
 				status.attackHitKind == Character::AttackHitKind::kWeakUpBurst ||
 				status.attackHitKind == Character::AttackHitKind::kBottomStan)
 			{
+				//下ガードのチュートリアルをクリアさせる
+				SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kDownGuard));
+
+				//ガード成功
 				return static_cast<int>(Character::HitReactionKind::kGuard);
 			}
 			//弱攻撃か中攻撃ならば

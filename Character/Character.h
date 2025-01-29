@@ -581,6 +581,12 @@ public:
 	/// <returns>ステージのポリゴンの座標</returns>
 	MyEngine::Vector3 GetNearStagePos();	
 
+	/// <summary>
+	/// エネミーのインプットクラスを取得する
+	/// </summary>
+	/// <returns>エネミーのインプットクラス</returns>
+	std::shared_ptr<EnemyInput> GetEnemyInput();
+
 private:
 
 	/// <summary>

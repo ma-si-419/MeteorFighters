@@ -25,5 +25,10 @@ private:
 	bool m_isLastGround;
 
 	int m_attackButtonPushTime;
+
+	//ˆê“xƒ{ƒ^ƒ“‚ª—£‚³‚ê‚½‚©‚Ç‚¤‚©
+	bool m_isReleaseX;
+	bool m_isReleaseY;
+
 };
 

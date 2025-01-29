@@ -17,7 +17,9 @@ CharacterStateIdle::CharacterStateIdle(std::shared_ptr<Character> character) :
 	m_attackKey("empty"),
 	m_attackButtonPushTime(0),
 	m_isPlayEndAnim(false),
-	m_endAnimTime(0)
+	m_endAnimTime(0),
+	m_isReleaseX(false),
+	m_isReleaseY(false)
 {
 }
 
@@ -91,16 +93,26 @@ void CharacterStateIdle::Update()
 	//前のフレームの終了アニメーションが再生されていたら下の条件分岐を通らない
 	if (m_isPlayEndAnim) return;
 
+	//一度ボタンが離されたかどうか
+	if (!input->IsPress("X"))
+	{
+		m_isReleaseX = true;
+	}
+	if (!input->IsPress("Y"))
+	{
+		m_isReleaseY = true;
+	}
+
 
 	//攻撃ボタンが押されていないときに
 	if (m_attackKey == "empty")
 	{
 		//格闘ボタンが押された時
-		if (input->IsPress("X"))
+		if (input->IsPress("X") && m_isReleaseX)
 		{
 			m_attackKey = "X";
 		}
-		else if (input->IsPress("Y"))
+		else if (input->IsPress("Y") && m_isReleaseY)
 		{
 			m_attackKey = "Y";
 		}
@@ -127,7 +139,7 @@ void CharacterStateIdle::Update()
 			if (isCharge)
 			{
 				//Xボタンが押されていて
-				if (m_attackKey == "X")
+				if (m_attackKey == "X" && m_isReleaseX)
 				{
 					//スティックを上に傾けていたら
 					if (input->GetStickInfo().leftStickY < -GameSceneConstant::kPhysicalAttackStickPower)
@@ -146,7 +158,7 @@ void CharacterStateIdle::Update()
 					}
 				}
 				//Yボタンが押されていたら
-				else if (m_attackKey == "Y")
+				else if (m_attackKey == "Y" && m_isReleaseY)
 				{
 					attackName = "EnergyCharge";
 				}
@@ -164,27 +176,31 @@ void CharacterStateIdle::Update()
 				}
 			}
 
-			//気弾攻撃ならば気力を減らす
-			if (attackName == "Energy1" || attackName == "EnergyCharge")
+			//攻撃がセットされていたら
+			if (attackName != "empty")
 			{
-				//減らせなければ攻撃をセットしない
-				if (m_pCharacter->SubMp(GameSceneConstant::kEnergyAttackCost))
+				//気弾攻撃ならば気力を減らす
+				if (attackName == "Energy1" || attackName == "EnergyCharge")
+				{
+					//減らせなければ攻撃をセットしない
+					if (m_pCharacter->SubMp(GameSceneConstant::kEnergyAttackCost))
+					{
+						next->SetAttack(m_attackKey, attackName);
+
+						//StateをAttackに変更する
+						ChangeState(next);
+						return;
+					}
+				}
+				else
 				{
 					next->SetAttack(m_attackKey, attackName);
+
 
 					//StateをAttackに変更する
 					ChangeState(next);
 					return;
 				}
-			}
-			else
-			{
-				next->SetAttack(m_attackKey, attackName);
-
-
-				//StateをAttackに変更する
-				ChangeState(next);
-				return;
 			}
 		}
 	}

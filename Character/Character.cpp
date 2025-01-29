@@ -196,6 +196,12 @@ void Character::Update()
 	if (m_playerNumber == PlayerNumber::kTwoPlayer)
 	{
 		m_pEnemyInput->Update();
+
+		//チュートリアルの時はMPが減らないようにする
+		if (m_pBattleManager->GetGameKind() == GameManagerBase::GameKind::kTutorial)
+		{
+			m_nowMp = GameSceneConstant::kMaxMp;
+		}
 	}
 
 	//常に更新するもの
@@ -469,6 +475,7 @@ void Character::SetNormalAttackData(std::vector<std::vector<std::string>> normal
 	{
 		NormalAttackData pushData;
 
+		pushData.attackName = item[static_cast<int>(NormalAttackDataSort::kAttackName)];
 		pushData.damageRate = stof(item[static_cast<int>(NormalAttackDataSort::kDamageRate)]);
 		pushData.totalFrame = stoi(item[static_cast<int>(NormalAttackDataSort::kTotalFrame)]);
 		pushData.attackFrame = stoi(item[static_cast<int>(NormalAttackDataSort::kAttackFrame)]);
@@ -573,7 +580,7 @@ std::shared_ptr<Attack> Character::CreateAttack(AttackData attackData)
 	status.attackHitKind = attackData.attackHitKind;
 	status.attackKind = attackData.attackKind;
 	status.effectName = attackData.effectName;
-	status.animationName = attackData.animationName;
+	status.attackName = attackData.attackName;
 
 	ans->Init(status, m_pBattleManager->GetEffectManagerPointer());
 
@@ -843,6 +850,18 @@ MyEngine::Vector3 Character::GetNearStagePos()
 	MyEngine::Vector3 pos = m_rigidbody.GetPos();
 	pos.y = 0;
 	return pos;
+}
+
+std::shared_ptr<EnemyInput> Character::GetEnemyInput()
+{
+	//2P側なら
+	if (m_playerNumber == PlayerNumber::kTwoPlayer)
+	{
+		return m_pEnemyInput;
+	}
+
+	//1Pの場合は何も返さない
+	return std::shared_ptr<EnemyInput>();
 }
 
 void Character::InitStart()

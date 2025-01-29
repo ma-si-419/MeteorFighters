@@ -17,13 +17,18 @@ public:
 
 	enum class Action
 	{
-		PhysicalAttack,
-		EnergyAttack,
-		Dash,
-		Rush,
-		SpecialAttack,
-		EnergyCharge,
-		Guard
+		kPhysicalAttack,
+		kEnergyAttack,
+		kDash,
+		kSuperDash,
+		kRocketDash,
+		kSpecialAttack,
+		kEnergyCharge,
+		kGuard,
+		kMiddleChargeAttack,
+		kDownChargeAttack,
+		kUpChargeAttack,
+		kNone
 	};
 
 	enum class DataIndex
@@ -44,6 +49,8 @@ public:
 
 	void SetState(std::shared_ptr<CharacterStateBase> state) { m_pEnemyState = state; }
 
+	void SetAction(Action action);
+
 	void Update();
 
 private:
@@ -62,13 +69,21 @@ private:
 
 	void Dash();
 
-	void Rush();
+	void SuperDash();
+
+	void RocketDash();
 
 	void SpecialAttack();
 
 	void EnergyCharge();
 
 	void Guard();
+
+	void UpChargeAttack();
+
+	void MiddleChargeAttack();
+
+	void DownChargeAttack();
 
 	/// <summary>
 	/// アクションを変更する
@@ -77,7 +92,7 @@ private:
 	void ChangeAction(Action action);
 
 	//何もしない
-	void None() {};
+	void None();
 
 private:
 
@@ -117,6 +132,9 @@ private:
 
 	//ガードを行う時間
 	int m_guardTime;
+
+	//スーパーダッシュを行う時間
+	int m_superDashTime;
 
 	//ゲームマネージャ
 	std::shared_ptr<GameManagerBase> m_pManager;

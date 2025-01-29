@@ -13,6 +13,9 @@ namespace
 	//チャージを行う時間
 	constexpr int kChargeTime = 120;
 
+	//最大何フレーム攻撃を行うか
+	constexpr int kMaxAttackTime = 240;
+
 	//中距離と判断する距離
 	constexpr float kMiddleDistance = 150.0f;
 
@@ -26,10 +29,22 @@ namespace
 	constexpr int kMoveDirRandomNum = 3;
 
 	//最大何フレームガードを行うか
-	constexpr int kMaxGuardTime = 240;
+	constexpr int kMaxGuardTime = 180;
 
 	//最低何フレームガードを行うか
-	constexpr int kMinGuardTime = 120;
+	constexpr int kMinGuardTime = 60;
+
+	//スーパーダッシュのアクションにはいって何フレーム目でスーパーダッシュを行うか
+	constexpr int kSuperDashActionTime = 45;
+
+	//最大何フレームスーパーダッシュを行うか
+	constexpr int kMaxSuperDashTime = 120;
+
+	//最低何フレームスーパーダッシュを行うか
+	constexpr int kMinSuperDashTime = 60;
+
+	//アイドル状態にいる時間
+	constexpr int kNoneTime = 120;
 
 	//近距離で選択できる移動方向
 	const EnemyInput::MoveDir kNearMoveDir[kMoveDirRandomNum] =
@@ -89,6 +104,13 @@ EnemyInput::~EnemyInput()
 
 }
 
+void EnemyInput::SetAction(Action action)
+{
+	m_stateTime = 0;
+
+	ChangeAction(action);
+}
+
 void EnemyInput::Update()
 {
 	auto player = m_pManager->GetOnePlayerPointer();
@@ -144,18 +166,15 @@ void EnemyInput::Update()
 		}
 	}
 
-	//Stateがいれかわったタイミングで
-	if (m_pEnemyState != m_pEnemyState->m_pNextState)
-	{
-		//Stateにいる時間をリセットする
-		//m_stateTime = 0;
-	}
-
 	if (m_isCountActionTime)
 	{
 		m_actionTime++;
 
-		m_actionFunc = &EnemyInput::None;
+		//バトル中であれば行動をしないようにする
+		if (m_pManager->GetGameKind() == GameManagerBase::GameKind::kBattle)
+		{
+			m_actionFunc = &EnemyInput::None;
+		}
 
 		//行う行動を選択するとき
 		if (m_actionTime > kActionTime)
@@ -197,7 +216,7 @@ void EnemyInput::Update()
 			//度の行動をするかをランダムで決定
 			int actionNum = GetRand(randNum);
 
-			Action action = Action::PhysicalAttack;
+			Action action = Action::kPhysicalAttack;
 
 			for (auto item : m_aiData)
 			{
@@ -232,12 +251,13 @@ void EnemyInput::Update()
 				//行動が決まったら
 				if (actionNum <= 0)
 				{
+					//チュートリアルの時は行動を変更しない
+					if (m_pManager->GetGameKind() == GameManagerBase::GameKind::kTutorial)break;
+
+					m_stateTime = 0;
+
 					//行動を変更する
 					ChangeAction(action);
-
-					///////////////////////////////////
-//					m_actionFunc = &EnemyInput::Guard;
-					///////////////////////////////////
 
 					//ループから抜ける
 					break;
@@ -254,14 +274,12 @@ void EnemyInput::Update()
 		m_actionTime = 0;
 	}
 
-	if (m_pManager->GetGameKind() == GameManagerBase::GameKind::kBattle)
-	{
-		//移動処理
-		(this->*m_moveFunc)();
+	//移動処理
+	(this->*m_moveFunc)();
 
-		//アクション処理
-		(this->*m_actionFunc)();
-	}
+	//アクション処理
+	(this->*m_actionFunc)();
+
 }
 
 void EnemyInput::MoveFront()
@@ -292,23 +310,47 @@ void EnemyInput::Dash()
 	m_isCountActionTime = true;
 }
 
-void EnemyInput::Rush()
+void EnemyInput::SuperDash()
 {
+	//スーパーダッシュのアクションに入って何フレーム目か計測
+	m_stateTime++;
 
+	//まだスーパーダッシュのアクションに入っていないなら
+	if (m_pEnemyState->GetKind() != CharacterStateBase::CharacterStateKind::kRush)
+	{
+		m_pInputData->PushTrigger(true);
+
+		if (m_stateTime > kSuperDashActionTime)
+		{
+			m_pInputData->PushButton("A");
+		}
+	}
+
+	//一定時間以上スーパーダッシュを行っていたら
+	if (m_stateTime > m_superDashTime)
+	{
+		m_isCountActionTime = true;
+	}
+
+}
+
+void EnemyInput::RocketDash()
+{
+	//ロケットダッシュを行う
 	m_pInputData->PushTrigger(true);
-
 	m_pInputData->BashButton("A");
 
+	//プレイヤーとの距離
 	auto player = m_pManager->GetOnePlayerPointer();
 	auto enemy = m_pManager->GetTwoPlayerPointer();
 
 	float distance = (player->GetPos() - enemy->GetPos()).Length();
 
+	//敵の近くに近づいたら
 	if (distance < kNearDistance)
 	{
 		m_isCountActionTime = true;
 	}
-
 }
 
 void EnemyInput::SpecialAttack()
@@ -340,13 +382,13 @@ void EnemyInput::EnergyCharge()
 	{
 		//チャージをやめる
 		m_isCountActionTime = true;
-		m_stateTime = 0;
 	}
 
 }
 
 void EnemyInput::PhysicalAttack()
 {
+	m_stateTime++;
 
 	m_pInputData->BashButton("X");
 
@@ -372,6 +414,13 @@ void EnemyInput::PhysicalAttack()
 	{
 		m_isCountActionTime = true;
 	}
+
+	//最大時間よりも長く攻撃を行っていたら
+	if (m_stateTime > kMaxAttackTime)
+	{
+		m_isCountActionTime = true;
+	}
+
 }
 
 void EnemyInput::EnergyAttack()
@@ -393,14 +442,60 @@ void EnemyInput::EnergyAttack()
 void EnemyInput::Guard()
 {
 	m_stateTime++;
-	
+
 	m_pInputData->PushButton("B");
 
 	//ガードをやめる
 	if (m_stateTime > m_guardTime)
 	{
 		m_isCountActionTime = true;
-		m_stateTime = 0;
+	}
+}
+
+void EnemyInput::UpChargeAttack()
+{
+	m_pInputData->TiltStick(MyEngine::Vector2(0, -1000), true);
+
+	m_pInputData->PushButton("X");
+
+	//アッパー攻撃を行っていたら
+	if (m_pEnemyState->GetKind() == CharacterStateBase::CharacterStateKind::kNormalAttack)
+	{
+		auto attackState = std::dynamic_pointer_cast<CharacterStateNormalAttack>(m_pEnemyState);
+		if (attackState->GetNowAttackName() == "UpCharge" || attackState->GetEndAttack())
+		{
+			m_isCountActionTime = true;
+		}
+	}
+}
+
+void EnemyInput::MiddleChargeAttack()
+{
+	m_pInputData->TiltStick(MyEngine::Vector2(0, 0), true);
+	m_pInputData->PushButton("X");
+	//ミドル攻撃を行っていたら
+	if (m_pEnemyState->GetKind() == CharacterStateBase::CharacterStateKind::kNormalAttack)
+	{
+		auto attackState = std::dynamic_pointer_cast<CharacterStateNormalAttack>(m_pEnemyState);
+		if (attackState->GetNowAttackName() == "MiddleCharge" || attackState->GetEndAttack())
+		{
+			m_isCountActionTime = true;
+		}
+	}
+}
+
+void EnemyInput::DownChargeAttack()
+{
+	m_pInputData->TiltStick(MyEngine::Vector2(0, 1000), true);
+	m_pInputData->PushButton("X");
+	//ダウン攻撃を行っていたら
+	if (m_pEnemyState->GetKind() == CharacterStateBase::CharacterStateKind::kNormalAttack)
+	{
+		auto attackState = std::dynamic_pointer_cast<CharacterStateNormalAttack>(m_pEnemyState);
+		if (attackState->GetNowAttackName() == "DownCharge" || attackState->GetEndAttack())
+		{
+			m_isCountActionTime = true;
+		}
 	}
 }
 
@@ -409,37 +504,43 @@ void EnemyInput::ChangeAction(Action action)
 	switch (action)
 	{
 		//格闘攻撃
-	case EnemyInput::Action::PhysicalAttack:
+	case EnemyInput::Action::kPhysicalAttack:
 		m_actionFunc = &EnemyInput::PhysicalAttack;
 		break;
 
 		//エネルギー攻撃
-	case EnemyInput::Action::EnergyAttack:
+	case EnemyInput::Action::kEnergyAttack:
 		m_actionFunc = &EnemyInput::EnergyAttack;
 		break;
 
 		//ダッシュ
-	case EnemyInput::Action::Dash:
+	case EnemyInput::Action::kDash:
 		m_actionFunc = &EnemyInput::Dash;
 		break;
 
 		//ラッシュ
-	case EnemyInput::Action::Rush:
-		m_actionFunc = &EnemyInput::Rush;
+	case EnemyInput::Action::kSuperDash:
+		//スーパーダッシュの時間設定
+		m_superDashTime = GetRand(kMaxSuperDashTime - kMinSuperDashTime) + kMinSuperDashTime;
+
+		//スーパーダッシュを始めるまでの時間を加算
+		m_superDashTime += kSuperDashActionTime;
+
+		m_actionFunc = &EnemyInput::SuperDash;
 		break;
 
 		//必殺技
-	case EnemyInput::Action::SpecialAttack:
+	case EnemyInput::Action::kSpecialAttack:
 		m_actionFunc = &EnemyInput::SpecialAttack;
 		break;
 
 		//エネルギーチャージ
-	case EnemyInput::Action::EnergyCharge:
+	case EnemyInput::Action::kEnergyCharge:
 		m_actionFunc = &EnemyInput::EnergyCharge;
 		break;
 
 		//ガード
-	case EnemyInput::Action::Guard:
+	case EnemyInput::Action::kGuard:
 		m_actionFunc = &EnemyInput::Guard;
 		//ガードを行う時間を設定
 		m_guardTime = GetRand(kMaxGuardTime - kMinGuardTime) + kMinGuardTime;
@@ -449,5 +550,18 @@ void EnemyInput::ChangeAction(Action action)
 	default:
 		m_actionFunc = &EnemyInput::None;
 		break;
+	}
+}
+
+void EnemyInput::None()
+{
+	m_stateTime++;
+
+	m_pInputData->TiltStick(MyEngine::Vector2(0, 0), true);
+
+	if (m_stateTime > kNoneTime)
+	{
+		m_stateTime = 0;
+		m_isCountActionTime = true;
 	}
 }

@@ -36,6 +36,8 @@ private:
 
 	int m_endAnimTime;
 
-	float a = 0.0f;
+	bool m_isReleaseX;
+
+	bool m_isReleaseY;
 };
 

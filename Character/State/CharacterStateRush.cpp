@@ -9,6 +9,7 @@
 #include "GameSceneConstant.h"
 #include "Effect.h"
 #include "GameManagerBase.h"
+#include "TutorialManager.h"
 #include <cmath>
 
 namespace
@@ -98,6 +99,9 @@ void CharacterStateRush::Enter()
 	m_pNextState = shared_from_this();
 	m_kind = CharacterStateKind::kRush;
 	m_pCharacter->ChangeAnim(Character::AnimKind::kRushStart, true);
+
+	//スーパーダッシュのチュートリアルをクリアする
+	SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kSuperDash));
 }
 
 void CharacterStateRush::Update()
@@ -375,6 +379,9 @@ void CharacterStateRush::Update()
 	//敵の背後に向かうフラグが立っていれば
 	if (m_isRushEnemy)
 	{
+		//ロケットダッシュのチュートリアルをクリアする
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kRocketDash));
+
 		//もし敵がRushStateであれば
 		if (static_cast<CharacterStateKind>(m_pManager->GetTargetState(m_pCharacter)) == CharacterStateKind::kRush)
 		{
@@ -382,6 +389,9 @@ void CharacterStateRush::Update()
 			auto next = std::make_shared<CharacterStateButtonBashing>(m_pCharacter);
 
 			ChangeState(next);
+
+			//ボタン連打対決のチュートリアルをクリアする
+			SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kButtonBashing));
 		
 			return;
 		}

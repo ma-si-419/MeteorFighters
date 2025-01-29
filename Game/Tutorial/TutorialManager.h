@@ -150,6 +150,12 @@ private:
 	/// <returns>変更後のチュートリアルの種類</returns>
 	TutorialKind ChangeStringToTutorialKind(std::string kind);
 
+	/// <summary>
+	/// エネミーの行動を変更する
+	/// </summary>
+	/// <param name="action">変更するアクション名</param>
+	void ChangeEnemyAction(std::string action);
+
 private:
 
 	//関数ポインタ
@@ -176,4 +182,7 @@ private:
 
 	//チュートリアルのデータ
 	std::vector<std::vector<std::string>> m_tutorialPlayData;
+
+	//エネミーのインプットデータ
+	std::shared_ptr<EnemyInput> m_pEnemyInput;
 };
