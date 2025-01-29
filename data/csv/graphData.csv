@@ -39,8 +39,11 @@ Stick,TutorialLStick,Tutorial
 StickUp,TutorialLStickUp,Tutorial
 StickDown,TutorialLStickDown,Tutorial
 +,TutorialPlus,Tutorial
-Menu,Menu,Tutorial
-SelectItem,MenuSelectItem,Tutorial
+StartMenu,TutorialStartMenu,Tutorial
+StartMenuItem,TutorialStartMenu,Tutorial
+StartMenuSelectItem,TutorialStartMenuSelectItemBox,Tutorial
+PlayMenu,Menu,Tutorial
+PlayMenuSelectItem,MenuSelectItem,Tutorial
 Success,TutorialSuccess,Tutorial
 Character0,SelectCharacter0,Select
 Character1,SelectCharacter1,Select

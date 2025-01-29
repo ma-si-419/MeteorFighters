@@ -357,7 +357,7 @@ void TutorialUi::DrawStartMenu()
 
 void TutorialUi::DrawPlayMenu()
 {
-	GraphData menu = m_drawGraphs["Menu"];
+	GraphData menu = m_drawGraphs["PlayMenu"];
 
 	//画面全体を覆う黒いボックスのアルファ値
 	int backBoxAlpha = menu.alpha;
@@ -379,7 +379,7 @@ void TutorialUi::DrawPlayMenu()
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	//選択している項目の後ろのボックスを表示する
-	GraphData itemBox = m_drawGraphs["SelectItemBox"];
+	GraphData itemBox = m_drawGraphs["PlayMenuSelectItemBox"];
 
 	DrawRotaGraph(static_cast<int>(itemBox.pos.x), static_cast<int>(itemBox.pos.y), itemBox.scale, 0.0, itemBox.handle, true);
 
