@@ -28,7 +28,8 @@ public:
 		kButtonBashing,
 		kKnockOut,
 		kResult,
-		kMenu
+		kMenu,
+		kIdle
 	};
 
 	enum class GameKind
@@ -365,4 +366,6 @@ protected:
 	Game::Scene m_nextScene;
 	//非同期処理を行うモデルの配列
 	std::map<std::string, int> m_modelHandles;
+	//HPバーを表示するかどうか
+	bool m_isDrawHpBar;
 };

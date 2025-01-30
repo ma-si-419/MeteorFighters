@@ -639,6 +639,11 @@ private:
 	void UpdateResult();
 
 	/// <summary>
+	/// アイドル時のアップデート
+	/// </summary>
+	void UpdateIdle();
+
+	/// <summary>
 	/// 何もしない時のアップデート
 	/// </summary>
 	void UpdateNone();

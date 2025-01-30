@@ -127,7 +127,7 @@ void TutorialManager::Init()
 	m_pTutorialUi->Init();
 
 	//situationの変更
-	ChangeSituation(TutorialSituation::kStart);
+	ChangeSituation(TutorialSituation::kStartMenu);
 
 	//エネミーのインプットデータを持っておく
 	m_pEnemyInput = m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetEnemyInput();
@@ -192,13 +192,41 @@ void TutorialManager::Final()
 
 void TutorialManager::UpdateStartMenu()
 {
+	auto input = MyEngine::Input::GetInstance().GetInputData(0);
+
+	auto selectItem = m_pTutorialUi->GetStartMenuSelectItem();
+
+	if (input->IsTrigger("A") && m_pTutorialUi->IsSelectStartMenu())
+	{
+		//チュートリアルを開始するが押されたら
+		if (selectItem == TutorialUi::StartMenuItem::kStartTutorial)
+		{ 
+			ChangeSituation(TutorialSituation::kStart);
+
+			//体力バーを表示する
+			m_isDrawHpBar = true;
+		}
+		//チュートリアルを選択するが押されたら
+		else if (selectItem == TutorialUi::StartMenuItem::kSelectTutorial)
+		{
+			//チュートリアルを選択する画面に移動
+			ChangeSituation(TutorialSituation::kSelectMenu);
+		}
+		else if (selectItem == TutorialUi::StartMenuItem::kEnd)
+		{
+			//メインメニューに戻る
+			m_nextScene = Game::Scene::kMenu;
+		}
+	}
+	//カメラの更新を行う
+	m_pCamera->Update();
 }
 
 void TutorialManager::UpdatePlayMenu()
 {
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
-	TutorialUi::MenuItem selectItem = m_pTutorialUi->GetSelectItem();
+	TutorialUi::PlayMenuItem selectItem = m_pTutorialUi->GetPlayMenuSelectItem();
 
 	bool isEnd = false;
 
@@ -206,14 +234,14 @@ void TutorialManager::UpdatePlayMenu()
 	{
 
 		//状況をリセットするを押されたら
-		if (selectItem == TutorialUi::MenuItem::kReset)
+		if (selectItem == TutorialUi::PlayMenuItem::kReset)
 		{
 			RetryInit();
 			m_nowTutorial = static_cast<TutorialKind>(m_pTutorialUi->GetTutorialNumber());
 			isEnd = true;
 		}
 		//メニューを閉じるが押されたら
-		else if (selectItem == TutorialUi::MenuItem::kMenuEnd)
+		else if (selectItem == TutorialUi::PlayMenuItem::kMenuEnd)
 		{
 			isEnd = true;
 			//今行っているチュートリアルと選択しているチュートリアルが異なっていたら
@@ -224,7 +252,7 @@ void TutorialManager::UpdatePlayMenu()
 			}
 		}
 		//チュートリアルを終了するが押されたら
-		else if (selectItem == TutorialUi::MenuItem::kTutorialEnd)
+		else if (selectItem == TutorialUi::PlayMenuItem::kTutorialEnd)
 		{
 			//メインメニューに戻る
 			m_nextScene = Game::Scene::kMenu;
@@ -345,8 +373,20 @@ void TutorialManager::UpdateSuccess()
 	m_pCamera->Update();
 }
 
+void TutorialManager::UpdateSelectMenu()
+{
+	//入力情報
+	auto input = MyEngine::Input::GetInstance().GetInputData(0);
+
+	if (input->IsTrigger("A"))
+	{
+		ChangeSituation(TutorialSituation::kStartMenu);
+	}
+}
+
 void TutorialManager::DrawStartMenu()
 {
+	m_pTutorialUi->DrawStartMenu();
 }
 
 void TutorialManager::DrawPlayMenu()
@@ -369,6 +409,11 @@ void TutorialManager::DrawSuccess()
 	m_pTutorialUi->DrawSuccess(static_cast<int>(m_nowTutorial));
 }
 
+void TutorialManager::DrawSelectMenu()
+{
+	m_pTutorialUi->DrawSelectMenu();
+}
+
 void TutorialManager::ChangeSituation(TutorialSituation next)
 {
 	//状況を変更
@@ -388,13 +433,43 @@ void TutorialManager::ChangeSituation(TutorialSituation next)
 		//描画処理の変更
 		m_drawSituationFunc = &TutorialManager::DrawPlayMenu;
 	}
+	//スタートメニュー時
+	else if (next == TutorialSituation::kStartMenu)
+	{
+		//プレイヤーの状況を変更
+		for (auto& player : m_pCharacters)
+		{
+			player->ChangeSituationUpdate(static_cast<int>(BattleSituation::kIdle));
+			player->LookTarget();
+		}
+		//初期化を行う
+		m_pTutorialUi->InitStartMenu();
+		//更新処理の変更
+		m_updateSituationFunc = &TutorialManager::UpdateStartMenu;
+		//描画処理の変更
+		m_drawSituationFunc = &TutorialManager::DrawStartMenu;
+		//HPバーを非表示にする
+		m_isDrawHpBar = false;
+	}
+	//チュートリアルセレクト時
+	else if (next == TutorialSituation::kSelectMenu)
+	{
+		//プレイヤーの状況を変更
+		for (auto& player : m_pCharacters) player->ChangeSituationUpdate(static_cast<int>(BattleSituation::kIdle));
+		//初期化を行う
+		m_pTutorialUi->InitSelectMenu();
+		//更新処理の変更
+		m_updateSituationFunc = &TutorialManager::UpdateSelectMenu;
+		//描画処理の変更
+		m_drawSituationFunc = &TutorialManager::DrawSelectMenu;
+	}
 	//開始時
 	else if (next == TutorialSituation::kStart)
 	{
 		//プレイヤーの状況を変更
 		for (auto& player : m_pCharacters)
 		{
-			player->ChangeSituationUpdate(static_cast<int>(BattleSituation::kMenu));
+			player->ChangeSituationUpdate(static_cast<int>(BattleSituation::kIdle));
 			player->RetryInit();
 		}
 		//初期化を行う

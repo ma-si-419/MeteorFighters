@@ -86,6 +86,7 @@ private:
 	enum class TutorialSituation
 	{
 		kStartMenu,
+		kSelectMenu,
 		kPlayMenu,
 		kStart,
 		kPlaying,
@@ -120,6 +121,8 @@ private:
 
 	void UpdateSuccess();
 
+	void UpdateSelectMenu();
+
 	void DrawStartMenu();
 
 	void DrawPlayMenu();
@@ -129,6 +132,8 @@ private:
 	void DrawPlaying();
 
 	void DrawSuccess();
+
+	void DrawSelectMenu();
 
 	/// <summary>
 	/// èÛãµÇïœâªÇ≥ÇπÇÈ

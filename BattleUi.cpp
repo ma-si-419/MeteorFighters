@@ -53,7 +53,7 @@ namespace
 	constexpr int kResultMenuFontSize = 50;
 
 	//メニューの文字を表示する座標
-	constexpr int kMenuStringPosX = Game::kWindowWidth / 2;
+	constexpr int kPlayMenuStringPosX = Game::kWindowWidth / 2;
 	
 	//メニューの文字
 	const std::string kMenuString[static_cast<int>(BattleUi::MenuItem::kItemNum)] =
@@ -64,7 +64,7 @@ namespace
 		"メニューに戻る"
 	};
 
-	constexpr int kMenuStringPosY[static_cast<int>(BattleUi::MenuItem::kItemNum)] =
+	constexpr int kPlayMenuStringPosY[static_cast<int>(BattleUi::MenuItem::kItemNum)] =
 	{
 		200,
 		380,
@@ -335,12 +335,12 @@ void BattleUi::DrawMenu()
 	DrawRotaGraph(kMenuPosX, kMenuPosY, 1.0, 0.0, graphManager.GetHandle("Menu"), true);
 
 	//選択している項目を示すボックスを表示
-	DrawRotaGraph(kMenuStringPosX, kMenuStringPosY[m_selectItem], m_selectItemBoxScale, 0.0, graphManager.GetHandle("SelectItem"), true);
+	DrawRotaGraph(kPlayMenuStringPosX, kPlayMenuStringPosY[m_selectItem], m_selectItemBoxScale, 0.0, graphManager.GetHandle("SelectItem"), true);
 
 	//メニューの文字を表示する
 	for (int i = 0; i < static_cast<int>(BattleUi::MenuItem::kItemNum); i++)
 	{
-		MyEngine::Vector2 pos(kMenuStringPosX, kMenuStringPosY[i]);
+		MyEngine::Vector2 pos(kPlayMenuStringPosX, kPlayMenuStringPosY[i]);
 
 		DrawStringCenter(kMenuString[i], pos, m_menuFontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));;
 	}
@@ -406,12 +406,12 @@ void BattleUi::DrawResult()
 		DrawRotaGraph(kMenuPosX,kMenuPosY,1.0,0.0,graphManager.GetHandle("Menu"),true);
 		
 		//選択している項目を示すボックスを表示
-		DrawRotaGraph(kMenuStringPosX, kResultStringPosY[m_selectItem], m_selectItemBoxScale, 0.0, graphManager.GetHandle("SelectItem"), true);
+		DrawRotaGraph(kPlayMenuStringPosX, kResultStringPosY[m_selectItem], m_selectItemBoxScale, 0.0, graphManager.GetHandle("SelectItem"), true);
 
 		//メニューの文字を表示する
 		for (int i = 0; i < static_cast<int>(BattleUi::ResultItem::kItemNum); i++)
 		{
-			MyEngine::Vector2 pos(kMenuStringPosX, kResultStringPosY[i]);
+			MyEngine::Vector2 pos(kPlayMenuStringPosX, kResultStringPosY[i]);
 
 			DrawStringCenter(kResultString[i], pos, m_menuFontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));;
 		}

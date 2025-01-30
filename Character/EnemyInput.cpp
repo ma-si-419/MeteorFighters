@@ -598,7 +598,7 @@ void EnemyInput::None()
 
 #ifdef _DEBUG
 
-	printfDx("‰½‚à‚µ‚È‚¢\n");
+	//printfDx("‰½‚à‚µ‚È‚¢\n");
 
 #endif // _DEBUG
 

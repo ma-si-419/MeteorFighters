@@ -841,6 +841,11 @@ void Character::ChangeSituationUpdate(int situation)
 	{
 		m_updateSituationFunc = &Character::UpdateNone;
 	}
+	//操作を受け付けないとき
+	else if (sit == GameManagerBase::BattleSituation::kIdle)
+	{
+		m_updateSituationFunc = &Character::UpdateIdle;
+	}
 }
 
 void Character::SetModelHandle(int handle)
@@ -973,6 +978,27 @@ void Character::UpdateResult()
 		}
 	}
 
+	PlayAnim();
+}
+
+void Character::UpdateIdle()
+{
+	//移動をしないようにする
+	m_rigidbody.SetVelo(MyEngine::Vector3(0, 0, 0));
+
+	//アニメーションの再生速度をリセットする
+	SetAnimPlaySpeed();
+
+	//残像の更新を行う
+	UpdateAfterImage();
+
+	//アニメーションを変更していなければ変更する
+	if (m_playAnimKind != AnimKind::kSkyIdle)
+	{
+		ChangeAnim(AnimKind::kSkyIdle, true);
+	}
+
+	//アニメーションの更新を行う
 	PlayAnim();
 }
 

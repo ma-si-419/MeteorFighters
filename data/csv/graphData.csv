@@ -25,7 +25,7 @@ ItemBox,ItemBox,Menu
 HpBar,HpBar,Tutorial
 HpBarNum,HpBarNumBox,Tutorial
 MpBar,MpBar,Tutorial
-BackBox,TutorialBackBox,Tutorial
+StartBackBox,TutorialBackBox,Tutorial
 ButtonFrame,TutorialButtonFrame,Tutorial
 A,TutorialA,Tutorial
 B,TutorialB,Tutorial
@@ -40,8 +40,12 @@ StickUp,TutorialLStickUp,Tutorial
 StickDown,TutorialLStickDown,Tutorial
 +,TutorialPlus,Tutorial
 StartMenu,TutorialStartMenu,Tutorial
-StartMenuItem,TutorialStartMenu,Tutorial
+StartMenuItem,TutorialStartMenuItemBox,Tutorial
 StartMenuSelectItem,TutorialStartMenuSelectItemBox,Tutorial
+SelectMenuSelectItem,TutorialStartMenuSelectItemBox,Tutorial
+SelectMenu,TutorialSelectTutorialMenu,Tutorial
+SelectMenuRB,TutorialSelectTutorialRB,Tutorial
+SelectMenuLB,TutorialSelectTutorialLB,Tutorial
 PlayMenu,Menu,Tutorial
 PlayMenuSelectItem,MenuSelectItem,Tutorial
 Success,TutorialSuccess,Tutorial

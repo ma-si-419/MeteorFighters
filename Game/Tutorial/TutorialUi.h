@@ -9,13 +9,22 @@ class TutorialUi
 {
 public:
 
-	enum class MenuItem
+	enum class PlayMenuItem
 	{
 		kReset,
 		kChangeTutorial,
 		kMenuEnd,
 		kTutorialEnd,
 		kItemEnd = kTutorialEnd,
+		kItemNum
+	};
+
+	enum class StartMenuItem
+	{
+		kStartTutorial,
+		kSelectTutorial,
+		kEnd,
+		kItemEnd = kEnd,
 		kItemNum
 	};
 
@@ -37,11 +46,15 @@ public:
 
 	void InitStart();
 
+	void InitSelectMenu();
+
 	void InitPlaying(int number);
 
 	void InitSuccess();
 
 	void DrawStartMenu();
+
+	void DrawSelectMenu();
 
 	void DrawPlayMenu();
 
@@ -50,6 +63,7 @@ public:
 	void DrawPlaying(int number);
 
 	void DrawSuccess(int number);
+
 
 	/// <summary>
 	/// 今行っているチュートリアルをクリアしたかどうかを設定する
@@ -60,7 +74,13 @@ public:
 	/// メニュー画面で選択したものを取得する
 	/// </summary>
 	/// <returns>なにも選択していないときは-1を返す</returns>
-	MenuItem GetSelectItem() { return m_selectItem; };
+	PlayMenuItem GetPlayMenuSelectItem() { return m_playMenuSelectItem; };
+
+	/// <summary>
+	/// スタート画面で選択したものを取得する
+	/// </summary>
+	/// <returns>何も選択していないときは-1を返す</returns>
+	StartMenuItem GetStartMenuSelectItem() { return m_startMenuSelectItem; }
 
 	/// <summary>
 	/// 選択したチュートリアル
@@ -80,6 +100,18 @@ public:
 	bool IsSuccessEnd() { return m_isSuccessEnd; }
 
 	/// <summary>
+	/// スタートメニューで選択できるかどうかを取得する
+	/// </summary>
+	/// <returns>選択できるのならtrue</returns>
+	bool IsSelectStartMenu() { return m_isSelectStartMenu; }
+
+	/// <summary>
+	/// セレクトメニューで選択できるかどうかを取得する
+	/// </summary>
+	/// <returns>選択できるのなら</returns>
+	bool IsSelectSelectMenu() { return m_isSelectSelectMenu; }
+
+	/// <summary>
 	/// チュートリアルのデータを設定する
 	/// </summary>
 	/// <param name="data">外部から読み込んだデータ</param>
@@ -90,6 +122,8 @@ private:
 	void DrawStringCenter(std::string string, MyEngine::Vector2 centerPos, int fontHandle, int color, int edgeColor);
 
 	void UpdateStartMenu();
+
+	void UpdateSelectMenu();
 
 	void UpdatePlayMenu();
 
@@ -119,7 +153,7 @@ private:
 	std::vector<std::vector<std::string>> m_tutorialPlayData;
 
 	//チュートリアルのスタートメニューのデータ
-	std::vector<std::vector<std::string>> m_tutorialStartMenuData;
+	std::vector<std::vector<std::string>> m_tutorialSelectMenuData;
 
 	//開始時の文字のフォントハンドル
 	int m_startFontHandle;
@@ -128,7 +162,10 @@ private:
 	int m_playingFontHandle;
 
 	//メニューの文字のフォントハンドル
-	int m_menuFontHandle;
+	int m_playMenuFontHandle;
+
+	//スタートメニューの文字のフォントハンドル
+	int m_startMenuFontHandle;
 
 	//表示しているボタンの数
 	int m_drawButtonNum;
@@ -143,7 +180,14 @@ private:
 	std::map<std::string, GraphData> m_drawGraphs;
 
 	//メニュー画面で現在選択している項目
-	MenuItem m_selectItem;
+	PlayMenuItem m_playMenuSelectItem;
+
+	//スタートメニューで現在選択している項目
+	StartMenuItem m_startMenuSelectItem;
+
+	//セレクトメニューで現在選択している項目
+	int m_selectMenuIndexX;
+	int m_selectMenuIndexY;
 
 	//メニュー画面で前回項目を動かしてからの時間
 	int m_selectItemMoveTime;
@@ -159,5 +203,12 @@ private:
 
 	//クリアの演出が終わったかどうか
 	bool m_isSuccessEnd;
+
+	//スタートメニューで選択できるかどうか
+	bool m_isSelectStartMenu;
+
+	//セレクトメニューで選択できるかどうか
+	bool m_isSelectSelectMenu;
+
 };
 

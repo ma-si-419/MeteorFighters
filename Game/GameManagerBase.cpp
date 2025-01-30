@@ -76,7 +76,8 @@ GameManagerBase::GameManagerBase(std::shared_ptr<GameCamera> camera, GameManager
 	m_isButtonBashing(false),
 	m_buttonBashingCameraRota(0.0f),
 	m_bashingButton("empty"),
-	m_buttonBashingSituation(ButtonBashingSituation::kFirstHit)
+	m_buttonBashingSituation(ButtonBashingSituation::kFirstHit),
+	m_isDrawHpBar(true)
 {
 	m_pCamera = camera;
 
@@ -438,14 +439,18 @@ void GameManagerBase::DrawCommon()
 	//ƒGƒtƒFƒNƒg‚Ì•`‰æ
 	m_pEffectManager->Draw();
 
-	//1P‚Ì‘Ì—Í‚ğ•`‰æ‚·‚é
-	m_pGameUi->DrawHpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetHp(), true);
-	//2P‚Ì‘Ì—Í‚ğ•`‰æ‚·‚é
-	m_pGameUi->DrawHpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetHp(), false);
-	//1P‚Ì‹C—Í‚ğ•`‰æ‚·‚é
-	m_pGameUi->DrawMpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetMp(), true);
-	//2P‚Ì‹C—Í‚ğ•`‰æ‚·‚é
-	m_pGameUi->DrawMpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetMp(), false);
+	//‘Ì—Í‚ğ•`‰æ‚·‚é‚©‚Ç‚¤‚©
+	if (m_isDrawHpBar)
+	{
+		//1P‚Ì‘Ì—Í‚ğ•`‰æ‚·‚é
+		m_pGameUi->DrawHpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetHp(), true);
+		//2P‚Ì‘Ì—Í‚ğ•`‰æ‚·‚é
+		m_pGameUi->DrawHpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetHp(), false);
+		//1P‚Ì‹C—Í‚ğ•`‰æ‚·‚é
+		m_pGameUi->DrawMpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetMp(), true);
+		//2P‚Ì‹C—Í‚ğ•`‰æ‚·‚é
+		m_pGameUi->DrawMpBar(m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetMp(), false);
+	}
 
 	//ƒ{ƒ^ƒ“˜A‘Åó‘Ô‚¾‚Á‚½‚ç
 	if (m_isButtonBashing)
