@@ -17,6 +17,11 @@ namespace
 	constexpr int kPlayMenuFontSize = 32;
 	//スタートメニューの文字のフォントのサイズ
 	constexpr int kStartMenuFontSize = 32;
+	//セレクトメニューの文字のフォントのサイズ
+	constexpr int kSelectMenuFontSize = 32;
+	//セレクトメニューのチュートリアルの種類のフォントのサイズ
+	constexpr int kSelectMenuTutorialKindFontSize = 48;
+
 
 	//チュートリアルのボタンを表示する座標のフレーム
 	constexpr int kButtonFramePosX = Game::kWindowWidth / 2;
@@ -67,11 +72,18 @@ namespace
 	constexpr int kSelectMenuStringPosX = kSelectMenuPosX;
 	constexpr int kSelectMenuStringPosY = kSelectMenuPosY - 60;
 
+	//セレクトメニューの選択しているチュートリアルの種類を表示する座標
+	constexpr int kSelectMenuTutorialKindPosX = kSelectMenuPosX - 5;
+	constexpr int kSelectMenuTutorialKindPosY = kSelectMenuPosY - 180;
+
 	//セレクトメニューの文字を表示する間隔
-	constexpr int kSelectMenuDistanceY = 80;
+	constexpr int kSelectMenuDistanceY = 84;
 
 	//セレクトメニューのRBとLBの文字とメニューの中心との距離
-	constexpr int kSelectMenuRbLbDistance = 150;
+	constexpr int kSelectMenuRbLbDistance = 380;
+
+	//セレクトメニューのRBとLBを表示する座標
+	constexpr int kSelectMenuRbLbPosY = kSelectMenuTutorialKindPosY;
 
 	//セレクトメニューがはいってくるときの速さ
 	constexpr int kSelectMenuMoveSpeed = 60;
@@ -212,6 +224,7 @@ TutorialUi::TutorialUi() :
 	m_selectTutorialStringArrowPos(0),
 	m_isSuccessTutorial(false),
 	m_isSelectStartMenu(false),
+	m_isSelectSelectMenu(false),
 	m_selectMenuIndexX(0),
 	m_selectMenuIndexY(0)
 {
@@ -225,6 +238,8 @@ TutorialUi::TutorialUi() :
 	m_playingFontHandle = CreateFontToHandle(kFontName, kPlayingFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, 0, 3);
 	m_playMenuFontHandle = CreateFontToHandle(kFontName, kPlayMenuFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, 0, 2);
 	m_startMenuFontHandle = CreateFontToHandle(kFontName, kStartMenuFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, 0, 2);
+	m_selectMenuFontHandle = CreateFontToHandle(kFontName, kSelectMenuFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, 0, 2);
+	m_selectTutorialKindFontHandle = CreateFontToHandle(kFontName, kSelectMenuTutorialKindFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, 0, 3);
 }
 
 TutorialUi::~TutorialUi()
@@ -247,6 +262,8 @@ void TutorialUi::Final()
 	DeleteFontToHandle(m_playingFontHandle);
 	DeleteFontToHandle(m_playMenuFontHandle);
 	DeleteFontToHandle(m_startMenuFontHandle);
+	DeleteFontToHandle(m_selectMenuFontHandle);
+	DeleteFontToHandle(m_selectTutorialKindFontHandle);
 }
 
 void TutorialUi::InitStartMenu()
@@ -357,15 +374,19 @@ void TutorialUi::InitSelectMenu()
 	//アップデートを変更する
 	m_updateFunc = &TutorialUi::UpdateSelectMenu;
 
+	//選択している項目をリセットする
+	m_selectMenuIndexX = 0;
+	m_selectMenuIndexY = 0;
+
 	//メニュー画面で選択できる項目を示す画像を登録する
-	for (int i = 0; i < m_tutorialSelectMenuData[m_selectMenuIndexX].size(); i++)
+	for (int i = 0; i < m_tutorialSelectMenuData[m_selectMenuIndexX].size() + 1; i++)
 	{
 		std::string name = kSelectMenuItemGraphName;
 		name += std::to_string(i);
 
 		GraphData itemBox;
 
-		itemBox.handle = manager.GetHandle(kSelectMenuSelectItemGraphName);
+		itemBox.handle = manager.GetHandle(kSelectMenuItemGraphName);
 		itemBox.pos = MyEngine::Vector2(Game::kWindowWidth + kSelectMenuStringPosX + kSelectMenuInitDistanceX, kSelectMenuStringPosY + (kSelectMenuDistanceY * i));
 		m_drawGraphs[name] = itemBox;
 	}
@@ -373,13 +394,13 @@ void TutorialUi::InitSelectMenu()
 	//RBボタンを登録する
 	GraphData rbButton;
 	rbButton.handle = manager.GetHandle(kSelectMenuRBGraphName);
-	rbButton.pos = MyEngine::Vector2(Game::kWindowWidth + kSelectMenuPosX + kSelectMenuRbLbDistance + kSelectMenuInitDistanceX, kSelectMenuStringPosY);
+	rbButton.pos = MyEngine::Vector2(Game::kWindowWidth + kSelectMenuPosX + kSelectMenuRbLbDistance + kSelectMenuInitDistanceX, kSelectMenuRbLbPosY);
 	m_drawGraphs[kSelectMenuRBGraphName] = rbButton;
 
 	//LBボタンを登録する
 	GraphData lbButton;
 	lbButton.handle = manager.GetHandle(kSelectMenuLBGraphName);
-	lbButton.pos = MyEngine::Vector2(Game::kWindowWidth + kSelectMenuPosX - kSelectMenuRbLbDistance + kSelectMenuInitDistanceX, kSelectMenuStringPosY);
+	lbButton.pos = MyEngine::Vector2(Game::kWindowWidth + kSelectMenuPosX - kSelectMenuRbLbDistance + kSelectMenuInitDistanceX, kSelectMenuRbLbPosY);
 	m_drawGraphs[kSelectMenuLBGraphName] = lbButton;
 
 	//メニュー画面で選択している項目を示す画像を登録する
@@ -388,12 +409,8 @@ void TutorialUi::InitSelectMenu()
 	selectItemBox.pos = MyEngine::Vector2(Game::kWindowWidth + kSelectMenuStringPosX + kSelectMenuInitDistanceX, kSelectMenuStringPosY);
 	m_drawGraphs[kSelectMenuSelectItemGraphName] = selectItemBox;
 
-	//選択している項目をリセットする
-	m_selectMenuIndexX = 0;
-	m_selectMenuIndexY = 0;
-
 	//一定の位置にくるまで選択できないようにする
-	m_isSelectStartMenu = false;
+	m_isSelectSelectMenu = false;
 }
 
 void TutorialUi::InitPlaying(int number)
@@ -596,38 +613,11 @@ void TutorialUi::DrawStartMenu()
 	//セレクトメニューの画像が登録されていたら描画する
 	if (m_drawGraphs.find(kSelectMenuGraphName) != m_drawGraphs.end())
 	{
-		GraphData selectMenu = m_drawGraphs[kSelectMenuGraphName];
-		DrawRotaGraph(static_cast<int>(selectMenu.pos.x), static_cast<int>(selectMenu.pos.y), selectMenu.scale, 0.0, selectMenu.handle, true);
-		//アイテムの数だけループ
-		for (int i = 0; i < m_tutorialSelectMenuData[m_selectMenuIndexX].size(); i++)
+		//更新関数がスタートメニューなら
+		if (m_updateFunc == &TutorialUi::UpdateStartMenu)
 		{
-			//文字列の裏のボックスを表示する
-			std::string name = kSelectMenuItemGraphName;
-			name += std::to_string(i);
-			GraphData itemBox = m_drawGraphs[name];
-			DrawRotaGraph(static_cast<int>(itemBox.pos.x), static_cast<int>(itemBox.pos.y), itemBox.scale, 0.0, itemBox.handle, true);
+			DrawSelectMenu();
 		}
-		//選択している項目のボックスを表示する
-		GraphData selectItemBox = m_drawGraphs[kSelectMenuSelectItemGraphName];
-		DrawRotaGraph(static_cast<int>(selectItemBox.pos.x), static_cast<int>(selectItemBox.pos.y), selectItemBox.scale, 0.0, selectItemBox.handle, true);
-		//アイテムの数だけループ
-		for (int i = 0; i < m_tutorialSelectMenuData[m_selectMenuIndexX].size(); i++)
-		{
-			//ボックスの座標に合わせる
-			std::string name = kSelectMenuItemGraphName;
-			name += std::to_string(i);
-			GraphData itemBox = m_drawGraphs[name];
-			//文字列の座標を設定
-			MyEngine::Vector2 pos = itemBox.pos;
-			DrawStringCenter(m_tutorialSelectMenuData[m_selectMenuIndexX][i], pos, m_startMenuFontHandle, GetColor(0, 0, 0), GetColor(255, 255, 255));
-		}
-		//RBボタンを描画する
-		GraphData rbButton = m_drawGraphs[kSelectMenuRBGraphName];
-		DrawRotaGraph(static_cast<int>(rbButton.pos.x), static_cast<int>(rbButton.pos.y), rbButton.scale, 0.0, rbButton.handle, true);
-		//LBボタンを描画する
-		GraphData lbButton = m_drawGraphs[kSelectMenuLBGraphName];
-		DrawRotaGraph(static_cast<int>(lbButton.pos.x), static_cast<int>(lbButton.pos.y), lbButton.scale, 0.0, lbButton.handle, true);
-
 	}
 
 }
@@ -799,43 +789,9 @@ void TutorialUi::DrawSuccess(int number)
 void TutorialUi::DrawSelectMenu()
 {
 	//スタートメニューの画像を描画
+	if (m_updateFunc == &TutorialUi::UpdateSelectMenu)
 	{
-		GraphData menu = m_drawGraphs[kStartMenuGraphName];
-
-		//メニューを描画
-		DrawRotaGraph(static_cast<int>(menu.pos.x), static_cast<int>(menu.pos.y), menu.scale, 0.0, menu.handle, true);
-
-		//アイテムの数だけループ
-		for (int i = 0; i < static_cast<int>(TutorialUi::StartMenuItem::kItemNum); i++)
-		{
-			//文字列の裏のボックスを表示する
-			std::string name = kStartMenuItemGraphName;
-			name += std::to_string(i);
-
-			GraphData itemBox = m_drawGraphs[name];
-
-			DrawRotaGraph(static_cast<int>(itemBox.pos.x), static_cast<int>(itemBox.pos.y), itemBox.scale, 0.0, itemBox.handle, true);
-		}
-
-		//選択している項目のボックスを表示する
-		GraphData selectItemBox = m_drawGraphs[kStartMenuSelectItemGraphName];
-
-		DrawRotaGraph(static_cast<int>(selectItemBox.pos.x), static_cast<int>(selectItemBox.pos.y), selectItemBox.scale, 0.0, selectItemBox.handle, true);
-
-		//アイテムの数だけループ
-		for (int i = 0; i < static_cast<int>(TutorialUi::StartMenuItem::kItemNum); i++)
-		{
-			//ボックスの座標に合わせる
-			std::string name = kStartMenuItemGraphName;
-			name += std::to_string(i);
-
-			GraphData itemBox = m_drawGraphs[name];
-
-			//文字列の座標を設定
-			MyEngine::Vector2 pos = itemBox.pos;
-
-			DrawStringCenter(kStartMenuStrings[i], pos, m_startMenuFontHandle, GetColor(0, 0, 0), GetColor(255, 255, 255));
-		}
+		DrawStartMenu();
 	}
 
 	//セレクトメニューの画像表示
@@ -844,7 +800,7 @@ void TutorialUi::DrawSelectMenu()
 		//メニューを描画
 		DrawRotaGraph(static_cast<int>(menu.pos.x), static_cast<int>(menu.pos.y), menu.scale, 0.0, menu.handle, true);
 		//アイテムの数だけループ
-		for (int i = 0; i < m_tutorialSelectMenuData[m_selectMenuIndexX].size(); i++)
+		for (int i = 0; i < m_tutorialSelectMenuData[m_selectMenuIndexX + 1].size(); i++)
 		{
 			//文字列の裏のボックスを表示する
 			std::string name = kSelectMenuItemGraphName;
@@ -856,7 +812,7 @@ void TutorialUi::DrawSelectMenu()
 		GraphData selectItemBox = m_drawGraphs[kSelectMenuSelectItemGraphName];
 		DrawRotaGraph(static_cast<int>(selectItemBox.pos.x), static_cast<int>(selectItemBox.pos.y), selectItemBox.scale, 0.0, selectItemBox.handle, true);
 		//アイテムの数だけループ
-		for (int i = 0; i < m_tutorialSelectMenuData[m_selectMenuIndexX].size(); i++)
+		for (int i = 0; i < m_tutorialSelectMenuData[m_selectMenuIndexX + 1].size(); i++)
 		{
 			//ボックスの座標に合わせる
 			std::string name = kSelectMenuItemGraphName;
@@ -864,8 +820,17 @@ void TutorialUi::DrawSelectMenu()
 			GraphData itemBox = m_drawGraphs[name];
 			//文字列の座標を設定
 			MyEngine::Vector2 pos = itemBox.pos;
-			DrawStringCenter(m_tutorialSelectMenuData[m_selectMenuIndexX][i], pos, m_startMenuFontHandle, GetColor(0, 0, 0), GetColor(255, 255, 255));
+			DrawStringCenter(m_tutorialSelectMenuData[m_selectMenuIndexX + 1][i], pos, m_selectMenuFontHandle, GetColor(0, 0, 0), GetColor(255, 255, 255));
 		}
+		//選択している大項目を表示する
+		MyEngine::Vector2 selectTutorialKindStringPos = menu.pos;
+
+		//Y座標の設定
+		selectTutorialKindStringPos.y = kSelectMenuTutorialKindPosY;
+
+		//描画
+		DrawStringCenter(m_tutorialSelectMenuData[m_selectMenuIndexX][0], selectTutorialKindStringPos, m_selectTutorialKindFontHandle, GetColor(64, 64, 255), GetColor(255, 255, 16));
+
 		//RBボタンを表示する
 		GraphData rbButton = m_drawGraphs[kSelectMenuRBGraphName];
 		DrawRotaGraph(static_cast<int>(rbButton.pos.x), static_cast<int>(rbButton.pos.y), rbButton.scale, 0.0, rbButton.handle, true);
@@ -877,48 +842,32 @@ void TutorialUi::DrawSelectMenu()
 
 void TutorialUi::DrawStringCenter(std::string string, MyEngine::Vector2 centerPos, int font, int color, int edgeColor)
 {
-
-	//文字を表示する座標
+	// 文字を表示する座標
 	MyEngine::Vector2 pos;
 
-	//文字数
+	// 文字数
 	int wordNum = GetStringLength(string.c_str());
 
-	//文字数が偶数の場合
+	// 文字の幅を計算
+	int charWidth = GetFontSizeToHandle(font) + GetFontEdgeSizeToHandle(font);
+
+	// 文字数が偶数の場合
 	if (wordNum % 2 == 0)
 	{
-		//文字の座標を左にずらす
-		pos.x = centerPos.x - static_cast<float>(GetFontSizeToHandle(font) * wordNum / 2);
-
-		//文字の大きさの半分だけ上にずらす
-		pos.y = centerPos.y - static_cast<float>(GetFontSizeToHandle(font) / 2);
+		// 文字の座標を左にずらす
+		pos.x = centerPos.x - static_cast<float>(charWidth * wordNum / 2);
 	}
-	//奇数の場合
+	// 奇数の場合
 	else
 	{
-		pos.x = centerPos.x;
-
-		//文字数が1文字じゃなければ
-		if (wordNum > 1)
-		{
-			//文字の座標を左にずらす
-			pos.x -= static_cast<float>(GetFontSizeToHandle(font) * (wordNum + 1) / 2);
-		}
-		//文字数が一文字であれば
-		else
-		{
-			//文字の座標を一文字分左にずらす
-			pos.x -= static_cast<float>(GetFontSizeToHandle(font) * wordNum);
-		}
-
-		//半角分右に動かす
-		pos.x += GetFontSizeToHandle(font) / 2;
-
-		//文字の大きさの半分だけ上にずらす
-		pos.y = centerPos.y - static_cast<float>(GetFontSizeToHandle(font) / 2);
+		// 文字の座標を左にずらす
+		pos.x = centerPos.x - static_cast<float>(charWidth * (wordNum / 2)) - static_cast<float>(charWidth / 2);
 	}
 
-	//文字の描画
+	// 文字の大きさの半分だけ上にずらす
+	pos.y = centerPos.y - static_cast<float>(charWidth / 2);
+
+	// 文字の描画
 	DrawStringToHandle(static_cast<int>(pos.x), static_cast<int>(pos.y), string.c_str(), color, font, edgeColor);
 }
 
@@ -936,7 +885,7 @@ void TutorialUi::UpdateStartMenu()
 		//メニュー画面の座標を更新
 		m_drawGraphs[kSelectMenuGraphName] = menu;
 		//選択できる項目を数だけループ
-		for (int i = 0; i < m_tutorialSelectMenuData[m_selectMenuIndexX].size(); i++)
+		for (int i = 0; i < m_tutorialSelectMenuData[m_selectMenuIndexX].size() + 1; i++)
 		{
 			//選択できる項目を示す画像
 			std::string name = kSelectMenuItemGraphName;
@@ -1120,94 +1069,199 @@ void TutorialUi::UpdateStartMenu()
 
 void TutorialUi::UpdateSelectMenu()
 {
+	if (!m_isSelectSelectMenu)
 	{
-		//スタートメニューの画像を左に動かす
-		GraphData menu = m_drawGraphs[kStartMenuGraphName];
-		menu.pos.x -= kStartMenuMoveSpeed;
 
-		//選択肢の画像を左に動かす
-		for (int i = 0; i < static_cast<int>(TutorialUi::StartMenuItem::kItemNum); i++)
 		{
-			std::string name = kStartMenuItemGraphName;
+			//スタートメニューの画像を左に動かす
+			GraphData menu = m_drawGraphs[kStartMenuGraphName];
+			menu.pos.x -= kStartMenuMoveSpeed;
+
+			//選択肢の画像を左に動かす
+			for (int i = 0; i < static_cast<int>(TutorialUi::StartMenuItem::kItemNum); i++)
+			{
+				std::string name = kStartMenuItemGraphName;
+				name += std::to_string(i);
+				auto& itemBox = m_drawGraphs[name];
+				itemBox.pos.x -= kStartMenuMoveSpeed;
+
+				m_drawGraphs[name] = itemBox;
+			}
+
+			//選択している項目を示す画像を左に動かす
+			auto& selectItemBox = m_drawGraphs[kStartMenuSelectItemGraphName];
+			selectItemBox.pos.x -= kStartMenuMoveSpeed;
+
+			//メニュー画像の座標を更新
+			m_drawGraphs[kStartMenuGraphName] = menu;
+
+			//選択している項目を示す画像を更新
+			m_drawGraphs[kStartMenuSelectItemGraphName] = selectItemBox;
+		}
+
+		//セレクトメニューの画像を左に動かす
+		GraphData menu = m_drawGraphs[kSelectMenuGraphName];
+		menu.pos.x -= kSelectMenuMoveSpeed;
+
+		//クランプ
+		menu.pos.x = fmax(menu.pos.x, static_cast<float>(kSelectMenuPosX));
+
+		//一定の座標まで来たら
+		if (menu.pos.x == static_cast<float>(kSelectMenuPosX))
+		{
+			//選択できるようにする
+			m_isSelectSelectMenu = true;
+		}
+
+		//メニュー画像の座標を更新
+		m_drawGraphs[kSelectMenuGraphName] = menu;
+
+		//選択できる項目を数だけループ
+		for (int i = 0; i < m_tutorialSelectMenuData[m_selectMenuIndexX].size() + 1; i++)
+		{
+			//選択できる項目を示す画像
+			std::string name = kSelectMenuItemGraphName;
 			name += std::to_string(i);
 			auto& itemBox = m_drawGraphs[name];
-			itemBox.pos.x -= kStartMenuMoveSpeed;
-
+			//選択できる項目を左に動かす
+			itemBox.pos.x -= kSelectMenuMoveSpeed;
+			//クランプ
+			itemBox.pos.x = fmax(itemBox.pos.x, static_cast<float>(kSelectMenuStringPosX));
+			//選択できる項目を更新
 			m_drawGraphs[name] = itemBox;
 		}
 
-		//選択している項目を示す画像を左に動かす
-		auto& selectItemBox = m_drawGraphs[kStartMenuSelectItemGraphName];
-		selectItemBox.pos.x -= kStartMenuMoveSpeed;
+		//選択している項目を左に動かす
+		auto& selectItemBox = m_drawGraphs[kSelectMenuSelectItemGraphName];
+		selectItemBox.pos.x -= kSelectMenuMoveSpeed;
 
-		//メニュー画像の座標を更新
-		m_drawGraphs[kStartMenuGraphName] = menu;
-
-		//選択している項目を示す画像を更新
-		m_drawGraphs[kStartMenuSelectItemGraphName] = selectItemBox;
-	}
-
-	//セレクトメニューの画像を左に動かす
-	GraphData menu = m_drawGraphs[kSelectMenuGraphName];
-	menu.pos.x -= kSelectMenuMoveSpeed;
-
-	//クランプ
-	menu.pos.x = fmax(menu.pos.x, static_cast<float>(kSelectMenuPosX));
-
-	//一定の座標まで来たら
-	if (menu.pos.x == static_cast<float>(kSelectMenuPosX))
-	{
-		//選択できるようにする
-		m_isSelectSelectMenu = true;
-	}
-
-	//メニュー画像の座標を更新
-	m_drawGraphs[kSelectMenuGraphName] = menu;
-
-	//選択できる項目を数だけループ
-	for (int i = 0; i < m_tutorialSelectMenuData[m_selectMenuIndexX].size(); i++)
-	{
-		//選択できる項目を示す画像
-		std::string name = kSelectMenuItemGraphName;
-		name += std::to_string(i);
-		auto& itemBox = m_drawGraphs[name];
-		//選択できる項目を左に動かす
-		itemBox.pos.x -= kSelectMenuMoveSpeed;
 		//クランプ
-		itemBox.pos.x = fmax(itemBox.pos.x, static_cast<float>(kSelectMenuStringPosX));
-		//選択できる項目を更新
-		m_drawGraphs[name] = itemBox;
+		selectItemBox.pos.x = fmax(selectItemBox.pos.x, static_cast<float>(kSelectMenuStringPosX));
+
+		//選択している項目を更新
+		m_drawGraphs[kSelectMenuSelectItemGraphName] = selectItemBox;
+
+		//LBボタンを左に動かす
+		auto& lbButton = m_drawGraphs[kSelectMenuLBGraphName];
+		lbButton.pos.x -= kSelectMenuMoveSpeed;
+
+		//クランプ
+		lbButton.pos.x = fmax(lbButton.pos.x, static_cast<float>(kSelectMenuPosX - kSelectMenuRbLbDistance));
+
+		//LBボタンを更新
+		m_drawGraphs[kSelectMenuLBGraphName] = lbButton;
+
+		//RBボタンを左に動かす
+		auto& rbButton = m_drawGraphs[kSelectMenuRBGraphName];
+		rbButton.pos.x -= kSelectMenuMoveSpeed;
+
+		//クランプ
+		rbButton.pos.x = fmax(rbButton.pos.x, static_cast<float>(kSelectMenuPosX + kSelectMenuRbLbDistance));
+
+		//RBボタンを更新
+		m_drawGraphs[kSelectMenuRBGraphName] = rbButton;
+
+	}
+	else
+	{
+		auto input = MyEngine::Input::GetInstance().GetInputData(0);
+
+		int lastSelectMenuIndexY = m_selectMenuIndexY;
+
+		//RBLB入力で選択しているチュートリアルの種類を変更する
+		if (input->IsTrigger("RB"))
+		{
+			//CSVデータの配置の都合上+2する
+			m_selectMenuIndexX += 2;
+			//一番右で右入力した場合
+			if (m_selectMenuIndexX > m_tutorialSelectMenuData.size() - 2)
+			{
+				//一番左に移動する
+				m_selectMenuIndexX = 0;
+			}
+			//選択している項目をリセットする
+			m_selectMenuIndexY = 0;
+		}
+		else if (input->IsTrigger("LB"))
+		{
+			//CSVデータの配置の都合上-2する
+			m_selectMenuIndexX -= 2;
+			//一番左で左入力した場合
+			if (m_selectMenuIndexX < 0)
+			{
+				//一番右に移動する
+				m_selectMenuIndexX = m_tutorialSelectMenuData.size() - 2;
+			}
+			//選択している項目をリセットする
+			m_selectMenuIndexY = 0;
+		}
+
+
+		//上下入力で選択しているものを変更する
+		if (input->IsTrigger("Up"))
+		{
+			m_selectMenuIndexY--;
+
+			//一番上で上入力した場合
+			if (m_selectMenuIndexY < 0)
+			{
+				//一番下に移動する(CSVのデータの配置の都合上Indexに+1する)
+				m_selectMenuIndexY = m_tutorialSelectMenuData[m_selectMenuIndexX + 1].size() - 1;
+			}
+		}
+		else if (input->IsTrigger("Down"))
+		{
+			m_selectMenuIndexY++;
+
+			//一番下で入力された場合(CSVのデータの配置の都合上Indexに+1する)
+			if (m_selectMenuIndexY > m_tutorialSelectMenuData[m_selectMenuIndexX + 1].size() - 1)
+			{
+				//一番上に移動する
+				m_selectMenuIndexY = 0;
+			}
+		}
+
+		//リピート入力
+		if (m_selectItemMoveTime > kRepeatInterval)
+		{
+			if (input->GetPressTime("Up") > kRepeatInputTime)
+			{
+				m_selectMenuIndexY--;
+			}
+			else if (input->GetPressTime("Down") > kRepeatInputTime)
+			{
+				m_selectMenuIndexY++;
+			}
+		}
+
+		//最大値と最小値を超えないように
+		m_selectMenuIndexY = max(m_selectMenuIndexY, 0);
+		m_selectMenuIndexY = min(m_selectMenuIndexY, m_tutorialSelectMenuData[m_selectMenuIndexX + 1].size() - 1);
+
+		//選択している項目を表す画像
+		auto& selectItemBox = m_drawGraphs[kSelectMenuSelectItemGraphName];
+
+		//選択している項目が変化していたら
+		if (m_selectMenuIndexY != lastSelectMenuIndexY)
+		{
+			//変化してから何フレーム立ったかをリセットする
+			m_selectItemMoveTime = 0;
+
+			//選択している項目を示す画像を動かす
+			MyEngine::Vector2 pos = MyEngine::Vector2(kSelectMenuStringPosX, kSelectMenuStringPosY);
+			pos.y += kSelectMenuDistanceY * m_selectMenuIndexY;
+
+			//座標を設定
+			selectItemBox.pos = pos;
+		}
+		//選択している項目が変化していなければ
+		else
+		{
+			m_selectItemMoveTime++;
+		}
 	}
 
-	//選択している項目を左に動かす
-	auto& selectItemBox = m_drawGraphs[kSelectMenuSelectItemGraphName];
-	selectItemBox.pos.x -= kSelectMenuMoveSpeed;
 
-	//クランプ
-	selectItemBox.pos.x = fmax(selectItemBox.pos.x, static_cast<float>(kSelectMenuStringPosX));
-
-	//選択している項目を更新
-	m_drawGraphs[kSelectMenuSelectItemGraphName] = selectItemBox;
-
-	//LBボタンを左に動かす
-	auto& lbButton = m_drawGraphs[kSelectMenuLBGraphName];
-	lbButton.pos.x -= kSelectMenuMoveSpeed;
-
-	//クランプ
-	lbButton.pos.x = fmax(lbButton.pos.x, static_cast<float>(kSelectMenuPosX - kSelectMenuRbLbDistance));
-
-	//LBボタンを更新
-	m_drawGraphs[kSelectMenuLBGraphName] = lbButton;
-
-	//RBボタンを左に動かす
-	auto& rbButton = m_drawGraphs[kSelectMenuRBGraphName];
-	rbButton.pos.x -= kSelectMenuMoveSpeed;
-
-	//クランプ
-	rbButton.pos.x = fmax(rbButton.pos.x, static_cast<float>(kSelectMenuPosX + kSelectMenuRbLbDistance));
-
-	//RBボタンを更新
-	m_drawGraphs[kSelectMenuRBGraphName] = rbButton;
 }
 
 void TutorialUi::UpdatePlayMenu()

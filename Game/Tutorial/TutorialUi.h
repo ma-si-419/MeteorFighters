@@ -89,6 +89,12 @@ public:
 	int GetTutorialNumber() { return m_selectTutorialNumber; }
 
 	/// <summary>
+	/// セレクトメニューで選択しているチュートリアルの名前を取得する
+	/// </summary>
+	/// <returns>チュートリアルの名前</returns>
+	std::string GetSelectTutorialName() { return m_tutorialSelectMenuData[m_selectMenuIndexX][m_selectMenuIndexY]; }
+
+	/// <summary>
 	/// 現在選択しているチュートリアル番号を設定する
 	/// </summary>
 	/// <param name="number">現在行っているチュートリアル番号</param>
@@ -166,6 +172,12 @@ private:
 
 	//スタートメニューの文字のフォントハンドル
 	int m_startMenuFontHandle;
+
+	//メニュー画面で選択している項目を示す文字列のフォントハンドル
+	int m_selectMenuFontHandle;
+
+	//メニュー画面で選択している項目を示す文字列のフォントハンドル
+	int m_selectTutorialKindFontHandle;
 
 	//表示しているボタンの数
 	int m_drawButtonNum;

@@ -42,6 +42,7 @@ StickDown,TutorialLStickDown,Tutorial
 StartMenu,TutorialStartMenu,Tutorial
 StartMenuItem,TutorialStartMenuItemBox,Tutorial
 StartMenuSelectItem,TutorialStartMenuSelectItemBox,Tutorial
+SelectMenuItem,TutorialStartMenuItemBox,Tutorial
 SelectMenuSelectItem,TutorialStartMenuSelectItemBox,Tutorial
 SelectMenu,TutorialSelectTutorialMenu,Tutorial
 SelectMenuRB,TutorialSelectTutorialRB,Tutorial
