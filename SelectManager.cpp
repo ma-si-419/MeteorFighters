@@ -86,10 +86,13 @@ void SelectManager::Update()
 	m_enemyLevel = max(m_enemyLevel, 0);
 	m_enemyLevel = min(m_enemyLevel, static_cast<int>(EnemyInput::AiLevel::kHard));
 
+	//AIのレベルを設定
+	m_pUi->SetLevel(m_enemyLevel);
+
 	//AIのレベルが変わったら
 	if (lastEnemyLevel != m_enemyLevel)
 	{
-		//UIに渡す
+		//スカイドームのハンドルを変更する
 		m_pUi->SetSkyDomeHandle(GraphManager::GetInstance().GetHandle(kSkyDomeTextureHandleName[m_enemyLevel]));
 	}
 

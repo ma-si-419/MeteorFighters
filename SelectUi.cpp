@@ -68,9 +68,9 @@ namespace
 	constexpr float kLevelSelectArrowShakeSpeed = 0.25f;
 
 	//難易度を表示する座標
-	constexpr int kRightLevelPosX = kRbPosX - 100;
-	constexpr int kLeftLevelPosX = kLbPosX + 100;
-	constexpr int kLevelPosY = kLevelSelectButtonPosY;
+	constexpr int kRightLevelPosX = kRbPosX - 46;
+	constexpr int kLeftLevelPosX = kLbPosX + 55;
+	constexpr int kLevelPosY = kLevelSelectButtonPosY - 20;
 
 	//難易度の文字列
 	const std::string kLevelString[static_cast<int>(EnemyInput::AiLevel::kLevelNum)] =
@@ -79,6 +79,15 @@ namespace
 		"NORMAL",
 		"HARD"
 	};
+
+	//難易度ごとの文字列の色
+	const unsigned int kLevelColor[static_cast<int>(EnemyInput::AiLevel::kLevelNum)] =
+	{
+		GetColor(255, 255, 255),
+		GetColor(32,32, 32),
+		GetColor(255, 0, 0)
+	};
+
 
 	const std::string kCharacterNames[static_cast<int>(SelectManager::CharacterNumber::kCharacterNum)] =
 	{
@@ -95,10 +104,11 @@ SelectUi::SelectUi() :
 	m_enemyNumber(static_cast<int>(SelectManager::CharacterNumber::kBlueHead)),
 	m_skyDomeHandle(-1),
 	m_iconFrameScalling(0.0f),
-	m_time(0.0f)
+	m_time(0.0f),
+	m_level(0)
 {
 	//レベルフォントの読み込み
-	m_levelFontHandle = CreateFontToHandle(kFontName, kLevelFontSize, 3, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
+	m_levelFontHandle = CreateFontToHandle(kFontName, kLevelFontSize, 3, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 2);
 }
 
 SelectUi::~SelectUi()
@@ -280,9 +290,32 @@ void SelectUi::Draw()
 		//右側の難易度
 		MyEngine::Vector2 pos = MyEngine::Vector2(kRightLevelPosX, kLevelPosY);
 
-		pos.x -= GetFontSizeToHandle(m_levelFontHandle) * kLevelString[static_cast<int>(EnemyInput::AiLevel::kHard)].size() / 2;
+		//一つ次のレベル
+		int nextLevel = m_level + 1;
 
+		if (nextLevel > static_cast<int>(EnemyInput::AiLevel::kHard))
+		{
+			nextLevel = static_cast<int>(EnemyInput::AiLevel::kEasy);
+		}
 
+		
+		//文字列の座標を右揃えに設定
+		pos.x -= GetFontSizeToHandle(m_levelFontHandle) * kLevelString[nextLevel].size();
+
+		DrawStringToHandle(static_cast<int>(pos.x), static_cast<int>(pos.y), kLevelString[nextLevel].c_str(), kLevelColor[nextLevel], m_levelFontHandle);
+
+		//左側の難易度
+		pos = MyEngine::Vector2(kLeftLevelPosX, kLevelPosY);
+
+		//一つ前のレベル
+		int prevLevel = m_level - 1;
+
+		if (prevLevel < static_cast<int>(EnemyInput::AiLevel::kEasy))
+		{
+			prevLevel = static_cast<int>(EnemyInput::AiLevel::kHard);
+		}
+		
+		DrawStringToHandle(static_cast<int>(pos.x), static_cast<int>(pos.y), kLevelString[prevLevel].c_str(), kLevelColor[prevLevel], m_levelFontHandle);
 	}
 }
 
