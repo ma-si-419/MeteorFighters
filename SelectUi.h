@@ -23,7 +23,11 @@ private:
 		kIconFrame2P,
 		kIconFrameBoth,
 		kHeadSet,
-		kVs
+		kVs,
+		kLeftArrow,
+		kRightArrow,
+		kRB,
+		kLB
 	};
 
 	struct GraphData
@@ -33,6 +37,7 @@ private:
 		double scale = 1.0;
 		int alpha = 255;
 		int handle = -1;
+		bool isReverseX = false;
 	};
 
 public:
@@ -45,6 +50,12 @@ public:
 	void Update();
 
 	void Draw();
+
+	/// <summary>
+	/// 現在選択しているレベルを設定する
+	/// </summary>
+	/// <param name="level">選択しているレベル</param>
+	void SetLevel(int level) { m_level = level; }
 
 	/// <summary>
 	/// どのキャラクターを選択しているかを設定する
@@ -66,6 +77,12 @@ public:
 	/// <param name="situation">次の状況</param>
 	void ChangeSituation(UiSituation situation);
 
+	/// <summary>
+	/// スカイドームのテクスチャハンドルを設定する
+	/// </summary>
+	/// <param name="handle">画像のハンドル</param>
+	void SetSkyDomeHandle(int handle);
+
 private:
 
 	void Update1P();
@@ -80,6 +97,12 @@ private:
 	UpdateFunc m_updateFunc;
 
 	std::map<GraphName,GraphData> m_drawGraphs;
+
+	//難易度を表示するフォントハンドル
+	int m_levelFontHandle;
+
+	//選択しているレベル
+	int m_level;
 
 	//今表示している1P側のキャラクター
 	int m_playerNumber;
@@ -101,5 +124,7 @@ private:
 
 	//現在の状況
 	UiSituation m_situation;
-};
 
+	//時間計測用の変数
+	float m_time;
+};

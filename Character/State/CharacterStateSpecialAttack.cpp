@@ -244,6 +244,11 @@ void CharacterStateSpecialAttack::Update()
 		//UŒ‚‚ðo‚µ‚½‚ÆÝ’è
 		m_isAttacked = true;
 	}
+	//UŒ‚‚ðo‚·ŽžŠÔ‚Ü‚Å“G‚Ì•û‚ðŒü‚­
+	else
+	{
+		m_pCharacter->LookTarget();
+	}
 
 }
 

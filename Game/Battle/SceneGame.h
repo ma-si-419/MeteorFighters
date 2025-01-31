@@ -26,7 +26,8 @@ public:
 	/// </summary>
 	/// <param name="player">プレイヤーが使うキャラクター番号</param>
 	/// <param name="enemy">エネミーが使用するキャラクター番号</param>
-	void SetCharacter(int player,int enemy);
+	/// <param name="enemyLevel">エネミーのレベル</param>
+	void SetCharacter(int player,int enemy,int enemyLevel);
 
 private:
 	std::vector<std::shared_ptr<Character>> m_pCharacters;

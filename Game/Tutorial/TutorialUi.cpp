@@ -122,13 +122,14 @@ namespace
 	constexpr int kPlayMenuStringPosY = 250;
 
 	//メニューの文字を表示する間隔
-	constexpr int kPlayMenuStringDistanceY = 130;
+	constexpr int kPlayMenuStringDistanceY = 110;
 
 	//プレイメニューで表示する文字列
 	const std::string kPlayMenuStrings[static_cast<int>(TutorialUi::PlayMenuItem::kItemNum)] =
 	{
 		"状況をリセットする",
 		"チュートリアルを変更",
+		"チュートリアルセレクトに戻る",
 		"メニューを閉じる",
 		"チュートリアルを終了する"
 	};

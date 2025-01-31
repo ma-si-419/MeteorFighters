@@ -18,7 +18,7 @@ SceneTutorial::SceneTutorial(SceneManager& sceneManager) :
 
 	m_pGameManager->SetOnePlayerStatus(0, data[0]);
 
-	m_pGameManager->SetTwoPlayerStatus(1, data[1]);
+	m_pGameManager->SetTwoPlayerStatus(1, data[1],0);
 }
 
 SceneTutorial::~SceneTutorial()

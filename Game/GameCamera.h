@@ -37,6 +37,11 @@ public:
 	void SetPlayerVelo(MyEngine::Vector3 velo);
 
 	/// <summary>
+	/// カメラのローカル座標を初期化する
+	/// </summary>
+	void SetLocalPos();
+
+	/// <summary>
 	/// カメラのローカル座標を設定する
 	/// </summary>
 	/// <param name="pos">カメラから見てどこにいるか<param>

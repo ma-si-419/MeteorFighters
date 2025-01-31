@@ -513,15 +513,6 @@ void CharacterStateRush::Update()
 		//ˆÚ“®•ûŒü‚ðŒ©‚é
 		m_pCharacter->SetFrontPos(m_pCharacter->GetPos() + velo);
 	}
-
-#ifdef _DEBUG
-
-	DrawSphere3D(m_rushTargetPos.CastVECTOR(), 3, 5, GetColor(255, 0, 255), GetColor(255, 0, 255), true);
-
-	DrawString(0, 16, "PlayerState:Rush", GetColor(255, 255, 255));
-
-#endif // _DEBUG
-
 }
 void CharacterStateRush::Exit()
 {

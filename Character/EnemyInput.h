@@ -40,6 +40,14 @@ public:
 		kMinMp
 	};
 
+	enum class AiLevel
+	{
+		kEasy,
+		kNormal,
+		kHard,
+		kLevelNum
+	};
+
 public:
 
 	EnemyInput(std::shared_ptr<MyEngine::InputData> inputData);
@@ -52,6 +60,12 @@ public:
 	void SetTutorialAction(Action action) { m_tutorialAction = action; }
 
 	void Update();
+
+	/// <summary>
+	/// 難易度を設定する
+	/// </summary>
+	/// <param name="level">難易度</param>
+	void SetAiLevel(AiLevel level);
 
 private:
 
@@ -124,6 +138,9 @@ private:
 	//チュートリアルアクション
 	Action m_tutorialAction;
 
+	//外部から読み込んだAIデータ
+	std::vector<std::vector<std::string>> m_loadAiData;
+
 	//行動時間
 	int m_actionTime;
 
@@ -154,5 +171,6 @@ private:
 	//AIデータ
 	std::vector<AiData> m_aiData;
 
+	//AIレベル
+	AiLevel m_aiLevel;
 };
-

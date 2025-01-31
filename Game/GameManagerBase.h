@@ -91,7 +91,8 @@ public:
 	/// エネミーが操作するキャラクターを設定する
 	/// </summary>
 	/// <param name="number">エネミーが使うキャラクターの番号</param>
-	void SetTwoPlayerStatus(int number, std::vector<std::string> statusData);
+	/// <param name="enemyLevel">Aiの強さ</param>
+	void SetTwoPlayerStatus(int number, std::vector<std::string> statusData,int enemyLevel);
 
 	/// <summary>
 	/// 1Pのポインタを返す

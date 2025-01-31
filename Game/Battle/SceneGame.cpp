@@ -120,7 +120,7 @@ void SceneGame::End()
 	m_pGameManager->Final();
 }
 
-void SceneGame::SetCharacter(int player, int enemy)
+void SceneGame::SetCharacter(int player, int enemy, int enemyLevel)
 {
 	m_pGameManager = std::make_shared<BattleManager>(std::make_shared<GameCamera>());
 
@@ -130,5 +130,5 @@ void SceneGame::SetCharacter(int player, int enemy)
 
 	m_pGameManager->SetOnePlayerStatus(player, data[player]);
 
-	m_pGameManager->SetTwoPlayerStatus(enemy, data[enemy]);
+	m_pGameManager->SetTwoPlayerStatus(enemy, data[enemy], enemyLevel);
 }

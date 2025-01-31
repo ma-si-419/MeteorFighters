@@ -168,12 +168,15 @@ void GameManagerBase::SetOnePlayerStatus(int number, std::vector<std::string> st
 
 }
 
-void GameManagerBase::SetTwoPlayerStatus(int number, std::vector<std::string> statusData)
+void GameManagerBase::SetTwoPlayerStatus(int number, std::vector<std::string> statusData, int enemyLevel)
 {
 	//エネミー作成
 	m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)] = std::make_shared<Character>(ObjectTag::kTwoPlayer, static_cast<Character::CharacterKind>(number));
 	//エネミーに自分のポインターを渡しておく
 	m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->SetGameManager(shared_from_this());
+
+	//エネミーのレベルを設定する
+	m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->SetEnemyInput(enemyLevel);
 
 	//ステータスを取得
 	Character::CharacterStatus status = GetCharacterStatus(statusData);
@@ -520,7 +523,10 @@ void GameManagerBase::UpdateButtonBashing()
 
 		MyEngine::Vector3 cameraPos = moveVec + kButtonBashingCameraTargetPos;
 
-		m_pCamera->SetCenterAndTarget(cameraPos, kButtonBashingCameraTargetPos);
+		if (m_pCamera != nullptr)
+		{
+			m_pCamera->SetCenterAndTarget(cameraPos, kButtonBashingCameraTargetPos);
+		}
 	}
 
 	//カメラの設定

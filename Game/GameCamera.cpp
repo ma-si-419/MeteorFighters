@@ -3,7 +3,7 @@
 
 namespace
 {
-	const MyEngine::Vector3 kPlayerToCameraInitVec(-17, 15, -30);
+	const MyEngine::Vector3 kPlayerToCameraInitVec(17, 15, -30);
 
 	constexpr float kCameraNear = 10.0f;
 	constexpr float kCameraFar = 10000.0f;
@@ -133,6 +133,11 @@ void GameCamera::SetFrontPos(MyEngine::Vector3 pos)
 void GameCamera::SetPlayerVelo(MyEngine::Vector3 velo)
 {
 	m_playerVelo = velo;
+}
+
+void GameCamera::SetLocalPos()
+{
+	m_localPos.SetLocalPos(kPlayerToCameraInitVec);
 }
 
 void GameCamera::ShakeCamera(int time)

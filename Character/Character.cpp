@@ -32,6 +32,9 @@ namespace
 	//2P側のキャラクターの初期座標
 	const MyEngine::Vector3 kTwoPlayerInitPos(50, 0, 50);
 
+	//敵が正面にいないときのターゲット座標までの距離
+	constexpr float kTargetDistance = 30.0f;
+
 	//攻撃の種類を外部ファイルの文字列から内部のAttackHitKindに変換する際に使用する
 	const std::map<std::string, Character::AttackHitKind> kAttackHitKindMap =
 	{
@@ -125,10 +128,6 @@ void Character::Init()
 	else if (m_playerNumber == Character::PlayerNumber::kTwoPlayer)
 	{
 		m_input = MyEngine::Input::GetInstance().GetInputData(1);
-
-		m_pEnemyInput = std::make_shared<EnemyInput>(m_input);
-
-		m_pEnemyInput->SetGameManager(m_pBattleManager);
 	}
 
 	std::string path;
@@ -186,6 +185,15 @@ void Character::Init()
 		m_pEnemyInput->SetState(m_pState);
 	}
 
+}
+
+void Character::SetEnemyInput(int level)
+{
+	m_pEnemyInput = std::make_shared<EnemyInput>(MyEngine::Input::GetInstance().GetInputData(1));
+
+	m_pEnemyInput->SetGameManager(m_pBattleManager);
+
+	m_pEnemyInput->SetAiLevel(static_cast<EnemyInput::AiLevel>(level));
 }
 
 void Character::Update()
@@ -550,9 +558,13 @@ std::shared_ptr<Attack> Character::CreateAttack(AttackData attackData)
 	{
 		localPos.SetFrontPos(m_rigidbody.GetPos() + toTarget.Normalize());
 	}
+	//敵が正面にいない場合
 	else
 	{
 		localPos.SetFrontPos(GetFrontPos());
+
+		//ターゲット座標を自身の正面方向にする
+		targetPos = (GetFrontPos() - m_rigidbody.GetPos()).Normalize() * kTargetDistance;
 	}
 	//どのくらいずらすかを設定
 	MyEngine::Vector3 localAttackPos;

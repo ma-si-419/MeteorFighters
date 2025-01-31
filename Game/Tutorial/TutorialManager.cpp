@@ -200,7 +200,7 @@ void TutorialManager::UpdateStartMenu()
 	{
 		//チュートリアルを開始するが押されたら
 		if (selectItem == TutorialUi::StartMenuItem::kStartTutorial)
-		{ 
+		{
 			ChangeSituation(TutorialSituation::kStart);
 
 			//体力バーを表示する
@@ -230,6 +230,8 @@ void TutorialManager::UpdatePlayMenu()
 
 	bool isEnd = false;
 
+	auto nextSituation = TutorialSituation::kPlaying;
+
 	if (input->IsTrigger("A"))
 	{
 
@@ -237,8 +239,11 @@ void TutorialManager::UpdatePlayMenu()
 		if (selectItem == TutorialUi::PlayMenuItem::kReset)
 		{
 			RetryInit();
+			//カメラを初期化
+			m_pCamera->SetLocalPos();
 			m_nowTutorial = static_cast<TutorialKind>(m_pTutorialUi->GetTutorialNumber());
 			isEnd = true;
+			nextSituation = TutorialSituation::kStart;
 		}
 		//メニューを閉じるが押されたら
 		else if (selectItem == TutorialUi::PlayMenuItem::kMenuEnd)
@@ -250,6 +255,15 @@ void TutorialManager::UpdatePlayMenu()
 				m_nowTutorial = static_cast<TutorialKind>(m_pTutorialUi->GetTutorialNumber());
 				RetryInit();
 			}
+
+			nextSituation = TutorialSituation::kPlaying;
+		}
+		//チュートリアルセレクト画面に戻るが押されたら
+		else if (selectItem == TutorialUi::PlayMenuItem::kSelectMenu)
+		{
+			RetryInit();
+			m_pCamera->SetLocalPos();
+			ChangeSituation(TutorialSituation::kSelectMenu);
 		}
 		//チュートリアルを終了するが押されたら
 		else if (selectItem == TutorialUi::PlayMenuItem::kTutorialEnd)
@@ -261,18 +275,23 @@ void TutorialManager::UpdatePlayMenu()
 	else if (input->IsTrigger("B"))
 	{
 		isEnd = true;
+
+		nextSituation = TutorialSituation::kPlaying;
+
 		//今行っているチュートリアルと選択しているチュートリアルが異なっていたら
 		if (m_nowTutorial != static_cast<TutorialKind>(m_pTutorialUi->GetTutorialNumber()))
 		{
 			m_nowTutorial = static_cast<TutorialKind>(m_pTutorialUi->GetTutorialNumber());
 			RetryInit();
+
+			nextSituation = TutorialSituation::kStart;
 		}
 	}
 
 	//メニュー画面を閉じる選択肢が選ばれていたら
 	if (isEnd)
 	{
-		ChangeSituation(TutorialSituation::kStart);
+		ChangeSituation(nextSituation);
 	}
 }
 
@@ -378,10 +397,21 @@ void TutorialManager::UpdateSelectMenu()
 	//入力情報
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
+	//決定ボタンが押されたら
 	if (input->IsTrigger("A"))
+	{
+		m_nowTutorial = kTutorialKindMap.at(m_pTutorialUi->GetSelectTutorialName());
+
+		ChangeSituation(TutorialSituation::kStart);
+	}
+	//戻るボタンが押されたら
+	else if (input->IsTrigger("B"))
 	{
 		ChangeSituation(TutorialSituation::kStartMenu);
 	}
+
+	//カメラの更新を行う
+	m_pCamera->Update();
 }
 
 void TutorialManager::DrawStartMenu()
@@ -462,6 +492,8 @@ void TutorialManager::ChangeSituation(TutorialSituation next)
 		m_updateSituationFunc = &TutorialManager::UpdateSelectMenu;
 		//描画処理の変更
 		m_drawSituationFunc = &TutorialManager::DrawSelectMenu;
+		//HPバーを非表示にする
+		m_isDrawHpBar = false;
 	}
 	//開始時
 	else if (next == TutorialSituation::kStart)
@@ -478,6 +510,8 @@ void TutorialManager::ChangeSituation(TutorialSituation next)
 		m_updateSituationFunc = &TutorialManager::UpdateStart;
 		//描画処理の変更
 		m_drawSituationFunc = &TutorialManager::DrawStart;
+		//HPバーを表示する
+		m_isDrawHpBar = true;
 	}
 	//プレイ中
 	else if (next == TutorialSituation::kPlaying)
@@ -496,6 +530,8 @@ void TutorialManager::ChangeSituation(TutorialSituation next)
 		m_updateSituationFunc = &TutorialManager::UpdatePlaying;
 		//描画処理の変更
 		m_drawSituationFunc = &TutorialManager::DrawPlaying;
+		//HPバーを表示する
+		m_isDrawHpBar = true;
 	}
 	else if (next == TutorialSituation::kSuccess)
 	{

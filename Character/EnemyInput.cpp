@@ -46,6 +46,9 @@ namespace
 	//アイドル状態にいる時間
 	constexpr int kNoneTime = 120;
 
+	//難易度によって読み取る場所を変える
+	constexpr int kLevelShiftIndex = 4;
+
 	//近距離で選択できる移動方向
 	const EnemyInput::MoveDir kNearMoveDir[kMoveDirRandomNum] =
 	{
@@ -83,20 +86,21 @@ EnemyInput::EnemyInput(std::shared_ptr<MyEngine::InputData> inputData) :
 
 	LoadCsv load;
 
-	auto aiData = load.LoadFile("data/csv/enemyAiData.csv");
+	m_loadAiData = load.LoadFile("data/csv/enemyAiData.csv");
 
-	for (auto item : aiData)
+	//AIの難易度を低いに設定しておく
+	m_aiLevel = AiLevel::kEasy;
+
+	//AIのデータを読み込む
+	for (auto data : m_loadAiData)
 	{
-		AiData pushData;
-
-		pushData.nearRate = stoi(item[static_cast<int>(DataIndex::kNearRate)]);
-		pushData.middleRate = stoi(item[static_cast<int>(DataIndex::kMiddleRate)]);
-		pushData.farRate = stoi(item[static_cast<int>(DataIndex::kFarRate)]);
-		pushData.minMp = stoi(item[static_cast<int>(DataIndex::kMinMp)]);
-
-		m_aiData.push_back(pushData);
+		AiData aiData;
+		aiData.nearRate = std::stoi(data[static_cast<int>(DataIndex::kNearRate)]);
+		aiData.middleRate = std::stoi(data[static_cast<int>(DataIndex::kMiddleRate)]);
+		aiData.farRate = std::stoi(data[static_cast<int>(DataIndex::kFarRate)]);
+		aiData.minMp = std::stoi(data[static_cast<int>(DataIndex::kMinMp)]);
+		m_aiData.push_back(aiData);
 	}
-
 }
 
 EnemyInput::~EnemyInput()
@@ -249,6 +253,8 @@ void EnemyInput::Update()
 
 					m_stateTime = 0;
 
+					action = Action::kRocketDash;
+
 					//行動を変更する
 					SetAction(action);
 
@@ -267,12 +273,42 @@ void EnemyInput::Update()
 		m_actionTime = 0;
 	}
 
-	//移動処理
-	(this->*m_moveFunc)();
+	if (m_pManager->GetGameKind() != GameManagerBase::GameKind::kTutorial)
+	{
+		//移動処理
+		(this->*m_moveFunc)();
+	}
 
 	//アクション処理
 	(this->*m_actionFunc)();
 
+}
+
+void EnemyInput::SetAiLevel(AiLevel level)
+{
+	//難易度によって読み取る場所を変える
+	int shiftIndex = static_cast<int>(level) * kLevelShiftIndex;
+
+	//AIデータを読み込む
+	for (auto item : m_loadAiData)
+	{
+		AiData pushData;
+
+		//近距離の確率
+		pushData.nearRate = stoi(item[static_cast<int>(DataIndex::kNearRate) + shiftIndex]);
+
+		//中距離の確率
+		pushData.middleRate = stoi(item[static_cast<int>(DataIndex::kMiddleRate) + shiftIndex]);
+
+		//遠距離の確率
+		pushData.farRate = stoi(item[static_cast<int>(DataIndex::kFarRate) + shiftIndex]);
+
+		//最低気力量
+		pushData.minMp = stoi(item[static_cast<int>(DataIndex::kMinMp) + shiftIndex]);
+
+		//AIデータを保存
+		m_aiData.push_back(pushData);
+	}
 }
 
 void EnemyInput::MoveFront()
@@ -586,22 +622,11 @@ void EnemyInput::DownChargeAttack()
 
 void EnemyInput::None()
 {
-	//時間計測
-	m_stateTime++;
-
-	m_pInputData->TiltStick(MyEngine::Vector2(0, 0), true);
-
-	if (m_stateTime > kActionTime)
-	{
-		m_isCountActionTime = true;
-	}
+	m_isCountActionTime = true;
 
 #ifdef _DEBUG
-
-	//printfDx("何もしない\n");
-
+	printfDx("何もしない\n");
 #endif // _DEBUG
-
 }
 
 

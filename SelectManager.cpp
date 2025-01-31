@@ -3,6 +3,8 @@
 #include "SelectUi.h"
 #include "Input.h"
 #include "Game.h"
+#include "EnemyInput.h"
+#include "GraphManager.h"
 
 namespace
 {
@@ -14,12 +16,21 @@ namespace
 	{
 		{0},{-1},{1}
 	};
+
+	//スカイドームの画像ハンドルの名前
+	const std::string kSkyDomeTextureHandleName[static_cast<int>(EnemyInput::AiLevel::kLevelNum)] =
+	{
+		"Easy",
+		"Normal",
+		"Hard"
+	};
 }
 
 SelectManager::SelectManager() :
 	m_playerNumber(0),
 	m_enemyNumber(static_cast<int>(CharacterNumber::kBlueHead)),
-	m_nextScene(-1)
+	m_nextScene(-1),
+	m_enemyLevel(0)
 {
 	m_updateSelectFunc = &SelectManager::SelectOnePlayer;
 	m_pUi = std::make_shared<SelectUi>();
@@ -32,15 +43,61 @@ SelectManager::~SelectManager()
 void SelectManager::Init()
 {
 	m_pUi->Init();
+	m_pUi->SetSkyDomeHandle(GraphManager::GetInstance().GetHandle(kSkyDomeTextureHandleName[m_enemyLevel]));
 }
 
 void SelectManager::Update()
 {
 	(this->*m_updateSelectFunc)();
 
+	//インプットデータの取得
+	auto input = MyEngine::Input::GetInstance().GetInputData(0);
+
+	int lastEnemyLevel = m_enemyLevel;
+
+	//AIのレベルを常に変更できるようにする
+	if (input->IsTrigger("RB"))
+	{
+		//RBボタンが押されたらAIのレベルを上げる
+		m_enemyLevel++;
+
+		//最大値を超えたら
+		if (m_enemyLevel > static_cast<int>(EnemyInput::AiLevel::kHard))
+		{
+			//最小値に戻す
+			m_enemyLevel = 0;
+		}
+
+	}
+	else if (input->IsTrigger("LB"))
+	{
+		//LBボタンが押されたらAIのレベルを下げる
+		m_enemyLevel--;
+
+		//最小値を下回ったら
+		if (m_enemyLevel < 0)
+		{
+			//最大値に戻す
+			m_enemyLevel = static_cast<int>(EnemyInput::AiLevel::kHard);
+		}
+	}
+
+	//クランプ
+	m_enemyLevel = max(m_enemyLevel, 0);
+	m_enemyLevel = min(m_enemyLevel, static_cast<int>(EnemyInput::AiLevel::kHard));
+
+	//AIのレベルが変わったら
+	if (lastEnemyLevel != m_enemyLevel)
+	{
+		//UIに渡す
+		m_pUi->SetSkyDomeHandle(GraphManager::GetInstance().GetHandle(kSkyDomeTextureHandleName[m_enemyLevel]));
+	}
+
+	//選択している番号をUiに渡す
 	m_pUi->SetNumber(m_playerNumber, true);
 	m_pUi->SetNumber(m_enemyNumber, false);
 
+	//UIの更新
 	m_pUi->Update();
 }
 
@@ -82,7 +139,7 @@ void SelectManager::SelectOnePlayer()
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
 	//選択しているアイコンをUiに渡す
-	m_pUi->SetIconFrame(m_playerNumber,true);
+	m_pUi->SetIconFrame(m_playerNumber, true);
 
 	//キャラクター選択
 	if (input->IsTrigger("Right"))
@@ -121,7 +178,7 @@ void SelectManager::SelectTwoPlayer()
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
 	//選択しているアイコンをUiに渡す
-	m_pUi->SetIconFrame(m_enemyNumber,false);
+	m_pUi->SetIconFrame(m_enemyNumber, false);
 
 	//キャラクターの選択
 	if (input->IsTrigger("Right"))

@@ -235,9 +235,6 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 		}
 	}
 
-	//ガードチュートリアルをクリアさせる
-//	SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kGuard));
-
 	//エフェクトが設定されていれば
 	if (effectKind != Effect::EffectKind::kNone)
 	{

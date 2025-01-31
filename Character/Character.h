@@ -267,6 +267,12 @@ public:
 
 	void Init();
 
+	/// <summary>
+	/// enemyInput‚ðƒZƒbƒg‚·‚é
+	/// </summary>
+	/// <param name="level">“G‚Ì‹­‚³</param>
+	void SetEnemyInput(int level);
+
 	void Update();
 
 	void Draw();

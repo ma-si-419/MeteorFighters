@@ -13,6 +13,7 @@ public:
 	{
 		kReset,
 		kChangeTutorial,
+		kSelectMenu,
 		kMenuEnd,
 		kTutorialEnd,
 		kItemEnd = kTutorialEnd,
@@ -92,7 +93,7 @@ public:
 	/// セレクトメニューで選択しているチュートリアルの名前を取得する
 	/// </summary>
 	/// <returns>チュートリアルの名前</returns>
-	std::string GetSelectTutorialName() { return m_tutorialSelectMenuData[m_selectMenuIndexX][m_selectMenuIndexY]; }
+	std::string GetSelectTutorialName() { return m_tutorialSelectMenuData[m_selectMenuIndexX + 1][m_selectMenuIndexY]; }
 
 	/// <summary>
 	/// 現在選択しているチュートリアル番号を設定する

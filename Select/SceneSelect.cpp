@@ -48,7 +48,7 @@ void SceneSelect::Update()
 		{
 			std::shared_ptr<SceneGame> next = std::make_shared<SceneGame>(m_sceneManager);
 
-			next->SetCharacter(m_selectManager->GetPlayerNumber(), m_selectManager->GetEnemyNumber());
+			next->SetCharacter(m_selectManager->GetPlayerNumber(), m_selectManager->GetEnemyNumber(),m_selectManager->GetEnemyLevel());
 
 			m_sceneManager.ChangeScene(next);
 		}
