@@ -5,16 +5,19 @@
 
 namespace
 {
-	const VECTOR kStagePos = VGet(0, -150, 0);
+	const VECTOR kStagePos = VGet(300, 0, 0);
 
 	const VECTOR kSkyDomeScale = VGet(50.0f, 50.0f, 50.0f);
 
 	const VECTOR kStageScale = VGet(0.3f, 0.3f, 0.3f);
 
+	//エフェクトの座標
+	const VECTOR kEffectPos = VGet(0, -80, 0);
+
 	constexpr float kSkyDomeRotaSpeed = 0.001f;
 }
 
-Stage::Stage(std::shared_ptr<EffectManager> manager):
+Stage::Stage(std::shared_ptr<EffectManager> manager) :
 	m_skyDomeHandle(-1),
 	m_stageHandle(-1)
 {
@@ -31,12 +34,12 @@ Stage::~Stage()
 
 void Stage::Init()
 {
-    m_pEffect= std::make_shared<Effect>("StageEdge");
+	m_pEffect = std::make_shared<Effect>("StageEdge");
 
 	m_pEffect->SetLoop(1.0f, 240.0f);
-	m_pEffect->SetPos(MyEngine::Vector3());
+	m_pEffect->SetPos(kEffectPos);
 
-	m_pEffect->Init(m_pEffectManager, VGet(0, 0, 0));
+	m_pEffect->Init(m_pEffectManager, kEffectPos);
 }
 
 void Stage::Update()
@@ -46,7 +49,7 @@ void Stage::Update()
 
 	rota.y += kSkyDomeRotaSpeed;
 
-	MV1SetRotationXYZ(m_skyDomeHandle,rota);
+	MV1SetRotationXYZ(m_skyDomeHandle, rota);
 
 }
 

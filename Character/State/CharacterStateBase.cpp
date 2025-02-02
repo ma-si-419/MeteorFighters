@@ -32,19 +32,6 @@ namespace
 		{Character::AttackHitKind::kMiddleStan,Character::HitReactionKind::kMiddleStan}
 	};
 
-	//攻撃を受けた時に出すエフェクト
-	const std::map<Character::AttackHitKind, Effect::EffectKind> kPhysicalAttackHitEffectMap =
-	{
-		{Character::AttackHitKind::kLow,Effect::EffectKind::kLowHit},
-		{Character::AttackHitKind::kMiddle,Effect::EffectKind::kMiddleHit},
-		{Character::AttackHitKind::kWeakUpBurst,Effect::EffectKind::kMiddleHit},
-		{Character::AttackHitKind::kUpBurst,Effect::EffectKind::kHighHit},
-		{Character::AttackHitKind::kDownBurst,Effect::EffectKind::kHighHit},
-		{Character::AttackHitKind::kFarBurst,Effect::EffectKind::kHighHit},
-		{Character::AttackHitKind::kBottomStan,Effect::EffectKind::kMiddleHit},
-		{Character::AttackHitKind::kMiddleStan,Effect::EffectKind::kMiddleHit}
-	};
-
 	//ヒットエフェクトを残す時間
 	constexpr int kHitEffectLifeTime = 180;
 
@@ -216,22 +203,7 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 		else
 		{
 			//攻撃に合わせたエフェクトを再生する
-
-			//格闘攻撃の場合
-			if (status.attackKind == Character::AttackKind::kPhysical)
-			{
-				effectKind = kPhysicalAttackHitEffectMap.at(status.attackHitKind);
-			}
-			//気弾攻撃の場合
-			else if (status.attackKind == Character::AttackKind::kEnergy)
-			{
-				effectKind = Effect::EffectKind::kLowHit;
-			}
-			//レーザー攻撃の場合
-			else if (status.attackKind == Character::AttackKind::kBeam)
-			{
-				effectKind = Effect::EffectKind::kLaserHit;
-			}
+			effectKind = static_cast<Effect::EffectKind>(static_cast<Effect::EffectKind>(attack->GetHitEffeckKind()));
 		}
 	}
 
@@ -280,7 +252,15 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 
 			local.SetFrontPos(frontPos);
 
-			local.SetLocalPos(MyEngine::Vector3(attack->GetStatus().radius + kTeleportationDistance, 0.0f, 0.0f));
+			//ランダムで左右どちらに移動するか決める
+			if (GetRand(1))
+			{
+				local.SetLocalPos(MyEngine::Vector3(attack->GetStatus().radius + kTeleportationDistance, 0.0f, 0.0f));
+			}
+			else
+			{
+				local.SetLocalPos(MyEngine::Vector3(-attack->GetStatus().radius - kTeleportationDistance, 0.0f, 0.0f));
+			}
 
 			moveTargetPos = local.GetWorldPos();
 
@@ -306,15 +286,28 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 	//攻撃を削除する
 	attack->DeleteAttack();
 
-	//動けない時間を設定する
-	SetStopTime(kDownTimeMap.at(hitReaction));
-
 	//ダメージを受ける
 	m_pCharacter->SubHp(damage);
+
+	//スーパーアーマー状態ならば
+	if (m_guardKind == CharacterGuardKind::kSuperArmor)
+	{
+		//やられが弱と中であれば
+		if (hitReaction == Character::HitReactionKind::kLow ||
+			hitReaction == Character::HitReactionKind::kMiddle)
+		{
+			//やられ状態にならない
+			return;
+		}
+		//それ以外の場合は下を通る(普通にダメージ演出に移行する)
+	}
 
 	//ガード状態
 	if (hitReaction == Character::HitReactionKind::kGuard)
 	{
+		//動けない時間を設定する
+		SetStopTime(kDownTimeMap.at(hitReaction));
+
 		//敵の方向を向く
 		m_pCharacter->LookTarget();
 
@@ -327,7 +320,7 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 		//現在の状態がガード状態でなければガード状態に遷移する
 		auto nextState = std::make_shared<CharacterStateGuard>(m_pCharacter);
 
-		//動けない時間を設定する
+		//次のStateに動けない時間を設定する
 		nextState->SetStopTime(kDownTimeMap.at(hitReaction));
 
 		ChangeState(nextState);
@@ -420,7 +413,7 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kChargeEnergyAttack));
 	}
-	else if(status.attackName == "Teleportation")
+	else if (status.attackName == "Teleportation")
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kChaseAttack));
 	}

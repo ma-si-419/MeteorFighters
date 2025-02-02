@@ -13,6 +13,7 @@
 #include <cmath>
 #include "Physics.h"
 #include "Input.h"
+#include "SoundManager.h"
 
 namespace
 {
@@ -56,6 +57,7 @@ namespace
 
 BattleManager::BattleManager(std::shared_ptr<GameCamera> camera) :
 	GameManagerBase(camera, GameManagerBase::GameKind::kBattle),
+	m_bgmPlayHandle(-1),
 	m_menuSelectNumber(0)
 {
 	m_pCamera = camera;
@@ -76,6 +78,9 @@ void BattleManager::Init()
 	m_pCamera->SetPoseCamera();
 	m_poseCameraPos = kStartCameraStartPos;
 	ChangeSituation(BattleSituation::kStart1P);
+
+	//BGM‚ðÄ¶‚·‚é
+	m_bgmPlayHandle = SoundManager::GetInstance().PlayLoopSound("Bgm");
 
 #ifdef _DEBUG
 	//	m_situation = Situation::kBattle;
@@ -185,6 +190,9 @@ void BattleManager::Final()
 	m_pStage->Final();
 	m_pCamera->Final();
 	m_pEffectManager->Final();
+
+	//BGM‚ðŽ~‚ß‚é
+	SoundManager::GetInstance().StopLoopSound(m_bgmPlayHandle);
 }
 
 void BattleManager::UpdateStart()

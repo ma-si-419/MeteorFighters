@@ -54,6 +54,20 @@ namespace
 	const std::string kTeleportationAttack = "Teleportation";
 	//アニメーションのブレンドスピード
 	constexpr float kAnimBlendSpeed = 0.15f;
+
+	//格闘攻撃の際に再生する音声
+	const std::map<Character::AttackHitKind, Character::VoiceKind> kPhysicalAttackSound =
+	{
+		{Character::AttackHitKind::kLow,Character::VoiceKind::kLowAttack},
+		{Character::AttackHitKind::kMiddle,Character::VoiceKind::kMiddleAttack},
+		{Character::AttackHitKind::kWeakUpBurst,Character::VoiceKind::kHighAttack},
+		{Character::AttackHitKind::kUpBurst,Character::VoiceKind::kMiddleAttack},
+		{Character::AttackHitKind::kDownBurst,Character::VoiceKind::kHighAttack},
+		{Character::AttackHitKind::kFarBurst,Character::VoiceKind::kHighAttack},
+		{Character::AttackHitKind::kBottomStan,Character::VoiceKind::kMiddleAttack},
+		{Character::AttackHitKind::kMiddleStan,Character::VoiceKind::kMiddleAttack}
+	};
+
 }
 
 CharacterStateNormalAttack::CharacterStateNormalAttack(std::shared_ptr<Character> character) :
@@ -113,6 +127,9 @@ void CharacterStateNormalAttack::Enter()
 	{
 		m_isCharge = true;
 	}
+
+	//最初の音声を再生する
+	m_pCharacter->PlayVoice(kPhysicalAttackSound.at(m_pCharacter->GetNormalAttackData(m_nowAttackName).attackHitKind));
 
 }
 
@@ -310,6 +327,9 @@ void CharacterStateNormalAttack::Update()
 
 			//攻撃情報の更新
 			attackData = nextAttack;
+
+			//次の攻撃の音声を再生する
+			m_pCharacter->PlayVoice(kPhysicalAttackSound.at(attackData.attackHitKind));
 
 		}
 	}

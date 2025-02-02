@@ -2,7 +2,7 @@
 #include "CharacterStateIdle.h"
 #include "Character.h"
 
-CharacterStateTeleportation::CharacterStateTeleportation(std::shared_ptr<Character> character):
+CharacterStateTeleportation::CharacterStateTeleportation(std::shared_ptr<Character> character) :
 	CharacterStateBase(character),
 	m_moveTargetPos(),
 	m_moveTime(0)
@@ -30,6 +30,18 @@ void CharacterStateTeleportation::Enter()
 	m_pCharacter->SetIsTrigger(true);
 
 	m_guardKind = CharacterGuardKind::kDodge;
+
+	//‰ñ”ðŽž‚Ì‰¹ºÄ¶
+
+	//ƒ‰ƒ“ƒ_ƒ€‚Å‰¹º‚ð•ÏX‚·‚é
+	if (GetRand(1))
+	{
+		m_pCharacter->PlayVoice(Character::VoiceKind::kDodge1);
+	}
+	else
+	{
+		m_pCharacter->PlayVoice(Character::VoiceKind::kDodge2);
+	}
 }
 
 void CharacterStateTeleportation::Update()

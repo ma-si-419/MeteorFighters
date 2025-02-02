@@ -12,11 +12,11 @@ namespace
 
 	constexpr float kOnMoveMaxLocalPosX = 42.0f;//左幅(大きいほど左に広がる)
 	constexpr float kOnMoveMaxLocalPosY = 18.0f;//下幅(大きいほど下に広がる)
-	constexpr float kOnMoveMaxLocalPosZ = -25.0f;//手前幅(大きいほどプレイヤーが手前に来る)
+	constexpr float kOnMoveMaxLocalPosZ = -30.0f;//手前幅(大きいほどプレイヤーが手前に来る)
 
 	constexpr float kOnMoveMinLocalPosX = -42.0f;//右幅(小さいほど右に広がる)
 	constexpr float kOnMoveMinLocalPosY = -12.0f;//上幅(小さいほど上に広がる)
-	constexpr float kOnMoveMinLocalPosZ = -30.0f;//奥幅(小さいほどプレイヤーが奥に行く)
+	constexpr float kOnMoveMinLocalPosZ = -35.0f;//奥幅(小さいほどプレイヤーが奥に行く)
 
 
 	constexpr float kLocalInitPosX = 27.0f;

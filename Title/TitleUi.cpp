@@ -513,7 +513,7 @@ void TitleUi::InitNormal(int number)
 void TitleUi::InitFall(int number)
 {
 	//落ちるサウンドを再生
-	SoundManager::GetInstance().OncePlaySound("Fall");
+	SoundManager::GetInstance().PlayOnceSound("Fall");
 	//移動時間を設定
 	m_characterDrawInfo[number].moveTime = kMinCharacterMoveFrame;
 
@@ -541,7 +541,7 @@ void TitleUi::InitFall(int number)
 void TitleUi::InitJump(int number)
 {
 	//落ちるサウンドを再生
-	SoundManager::GetInstance().OncePlaySound("Jump");
+	SoundManager::GetInstance().PlayOnceSound("Jump");
 	//移動時間を設定
 	m_characterDrawInfo[number].moveTime = kMinCharacterMoveFrame;
 	//サイドを下に設定
@@ -563,7 +563,7 @@ void TitleUi::InitJump(int number)
 void TitleUi::InitSideJump(int number)
 {
 	//横っ飛びのサウンドを再生
-	SoundManager::GetInstance().OncePlaySound("SideJump");
+	SoundManager::GetInstance().PlayOnceSound("SideJump");
 
 	//移動時間を設定
 	m_characterDrawInfo[number].moveTime = kMinCharacterMoveFrame;

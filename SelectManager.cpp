@@ -161,7 +161,7 @@ void SelectManager::SelectOnePlayer()
 	//Aボタンを押したら2プレイヤーの選択に移る
 	if (input->IsTrigger("A"))
 	{
-		SoundManager::GetInstance().OncePlaySound("Ok");
+		SoundManager::GetInstance().PlayOnceSound("Ok");
 		m_updateSelectFunc = &SelectManager::SelectTwoPlayer;
 
 		m_pUi->ChangeSituation(SelectUi::UiSituation::kSelect2P);
@@ -170,7 +170,7 @@ void SelectManager::SelectOnePlayer()
 	//Bボタンを押したらメニュー選択に戻る
 	else if (input->IsTrigger("B"))
 	{
-		SoundManager::GetInstance().OncePlaySound("Cancel");
+		SoundManager::GetInstance().PlayOnceSound("Cancel");
 
 		m_nextScene = static_cast<int>(Game::Scene::kMenu);
 	}
@@ -200,14 +200,14 @@ void SelectManager::SelectTwoPlayer()
 	//Aボタンを押したらゲームシーンに行く
 	if (input->IsTrigger("A"))
 	{
-		SoundManager::GetInstance().OncePlaySound("Confirm");
+		SoundManager::GetInstance().PlayOnceSound("Confirm");
 
 		m_nextScene = static_cast<int>(Game::Scene::kGame);
 	}
 	//Bボタンを押したら1プレイヤーのキャラクター選択画面に戻る
 	else if (input->IsTrigger("B"))
 	{
-		SoundManager::GetInstance().OncePlaySound("Cancel");
+		SoundManager::GetInstance().PlayOnceSound("Cancel");
 		m_updateSelectFunc = &SelectManager::SelectOnePlayer;
 
 		m_pUi->ChangeSituation(SelectUi::UiSituation::kSelect1P);

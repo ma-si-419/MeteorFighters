@@ -14,6 +14,12 @@ namespace
 	//最低何フレーム攻撃を行うか
 	constexpr int kMinAttackTime = 60;
 
+	//開始時のエフェクトの再生時間
+	constexpr int kStartEffectLifeTime = 60;
+
+	//攻撃のエフェクトを残す時間
+	constexpr int kAttackEffectLifeTime = 40;
+
 	const std::map<Character::AttackKind, int> kAttackTimeMap =
 	{
 		{Character::AttackKind::kEnergy,90},
@@ -50,10 +56,10 @@ namespace
 	{
 		{Character::AttackKind::kEnergy,6.0f},
 		{Character::AttackKind::kPhysical,0.0f},
-		{Character::AttackKind::kBeam,11.0f},
+		{Character::AttackKind::kBeam,20.0f},
 		{Character::AttackKind::kRush,0.0f},
 		{Character::AttackKind::kThrow,0.0f},
-		{Character::AttackKind::kAssault,0.0f},
+		{Character::AttackKind::kAssault,0.0f}
 	};
 }
 
@@ -104,6 +110,23 @@ void CharacterStateSpecialAttack::Enter()
 	//敵の方向を向く
 	m_pCharacter->LookTarget();
 
+	//ガードの状態をスーパーアーマーにする
+	m_guardKind = CharacterGuardKind::kSuperArmor;
+
+	//必殺技を発動するエフェクトを再生する
+	auto effect = std::make_shared<Effect>(Effect::EffectKind::kStartLaser);
+
+	//エフェクトの再生時間を設定する
+	effect->SetLifeTime(kStartEffectLifeTime);
+
+	//エフェクトの座標を設定する
+	effect->SetPos(m_pCharacter->GetPos());
+
+	//エフェクトを登録する
+	m_pManager->EntryEffect(effect);
+
+	//音声を再生する
+	m_pCharacter->PlayVoice(Character::VoiceKind::kSpecialAttack);
 }
 
 void CharacterStateSpecialAttack::Update()
@@ -120,6 +143,8 @@ void CharacterStateSpecialAttack::Update()
 	//攻撃をやめてから一定時間たっていたら
 	if (m_time > totalFrame)
 	{
+		//多分とおらないと思うけど一応書いておく
+
 		//アイドル状態に戻る
 		auto next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 
@@ -144,10 +169,27 @@ void CharacterStateSpecialAttack::Update()
 		if (m_pCharacter->GetPlayAnimKind() == Character::AnimKind::kOnFirstSpecialAttack)
 		{
 			m_pCharacter->ChangeAnim(Character::AnimKind::kEndFirstSpecialAttack, false);
+
+			//アイドル状態に戻る
+			auto next = std::make_shared<CharacterStateIdle>(m_pCharacter);
+
+			//動けない時間を設定する
+			next->SetEndAnim(static_cast<int>(Character::AnimKind::kEndFirstSpecialAttack), totalFrame - attackEndFrame);
+
+			ChangeState(next);
+
 		}
 		else if (m_pCharacter->GetPlayAnimKind() == Character::AnimKind::kOnSecondSpecialAttack)
 		{
 			m_pCharacter->ChangeAnim(Character::AnimKind::kEndSecondSpecialAttack, false);
+
+			//アイドル状態に戻る
+			auto next = std::make_shared<CharacterStateIdle>(m_pCharacter);
+
+			//動けない時間を設定する
+			next->SetEndAnim(static_cast<int>(Character::AnimKind::kEndSecondSpecialAttack), totalFrame - attackEndFrame);
+
+			ChangeState(next);
 		}
 	}
 	//エフェクトが設定されていたら
@@ -254,7 +296,14 @@ void CharacterStateSpecialAttack::Update()
 
 void CharacterStateSpecialAttack::Exit()
 {
-	m_pManager->ExitEffect(m_pEffect);
+	//エフェクトが設定されていたら
+	if (m_pEffect)
+	{
+		//攻撃のエフェクトを少しだけ残す
+		m_pEffect->SetLifeTime(kAttackEffectLifeTime);
+	}
+	//ガードの状態を通常に戻す
+	m_guardKind = CharacterGuardKind::kNone;
 
 	//必殺技発動のチュートリアルをクリアさせる
 	SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kSpecialAttack));

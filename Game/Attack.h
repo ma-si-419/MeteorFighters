@@ -60,6 +60,12 @@ public:
 	void SetEffectLifeTime(int time);
 
 	/// <summary>
+	/// 攻撃が当たったときのエフェクトの種類を返す
+	/// </summary>
+	/// <returns>Effeck::EffeckKindをintにキャストしたものを返す</returns>
+	int GetHitEffeckKind();
+
+	/// <summary>
 	/// 存在しているかを返す
 	/// </summary>
 	/// <returns>攻撃が存在しているかどうか</returns>
@@ -93,6 +99,15 @@ public:
 	/// </summary>
 	/// <param name="collider">ぶつかった相手側のコライダー</param>
 	virtual void OnCollide(std::shared_ptr<Collidable> collider) override;
+
+private:
+
+	/// <summary>
+	/// 敵の攻撃とぶつかったときに自身の攻撃を消すかどうか
+	/// </summary>
+	/// <param name="attack">相手の攻撃</param>
+	/// <returns>攻撃を消すならtrue</returns>
+	bool IsDelete(std::shared_ptr<Attack> attack);
 
 private:
 

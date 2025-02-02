@@ -19,13 +19,13 @@ namespace
 	constexpr int kButtonBashingTime = 300;
 
 	//ボタン連打対決の時のカメラのターゲット座標
-	const MyEngine::Vector3 kButtonBashingCameraTargetPos(0, 100, 0);
+	const MyEngine::Vector3 kButtonBashingCameraTargetPos(0, 200, 0);
 
 	const MyEngine::Vector3 kButtonBashingCameraPos[static_cast<int>(GameManagerBase::ButtonBashingSituation::kSituationNum)] =
 	{
-		MyEngine::Vector3(-50,90,-100),
-		MyEngine::Vector3(-30,90,70),
-		MyEngine::Vector3(10,105,10)
+		MyEngine::Vector3(-50,190,-100),
+		MyEngine::Vector3(-30,190,70),
+		MyEngine::Vector3(10,205,10)
 	};
 
 	//カメラ間を移動する時間

@@ -7,6 +7,7 @@
 #include <cassert>
 #include <cmath>
 #include "BattleManager.h"
+#include "SoundManager.h"
 #include "LocalPos.h"
 #include "SceneGame.h"
 #include "Game.h"
@@ -28,9 +29,9 @@ namespace
 	//向いている方向を設定する際に使用する定数
 	constexpr float kFrontPosDistance = 3.0f;
 	//1P側のキャラクターの初期座標
-	const MyEngine::Vector3 kOnePlayerInitPos(-50, 0, -50);
+	const MyEngine::Vector3 kOnePlayerInitPos(-50, 150, -50);
 	//2P側のキャラクターの初期座標
-	const MyEngine::Vector3 kTwoPlayerInitPos(50, 0, 50);
+	const MyEngine::Vector3 kTwoPlayerInitPos(50, 150, 50);
 
 	//敵が正面にいないときのターゲット座標までの距離
 	constexpr float kTargetDistance = 30.0f;
@@ -57,6 +58,18 @@ namespace
 		{"体当たり",Character::AttackKind::kAssault}
 	};
 
+	//キャラクターの声をVoiceKindから文字列に変換する際に使用する
+	const std::map<Character::VoiceKind, std::string> kVoiceKindMap =
+	{
+		{Character::VoiceKind::kStart,"Start"},
+		{Character::VoiceKind::kLowAttack,"LowAttack"},
+		{Character::VoiceKind::kMiddleAttack,"MiddleAttack"},
+		{Character::VoiceKind::kHighAttack,"HighAttack"},
+		{Character::VoiceKind::kSpecialAttack,"SpecialAttack"},
+		{Character::VoiceKind::kDodge1,"Dodge1"},
+		{Character::VoiceKind::kDodge2,"Dodge2"},
+		{Character::VoiceKind::kWinBashing,"WinBashing"}
+	};
 
 	//攻撃のアニメーションを外部ファイルの文字列から内部のAnimKindに変換する際に使用する
 	const std::map<std::string, Character::AnimKind> kAttackAnimKindMap =
@@ -143,7 +156,7 @@ void Character::Init()
 	{
 		path += "Mouse";
 	}
-	else if (m_characterKind == CharacterKind::kBigBlue)
+	else if (m_characterKind == CharacterKind::kTheBlue)
 	{
 		path += "BigB";
 	}
@@ -886,6 +899,32 @@ std::shared_ptr<EnemyInput> Character::GetEnemyInput()
 	return std::shared_ptr<EnemyInput>();
 }
 
+void Character::PlayVoice(VoiceKind kind)
+{
+	//もしボイスが再生されていたら
+	if (m_voiceHandle != -1)
+	{
+		//ボイスを止める
+		StopSoundMem(m_voiceHandle);
+	}
+
+	//ボイスの名前
+	std::string voiceName = kVoiceKindMap.at(kind);
+
+	//キャラクターによってボイスのパスを変更する
+	if (m_characterKind == CharacterKind::kMouse)
+	{
+		voiceName = "Mouse" + voiceName;
+	}
+	else if (m_characterKind == CharacterKind::kTheBlue)
+	{
+		voiceName = "Blue" + voiceName;
+	}
+
+	//ボイスの再生
+	m_voiceHandle = SoundManager::GetInstance().PlayOnceSound(voiceName);
+}
+
 void Character::InitStart()
 {
 	//初期座標の決定
@@ -909,6 +948,8 @@ void Character::UpdateStart()
 	if (m_playAnimKind != AnimKind::kStartPose)
 	{
 		ChangeAnim(AnimKind::kStartPose, false);
+		//このタイミングで一緒に音声も再生する
+		PlayVoice(VoiceKind::kStart);
 	}
 	PlayAnim();
 }

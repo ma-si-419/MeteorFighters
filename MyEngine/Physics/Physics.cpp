@@ -18,6 +18,9 @@ namespace
 	constexpr int kMaxPushWallNum = 16;
 	//壁からの押し出しするときの動く大きさ
 	constexpr float kColHitSlideLength = 1.0f;
+
+	//移動制限をかける距離
+	constexpr float kMoveLimitLength = 710.0f;
 }
 
 Physics::~Physics()
@@ -267,6 +270,25 @@ void Physics::ConfirmPosition()
 		// Posを更新するので、velocityもそこに移動するvelocityに修正
 		MyEngine::Vector3 velocity = item->m_nextPos - item->m_rigidbody.GetPos();
 		MyEngine::Vector3 nextPos = item->m_rigidbody.GetPos() + velocity;
+
+		MyEngine::Vector3 centerPos = MyEngine::Vector3(0, 0, 0);
+
+		//移動制限をつける
+
+		//IsTriggerでないものは移動制限をかける
+		if (!item->m_pColData->GetIsTrigger())
+		{
+			if ((nextPos - centerPos).Length() > kMoveLimitLength)
+			{
+				//座標を補正
+				nextPos = (nextPos - centerPos).Normalize() * kMoveLimitLength;
+			}
+			//一定よりも下に行かないようにする
+			if (nextPos.y < 0.0f)
+			{
+				nextPos.y = 0.0f;
+			}
+		}
 
 		//当たり判定がカプセルだったら
 		if (item->m_pColData->GetKind() == ColliderData::Kind::kCapsule)

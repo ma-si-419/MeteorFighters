@@ -37,7 +37,7 @@ void SceneTitle::Init()
 	m_pTitleUi->Init();
 
 	//BGM‚ğÄ¶
-	m_bgmPlayHandle = SoundManager::GetInstance().LoopPlaySound("Bgm");
+	m_bgmPlayHandle = SoundManager::GetInstance().PlayLoopSound("Bgm");
 }
 
 void SceneTitle::Update()
@@ -54,7 +54,7 @@ void SceneTitle::Update()
 		if (m_sceneManager.IsChangeScene()) return;
 		auto& soundManager = SoundManager::GetInstance();
 		//SEÄ¶
-		soundManager.OncePlaySound("Ok");
+		soundManager.PlayOnceSound("Ok");
 		//BGM‚ğ~‚ß‚é
 		soundManager.StopLoopSound(m_bgmPlayHandle);
 		//ƒV[ƒ“‘JˆÚ

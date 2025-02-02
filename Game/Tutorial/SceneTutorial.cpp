@@ -3,8 +3,10 @@
 #include "GameCamera.h"
 #include "TutorialManager.h"
 #include "LoadManager.h"
+#include "SoundManager.h"
 #include "LoadCsv.h"
 #include "GraphManager.h"
+#include "Physics.h"
 
 SceneTutorial::SceneTutorial(SceneManager& sceneManager) :
 	SceneBase(sceneManager),
@@ -29,6 +31,12 @@ void SceneTutorial::Init()
 {
 	//画像のロード
 	GraphManager::GetInstance().LoadSceneGraph("Tutorial");
+
+	//音声のロード
+	SoundManager::GetInstance().LoadSceneSound("Tutorial");
+
+	//Physicsを動かす
+	Physics::GetInstance().StartUpdate();
 
 	auto& loadManager = LoadManager::GetInstance();
 
@@ -62,7 +70,6 @@ void SceneTutorial::Init()
 	loadManager.LoadHandle("Rock1", "data/model/Rock1.mv1", LoadManager::FileKind::kModel);
 	loadManager.LoadHandle("Rock2", "data/model/Rock2.mv1", LoadManager::FileKind::kModel);
 	loadManager.LoadHandle("Rock3", "data/model/Rock3.mv1", LoadManager::FileKind::kModel);
-
 }
 
 void SceneTutorial::Update()

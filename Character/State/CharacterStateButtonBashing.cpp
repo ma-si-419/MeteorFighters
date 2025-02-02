@@ -12,11 +12,11 @@
 
 namespace
 {
-	const MyEngine::Vector3 kPlayerInitPos(-3, 100, -3);
-	const MyEngine::Vector3 kEnemyInitPos(3, 100, 3);
+	const MyEngine::Vector3 kPlayerInitPos(-3, 200, -3);
+	const MyEngine::Vector3 kEnemyInitPos(3, 200, 3);
 
 	//中心座標
-	const MyEngine::Vector3 kTargetPos(0, 100, 0);
+	const MyEngine::Vector3 kTargetPos(0, 200, 0);
 
 	//ぶつかった時の移動速度
 	constexpr float kBumpSpeed = -10.0f;
@@ -311,6 +311,9 @@ void CharacterStateButtonBashing::Update()
 		//勝っていた場合
 		if (m_pManager->GetButtonBashWinner() == m_pCharacter->GetPlayerNumber())
 		{
+			//勝ったときの音声を再生する
+			m_pCharacter->PlayVoice(Character::VoiceKind::kWinBashing);
+
 			//アイドル状態に戻る
 			auto next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 

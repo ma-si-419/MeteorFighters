@@ -5,6 +5,7 @@
 #include "Character.h"
 #include "BattleManager.h"
 #include "GraphManager.h"
+#include "SoundManager.h"
 #include "LoadManager.h"
 #include "Physics.h"
 #include "LoadCsv.h"
@@ -30,6 +31,8 @@ void SceneGame::Init()
 {
 	//画像のロード
 	GraphManager::GetInstance().LoadSceneGraph("Game");
+	//音声のロード
+	SoundManager::GetInstance().LoadSceneSound("Game");
 
 	//非同期ロードマネージャー
 	auto& loadManager = LoadManager::GetInstance();

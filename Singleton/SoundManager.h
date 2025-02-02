@@ -39,9 +39,9 @@ public:
 	/// <param name="">ÉVÅ[ÉìÇÃñºëO</param>
 	void LoadSceneSound(std::string sceneName);
 
-	int OncePlaySound(std::string soundName);
+	int PlayOnceSound(std::string soundName);
 	
-	int LoopPlaySound(std::string soundName);
+	int PlayLoopSound(std::string soundName);
 
 	void StopLoopSound(int playHandle);
 private:

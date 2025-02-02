@@ -253,7 +253,7 @@ void EnemyInput::Update()
 
 					m_stateTime = 0;
 
-					action = Action::kRocketDash;
+			//		action = Action::kSpecialAttack;
 
 					//s“®‚ğ•ÏX‚·‚é
 					SetAction(action);

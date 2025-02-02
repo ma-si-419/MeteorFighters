@@ -190,4 +190,7 @@ private:
 
 	//エネミーのインプットデータ
 	std::shared_ptr<EnemyInput> m_pEnemyInput;
+
+	//BGMのハンドル
+	int m_bgmPlayHandle;
 };

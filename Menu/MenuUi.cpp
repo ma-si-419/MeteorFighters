@@ -259,7 +259,7 @@ int MenuUi::Update()
 
 	if (input->IsTrigger("A"))
 	{
-		SoundManager::GetInstance().OncePlaySound("Ok");
+		SoundManager::GetInstance().PlayOnceSound("Ok");
 
 		return static_cast<int>(m_selectItem);
 	}

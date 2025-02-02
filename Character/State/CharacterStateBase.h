@@ -41,7 +41,8 @@ public:
 		kMiddleGuard,//中段ガード
 		kDownGuard,//下段ガード
 		kJustGuard,//ジャストガード
-		kDodge//回避
+		kDodge,//回避
+		kSuperArmor//スーパーアーマー
 	};
 
 public:

@@ -8,6 +8,7 @@
 #include "Stage.h"
 #include "Input.h"
 #include "EnemyInput.h"
+#include "SoundManager.h"
 
 namespace
 {
@@ -101,7 +102,8 @@ TutorialManager::TutorialManager(std::shared_ptr<GameCamera> camera) :
 	m_nowTutorial(TutorialKind::kMove),
 	m_drawSituationFunc(&TutorialManager::DrawPlayMenu),
 	m_updateSituationFunc(&TutorialManager::UpdatePlayMenu),
-	m_tutorialSituation(TutorialSituation::kPlayMenu)
+	m_tutorialSituation(TutorialSituation::kPlayMenu),
+	m_bgmPlayHandle(-1)
 {
 	m_pTutorialUi = std::make_shared<TutorialUi>();
 
@@ -135,6 +137,12 @@ void TutorialManager::Init()
 
 void TutorialManager::Update()
 {
+	if (m_bgmPlayHandle == -1)
+	{
+		//BGMを再生する
+		m_bgmPlayHandle = SoundManager::GetInstance().PlayLoopSound("Bgm");
+	}
+
 	(this->*m_updateSituationFunc)();
 
 	//常にエネミーの入力を更新する
@@ -188,6 +196,9 @@ void TutorialManager::Final()
 	m_pStage->Final();
 	m_pCamera->Final();
 	m_pEffectManager->Final();
+
+	//BGMを止める
+	SoundManager::GetInstance().StopLoopSound(m_bgmPlayHandle);
 }
 
 void TutorialManager::UpdateStartMenu()

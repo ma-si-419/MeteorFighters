@@ -11,7 +11,29 @@ namespace
 
 	constexpr float kAttackLange = 0.5f;
 
-	constexpr int kEnergyHitEffectTime = 30;
+	constexpr int kHitEffectTime = 30;
+
+	//格闘攻撃を受けた時に出すエフェクト
+	const std::map<Character::AttackHitKind, Effect::EffectKind> kPhysicalAttackHitEffectMap =
+	{
+		{Character::AttackHitKind::kLow,Effect::EffectKind::kLowHit},
+		{Character::AttackHitKind::kMiddle,Effect::EffectKind::kMiddleHit},
+		{Character::AttackHitKind::kWeakUpBurst,Effect::EffectKind::kMiddleHit},
+		{Character::AttackHitKind::kUpBurst,Effect::EffectKind::kHighHit},
+		{Character::AttackHitKind::kDownBurst,Effect::EffectKind::kHighHit},
+		{Character::AttackHitKind::kFarBurst,Effect::EffectKind::kHighHit},
+		{Character::AttackHitKind::kBottomStan,Effect::EffectKind::kMiddleHit},
+		{Character::AttackHitKind::kMiddleStan,Effect::EffectKind::kMiddleHit}
+	};
+
+	//攻撃の種類によって出すエフェクトの種類
+	const std::map<Character::AttackKind, Effect::EffectKind> kAttackEffectMap =
+	{
+		{Character::AttackKind::kPhysical,Effect::EffectKind::kLowHit},//格闘攻撃の場合は上のマップを使う
+		{Character::AttackKind::kEnergy,Effect::EffectKind::kEnergyHit},
+		{Character::AttackKind::kBeam,Effect::EffectKind::kLaserHit}
+	};
+
 }
 
 Attack::Attack(ObjectTag tag, MyEngine::Vector3 pos) :
@@ -108,24 +130,109 @@ void Attack::SetEffectLifeTime(int time)
 	m_pEffect->SetLifeTime(time);
 }
 
+int Attack::GetHitEffeckKind()
+{
+	//格闘攻撃の場合
+	if (m_status.attackKind == Character::AttackKind::kPhysical)
+	{
+		return static_cast<int>(kPhysicalAttackHitEffectMap.at(m_status.attackHitKind));
+	}
+	//それ以外の攻撃の場合
+	else
+	{
+		return static_cast<int>(kAttackEffectMap.at(m_status.attackKind));
+	}
+
+	return 0;
+}
+
 void Attack::OnCollide(std::shared_ptr<Collidable> collider)
 {
-	//自身がプレイヤーの攻撃で
-	if (GetTag() == ObjectTag::kOnePlayerAttack)
+	//気弾系の攻撃だったら
+	if (m_status.attackKind == Character::AttackKind::kBeam ||
+		m_status.attackKind == Character::AttackKind::kEnergy)
 	{
-		//エネミーにぶつかったら
-		if (collider->GetTag() == ObjectTag::kTwoPlayer)
+		//自身がプレイヤーの攻撃で
+		if (GetTag() == ObjectTag::kOnePlayerAttack)
 		{
+			//エネミーの攻撃にぶつかったら
+			if (collider->GetTag() == ObjectTag::kTwoPlayerAttack)
+			{
+				//相手の攻撃
+				auto attack = std::static_pointer_cast<Attack>(collider);
 
+				//自身の攻撃を消すかどうかチェック
+				if (IsDelete(attack))
+				{
+					//この攻撃を消す
+					m_isExist = false;
+
+					//ヒットエフェクトを再生する
+					auto effect = std::make_shared<Effect>(static_cast<Effect::EffectKind>(GetHitEffeckKind()));
+
+					//座標設定
+					effect->SetPos(m_rigidbody.GetPos());
+
+					//エフェクトの再生時間を設定
+					effect->SetLifeTime(kHitEffectTime);
+
+					//エフェクトを登録
+					m_pEffectManager->Entry(effect, m_rigidbody.GetPos());
+				}
+			}
+		}
+		//自身がエネミーの攻撃で
+		else if (GetTag() == ObjectTag::kTwoPlayerAttack)
+		{
+			//プレイヤーの攻撃にぶつかったら
+			if (collider->GetTag() == ObjectTag::kOnePlayerAttack)
+			{
+				//相手の攻撃
+				auto attack = std::static_pointer_cast<Attack>(collider);
+
+				//自身の攻撃を消すかどうかチェック
+				if (IsDelete(attack))
+				{
+					//この攻撃を消す
+					m_isExist = false;
+
+					//ヒットエフェクトを再生する
+					auto effect = std::make_shared<Effect>(static_cast<Effect::EffectKind>(GetHitEffeckKind()));
+
+					//座標設定
+					effect->SetPos(m_rigidbody.GetPos());
+
+					//エフェクトの再生時間を設定
+					effect->SetLifeTime(kHitEffectTime);
+
+					//エフェクトを登録
+					m_pEffectManager->Entry(effect, m_rigidbody.GetPos());
+				}
+			}
 		}
 	}
-	//自身がエネミーの攻撃で
-	else if (GetTag() == ObjectTag::kTwoPlayerAttack)
-	{
-		//プレイヤーにぶつかったら
-		if (collider->GetTag() == ObjectTag::kOnePlayer)
-		{
-		}
-	}
 
+}
+
+bool Attack::IsDelete(std::shared_ptr<Attack> attack)
+{
+	//自身の攻撃のステータス
+	auto attackKind = m_status.attackKind;
+
+	//相手の攻撃のステータス
+	auto enemyAttackKind = attack->GetStatus().attackKind;
+
+	//相手の攻撃がエネルギーで自身の攻撃がビームだったら
+	if (attackKind == Character::AttackKind::kBeam &&
+		enemyAttackKind == Character::AttackKind::kEnergy)
+	{
+		//消さない
+		return false;
+	}
+	//それ以外の場合はすべて消す
+	else
+	{
+		//消す
+		return true;
+	}
 }

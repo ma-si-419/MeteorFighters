@@ -16,6 +16,19 @@ class Character : public Collidable
 {
 public:
 
+	enum class VoiceKind
+	{
+		kStart,
+		kLowAttack,
+		kMiddleAttack,
+		kHighAttack,
+		kSpecialAttack,
+		kDodge1,
+		kDodge2,
+		kWinBashing,
+		kVoiceNum
+	};
+
 	/// <summary>
 	/// 攻撃の種類
 	/// </summary>
@@ -124,7 +137,7 @@ public:
 	enum class CharacterKind
 	{
 		kMouse,
-		kBigBlue
+		kTheBlue
 	};
 
 	enum class CharacterStatusDataSort
@@ -593,6 +606,13 @@ public:
 	/// <returns>エネミーのインプットクラス</returns>
 	std::shared_ptr<EnemyInput> GetEnemyInput();
 
+
+	/// <summary>
+	/// 声を出す際に呼ぶ関数
+	/// </summary>
+	/// <param name="kind">話す声の種類</param>
+	void PlayVoice(VoiceKind kind);
+
 private:
 
 	/// <summary>
@@ -721,6 +741,8 @@ private:
 	MyEngine::Vector3 m_knockOutVelo;
 	//キャラクターを描画するかどうか
 	bool m_isDrawCharacter;
+	//話している声のプレイハンドル
+	int m_voiceHandle;
 
 	friend CharacterStateBase;
 };

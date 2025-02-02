@@ -21,7 +21,8 @@ public:
 		kEnergyHit,
 		kTeleportaion,
 		kStageHit,
-		kLaserHit
+		kLaserHit,
+		kStartLaser
 	};
 
 public:

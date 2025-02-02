@@ -78,7 +78,7 @@ void SoundManager::Init()
 
 void SoundManager::LoadSceneSound(std::string sceneName)
 {
-	//画像ハンドルを削除する
+	//音声ハンドルを削除する
 	if (m_sceneSoundHandle.size() > 0)
 	{
 		for (auto& item : m_sceneSoundHandle)
@@ -90,7 +90,7 @@ void SoundManager::LoadSceneSound(std::string sceneName)
 	//指定されたシーンのロードするパス
 	std::vector<std::pair<std::string, std::string>> loadPaths = m_pathData[sceneName];
 
-	//画像をロードする
+	//音声をロードする
 	for (auto item : loadPaths)
 	{
 		std::string path = "data/sound/" + item.second;
@@ -99,12 +99,12 @@ void SoundManager::LoadSceneSound(std::string sceneName)
 	}
 }
 
-int SoundManager::OncePlaySound(std::string soundName)
+int SoundManager::PlayOnceSound(std::string soundName)
 {
 	return PlaySoundMem(m_sceneSoundHandle[soundName],DX_PLAYTYPE_BACK);
 }
 
-int SoundManager::LoopPlaySound(std::string soundName)
+int SoundManager::PlayLoopSound(std::string soundName)
 {
 	int playHandle = PlaySoundMem(m_sceneSoundHandle[soundName], DX_PLAYTYPE_LOOP);
 	

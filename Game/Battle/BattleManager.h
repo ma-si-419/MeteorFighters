@@ -83,5 +83,7 @@ private:
 	std::shared_ptr<BattleUi> m_pBattleUi;
 
 	int m_menuSelectNumber;
-};
 
+	//BGM‚Ìƒnƒ“ƒhƒ‹
+	int m_bgmPlayHandle;
+};
