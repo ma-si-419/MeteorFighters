@@ -13,11 +13,17 @@ namespace
 	//フォントのサイズ
 	constexpr int kLevelFontSize = 48;
 	//曲名を表示するフォントのサイズ
-	constexpr int kMusicNameFontSize = 32;
+	constexpr int kMusicNameFontSize = 36;
+	//曲名を表示する文字列の色(黄色)
+	const int kMusicNameColor = GetColor(255, 255, 32);	 
 
+	//音符を表示する座標
+	constexpr int kMusicNotePosX = 1120;
+	constexpr int kMusicNotePosY = 855;
+	
 	//曲名を表示する座標
-	constexpr int kMusicNamePosX = 1200;
-	constexpr int kMusicNamePosY = 860;
+	constexpr int kMusicNamePosX = 1170;
+	constexpr int kMusicNamePosY = 850;
 
 	//カメラの設定
 	constexpr float kCameraNear = 0.1f;
@@ -256,8 +262,8 @@ void SelectUi::Init()
 
 	//音符の画像設定
 	GraphData musicNote;
-	musicNote.posX = kMusicNamePosX - 50;
-	musicNote.posY = kMusicNamePosY;
+	musicNote.posX = kMusicNotePosX;
+	musicNote.posY = kMusicNotePosY;
 	musicNote.handle = graphManager.GetHandle("MusicNote");
 	m_drawGraphs[GraphName::kMusicNote] = musicNote;
 }
@@ -335,9 +341,8 @@ void SelectUi::Draw()
 
 		DrawStringToHandle(static_cast<int>(pos.x), static_cast<int>(pos.y), kLevelString[prevLevel].c_str(), kLevelColor[prevLevel], m_levelFontHandle);
 
-
 		//曲名を表示する
-		DrawStringToHandle(kMusicNamePosX, kMusicNamePosY, m_musicName.c_str(), GetColor(192, 192, 16), m_musicNameFontHandle);
+		DrawStringToHandle(kMusicNamePosX, kMusicNamePosY, m_musicName.c_str(), kMusicNameColor, m_musicNameFontHandle);
 	}
 }
 
