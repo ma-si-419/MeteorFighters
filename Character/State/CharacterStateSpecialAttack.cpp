@@ -8,6 +8,7 @@
 #include <cassert>
 #include <map>
 #include <cmath>
+#include "SoundManager.h"
 
 namespace
 {
@@ -127,6 +128,9 @@ void CharacterStateSpecialAttack::Enter()
 
 	//‰¹º‚ğÄ¶‚·‚é
 	m_pCharacter->PlayVoice(Character::VoiceKind::kSpecialAttack);
+
+	//•KE‹Z”­“®‚ÌSe‚ğÄ¶‚·‚é
+	SoundManager::GetInstance().PlayOnceSound("SpecialStart");
 }
 
 void CharacterStateSpecialAttack::Update()
@@ -252,6 +256,9 @@ void CharacterStateSpecialAttack::Update()
 		{
 			//İ’è‚³‚ê‚½“–‚½‚è”»’è‚Ì‘å‚«‚³‚ğg—p‚·‚é
 			attack.radius = attackData.radius;
+
+			//UŒ‚‚ÌƒTƒEƒ“ƒh‚ğÄ¶‚·‚é
+			SoundManager::GetInstance().PlayOnceSound("Laser");
 		}
 
 		//UŒ‚‚Ìí—Ş‚ğİ’è
@@ -262,6 +269,9 @@ void CharacterStateSpecialAttack::Update()
 
 		//UŒ‚‚Ì¶‘¶ŠÔ‚ğİ’è
 		attack.lifeTime = kAttackTimeMap.at(attackData.kind);
+
+		//UŒ‚‚ÌƒqƒbƒgƒTƒEƒ“ƒh‚ğİ’è
+		attack.hitSoundName = "SpecialHit";
 
 		//“G‚Ìó‘Ô‚ª‰½‚É‚È‚Á‚½‚çUŒ‚‚ğ‚â‚ß‚é‚©‚ğİ’è
 		m_endHitReaction = static_cast<int>(kHitReactionMap.at(kHitKindMap.at(attackData.kind)));

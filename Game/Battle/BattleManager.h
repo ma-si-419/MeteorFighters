@@ -84,6 +84,6 @@ private:
 
 	int m_menuSelectNumber;
 
-	//BGM‚Ìƒnƒ“ƒhƒ‹
-	int m_bgmPlayHandle;
+	//BGM‚Ì–¼‘O
+	std::string m_bgmName;
 };

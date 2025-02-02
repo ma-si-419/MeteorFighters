@@ -44,5 +44,9 @@ private:
 	bool m_isReleaseX;
 
 	bool m_isReleaseY;
+
+	//‹ó’†‚É‚¢‚é‚Æ‚«‚É—h‚ç‚·‚½‚ß‚Ég‚¤•Ï”
+	float m_swayCount;
+
 };
 

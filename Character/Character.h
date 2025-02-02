@@ -211,6 +211,7 @@ public:
 		std::string targetHitReaction = "empty";
 		std::string animationName = "empty";
 		std::string effectName = "empty";
+		std::string soundName = "empty";
 	};
 
 	/// <summary>
@@ -258,6 +259,7 @@ public:
 		float radius = 0;
 		std::string attackName = "empty";
 		std::string effectName = "empty";
+		std::string hitSoundName = "empty";
 		AttackKind attackKind = AttackKind::kPhysical;
 		AttackHitKind attackHitKind = AttackHitKind::kLow;
 	};
@@ -613,6 +615,12 @@ public:
 	/// <param name="kind">話す声の種類</param>
 	void PlayVoice(VoiceKind kind);
 
+	/// <summary>
+	/// どのくらい描画座標をずらすかを設定する
+	/// </summary>
+	/// <param name="vec">ずらすベクトル</param>
+	void SetDrawShiftVec(MyEngine::Vector3 vec) { m_drawShiftVec = vec; }
+
 private:
 
 	/// <summary>
@@ -634,7 +642,8 @@ private:
 		kTargetHitReaction,//敵の状態が何だったら攻撃を出せるか
 		kAnimationName,//アニメーションの名前
 		kAnimationSpeed,//アニメーションの再生速度
-		kEffectName//攻撃のエフェクトの名前
+		kEffectName,//攻撃のエフェクトの名前
+		kSoundName//攻撃の音の名前
 	};
 
 private:
@@ -701,6 +710,8 @@ private:
 	CharacterKind m_characterKind;
 	//自身のステータス
 	CharacterStatus m_status;
+	//描画座標をどのくらいずらすか(空中で揺れる際などに使用)
+	MyEngine::Vector3 m_drawShiftVec;
 	//現在の体力
 	float m_nowHp;
 	//現在の気力

@@ -24,4 +24,6 @@ private:
 
 	std::shared_ptr<MenuUi> m_pMenuUi;
 
+	int m_bgmPlayHandle;
+
 };

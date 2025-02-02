@@ -53,11 +53,20 @@ namespace
 
 	//バトル終了時のカメラの移動速度
 	constexpr float kResultCameraMoveSpeed = 1.0f;
+
+	//Bgmの音量
+	constexpr int kBgmVolume = 150;
+
+	//KnockOutの音量
+	constexpr int kKnockOutVolume = 255;
+
+	//BGMの名前(仮処理)
+	const std::string kBgmName = "Bgm2";
 }
 
 BattleManager::BattleManager(std::shared_ptr<GameCamera> camera) :
 	GameManagerBase(camera, GameManagerBase::GameKind::kBattle),
-	m_bgmPlayHandle(-1),
+	m_bgmName("empty"),
 	m_menuSelectNumber(0)
 {
 	m_pCamera = camera;
@@ -80,7 +89,10 @@ void BattleManager::Init()
 	ChangeSituation(BattleSituation::kStart1P);
 
 	//BGMを再生する
-	m_bgmPlayHandle = SoundManager::GetInstance().PlayLoopSound("Bgm");
+	SoundManager::GetInstance().PlayLoopSound(kBgmName);
+
+	//BGMの音量を設定する
+	SoundManager::GetInstance().SetSoundVolume(kBgmName, kBgmVolume);
 
 #ifdef _DEBUG
 	//	m_situation = Situation::kBattle;
@@ -90,17 +102,6 @@ void BattleManager::Init()
 
 void BattleManager::Update()
 {
-#ifdef _DEBUG
-
-	MyEngine::Vector3 pos = m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetPos();
-
-	DrawFormatString(0, 80, GetColor(255, 255, 255), "プレイヤーの座標(%0.1f,%0.1f,%0.1f)", pos.x, pos.y, pos.z);
-
-	pos = m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetPos();
-
-	DrawFormatString(0, 96, GetColor(255, 255, 255), "エネミーの座標(%0.1f,%0.1f,%0.1f)", pos.x, pos.y, pos.z);
-
-#endif // _DEBUG
 
 	//状況によって変わるUpdate
 	(this->*m_updateSituationFunc)();
@@ -192,7 +193,7 @@ void BattleManager::Final()
 	m_pEffectManager->Final();
 
 	//BGMを止める
-	SoundManager::GetInstance().StopLoopSound(m_bgmPlayHandle);
+	SoundManager::GetInstance().StopLoopSound(kBgmName);
 }
 
 void BattleManager::UpdateStart()
@@ -356,6 +357,12 @@ void BattleManager::UpdateBattle()
 			m_pCamera->SetFrontPos(frontPos);
 
 			m_pCamera->SetPoseCamera();
+
+			//ノックアウト時のサウンドの音量を設定
+			SoundManager::GetInstance().SetSoundVolume("KnockOut", kKnockOutVolume);
+
+			//ノックアウト時のサウンドを再生
+			SoundManager::GetInstance().PlayOnceSound("KnockOut");
 
 			ChangeSituation(BattleSituation::kKnockOut);
 			return;
@@ -532,6 +539,9 @@ void BattleManager::UpdateMenu()
 		ChangeSituation(BattleSituation::kBattle);
 		m_pBattleUi->ChangeSituation(BattleUi::UiSituation::kNone);
 		Physics::GetInstance().StartUpdate();
+
+		//サウンドを再生
+		SoundManager::GetInstance().PlayOnceSound("Cancel");
 	}
 
 	auto select = static_cast<BattleUi::MenuItem>(m_pBattleUi->GetDecisionItem());

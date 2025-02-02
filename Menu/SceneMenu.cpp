@@ -23,6 +23,9 @@ void SceneMenu::Init()
 	GraphManager::GetInstance().LoadSceneGraph("Menu");
 	SoundManager::GetInstance().LoadSceneSound("Menu");
 	m_pMenuUi->Init();
+
+	//Bgm‚ğÄ¶
+	m_bgmPlayHandle = SoundManager::GetInstance().PlayLoopSound("Bgm");
 }
 
 void SceneMenu::Update()
@@ -46,7 +49,6 @@ void SceneMenu::Update()
 		m_sceneManager.GameEnd();
 		return;
 	}
-
 }
 
 void SceneMenu::UpdateAsyncLoad()
@@ -68,4 +70,5 @@ void SceneMenu::Draw()
 
 void SceneMenu::End()
 {
+	SoundManager::GetInstance().StopLoopSound("Bgm");
 }

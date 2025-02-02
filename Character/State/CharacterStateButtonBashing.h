@@ -23,5 +23,7 @@ private:
 	bool m_isBump;
 
 	bool m_isStay;
+
+	int m_soundPlayTime;
 };
 

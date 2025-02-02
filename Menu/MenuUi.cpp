@@ -251,6 +251,9 @@ int MenuUi::Update()
 
 		//動いて何フレーム立ったかリセット
 		m_selectItemMoveTime = 0;
+
+		//選択音を鳴らす
+		SoundManager::GetInstance().PlayOnceSound("Select");
 	}
 	else
 	{

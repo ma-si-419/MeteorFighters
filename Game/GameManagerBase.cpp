@@ -12,6 +12,7 @@
 #include "Game.h"
 #include "ObjectBase.h"
 #include <cmath>
+#include "SoundManager.h"
 
 namespace
 {
@@ -62,6 +63,9 @@ namespace
 
 	//ボタン連打時のカメラの揺れの大きさ
 	constexpr int kButtonBashingCameraShakePower = 1;
+
+	//ボタン連打終了時のサウンドの音量
+	constexpr int kWinButtonBashingSoundVolume = 255;
 
 }
 
@@ -348,6 +352,9 @@ void GameManagerBase::StartButtonBashing()
 	m_buttonBashNum[1] = 0;
 	m_buttonBashingSituation = ButtonBashingSituation::kFirstHit;
 
+	//ぶつかったときのサウンドを再生する
+	SoundManager::GetInstance().PlayOnceSound("HighHit");
+
 	m_buttonBashingCameraPos = kButtonBashingCameraPos[static_cast<int>(m_buttonBashingSituation)];
 
 	//連打するボタンをランダムで決める
@@ -540,6 +547,13 @@ void GameManagerBase::UpdateButtonBashing()
 	{
 		m_isButtonBashing = false;
 		m_pCamera->SetBattleCamera();
+
+		//ボタン連打終了時のサウンドの音量を設定する
+		SoundManager::GetInstance().SetSoundVolume("WinButtonBashing", kWinButtonBashingSoundVolume);
+
+		//ボタン連打終了のサウンドを再生する
+		SoundManager::GetInstance().PlayOnceSound("WinButtonBashing");
+
 	}
 }
 

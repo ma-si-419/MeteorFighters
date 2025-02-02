@@ -9,6 +9,7 @@
 #include "GameSceneConstant.h"
 #include "TutorialManager.h"
 #include "Input.h"
+#include "SoundManager.h"
 
 namespace
 {
@@ -55,6 +56,9 @@ void CharacterStateJump::Enter()
 
 	//ジャンプチュートリアルのクリア判定をtrueにする
 	SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kJump));
+
+	//効果音を再生する
+	SoundManager::GetInstance().PlayOnceSound("Jump");
 
 }
 
@@ -249,10 +253,14 @@ void CharacterStateJump::Update()
 
 		ChangeState(next);
 
+		//着地音を再生する
+		SoundManager::GetInstance().PlayOnceSound("JumpEnd");
+
 		return;
 	}
 }
 
 void CharacterStateJump::Exit()
 {
+
 }

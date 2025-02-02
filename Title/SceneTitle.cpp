@@ -18,8 +18,7 @@ namespace
 }
 
 SceneTitle::SceneTitle(SceneManager& sceneManager) :
-	SceneBase(sceneManager),
-	m_bgmPlayHandle(-1)
+	SceneBase(sceneManager)
 {
 	m_pTitleUi = std::make_shared<TitleUi>();
 }
@@ -37,7 +36,7 @@ void SceneTitle::Init()
 	m_pTitleUi->Init();
 
 	//BGM‚ğÄ¶
-	m_bgmPlayHandle = SoundManager::GetInstance().PlayLoopSound("Bgm");
+	SoundManager::GetInstance().PlayLoopSound("Bgm");
 }
 
 void SceneTitle::Update()
@@ -56,7 +55,7 @@ void SceneTitle::Update()
 		//SEÄ¶
 		soundManager.PlayOnceSound("Ok");
 		//BGM‚ğ~‚ß‚é
-		soundManager.StopLoopSound(m_bgmPlayHandle);
+		soundManager.StopLoopSound("Bgm");
 		//ƒV[ƒ“‘JˆÚ
 		m_sceneManager.ChangeScene(std::make_shared<SceneMenu>(m_sceneManager));
 	}

@@ -12,6 +12,9 @@
 
 namespace
 {
+	//BGMの音量
+	constexpr int kBgmVolume = 150;
+
 	//stringからSuccessKindに変換するためのmap
 	const std::map<std::string, TutorialManager::TutorialSuccessKind> kSuccessKindMap =
 	{
@@ -95,6 +98,9 @@ namespace
 		{"RocketDash",EnemyInput::Action::kRocketDash},
 		{"None",EnemyInput::Action::kNone}
 	};
+
+	//BGMの名前
+	const std::string kBgmName = "Bgm1";
 }
 
 TutorialManager::TutorialManager(std::shared_ptr<GameCamera> camera) :
@@ -102,8 +108,7 @@ TutorialManager::TutorialManager(std::shared_ptr<GameCamera> camera) :
 	m_nowTutorial(TutorialKind::kMove),
 	m_drawSituationFunc(&TutorialManager::DrawPlayMenu),
 	m_updateSituationFunc(&TutorialManager::UpdatePlayMenu),
-	m_tutorialSituation(TutorialSituation::kPlayMenu),
-	m_bgmPlayHandle(-1)
+	m_tutorialSituation(TutorialSituation::kPlayMenu)
 {
 	m_pTutorialUi = std::make_shared<TutorialUi>();
 
@@ -137,10 +142,13 @@ void TutorialManager::Init()
 
 void TutorialManager::Update()
 {
-	if (m_bgmPlayHandle == -1)
+	if (SoundManager::GetInstance().IsPlayingSound(kBgmName))
 	{
 		//BGMを再生する
-		m_bgmPlayHandle = SoundManager::GetInstance().PlayLoopSound("Bgm");
+		SoundManager::GetInstance().PlayLoopSound(kBgmName);
+
+		//BGMの音量を設定する
+		SoundManager::GetInstance().SetSoundVolume(kBgmName, kBgmVolume);
 	}
 
 	(this->*m_updateSituationFunc)();
@@ -198,7 +206,7 @@ void TutorialManager::Final()
 	m_pEffectManager->Final();
 
 	//BGMを止める
-	SoundManager::GetInstance().StopLoopSound(m_bgmPlayHandle);
+	SoundManager::GetInstance().StopLoopSound(kBgmName);
 }
 
 void TutorialManager::UpdateStartMenu()
@@ -212,6 +220,9 @@ void TutorialManager::UpdateStartMenu()
 		//チュートリアルを開始するが押されたら
 		if (selectItem == TutorialUi::StartMenuItem::kStartTutorial)
 		{
+			//サウンドを再生
+			SoundManager::GetInstance().PlayOnceSound("Ok");
+
 			ChangeSituation(TutorialSituation::kStart);
 
 			//体力バーを表示する
@@ -220,11 +231,17 @@ void TutorialManager::UpdateStartMenu()
 		//チュートリアルを選択するが押されたら
 		else if (selectItem == TutorialUi::StartMenuItem::kSelectTutorial)
 		{
+			//サウンドを再生
+			SoundManager::GetInstance().PlayOnceSound("Ok");
+
 			//チュートリアルを選択する画面に移動
 			ChangeSituation(TutorialSituation::kSelectMenu);
 		}
 		else if (selectItem == TutorialUi::StartMenuItem::kEnd)
 		{
+			//サウンドを再生
+			SoundManager::GetInstance().PlayOnceSound("Cancel");
+
 			//メインメニューに戻る
 			m_nextScene = Game::Scene::kMenu;
 		}
@@ -245,6 +262,8 @@ void TutorialManager::UpdatePlayMenu()
 
 	if (input->IsTrigger("A"))
 	{
+		//サウンドを再生
+		SoundManager::GetInstance().PlayOnceSound("Ok");
 
 		//状況をリセットするを押されたら
 		if (selectItem == TutorialUi::PlayMenuItem::kReset)
@@ -297,6 +316,10 @@ void TutorialManager::UpdatePlayMenu()
 
 			nextSituation = TutorialSituation::kStart;
 		}
+
+		//サウンドを再生
+		SoundManager::GetInstance().PlayOnceSound("Cancel");
+
 	}
 
 	//メニュー画面を閉じる選択肢が選ばれていたら
@@ -313,6 +336,9 @@ void TutorialManager::UpdateStart()
 	if (input->IsTrigger("A"))
 	{
 		ChangeSituation(TutorialSituation::kPlaying);
+
+		//サウンドを再生
+		SoundManager::GetInstance().PlayOnceSound("Ok");
 	}
 
 	//カメラの更新を行う
@@ -326,6 +352,9 @@ void TutorialManager::UpdatePlaying()
 
 	if (input->IsTrigger("Pause"))
 	{
+		//サウンドを再生
+		SoundManager::GetInstance().PlayOnceSound("Ok");
+
 		ChangeSituation(TutorialSituation::kPlayMenu);
 	}
 
@@ -414,11 +443,17 @@ void TutorialManager::UpdateSelectMenu()
 		m_nowTutorial = kTutorialKindMap.at(m_pTutorialUi->GetSelectTutorialName());
 
 		ChangeSituation(TutorialSituation::kStart);
+
+		//サウンドを再生する
+		SoundManager::GetInstance().PlayOnceSound("Ok");
+
 	}
 	//戻るボタンが押されたら
 	else if (input->IsTrigger("B"))
 	{
 		ChangeSituation(TutorialSituation::kStartMenu);
+		//サウンドを再生する
+		SoundManager::GetInstance().PlayOnceSound("Cancel");
 	}
 
 	//カメラの更新を行う

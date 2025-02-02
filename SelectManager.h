@@ -78,5 +78,8 @@ private:
 
 	//エネミーのAIレベル
 	int m_enemyLevel;
+
+	//今再生しているBGMの番号
+	int m_bgmNumber;
 };
 

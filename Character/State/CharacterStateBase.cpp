@@ -13,6 +13,7 @@
 #include <cmath>
 #include "GameSceneConstant.h"
 #include "LocalPos.h"
+#include "SoundManager.h"
 
 namespace
 {
@@ -288,6 +289,9 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 
 	//ダメージを受ける
 	m_pCharacter->SubHp(damage);
+
+	//ダメージを受ける際にヒットサウンドを鳴らす
+	SoundManager::GetInstance().PlayOnceSound(status.hitSoundName);
 
 	//スーパーアーマー状態ならば
 	if (m_guardKind == CharacterGuardKind::kSuperArmor)

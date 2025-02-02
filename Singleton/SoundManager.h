@@ -9,6 +9,7 @@ private:
 	enum class FileDataSort
 	{
 		kSoundName,
+		kFileName,
 		kPath,
 		kSceneName
 	};
@@ -43,7 +44,16 @@ public:
 	
 	int PlayLoopSound(std::string soundName);
 
-	void StopLoopSound(int playHandle);
+	void StopLoopSound(std::string soundName);
+
+	bool IsPlayingSound(std::string soundName);
+
+	/// <summary>
+	/// 音声のボリュームを設定する
+	/// </summary>
+	/// <param name="soundName">音声の名前</param>
+	/// <param name="volume">大きさ</param>
+	void SetSoundVolume(std::string soundName,int volume);
 private:
 
 	//すべての音声のパス
@@ -52,7 +62,8 @@ private:
 	//今いるシーンの音声のハンドル
 	std::map<std::string, int> m_sceneSoundHandle;
 
-	//ループ再生中の音声のプレイハンドル
-	std::vector<int> m_loopPlayHandles;
+	//常に使用する音声のハンドル
+	std::map<std::string, int> m_utilitySoundHandle;
+
 
 };

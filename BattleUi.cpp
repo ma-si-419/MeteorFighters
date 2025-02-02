@@ -1,6 +1,7 @@
 #include "BattleUi.h"
 #include "BattleManager.h"
 #include "GraphManager.h"
+#include "SoundManager.h"
 #include "Input.h"
 
 namespace
@@ -198,6 +199,9 @@ void BattleUi::UpdateMenu()
 	if (input->IsTrigger("A"))
 	{
 		m_decisionItem = m_selectItem;
+
+		//サウンドを再生
+		SoundManager::GetInstance().PlayOnceSound("Ok");
 	}
 	//上下入力を受け取る
 	if (input->IsTrigger("Down"))
@@ -236,6 +240,9 @@ void BattleUi::UpdateMenu()
 		//選択している項目の後ろのボックスのサイズを縮小する
 		m_selectItemBoxScale = kSelectItemBoxMinScale;
 
+		//サウンドを再生
+		SoundManager::GetInstance().PlayOnceSound("Select");
+
 	}
 	//動かしていなければ
 	else
@@ -266,6 +273,10 @@ void BattleUi::UpdateResult()
 	if (input->IsTrigger("A"))
 	{
 		m_decisionItem = m_selectItem;
+
+		//サウンドを再生
+		SoundManager::GetInstance().PlayOnceSound("Ok");
+
 	}
 	//上下入力を受け取る
 	if (input->IsTrigger("Down"))
@@ -303,6 +314,9 @@ void BattleUi::UpdateResult()
 
 		//選択している項目の後ろのボックスのサイズを縮小する
 		m_selectItemBoxScale = kSelectItemBoxMinScale;
+
+		//サウンドを再生する
+		SoundManager::GetInstance().PlayOnceSound("Select");
 
 	}
 	//動かしていなければ

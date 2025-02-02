@@ -2,6 +2,7 @@
 #include "LoadCsv.h"
 #include "TutorialManager.h"
 #include "GraphManager.h"
+#include "SoundManager.h"
 #include "Input.h"
 
 namespace
@@ -1022,6 +1023,10 @@ void TutorialUi::UpdateStartMenu()
 
 			//座標を設定
 			selectItemBox.pos = pos;
+
+			//サウンドを再生
+			SoundManager::GetInstance().PlayOnceSound("Select");
+
 		}
 		//選択している項目が変化していなければ
 		else
@@ -1167,6 +1172,8 @@ void TutorialUi::UpdateSelectMenu()
 	{
 		auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
+		//前のフレームで選択している項目
+		int lastSelectMenuIndexX = m_selectMenuIndexX;
 		int lastSelectMenuIndexY = m_selectMenuIndexY;
 
 		//RBLB入力で選択しているチュートリアルの種類を変更する
@@ -1196,6 +1203,14 @@ void TutorialUi::UpdateSelectMenu()
 			//選択している項目をリセットする
 			m_selectMenuIndexY = 0;
 		}
+
+		//選択している項目が変化していたら
+		if (m_selectMenuIndexX != lastSelectMenuIndexX)
+		{
+			//サウンドを再生
+			SoundManager::GetInstance().PlayOnceSound("Select");
+		}
+
 
 
 		//上下入力で選択しているものを変更する
@@ -1254,6 +1269,9 @@ void TutorialUi::UpdateSelectMenu()
 
 			//座標を設定
 			selectItemBox.pos = pos;
+
+			//サウンドを再生
+			SoundManager::GetInstance().PlayOnceSound("Select");
 		}
 		//選択している項目が変化していなければ
 		else
@@ -1339,6 +1357,10 @@ void TutorialUi::UpdatePlayMenu()
 
 		//座標を設定
 		selectItemBox.pos = pos;
+
+		//サウンドを再生
+		SoundManager::GetInstance().PlayOnceSound("Select");
+		
 	}
 	//選択している項目が変化していなければ
 	else
@@ -1349,6 +1371,7 @@ void TutorialUi::UpdatePlayMenu()
 	//左右に動かせる項目であれば
 	if (m_playMenuSelectItem == PlayMenuItem::kChangeTutorial)
 	{
+		int last = m_selectTutorialNumber;
 
 		//右を押したら
 		if (input->IsTrigger("Right"))
@@ -1365,6 +1388,13 @@ void TutorialUi::UpdatePlayMenu()
 		//クランプ
 		m_selectTutorialNumber = max(m_selectTutorialNumber, 0);
 		m_selectTutorialNumber = min(m_selectTutorialNumber, static_cast<int>(TutorialManager::TutorialKind::kTutorialNum) - 1);
+	
+		//選択している項目が変化していたら
+		if (last != m_selectTutorialNumber)
+		{
+			//サウンドを再生
+			SoundManager::GetInstance().PlayOnceSound("Select");
+		}
 	}
 	//左右の矢印を揺らす
 	m_selectTutorialStringArrowPos += kPlayMenuTutorialNameSideArrowSpeed;

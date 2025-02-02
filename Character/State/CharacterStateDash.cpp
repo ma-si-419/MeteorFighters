@@ -3,6 +3,7 @@
 #include "Character.h"
 #include "GameSceneConstant.h"
 #include "TutorialManager.h"
+#include "SoundManager.h"
 #include <cmath>
 
 namespace
@@ -78,6 +79,14 @@ void CharacterStateDash::Enter()
 			m_pCharacter->ChangeAnim(Character::AnimKind::kDodgeLeft, false, kAnimationBlendSpeed);
 			m_moveDir = MyEngine::Vector3(-1.0f, 0.0f, 0.0f);
 		}
+
+		//‰ñ”ð‚Ì‰¹ºÄ¶
+		SoundManager::GetInstance().PlayOnceSound("Step");
+	}
+	else
+	{
+		//ƒ_ƒbƒVƒ…‚Ì‰¹ºÄ¶
+		SoundManager::GetInstance().PlayOnceSound("Dash");
 	}
 
 	m_pCharacter->SetAnimPlaySpeed(kAnimPlaySpeed);

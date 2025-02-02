@@ -12,6 +12,15 @@
 #include "Input.h"
 #include "GameSceneConstant.h"
 
+namespace
+{
+	//‹ó’†‚É‚¢‚é‚Æ‚«‚É—h‚ç‚·‘¬“x
+	constexpr float kSwaySpeed = 0.1f;
+
+	//‹ó’†‚É‚¢‚é‚Æ‚«‚É—h‚ç‚·•
+	constexpr float kSwayWidth = 0.5f;
+}
+
 CharacterStateIdle::CharacterStateIdle(std::shared_ptr<Character> character) :
 	CharacterStateBase(character),
 	m_attackKey("empty"),
@@ -19,7 +28,8 @@ CharacterStateIdle::CharacterStateIdle(std::shared_ptr<Character> character) :
 	m_isPlayEndAnim(false),
 	m_endAnimTime(0),
 	m_isReleaseX(true),
-	m_isReleaseY(true)
+	m_isReleaseY(true),
+	m_swayCount(0)
 {
 }
 
@@ -95,6 +105,15 @@ void CharacterStateIdle::Update()
 				//ˆê‰Ä¶‘¬“x‚ğƒŠƒZƒbƒg‚µ‚Ä‚¨‚­
 				m_pCharacter->SetAnimPlaySpeed();
 			}
+
+			//‹ó’†‚É‚¢‚é‚Æ‚«‚É—h‚ç‚·
+			m_swayCount += kSwaySpeed;
+
+			//sin”g‚Å—h‚ç‚·
+			MyEngine::Vector3 shiftVec = MyEngine::Vector3(0.0f,sinf(m_swayCount) * kSwayWidth,0.0f);
+
+			//À•W‚ğİ’è
+			m_pCharacter->SetDrawShiftVec(shiftVec);
 		}
 	}
 

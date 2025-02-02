@@ -9,6 +9,7 @@
 #include "Effect.h"
 #include "Rock.h"
 #include "TutorialManager.h"
+#include "SoundManager.h"
 
 namespace
 {
@@ -246,6 +247,8 @@ void CharacterStateHitAttack::Update()
 					//石を登録する
 					m_pManager->EntryObject(rock);
 				}
+				//ぶつかった時のサウンドを再生
+				SoundManager::GetInstance().PlayOnceSound("StageHit");
 			}
 
 
@@ -292,6 +295,10 @@ void CharacterStateHitAttack::Update()
 					//石を登録する
 					m_pManager->EntryObject(rock);
 				}
+
+				//ぶつかった時のサウンドを再生
+				SoundManager::GetInstance().PlayOnceSound("StageHit");
+
 			}
 
 			return;

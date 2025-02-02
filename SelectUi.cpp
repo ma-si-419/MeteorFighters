@@ -12,6 +12,12 @@ namespace
 
 	//フォントのサイズ
 	constexpr int kLevelFontSize = 48;
+	//曲名を表示するフォントのサイズ
+	constexpr int kMusicNameFontSize = 32;
+
+	//曲名を表示する座標
+	constexpr int kMusicNamePosX = 1200;
+	constexpr int kMusicNamePosY = 860;
 
 	//カメラの設定
 	constexpr float kCameraNear = 0.1f;
@@ -109,10 +115,15 @@ SelectUi::SelectUi() :
 {
 	//レベルフォントの読み込み
 	m_levelFontHandle = CreateFontToHandle(kFontName, kLevelFontSize, 3, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 2);
+
+	//曲名を表示するフォントの読み込み
+	m_musicNameFontHandle = CreateFontToHandle(kFontName, kMusicNameFontSize, 3, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 2);
 }
 
 SelectUi::~SelectUi()
 {
+	DeleteFontToHandle(m_levelFontHandle);
+	DeleteFontToHandle(m_musicNameFontHandle);
 }
 
 void SelectUi::Init()
@@ -242,6 +253,13 @@ void SelectUi::Init()
 	lb.posY = kLevelSelectButtonPosY;
 	lb.handle = graphManager.GetHandle("LB");
 	m_drawGraphs[GraphName::kLB] = lb;
+
+	//音符の画像設定
+	GraphData musicNote;
+	musicNote.posX = kMusicNamePosX - 50;
+	musicNote.posY = kMusicNamePosY;
+	musicNote.handle = graphManager.GetHandle("MusicNote");
+	m_drawGraphs[GraphName::kMusicNote] = musicNote;
 }
 
 void SelectUi::Update()
@@ -298,7 +316,7 @@ void SelectUi::Draw()
 			nextLevel = static_cast<int>(EnemyInput::AiLevel::kEasy);
 		}
 
-		
+
 		//文字列の座標を右揃えに設定
 		pos.x -= GetFontSizeToHandle(m_levelFontHandle) * kLevelString[nextLevel].size();
 
@@ -314,8 +332,12 @@ void SelectUi::Draw()
 		{
 			prevLevel = static_cast<int>(EnemyInput::AiLevel::kHard);
 		}
-		
+
 		DrawStringToHandle(static_cast<int>(pos.x), static_cast<int>(pos.y), kLevelString[prevLevel].c_str(), kLevelColor[prevLevel], m_levelFontHandle);
+
+
+		//曲名を表示する
+		DrawStringToHandle(kMusicNamePosX, kMusicNamePosY, m_musicName.c_str(), GetColor(192, 192, 16), m_musicNameFontHandle);
 	}
 }
 

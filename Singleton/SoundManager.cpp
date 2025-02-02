@@ -3,6 +3,11 @@
 #include "DxLib.h"
 #include "LoadCsv.h"
 
+namespace
+{
+	constexpr int kDefaultVolume = 200;
+}
+
 SoundManager::~SoundManager()
 {
 }
@@ -26,32 +31,50 @@ void SoundManager::Init()
 
 	for (auto item : loadData)
 	{
-		pushDataInfo pushData;
+		//常に使用する音声のデータ
+		std::vector<std::string> utilityData;
 
-		//画像の名前を保存
-		pushData.name = item[static_cast<int>(FileDataSort::kSoundName)];
-		//画像のパスを保存
-		pushData.path = item[static_cast<int>(FileDataSort::kPath)];
-		//画像をどのシーンで使うかを保存
-		pushData.scene = item[static_cast<int>(FileDataSort::kSceneName)];
-
-		//一時的にデータを保存
-		pathData.push_back(pushData);
-
-		//同じ名前のシーンが登録されていないか
-		bool isSame = false;
-
-		for (auto name : sceneName)
+		//Utilityのデータを取得
+		if (item[static_cast<int>(FileDataSort::kFileName)] == "Utility")
 		{
-			if (name == item[static_cast<int>(FileDataSort::kSceneName)])
-			{
-				isSame = true;
-			}
+			std::string path = "data/sound/" + item[static_cast<int>(FileDataSort::kFileName)] + "/" + item[static_cast<int>(FileDataSort::kPath)];
+
+			m_utilitySoundHandle[item[static_cast<int>(FileDataSort::kSoundName)]] = LoadSoundMem(path.c_str());
 		}
-		//同じ名前が存在していなければ登録
-		if (!isSame)
+		//Utility以外のデータを取得
+		else
 		{
-			sceneName.push_back(item[static_cast<int>(FileDataSort::kSceneName)]);
+			//音声パスを入れるための構造体
+			pushDataInfo pushData;
+
+			//画像の名前を保存
+			pushData.name = item[static_cast<int>(FileDataSort::kSoundName)];
+			//画像のファイル名を保存
+			pushData.path = item[static_cast<int>(FileDataSort::kFileName)];
+			pushData.path += "/";
+			//画像のパスを保存
+			pushData.path += item[static_cast<int>(FileDataSort::kPath)];
+			//画像をどのシーンで使うかを保存
+			pushData.scene = item[static_cast<int>(FileDataSort::kSceneName)];
+
+			//一時的にデータを保存
+			pathData.push_back(pushData);
+
+			//同じ名前のシーンが登録されていないか
+			bool isSame = false;
+
+			for (auto name : sceneName)
+			{
+				if (name == item[static_cast<int>(FileDataSort::kSceneName)])
+				{
+					isSame = true;
+				}
+			}
+			//同じ名前が存在していなければ登録
+			if (!isSame)
+			{
+				sceneName.push_back(item[static_cast<int>(FileDataSort::kSceneName)]);
+			}
 		}
 	}
 
@@ -96,40 +119,78 @@ void SoundManager::LoadSceneSound(std::string sceneName)
 		std::string path = "data/sound/" + item.second;
 
 		m_sceneSoundHandle[item.first] = LoadSoundMem(path.c_str());
+
+		//音量を設定する
+		ChangeVolumeSoundMem(kDefaultVolume, m_sceneSoundHandle[item.first]);
 	}
 }
 
 int SoundManager::PlayOnceSound(std::string soundName)
 {
-	return PlaySoundMem(m_sceneSoundHandle[soundName],DX_PLAYTYPE_BACK);
+	//常に使用する音声のハンドルがあればそれを再生する
+	if (m_utilitySoundHandle.find(soundName) != m_utilitySoundHandle.end())
+	{
+		return PlaySoundMem(m_utilitySoundHandle[soundName], DX_PLAYTYPE_BACK);
+	}
+	//シーンの音声ハンドルがあればそれを再生する
+	else
+	{
+		return PlaySoundMem(m_sceneSoundHandle[soundName], DX_PLAYTYPE_BACK);
+	}
+
+	return -1;
 }
 
 int SoundManager::PlayLoopSound(std::string soundName)
 {
-	int playHandle = PlaySoundMem(m_sceneSoundHandle[soundName], DX_PLAYTYPE_LOOP);
-	
-	m_loopPlayHandles.push_back(playHandle);
+	int playHandle = -1;
+
+	//常に使用する音声のハンドルがあればそれを再生する
+	if (m_utilitySoundHandle.find(soundName) != m_utilitySoundHandle.end())
+	{
+		playHandle = PlaySoundMem(m_utilitySoundHandle[soundName], DX_PLAYTYPE_BACK);
+	}
+	//シーンの音声ハンドルがあればそれを再生する
+	else
+	{
+		playHandle = PlaySoundMem(m_sceneSoundHandle[soundName], DX_PLAYTYPE_LOOP);
+	}
 
 	return playHandle;
 }
 
-void SoundManager::StopLoopSound(int playHandle)
+void SoundManager::StopLoopSound(std::string soundName)
 {
-	StopSoundMem(playHandle);
+	if (m_utilitySoundHandle.find(soundName) != m_utilitySoundHandle.end())
+	{
+		StopSoundMem(m_utilitySoundHandle[soundName]);
+	}
+	else
+	{
+		StopSoundMem(m_sceneSoundHandle[soundName]);
+	}
+}
 
-	//配列から削除する
-	auto iterator = std::remove_if(m_loopPlayHandles.begin(), m_loopPlayHandles.end(),
-		[&](auto item)
-		{
-			if (item == playHandle)
-			{
-				StopSoundMem(playHandle);
+bool SoundManager::IsPlayingSound(std::string soundName)
+{
+	if (m_utilitySoundHandle.find(soundName) != m_utilitySoundHandle.end())
+	{
+		return CheckSoundMem(m_utilitySoundHandle[soundName]) == 1;
+	}
+	else
+	{
+		return CheckSoundMem(m_sceneSoundHandle[soundName]) == 1;
+	}
+}
 
-				return true;
-			}
-
-			return false;
-		});
-
-	m_loopPlayHandles.erase(iterator,m_loopPlayHandles.end());
+void SoundManager::SetSoundVolume(std::string soundName, int volume)
+{
+	if (m_utilitySoundHandle.find(soundName) != m_utilitySoundHandle.end())
+	{
+		ChangeVolumeSoundMem(volume, m_utilitySoundHandle[soundName]);
+	}
+	else
+	{
+		ChangeVolumeSoundMem(volume, m_sceneSoundHandle[soundName]);
+	}
 }

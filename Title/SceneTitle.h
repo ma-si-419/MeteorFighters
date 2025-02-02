@@ -21,7 +21,5 @@ public:
 
 private:
 	std::shared_ptr<TitleUi> m_pTitleUi;
-
-	int m_bgmPlayHandle;
 };
 

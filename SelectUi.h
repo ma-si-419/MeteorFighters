@@ -1,5 +1,7 @@
 #pragma once
 #include <map>
+#include <string>
+
 class SelectUi
 {
 public:
@@ -27,7 +29,8 @@ private:
 		kLeftArrow,
 		kRightArrow,
 		kRB,
-		kLB
+		kLB,
+		kMusicNote
 	};
 
 	struct GraphData
@@ -83,6 +86,12 @@ public:
 	/// <param name="handle">画像のハンドル</param>
 	void SetSkyDomeHandle(int handle);
 
+	/// <summary>
+	/// 今流している曲の名前を設定する
+	/// </summary>
+	/// <param name="musicName">曲の名前</param>
+	void SetMusicName(std::string musicName) { m_musicName = musicName; }
+
 private:
 
 	void Update1P();
@@ -100,6 +109,9 @@ private:
 
 	//難易度を表示するフォントハンドル
 	int m_levelFontHandle;
+
+	//曲名を表示するフォントハンドル
+	int m_musicNameFontHandle;
 
 	//選択しているレベル
 	int m_level;
@@ -127,4 +139,7 @@ private:
 
 	//時間計測用の変数
 	float m_time;
+
+	//曲の名前
+	std::string m_musicName;
 };

@@ -8,6 +8,7 @@
 #include "Attack.h"
 #include "Effect.h"
 #include "TutorialManager.h"
+#include "SoundManager.h"
 
 
 namespace
@@ -63,6 +64,9 @@ namespace
 
 	//ぶつかった時カメラを揺らす大きさ
 	constexpr int kBumpCameraShakePower = 3;
+
+	//効果音を再生する間隔
+	constexpr int kSoundPlayInterval = 7;
 }
 
 CharacterStateButtonBashing::CharacterStateButtonBashing(std::shared_ptr<Character> character) :
@@ -71,7 +75,8 @@ CharacterStateButtonBashing::CharacterStateButtonBashing(std::shared_ptr<Charact
 	m_isBump(false),
 	m_bumpTime(0),
 	m_stayTime(0),
-	m_isStay(false)
+	m_isStay(false),
+	m_soundPlayTime(0)
 {
 }
 
@@ -204,6 +209,16 @@ void CharacterStateButtonBashing::Update()
 			isMove = false;
 			SetCharacterVelo(MyEngine::Vector3(0, 0, 0));
 
+			//効果音再生時間をカウントする
+			m_soundPlayTime++;
+
+			//効果音を再生する
+			if (m_soundPlayTime > kSoundPlayInterval)
+			{
+				SoundManager::GetInstance().PlayOnceSound("ButtonBashing");
+				m_soundPlayTime = 0;
+			}
+
 			//二つ目のSituationに行く
 			m_pManager->SetBashingSituation(GameManagerBase::ButtonBashingSituation::kFighting);
 
@@ -254,6 +269,8 @@ void CharacterStateButtonBashing::Update()
 			m_pManager->EntryEffect(effect);
 			//カメラを揺らす
 			m_pManager->ShakeCamera(kBumpCameraShakeTime, kBumpCameraShakePower);
+			//ぶつかったときのサウンドを再生
+			SoundManager::GetInstance().PlayOnceSound("HighHit");
 		}
 		m_bumpTime = 0;
 

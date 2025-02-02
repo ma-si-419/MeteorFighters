@@ -19,6 +19,7 @@ public:
 		float radius = 0;
 		std::string attackName = "empty";
 		std::string effectName = "empty";
+		std::string hitSoundName = "empty";
 		Character::AttackKind attackKind = Character::AttackKind::kPhysical;
 		Character::AttackHitKind attackHitKind = Character::AttackHitKind::kLow;
 	};

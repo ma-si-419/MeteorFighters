@@ -36,6 +36,9 @@ namespace
 	//敵が正面にいないときのターゲット座標までの距離
 	constexpr float kTargetDistance = 30.0f;
 
+	//ボイスの大きさ(255がMAX)
+	constexpr int kVoiceVolume = 40;
+
 	//攻撃の種類を外部ファイルの文字列から内部のAttackHitKindに変換する際に使用する
 	const std::map<std::string, Character::AttackHitKind> kAttackHitKindMap =
 	{
@@ -196,6 +199,12 @@ void Character::Init()
 	if (m_playerNumber == Character::PlayerNumber::kTwoPlayer)
 	{
 		m_pEnemyInput->SetState(m_pState);
+	}
+
+	//音声大きさの設定
+	for (auto item : kVoiceKindMap)
+	{
+		SoundManager::GetInstance().SetSoundVolume(item.second.c_str(), kVoiceVolume);
 	}
 
 }
@@ -516,6 +525,7 @@ void Character::SetNormalAttackData(std::vector<std::vector<std::string>> normal
 		pushData.attackHitKind = kAttackHitKindMap.at(item[static_cast<int>(NormalAttackDataSort::kAttackHitKind)]);
 		pushData.animationSpeed = stof(item[static_cast<int>(NormalAttackDataSort::kAnimationSpeed)]);
 		pushData.effectName = item[static_cast<int>(NormalAttackDataSort::kEffectName)];
+		pushData.soundName = item[static_cast<int>(NormalAttackDataSort::kSoundName)];
 
 		m_normalAttackData[item[static_cast<int>(NormalAttackDataSort::kAttackName)]] = pushData;
 	}
@@ -611,6 +621,7 @@ std::shared_ptr<Attack> Character::CreateAttack(AttackData attackData)
 	status.attackKind = attackData.attackKind;
 	status.effectName = attackData.effectName;
 	status.attackName = attackData.attackName;
+	status.hitSoundName = attackData.hitSoundName;
 
 	ans->Init(status, m_pBattleManager->GetEffectManagerPointer());
 
@@ -703,6 +714,8 @@ bool Character::IsFrontTarget()
 void Character::SetDrawPos(MyEngine::Vector3 pos)
 {
 	pos.y -= kCharacterHeight;
+
+	pos += m_drawShiftVec;
 
 	MV1SetPosition(m_modelHandle, pos.CastVECTOR());
 }
@@ -923,6 +936,7 @@ void Character::PlayVoice(VoiceKind kind)
 
 	//ボイスの再生
 	m_voiceHandle = SoundManager::GetInstance().PlayOnceSound(voiceName);
+
 }
 
 void Character::InitStart()

@@ -11,7 +11,7 @@ namespace
 
 	constexpr float kAttackLange = 0.5f;
 
-	constexpr int kHitEffectTime = 30;
+	constexpr int kHitEffectTime = 50;
 
 	//格闘攻撃を受けた時に出すエフェクト
 	const std::map<Character::AttackHitKind, Effect::EffectKind> kPhysicalAttackHitEffectMap =

@@ -7,6 +7,7 @@
 #include "Effect.h"
 #include "GameSceneConstant.h"
 #include "TutorialManager.h"
+#include "SoundManager.h"
 
 namespace
 {
@@ -100,14 +101,18 @@ void CharacterStateNormalAttack::Enter()
 	m_pNextState = shared_from_this();
 	m_kind = CharacterStateKind::kNormalAttack;
 
+	//UŒ‚‚Ìî•ñ
+	auto status = m_pCharacter->GetNormalAttackData(m_nowAttackName);
+
 	//Ý’è‚³‚ê‚½UŒ‚‚ÌƒAƒjƒ[ƒVƒ‡ƒ“Žæ“¾
-	std::string animName = m_pCharacter->GetNormalAttackData(m_nowAttackName).animationName;
+	std::string animName = status.animationName;
 
 	Character::AnimKind anim = static_cast<Character::AnimKind>(m_pCharacter->GetAttackAnimKind(animName));
 
+
 	//ƒAƒjƒ[ƒVƒ‡ƒ“‚Ì•ÏX
 	m_pCharacter->ChangeAnim(anim, false, kAnimBlendSpeed);
-	m_pCharacter->SetAnimPlaySpeed(m_pCharacter->GetNormalAttackData(m_nowAttackName).animationSpeed);
+	m_pCharacter->SetAnimPlaySpeed(status.animationSpeed);
 
 	//Œü‚©‚¤•ûŒü‚ÌÝ’è
 	MyEngine::Vector3 shiftVec = (m_pManager->GetTargetPos(m_pCharacter) - m_pCharacter->GetPos()).Normalize();
@@ -128,8 +133,18 @@ void CharacterStateNormalAttack::Enter()
 		m_isCharge = true;
 	}
 
-	//Å‰‚Ì‰¹º‚ðÄ¶‚·‚é
-	m_pCharacter->PlayVoice(kPhysicalAttackSound.at(m_pCharacter->GetNormalAttackData(m_nowAttackName).attackHitKind));
+	//Ši“¬UŒ‚‚È‚ç
+	if (status.attackKind == Character::AttackKind::kPhysical)
+	{
+		//Å‰‚Ì‰¹º‚ðÄ¶‚·‚é
+		m_pCharacter->PlayVoice(kPhysicalAttackSound.at(status.attackHitKind));
+	}
+	//‹C’eUŒ‚‚È‚ç
+	else if (status.attackKind == Character::AttackKind::kEnergy)
+	{
+		//‹C’eUŒ‚‚ÌƒTƒEƒ“ƒh‚ðÄ¶‚·‚é
+		SoundManager::GetInstance().PlayOnceSound("StartEnergy");
+	}
 
 }
 
@@ -328,9 +343,17 @@ void CharacterStateNormalAttack::Update()
 			//UŒ‚î•ñ‚ÌXV
 			attackData = nextAttack;
 
-			//ŽŸ‚ÌUŒ‚‚Ì‰¹º‚ðÄ¶‚·‚é
-			m_pCharacter->PlayVoice(kPhysicalAttackSound.at(attackData.attackHitKind));
-
+			//Ši“¬UŒ‚‚È‚ç
+			if (attackData.attackKind == Character::AttackKind::kPhysical)
+			{
+				//ŽŸ‚ÌUŒ‚‚Ì‰¹º‚ðÄ¶‚·‚é
+				m_pCharacter->PlayVoice(kPhysicalAttackSound.at(attackData.attackHitKind));
+			}
+			else if (attackData.attackKind == Character::AttackKind::kEnergy)
+			{
+				//‹C’eUŒ‚‚ÌƒTƒEƒ“ƒh‚ðÄ¶‚·‚é
+				SoundManager::GetInstance().PlayOnceSound("StartEnergy");
+			}
 		}
 	}
 
@@ -474,6 +497,7 @@ void CharacterStateNormalAttack::Update()
 		attack.attackKind = attackData.attackKind;
 		attack.effectName = attackData.effectName;
 		attack.attackName = attackData.attackName;
+		attack.hitSoundName = attackData.soundName;
 
 		//UŒ‚‚ðì¬
 		m_pCharacter->CreateAttack(attack);

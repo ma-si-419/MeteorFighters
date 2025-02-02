@@ -24,13 +24,29 @@ namespace
 		"Normal",
 		"Hard"
 	};
+
+	//BGMの数
+	constexpr int kBgmNum = 2;
+
+	//BGMの番号の最小値
+	constexpr int kBgmMin = 0;
+
+	//BGMのなまえ
+	const std::string kBgmName[kBgmNum + 1] =
+	{
+		"最強のデカヘッド",
+		"デカヘッドの決戦",
+		"デカヘッドは止まらない"
+	};
+
 }
 
 SelectManager::SelectManager() :
 	m_playerNumber(0),
 	m_enemyNumber(static_cast<int>(CharacterNumber::kBlueHead)),
 	m_nextScene(-1),
-	m_enemyLevel(0)
+	m_enemyLevel(0),
+	m_bgmNumber(kBgmMin)
 {
 	m_updateSelectFunc = &SelectManager::SelectOnePlayer;
 	m_pUi = std::make_shared<SelectUi>();
@@ -38,12 +54,20 @@ SelectManager::SelectManager() :
 
 SelectManager::~SelectManager()
 {
+	//BGMの停止
+	SoundManager::GetInstance().StopLoopSound("Bgm" + std::to_string(m_bgmNumber));
 }
 
 void SelectManager::Init()
 {
 	m_pUi->Init();
 	m_pUi->SetSkyDomeHandle(GraphManager::GetInstance().GetHandle(kSkyDomeTextureHandleName[m_enemyLevel]));
+
+	//BGMの再生
+	SoundManager::GetInstance().PlayLoopSound("Bgm0");
+
+	//UIにBGMの名前を渡す
+	m_pUi->SetMusicName(kBgmName[m_bgmNumber]);
 }
 
 void SelectManager::Update()
@@ -96,6 +120,32 @@ void SelectManager::Update()
 		m_pUi->SetSkyDomeHandle(GraphManager::GetInstance().GetHandle(kSkyDomeTextureHandleName[m_enemyLevel]));
 	}
 
+	//YボタンでBGMを変更する
+	if (input->IsTrigger("Y"))
+	{
+		//BGMを変更する
+		SoundManager::GetInstance().StopLoopSound("Bgm" + std::to_string(m_bgmNumber));
+		
+		m_bgmNumber++;
+
+		//最大値を超えたら
+		if (m_bgmNumber > kBgmNum)
+		{
+			//最小値に戻す
+			m_bgmNumber = kBgmMin;
+		}
+
+		//切り替えサウンドを再生
+		SoundManager::GetInstance().PlayOnceSound("MusicChange");
+
+		//BGMを再生
+		SoundManager::GetInstance().PlayLoopSound("Bgm" + std::to_string(m_bgmNumber));
+
+		//UIにBGMの名前を渡す
+		m_pUi->SetMusicName(kBgmName[m_bgmNumber]);
+
+	}
+
 	//選択している番号をUiに渡す
 	m_pUi->SetNumber(m_playerNumber, true);
 	m_pUi->SetNumber(m_enemyNumber, false);
@@ -144,6 +194,9 @@ void SelectManager::SelectOnePlayer()
 	//選択しているアイコンをUiに渡す
 	m_pUi->SetIconFrame(m_playerNumber, true);
 
+	//前のフレームで選択していたキャラクターの番号
+	int lastPlayerNumber = m_playerNumber;
+
 	//キャラクター選択
 	if (input->IsTrigger("Right"))
 	{
@@ -158,10 +211,17 @@ void SelectManager::SelectOnePlayer()
 		m_playerNumber = max(m_playerNumber, 0);
 	}
 
+	//キャラクターが変わったら
+	if (lastPlayerNumber!= m_playerNumber)
+	{
+		//サウンドを再生
+		SoundManager::GetInstance().PlayOnceSound("Select");
+	}
+
 	//Aボタンを押したら2プレイヤーの選択に移る
 	if (input->IsTrigger("A"))
 	{
-		SoundManager::GetInstance().PlayOnceSound("Ok");
+		SoundManager::GetInstance().PlayOnceSound("CharacterConfirm");
 		m_updateSelectFunc = &SelectManager::SelectTwoPlayer;
 
 		m_pUi->ChangeSituation(SelectUi::UiSituation::kSelect2P);
@@ -183,6 +243,8 @@ void SelectManager::SelectTwoPlayer()
 	//選択しているアイコンをUiに渡す
 	m_pUi->SetIconFrame(m_enemyNumber, false);
 
+	int lastEnemyNumber = m_enemyNumber;
+
 	//キャラクターの選択
 	if (input->IsTrigger("Right"))
 	{
@@ -197,10 +259,18 @@ void SelectManager::SelectTwoPlayer()
 		m_enemyNumber = max(m_enemyNumber, 0);
 	}
 
+	//キャラクターが変わったら
+	if (lastEnemyNumber != m_enemyNumber)
+	{
+		//サウンドを再生
+		SoundManager::GetInstance().PlayOnceSound("Select");
+	}
+
+
 	//Aボタンを押したらゲームシーンに行く
 	if (input->IsTrigger("A"))
 	{
-		SoundManager::GetInstance().PlayOnceSound("Confirm");
+		SoundManager::GetInstance().PlayOnceSound("CharacterConfirm");
 
 		m_nextScene = static_cast<int>(Game::Scene::kGame);
 	}
