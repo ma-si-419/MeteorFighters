@@ -62,7 +62,6 @@ void CharacterStateMove::Update()
 
 	MyEngine::Vector3 inputDir;
 
-
 	//スティックの情報取得
 	auto stick = input->GetStickInfo();
 

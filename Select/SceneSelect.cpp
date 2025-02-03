@@ -50,6 +50,8 @@ void SceneSelect::Update()
 
 			next->SetCharacter(m_selectManager->GetPlayerNumber(), m_selectManager->GetEnemyNumber(),m_selectManager->GetEnemyLevel());
 
+			next->SetMusicName("Bgm" + std::to_string(m_selectManager->GetBgmNumber()));
+
 			m_sceneManager.ChangeScene(next);
 		}
 		//メニューシーンの場合

@@ -65,6 +65,18 @@ namespace
 		{Character::HitReactionKind::kMiddleStan,60},
 		{Character::HitReactionKind::kBottomStan,60}
 	};
+
+	//‚«”ò‚Î‚·UŒ‚‚ğ“–‚Ä‚½‚ÌƒJƒƒ‰‚ğ—h‚ç‚·ŠÔ
+	constexpr int kHighShakeCameraTime = 10;
+
+	//‚«”ò‚Î‚·UŒ‚‚ğ“–‚Ä‚½‚ÌƒJƒƒ‰‚ğ—h‚ç‚·‘å‚«‚³
+	constexpr int kHighShakeCameraPower = 10;
+
+	//’†‚­‚ç‚¢‚ÌUŒ‚‚ğ“–‚Ä‚½‚ÌƒJƒƒ‰‚ğ—h‚ç‚·ŠÔ
+	constexpr int kMiddleShakeCameraTime = 5;
+
+	//’†‚­‚ç‚¢‚ÌUŒ‚‚ğ“–‚Ä‚½‚ÌƒJƒƒ‰‚ğ—h‚ç‚·‘å‚«‚³
+	constexpr int kMiddleShakeCameraPower = 5;
 }
 
 CharacterStateBase::CharacterStateBase(std::shared_ptr<Character> character) :
@@ -166,7 +178,7 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 	if (hitReaction == Character::HitReactionKind::kGuard)
 	{
 		//‹C’eUŒ‚Œn‚ğƒ_ƒ[ƒWƒJƒbƒg‚·‚é
-		if (status.attackKind == Character::AttackKind::kBeam ||
+		if (status.attackKind == Character::AttackKind::kLaser ||
 			status.attackKind == Character::AttackKind::kEnergy)
 		{
 			damage = static_cast<int>(damage * kDamageCutRate);
@@ -181,7 +193,7 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 		effectKind = Effect::EffectKind::kGuardHit;
 
 		//ƒr[ƒ€UŒ‚‚Ìê‡
-		if (status.attackKind == Character::AttackKind::kBeam)
+		if (status.attackKind == Character::AttackKind::kLaser)
 		{
 			//ƒK[ƒh‚ÉŠÖŒW‚È‚­ƒGƒtƒFƒNƒg‚ğÄ¶‚·‚é
 			effectKind = Effect::EffectKind::kLaserHit;
@@ -242,7 +254,7 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 
 		//‹C’eŒn‚ÌUŒ‚‚Å‚ ‚ê‚Î
 		if (attack->GetStatus().attackKind == Character::AttackKind::kEnergy ||
-			attack->GetStatus().attackKind == Character::AttackKind::kBeam)
+			attack->GetStatus().attackKind == Character::AttackKind::kLaser)
 		{
 			//ˆÚ“®–Ú•W‚ğUŒ‚‚Ì‰¡‚ÌÀ•W‚É‚·‚é
 			MyEngine::LocalPos local;
@@ -292,6 +304,23 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 
 	//ƒ_ƒ[ƒW‚ğó‚¯‚éÛ‚ÉƒqƒbƒgƒTƒEƒ“ƒh‚ğ–Â‚ç‚·
 	SoundManager::GetInstance().PlayOnceSound(status.hitSoundName);
+
+	//“G‚ğ‚«”ò‚Î‚·UŒ‚‚Å‚ ‚ê‚Î
+	if (hitReaction == Character::HitReactionKind::kUpBurst ||
+		hitReaction == Character::HitReactionKind::kDownBurst ||
+		hitReaction == Character::HitReactionKind::kFarBurst)
+	{
+		//ƒJƒƒ‰‚ğ—h‚ç‚·
+		m_pManager->ShakeCamera(kHighShakeCameraTime, kHighShakeCameraPower);
+	}
+	//’†‚­‚ç‚¢‚ÌUŒ‚‚Å‚ ‚ê‚Î
+	else if (hitReaction == Character::HitReactionKind::kMiddle ||
+		hitReaction == Character::HitReactionKind::kWeakBurst ||
+		hitReaction == Character::HitReactionKind::kWeakUpBurst)
+	{
+		//ƒJƒƒ‰‚ğ—h‚ç‚·
+		m_pManager->ShakeCamera(kMiddleShakeCameraTime, kMiddleShakeCameraPower);
+	}
 
 	//ƒX[ƒp[ƒA[ƒ}[ó‘Ô‚È‚ç‚Î
 	if (m_guardKind == CharacterGuardKind::kSuperArmor)
@@ -422,7 +451,7 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kChaseAttack));
 	}
 	//•KE‹Z‚ğó‚¯‚Ä‚¢‚½‚ç•KE‹Zƒ`ƒ…[ƒgƒŠƒAƒ‹‚ğƒNƒŠƒA‚³‚¹‚é
-	else if (status.attackKind == Character::AttackKind::kBeam)
+	else if (status.attackKind == Character::AttackKind::kLaser)
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kSpecialAttack));
 	}
@@ -591,7 +620,7 @@ int CharacterStateBase::GetNextHitReactionKind(std::shared_ptr<Attack> attack)
 	}
 	//‹C’eŒn‚ÌUŒ‚‚Ìê‡
 	else if (status.attackKind == Character::AttackKind::kEnergy ||
-		status.attackKind == Character::AttackKind::kBeam)
+		status.attackKind == Character::AttackKind::kLaser)
 	{
 		//UŒ‚‚ğó‚¯‚Ä‚¢‚éó‘Ô‚È‚ç‚Î
 		if (m_kind == CharacterStateKind::kHitAttack)

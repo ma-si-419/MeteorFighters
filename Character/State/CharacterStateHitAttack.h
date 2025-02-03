@@ -26,6 +26,12 @@ public:
 	/// <returns>次に再生するアニメーション</returns>
 	int GetNextAnimKind(int kind);
 
+	/// <summary>
+	/// 受け身できる状況かどうかを返す
+	/// </summary>
+	/// <returns>受け身できるのならtrueを返す</returns>
+	bool IsFalls() { return m_isFalls; }
+
 private:
 
 	//動かされる時間
@@ -48,5 +54,7 @@ private:
 
 	//ステージとぶつかるかどうか
 	bool m_isStageBump;
-};
 
+	//受け身できるかどうか
+	bool m_isFalls;
+};

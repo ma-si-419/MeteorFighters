@@ -48,6 +48,13 @@ public:
 	/// </summary>
 	/// <returns>次のシーン(Game::Sceneキャストして使用)</returns>
 	int GetNextScene() { return m_nextScene; };
+
+	/// <summary>
+	/// BGMの番号を取得する
+	/// </summary>
+	/// <returns>BGMの番号</returns>
+	int GetBgmNumber() { return m_bgmNumber; }
+
 private:
 
 	void SelectOnePlayer();

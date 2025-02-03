@@ -29,8 +29,9 @@ MouseMiddleAttack,Game,mouse/middle.m4a,Game
 MouseSpecialAttack,Game,mouse/special.m4a,Game
 MouseStart,Game,mouse/start.m4a,Game
 MouseWinBashing,Game,mouse/winBashing.m4a,Game
-Bgm1,Game,BattleBgm1.mp3,Game
-Bgm2,Game,BattleBgm2.mp3,Game
+Bgm0,Game,BattleBgm1.mp3,Game
+Bgm1,Game,BattleBgm2.mp3,Game
+Bgm2,Game,BattleBgm3.mp3,Game
 EnergyHit,Game,EnergyHit.mp3,Game
 HighHit,Game,High.mp3,Game
 MiddleHit,Game,Middle.mp3,Game

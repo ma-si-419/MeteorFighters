@@ -59,9 +59,6 @@ namespace
 
 	//KnockOutの音量
 	constexpr int kKnockOutVolume = 255;
-
-	//BGMの名前(仮処理)
-	const std::string kBgmName = "Bgm2";
 }
 
 BattleManager::BattleManager(std::shared_ptr<GameCamera> camera) :
@@ -89,10 +86,10 @@ void BattleManager::Init()
 	ChangeSituation(BattleSituation::kStart1P);
 
 	//BGMを再生する
-	SoundManager::GetInstance().PlayLoopSound(kBgmName);
+	SoundManager::GetInstance().PlayLoopSound(m_bgmName);
 
 	//BGMの音量を設定する
-	SoundManager::GetInstance().SetSoundVolume(kBgmName, kBgmVolume);
+	SoundManager::GetInstance().SetSoundVolume(m_bgmName, kBgmVolume);
 
 #ifdef _DEBUG
 	//	m_situation = Situation::kBattle;
@@ -102,6 +99,7 @@ void BattleManager::Init()
 
 void BattleManager::Update()
 {
+	
 
 	//状況によって変わるUpdate
 	(this->*m_updateSituationFunc)();
@@ -193,7 +191,7 @@ void BattleManager::Final()
 	m_pEffectManager->Final();
 
 	//BGMを止める
-	SoundManager::GetInstance().StopLoopSound(kBgmName);
+	SoundManager::GetInstance().StopLoopSound(m_bgmName);
 }
 
 void BattleManager::UpdateStart()
@@ -390,7 +388,8 @@ void BattleManager::UpdateBattle()
 
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
-	if (input->IsTrigger("Pause"))
+	//ボタン連打状態じゃない時にボタンが押されたら
+	if (input->IsTrigger("Pause") && !m_isButtonBashing)
 	{
 		ChangeSituation(BattleSituation::kMenu);
 	}

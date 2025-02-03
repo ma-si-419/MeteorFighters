@@ -274,6 +274,11 @@ void TutorialManager::UpdatePlayMenu()
 			m_nowTutorial = static_cast<TutorialKind>(m_pTutorialUi->GetTutorialNumber());
 			isEnd = true;
 			nextSituation = TutorialSituation::kStart;
+
+			for (auto& item : m_successTutorialKinds)
+			{
+				item.second = false;
+			}
 		}
 		//メニューを閉じるが押されたら
 		else if (selectItem == TutorialUi::PlayMenuItem::kMenuEnd)
@@ -284,6 +289,11 @@ void TutorialManager::UpdatePlayMenu()
 			{
 				m_nowTutorial = static_cast<TutorialKind>(m_pTutorialUi->GetTutorialNumber());
 				RetryInit();
+
+				for (auto& item : m_successTutorialKinds)
+				{
+					item.second = false;
+				}
 			}
 
 			nextSituation = TutorialSituation::kPlaying;
@@ -315,6 +325,11 @@ void TutorialManager::UpdatePlayMenu()
 			RetryInit();
 
 			nextSituation = TutorialSituation::kStart;
+
+			for (auto& item : m_successTutorialKinds)
+			{
+				item.second = false;
+			}
 		}
 
 		//サウンドを再生

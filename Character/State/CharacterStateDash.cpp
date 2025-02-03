@@ -56,7 +56,11 @@ void CharacterStateDash::Enter()
 
 		//回避状態にしておく
 		m_guardKind = CharacterGuardKind::kDodge;
+	}
 
+	//回避
+	if (m_isDodge)
+	{
 		//向きによってアニメーションを変える
 		//回避の場合は移動方向を前後左右の四通りに限定する(斜めをなくす)
 		if (m_moveDir.z >= 0.5f)
@@ -83,6 +87,7 @@ void CharacterStateDash::Enter()
 		//回避の音声再生
 		SoundManager::GetInstance().PlayOnceSound("Step");
 	}
+	//ダッシュの場合
 	else
 	{
 		//ダッシュの音声再生

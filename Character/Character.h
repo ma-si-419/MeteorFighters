@@ -175,7 +175,7 @@ public:
 	{
 		kEnergy,//気弾攻撃
 		kPhysical,//格闘攻撃
-		kBeam,//レーザー上の攻撃
+		kLaser,//レーザー上の攻撃
 		kRush,//ぶつかると演出に切り替わる攻撃
 		kThrow,//ガードできなくぶつかると演出に切り替わる攻撃
 		kAssault//ぶつかると演出せずにそのままダメージを受ける攻撃
@@ -221,7 +221,7 @@ public:
 	{
 		std::string name = "empty";
 		std::string path = "empty";
-		AttackKind kind = AttackKind::kBeam;//必殺技の種類によって吹き飛ばし方などを判別する
+		AttackKind kind = AttackKind::kLaser;//必殺技の種類によって吹き飛ばし方などを判別する
 		int cost = -1;
 		float damageRate = -1;
 		float radius = -1;

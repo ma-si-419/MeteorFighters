@@ -10,6 +10,8 @@ public:
 	{
 		kMenu,
 		kResult,
+		kStart1P,
+		kStart2P,
 		kNone
 	};
 
@@ -69,9 +71,17 @@ private:
 
 	void UpdateResult();
 
+	void UpdateStart1P();
+
+	void UpdateStart2P();
+
 	void DrawMenu();
 
 	void DrawResult();
+
+	void DrawStart1P();
+
+	void DrawStart2P();
 
 	/// <summary>
 	/// ‚È‚É‚à‚µ‚È‚¢

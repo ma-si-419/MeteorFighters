@@ -35,6 +35,13 @@ public:
 	/// </summary>
 	void Final();
 
+
+	/// <summary>
+	/// BGMの名前をセットする
+	/// </summary>
+	/// <param name="name">BGMの名前</param>
+	void SetMusicName(std::string name) { m_bgmName = name; }
+
 private:
 
 	/// <summary>

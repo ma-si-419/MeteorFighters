@@ -31,7 +31,7 @@ namespace
 	{
 		{Character::AttackKind::kPhysical,Effect::EffectKind::kLowHit},//Ši“¬UŒ‚‚Ìê‡‚Íã‚Ìƒ}ƒbƒv‚ğg‚¤
 		{Character::AttackKind::kEnergy,Effect::EffectKind::kEnergyHit},
-		{Character::AttackKind::kBeam,Effect::EffectKind::kLaserHit}
+		{Character::AttackKind::kLaser,Effect::EffectKind::kLaserHit}
 	};
 
 }
@@ -149,7 +149,7 @@ int Attack::GetHitEffeckKind()
 void Attack::OnCollide(std::shared_ptr<Collidable> collider)
 {
 	//‹C’eŒn‚ÌUŒ‚‚¾‚Á‚½‚ç
-	if (m_status.attackKind == Character::AttackKind::kBeam ||
+	if (m_status.attackKind == Character::AttackKind::kLaser ||
 		m_status.attackKind == Character::AttackKind::kEnergy)
 	{
 		//©g‚ªƒvƒŒƒCƒ„[‚ÌUŒ‚‚Å
@@ -223,7 +223,7 @@ bool Attack::IsDelete(std::shared_ptr<Attack> attack)
 	auto enemyAttackKind = attack->GetStatus().attackKind;
 
 	//‘Šè‚ÌUŒ‚‚ªƒGƒlƒ‹ƒM[‚Å©g‚ÌUŒ‚‚ªƒr[ƒ€‚¾‚Á‚½‚ç
-	if (attackKind == Character::AttackKind::kBeam &&
+	if (attackKind == Character::AttackKind::kLaser &&
 		enemyAttackKind == Character::AttackKind::kEnergy)
 	{
 		//Á‚³‚È‚¢

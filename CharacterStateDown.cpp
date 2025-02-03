@@ -12,11 +12,12 @@ namespace
 	constexpr int kDownTime = 90;
 
 	//動けるようになる時間
-	constexpr int kMoveTime = 30;
+	constexpr int kMoveTime = 25;
 }
 
 CharacterStateDown::CharacterStateDown(std::shared_ptr<Character> character) :
-	CharacterStateBase(character)
+	CharacterStateBase(character),
+	m_isReturn(false)
 {
 }
 
@@ -45,24 +46,27 @@ void CharacterStateDown::Update()
 	//動けるようになる時間が経ったら
 	if (m_time > kMoveTime)
 	{
-		//入力データを取得
-		auto input = m_pCharacter->GetInputData();
+		//復帰フラグを立てる
+		m_isReturn = true;
 
-		//復帰入力があったら
-		if (input->IsTrigger("B"))
-		{
-			//次の状態をダッシュ状態に設定する
-			std::shared_ptr<CharacterStateDash> next = std::make_shared<CharacterStateDash>(m_pCharacter);
-			//回避になるように設定
-			next->SetDodge();
-			//移動方向を設定
-			next->SetMoveDir(MyEngine::Vector3(0.0f, 0.0f, -1.0f));
-			//ダッシュ状態に遷移
-			ChangeState(next);
-			//復帰チュートリアルをクリア
-			SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kReturn));
-			return;
-		}
+	}
+	//入力データを取得
+	auto input = m_pCharacter->GetInputData();
+
+	//復帰できる状況で復帰入力があったら
+	if (input->IsTrigger("B") && m_isReturn)
+	{
+		//次の状態をダッシュ状態に設定する
+		std::shared_ptr<CharacterStateDash> next = std::make_shared<CharacterStateDash>(m_pCharacter);
+		//回避になるように設定
+		next->SetDodge();
+		//移動方向を設定
+		next->SetMoveDir(MyEngine::Vector3(0.0f, 0.0f, -1.0f));
+		//ダッシュ状態に遷移
+		ChangeState(next);
+		//復帰チュートリアルをクリア
+		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kReturn));
+		return;
 	}
 
 	//移動ベクトルを0にする
@@ -80,10 +84,10 @@ void CharacterStateDown::SetFrontHit(bool front)
 	//前方から攻撃を受けたかどうかを設定
 	if (front)
 	{
-		m_pCharacter->ChangeAnim(Character::AnimKind::kFrontDown,false);
+		m_pCharacter->ChangeAnim(Character::AnimKind::kFrontDown, false);
 	}
 	else
 	{
-		m_pCharacter->ChangeAnim(Character::AnimKind::kBackDown,false);
+		m_pCharacter->ChangeAnim(Character::AnimKind::kBackDown, false);
 	}
 }

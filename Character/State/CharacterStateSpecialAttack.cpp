@@ -25,7 +25,7 @@ namespace
 	{
 		{Character::AttackKind::kEnergy,90},
 		{Character::AttackKind::kPhysical,90},
-		{Character::AttackKind::kBeam,90},
+		{Character::AttackKind::kLaser,90},
 		{Character::AttackKind::kRush,90},
 		{Character::AttackKind::kThrow,30},
 		{Character::AttackKind::kAssault,90}
@@ -35,7 +35,7 @@ namespace
 	{
 		{Character::AttackKind::kEnergy,Character::AttackHitKind::kWeakUpBurst},
 		{Character::AttackKind::kPhysical,Character::AttackHitKind::kFarBurst},
-		{Character::AttackKind::kBeam,Character::AttackHitKind::kFarBurst},
+		{Character::AttackKind::kLaser,Character::AttackHitKind::kFarBurst},
 		{Character::AttackKind::kRush,Character::AttackHitKind::kFarBurst},
 		{Character::AttackKind::kThrow,Character::AttackHitKind::kFarBurst},
 		{Character::AttackKind::kAssault,Character::AttackHitKind::kWeakUpBurst}
@@ -57,7 +57,7 @@ namespace
 	{
 		{Character::AttackKind::kEnergy,6.0f},
 		{Character::AttackKind::kPhysical,0.0f},
-		{Character::AttackKind::kBeam,20.0f},
+		{Character::AttackKind::kLaser,20.0f},
 		{Character::AttackKind::kRush,0.0f},
 		{Character::AttackKind::kThrow,0.0f},
 		{Character::AttackKind::kAssault,0.0f}

@@ -126,6 +126,11 @@ void CharacterStateCharge::Update()
 		}
 	}
 
+	//1P側が行っていたらカメラを少し揺らす
+	if (m_pCharacter->GetPlayerNumber() == Character::PlayerNumber::kOnePlayer)
+	{
+		m_pManager->SwayCamera();
+	}
 
 	//エフェクトの座標を設定する
 	m_pEffect->SetPos(m_pCharacter->GetPos());

@@ -1,6 +1,7 @@
 #pragma once
 #include "SceneBase.h"
 #include <vector>
+#include <string>
 
 class GameManagerBase;
 class Character;
@@ -28,6 +29,12 @@ public:
 	/// <param name="enemy">エネミーが使用するキャラクター番号</param>
 	/// <param name="enemyLevel">エネミーのレベル</param>
 	void SetCharacter(int player,int enemy,int enemyLevel);
+
+	/// <summary>
+	/// バトル中に使用するBGMを設定する
+	/// </summary>
+	/// <param name="musicName">BGMの名前</param>
+	void SetMusicName(std::string musicName);
 
 private:
 	std::vector<std::shared_ptr<Character>> m_pCharacters;

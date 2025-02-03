@@ -97,6 +97,18 @@ namespace
 
 	//受け身にかかる時間
 	constexpr int kFallsStopTime = 10;
+
+	//受け身をとった時のエフェクトの再生時間
+	constexpr int kFallsEffectLifeTime = 30;
+
+	//ステージにぶつかった時のカメラを揺らす時間
+	constexpr int kStageBumpShakeCameraTime = 13;
+
+	//ステージにぶつかった時のカメラを揺らす大きさ
+	constexpr int kStageBumpShakeCameraPower = 10;
+
+	//ステージにぶつかった時受けるダメージ
+	constexpr int kStageBumpDamage = 2000;
 }
 
 CharacterStateHitAttack::CharacterStateHitAttack(std::shared_ptr<Character> character) :
@@ -104,7 +116,8 @@ CharacterStateHitAttack::CharacterStateHitAttack(std::shared_ptr<Character> char
 	m_moveTime(0),
 	m_isFrontHit(false),
 	m_moveLength(0.0f),
-	m_isStageBump(false)
+	m_isStageBump(false),
+	m_isFalls(false)
 {
 }
 
@@ -127,7 +140,7 @@ void CharacterStateHitAttack::Update()
 		m_pCharacter->GetHitReaction() == Character::HitReactionKind::kMiddleStan)
 	{
 		int slowAnimTime = static_cast<int>(m_stopTime * kSlowAnimTimeRate);
-		
+
 		if (m_time < slowAnimTime)
 		{
 			//再生速度をゆっくりにする
@@ -205,6 +218,13 @@ void CharacterStateHitAttack::Update()
 		}
 	}
 
+	//設定した時間たったら
+	if (m_time >= static_cast<float>(m_stopTime * kStopTimeRate))
+	{
+		//受け身をとれるようにする
+		m_isFalls = true;
+	}
+
 	//吹っ飛び状態であれば
 	if (m_pCharacter->GetHitReaction() == Character::HitReactionKind::kUpBurst ||
 		m_pCharacter->GetHitReaction() == Character::HitReactionKind::kDownBurst ||
@@ -249,6 +269,12 @@ void CharacterStateHitAttack::Update()
 				}
 				//ぶつかった時のサウンドを再生
 				SoundManager::GetInstance().PlayOnceSound("StageHit");
+
+				//ステージにぶつかった時にカメラを揺らす
+				m_pManager->ShakeCamera(kStageBumpShakeCameraTime, kStageBumpShakeCameraPower);
+
+				//ステージにぶつかった時にダメージを受ける
+				m_pCharacter->SubHp(kStageBumpDamage);
 			}
 
 
@@ -299,21 +325,36 @@ void CharacterStateHitAttack::Update()
 				//ぶつかった時のサウンドを再生
 				SoundManager::GetInstance().PlayOnceSound("StageHit");
 
+				//ステージにぶつかった時にカメラを揺らす
+				m_pManager->ShakeCamera(kStageBumpShakeCameraTime, kStageBumpShakeCameraPower);
+
+				//ステージにぶつかった時にダメージを受ける
+				m_pCharacter->SubHp(kStageBumpDamage);
 			}
 
 			return;
 		}
 
-
-		//設定した時間たって受け身ボタンが押されたら
-		if (m_time >= static_cast<float>(m_stopTime * kStopTimeRate) &&
-			input->IsTrigger("B"))
+		//受け身がとれる状態で受け身ボタンが押されたら
+		if (input->IsTrigger("B") && m_isFalls)
 		{
 			//次の状態をアイドル状態に設定する
 			std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 
 			//受け身アニメを再生する
 			next->SetEndAnim(static_cast<int>(Character::AnimKind::kBottomStan), kFallsStopTime, kFallsBlendSpeed);
+
+			//受け身エフェクトを再生する
+			auto effect = std::make_shared<Effect>(Effect::EffectKind::kFalls);
+
+			//エフェクトの位置を設定する
+			effect->SetPos(m_pCharacter->GetPos() + m_moveVec * kFallsStopTime);
+
+			//エフェクトの寿命を設定する
+			effect->SetLifeTime(kFallsEffectLifeTime);
+
+			//エフェクトを登録する
+			m_pManager->EntryEffect(effect);
 
 			//受け身チュートリアルをクリアさせる
 			SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kFalls));
@@ -331,9 +372,8 @@ void CharacterStateHitAttack::Update()
 		m_pCharacter->GetHitReaction() == Character::HitReactionKind::kWeakBurst)
 	{
 
-		//設定した時間たって受け身ボタンが押されたら
-		if (m_time >= static_cast<float>(m_stopTime * kStopTimeRate) &&
-			input->IsTrigger("B"))
+		//受け身がとれる状態で受け身ボタンが押されたら
+		if (input->IsTrigger("B") && m_isFalls)
 		{
 			//次の状態をアイドル状態に設定する
 			std::shared_ptr<CharacterStateIdle> next = std::make_shared<CharacterStateIdle>(m_pCharacter);
@@ -411,7 +451,7 @@ void CharacterStateHitAttack::HitAttack(int kind)
 	local.SetFrontPos(centerFrontPos);
 
 	//コンボとやられ状態の確認
-	
+
 	//下段スタン攻撃
 	if (reaction == Character::HitReactionKind::kBottomStan)
 	{

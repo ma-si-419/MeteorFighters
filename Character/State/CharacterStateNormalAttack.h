@@ -25,6 +25,12 @@ public:
 
 	virtual void Exit() override;
 
+	/// <summary>
+	/// UŒ‚‚Ü‚Å‚ÌŠÔ‚ğæ“¾‚·‚é
+	/// </summary>
+	/// <returns>UŒ‚‚Ü‚Å‚ÌŠÔ(UŒ‚‚ğ‚·‚Å‚Éo‚µ‚Ä‚¢‚½‚ç-1‚ğ•Ô‚·)</returns>
+	int GetTimeToAttack();
+
 	std::string GetNowAttackName() { return m_nowAttackName; }
 
 	bool GetEndAttack() { return m_isEndAttack; };

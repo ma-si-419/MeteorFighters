@@ -2,6 +2,8 @@
 #include "GameManagerBase.h"
 #include "CharacterStateBase.h"
 #include "CharacterStateNormalAttack.h"
+#include "CharacterStateHitAttack.h"
+#include "CharacterStateDown.h"
 #include "LoadCsv.h"
 #include "GameSceneConstant.h"
 
@@ -9,6 +11,9 @@ namespace
 {
 	//行動を行うまでの時間
 	constexpr int kActionTime = 60;
+
+	//状況に応じた行動を行うまでの時間
+	constexpr int kSituationActionTime = 60;
 
 	//チャージを行う時間
 	constexpr int kChargeTime = 120;
@@ -49,6 +54,9 @@ namespace
 	//難易度によって読み取る場所を変える
 	constexpr int kLevelShiftIndex = 4;
 
+	//ジャストガードの猶予時間
+	constexpr int kJustGuardTime = 10;
+
 	//近距離で選択できる移動方向
 	const EnemyInput::MoveDir kNearMoveDir[kMoveDirRandomNum] =
 	{
@@ -78,7 +86,13 @@ EnemyInput::EnemyInput(std::shared_ptr<MyEngine::InputData> inputData) :
 	m_moveTime(0),
 	m_stateTime(0),
 	m_actionTime(0),
-	m_isCountActionTime(true)
+	m_isCountActionTime(true),
+	m_situationAction(SituationAction::kNone),
+	m_situationActionTime(0),
+	m_guardTime(0),
+	m_superDashTime(0),
+	m_pManager(nullptr),
+	m_tutorialAction(Action::kNone)
 {
 	m_pInputData = inputData;
 	m_moveFunc = &EnemyInput::None;
@@ -86,13 +100,13 @@ EnemyInput::EnemyInput(std::shared_ptr<MyEngine::InputData> inputData) :
 
 	LoadCsv load;
 
-	m_loadAiData = load.LoadFile("data/csv/enemyAiData.csv");
+	m_loadActionAiData = load.LoadFile("data/csv/enemyActionAiData.csv");
 
 	//AIの難易度を低いに設定しておく
 	m_aiLevel = AiLevel::kEasy;
 
 	//AIのデータを読み込む
-	for (auto data : m_loadAiData)
+	for (auto data : m_loadActionAiData)
 	{
 		AiData aiData;
 		aiData.nearRate = std::stoi(data[static_cast<int>(DataIndex::kNearRate)]);
@@ -101,6 +115,41 @@ EnemyInput::EnemyInput(std::shared_ptr<MyEngine::InputData> inputData) :
 		aiData.minMp = std::stoi(data[static_cast<int>(DataIndex::kMinMp)]);
 		m_aiData.push_back(aiData);
 	}
+
+	//状況に応じた行動の確率を設定する
+	auto situationActionData = load.LoadFile("data/csv/enemySituationAiData.csv");
+
+	for (auto data : situationActionData)
+	{
+		for (auto item : data)
+		{
+			if (item == "受け身")
+			{
+				m_situationActionRate[static_cast<int>(SituationAction::kFalls)][static_cast<int>(AiLevel::kEasy)] = std::stoi(data[1]);
+				m_situationActionRate[static_cast<int>(SituationAction::kFalls)][static_cast<int>(AiLevel::kNormal)] = std::stoi(data[2]);
+				m_situationActionRate[static_cast<int>(SituationAction::kFalls)][static_cast<int>(AiLevel::kHard)] = std::stoi(data[3]);
+			}
+			else if (item == "復帰")
+			{
+				m_situationActionRate[static_cast<int>(SituationAction::kReturn)][static_cast<int>(AiLevel::kEasy)] = std::stoi(data[1]);
+				m_situationActionRate[static_cast<int>(SituationAction::kReturn)][static_cast<int>(AiLevel::kNormal)] = std::stoi(data[2]);
+				m_situationActionRate[static_cast<int>(SituationAction::kReturn)][static_cast<int>(AiLevel::kHard)] = std::stoi(data[3]);
+			}
+			else if (item == "ガード")
+			{
+				m_situationActionRate[static_cast<int>(SituationAction::kGuard)][static_cast<int>(AiLevel::kEasy)] = std::stoi(data[1]);
+				m_situationActionRate[static_cast<int>(SituationAction::kGuard)][static_cast<int>(AiLevel::kNormal)] = std::stoi(data[2]);
+				m_situationActionRate[static_cast<int>(SituationAction::kGuard)][static_cast<int>(AiLevel::kHard)] = std::stoi(data[3]);
+			}
+			else if (item == "ジャストガード")
+			{
+				m_situationActionRate[static_cast<int>(SituationAction::kJustGuard)][static_cast<int>(AiLevel::kEasy)] = std::stoi(data[1]);
+				m_situationActionRate[static_cast<int>(SituationAction::kJustGuard)][static_cast<int>(AiLevel::kNormal)] = std::stoi(data[2]);
+				m_situationActionRate[static_cast<int>(SituationAction::kJustGuard)][static_cast<int>(AiLevel::kHard)] = std::stoi(data[3]);
+			}
+		}
+	}
+	int a = 0;
 }
 
 EnemyInput::~EnemyInput()
@@ -253,9 +302,9 @@ void EnemyInput::Update()
 
 					m_stateTime = 0;
 
-			//		action = Action::kSpecialAttack;
+					//		action = Action::kSpecialAttack;
 
-					//行動を変更する
+							//行動を変更する
 					SetAction(action);
 
 					//ループから抜ける
@@ -273,24 +322,82 @@ void EnemyInput::Update()
 		m_actionTime = 0;
 	}
 
+	//状況に応じたアクションを行うまでの時間をカウント
+	m_situationActionTime++;
+
+	//状況に応じたアクション
+	SituationAction situationAction = SituationAction::kNone;
+
+	//状況に応じたアクションを行うまでの時間が一定時間経過したら
+	if (m_situationActionTime > kSituationActionTime)
+	{
+		//状況に応じたアクションを取得
+		situationAction = GetSituationAction();
+
+	}
+
+	//状況に応じたアクションが設定されていたら
+	if (situationAction != SituationAction::kNone)
+	{
+		//確率を見て状況に応じたアクションを行うかを決定
+		int randNum = GetRand(100);
+
+		//状況に応じたアクションを行う確率
+		int rate = m_situationActionRate[static_cast<int>(situationAction)][static_cast<int>(m_aiLevel)];
+
+		//確率で状況に応じたアクションを行うかを決定
+		if (randNum < rate)
+		{
+			m_situationAction = situationAction;
+		}
+		else
+		{
+			m_situationActionTime = 0;
+		}
+	}
+
 	if (m_pManager->GetGameKind() != GameManagerBase::GameKind::kTutorial)
 	{
 		//移動処理
 		(this->*m_moveFunc)();
 	}
-
-	//アクション処理
-	(this->*m_actionFunc)();
+	//状況に応じたアクションが設定されてないのなら
+	if (m_situationAction == SituationAction::kNone)
+	{
+		//アクション処理
+		(this->*m_actionFunc)();
+	}
+	else
+	{
+		//状況に応じたアクション処理
+		switch (m_situationAction)
+		{
+		case SituationAction::kFalls:
+			Falls();
+			break;
+		case SituationAction::kReturn:
+			Return();
+			break;
+		case SituationAction::kGuard:
+			Guard();
+			break;
+		case SituationAction::kJustGuard:
+			JustGuard();
+			break;
+		}
+	}
 
 }
 
 void EnemyInput::SetAiLevel(AiLevel level)
 {
+	m_aiData.clear();
+
 	//難易度によって読み取る場所を変える
 	int shiftIndex = static_cast<int>(level) * kLevelShiftIndex;
 
 	//AIデータを読み込む
-	for (auto item : m_loadAiData)
+	for (auto item : m_loadActionAiData)
 	{
 		AiData pushData;
 
@@ -309,6 +416,67 @@ void EnemyInput::SetAiLevel(AiLevel level)
 		//AIデータを保存
 		m_aiData.push_back(pushData);
 	}
+}
+
+EnemyInput::SituationAction EnemyInput::GetSituationAction()
+{
+	//自身の状況がふっとんでいるなら
+	if (m_pEnemyState->GetKind() == CharacterStateBase::CharacterStateKind::kHitAttack)
+	{
+		//ヒットアタックのステートに変換
+		auto hitState = std::dynamic_pointer_cast<CharacterStateHitAttack>(m_pEnemyState);
+
+		//受け身がとれる状況なら
+		if (hitState->IsFalls())
+		{
+			//受け身アクション
+			return SituationAction::kFalls;
+		}
+	}
+
+	//自身の状態がダウン状態なら
+	if (m_pEnemyState->GetKind() == CharacterStateBase::CharacterStateKind::kDown)
+	{
+		//ダウン状態のステートに変換
+		auto downState = std::dynamic_pointer_cast<CharacterStateDown>(m_pEnemyState);
+
+		//復帰できる状況なら
+		if (downState->IsReturn())
+		{
+			//復帰アクション
+			return SituationAction::kReturn;
+		}
+	}
+
+	//プレイヤーの状態が攻撃状態なら
+	if (m_pPlayerState->GetKind() == CharacterStateBase::CharacterStateKind::kNormalAttack)
+	{
+		//攻撃状態のステートに変換
+		auto attackState = std::dynamic_pointer_cast<CharacterStateNormalAttack>(m_pPlayerState);
+
+		//攻撃までの時間を取得
+		int attackTime = attackState->GetTimeToAttack();
+
+		//攻撃までの時間が-1でないなら
+		if (attackTime != -1)
+		{
+			//ジャストガードの猶予時間内なら
+			if (attackTime < kJustGuardTime)
+			{
+				//ジャストガードアクション
+				return SituationAction::kJustGuard;
+			}
+			//それ以外なら
+			else
+			{
+				//ガードアクション
+				return SituationAction::kGuard;
+			}
+		}
+	}
+
+	//それ以外なら
+	return SituationAction::kNone;
 }
 
 void EnemyInput::MoveFront()
@@ -522,12 +690,63 @@ void EnemyInput::Guard()
 	if (m_stateTime > m_guardTime)
 	{
 		m_isCountActionTime = true;
+		m_situationAction = SituationAction::kNone;
 	}
 #ifdef _DEBUG
 
 	printfDx("ガード\n");
 
 #endif // _DEBUG
+}
+
+void EnemyInput::JustGuard()
+{
+	//敵の攻撃をジャストガードする
+	if (m_pPlayerState->GetKind() == CharacterStateBase::CharacterStateKind::kNormalAttack)
+	{
+		auto attackState = std::dynamic_pointer_cast<CharacterStateNormalAttack>(m_pPlayerState);
+		//攻撃までの時間を取得
+		int attackTime = attackState->GetTimeToAttack();
+
+		//ジャストガードの猶予時間内なら
+		if (attackTime < kJustGuardTime)
+		{
+			m_pInputData->PushButton("B");
+		}
+	}
+	//敵のステートが攻撃状態でないなら
+	else
+	{
+		//ジャストガードをやめる
+		m_situationAction = SituationAction::kNone;
+	}
+}
+
+void EnemyInput::Return()
+{
+	//前のステートが違うなら
+	if (m_lastStateKind != static_cast<int>(m_pEnemyState->GetKind()))
+	{
+		//復帰アクションをやめる
+		m_situationAction = SituationAction::kNone;
+	}
+	//復帰アクションを行う
+	m_pInputData->BashButton("B");
+	m_lastStateKind = static_cast<int>(m_pEnemyState->GetKind());
+}
+
+void EnemyInput::Falls()
+{
+	//前のステートが違うなら
+	if (m_lastStateKind != static_cast<int>(m_pEnemyState->GetKind()))
+	{
+		//復帰アクションをやめる
+		m_situationAction = SituationAction::kNone;
+	}
+	//受け身アクションを行う
+	m_pInputData->BashButton("B");
+
+	m_lastStateKind = static_cast<int>(m_pEnemyState->GetKind());
 }
 
 void EnemyInput::UpChargeAttack()

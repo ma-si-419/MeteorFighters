@@ -23,6 +23,8 @@ BashBack,BashButtonBack,Game
 Easy,Easy,Game
 Normal,Normal,Game
 Hard,Hard,Game
+BlueName,BlueName,Game
+MouseName,MouseName,Game
 SelectItemBox,SelectItemBox,Menu
 ItemBox,ItemBox,Menu
 HpBar,HpBar,Tutorial

@@ -22,7 +22,8 @@ public:
 		kTeleportaion,
 		kStageHit,
 		kLaserHit,
-		kStartLaser
+		kStartLaser,
+		kFalls
 	};
 
 public:

@@ -25,14 +25,14 @@ namespace
 	//1フレームでどのくらい行く方向を回転できるか
 	constexpr float kRotScaleMax = 10.0f;
 
-	//ドラゴンダッシュ時にカーブする距離
+	//ロケットダッシュ時にカーブする距離
 	constexpr float kCurveDistance = 300.0f;
 
 	//エネミーに向かっていくダッシュで使用する気力量
 	constexpr float kEnemyRushCost = 10000.0f;
 
 	//移動中にどのくらい気力を使用するか
-	constexpr float kRushCost = 20.0f;
+	constexpr float kRushCost = 50.0f;
 
 	//アイドルに戻るときのアニメーションブレンドの速さ
 	constexpr float kEndAnimBlendSpeed = 0.08f;
@@ -227,7 +227,7 @@ void CharacterStateRush::Update()
 				{
 					//敵の近くまで向かう突撃状態になる
 					m_isRushEnemy = true;
-					m_rushTargetPos = m_pManager->GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance,m_pCharacter);
+					m_rushTargetPos = m_pManager->GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance, m_pCharacter);
 				}
 			}
 		}
@@ -428,19 +428,27 @@ void CharacterStateRush::Update()
 		}
 
 		//一定距離までは目的座標を更新し続ける
-		if ((m_pManager->GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance,m_pCharacter) - m_pCharacter->GetPos()).Length() > GameSceneConstant::kCameraMoveDistance)
+		if ((m_pManager->GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance, m_pCharacter) - m_pCharacter->GetPos()).Length() > GameSceneConstant::kCameraMoveDistance)
 		{
-			m_rushTargetPos = m_pManager->GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance,m_pCharacter);
-			m_pManager->StopCameraCorrection();
+			m_rushTargetPos = m_pManager->GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance, m_pCharacter);
+
+			//1Pのみカメラを動かす
+			if (m_pCharacter->GetPlayerNumber() == Character::PlayerNumber::kOnePlayer)
+			{
+				m_pManager->StopCameraCorrection();
+			}
 		}
 		//一定距離まで近づいたら
 		else
 		{
 			m_pManager->StartCameraCorrection();
 
-			//カメラを高速移動させる
-			m_pCharacter->StartFastCameraMove();
-
+			//1Pのみカメラを動かす
+			if (m_pCharacter->GetPlayerNumber() == Character::PlayerNumber::kOnePlayer)
+			{
+				//カメラを高速移動させる
+				m_pCharacter->StartFastCameraMove();
+			}
 			//さらに近くまで近づいたら
 			if (toTarget.Length() < GameSceneConstant::kEndRushDistance)
 			{
@@ -507,9 +515,12 @@ void CharacterStateRush::Update()
 	//ラッシュを終わる処理をしていなければ
 	if (!m_isEndRush)
 	{
-		//カメラを少し揺らす
-		m_pManager->SwayCamera();
-
+		//1Pのみカメラを動かす
+		if (m_pCharacter->GetPlayerNumber() == Character::PlayerNumber::kOnePlayer)
+		{
+			//カメラを少し揺らす
+			m_pManager->SwayCamera();
+		}
 		//移動方向を見る
 		m_pCharacter->SetFrontPos(m_pCharacter->GetPos() + velo);
 	}

@@ -178,6 +178,7 @@ void BattleUi::ChangeSituation(UiSituation situation)
 
 		break;
 
+
 	default:
 		break;
 	}
@@ -330,6 +331,14 @@ void BattleUi::UpdateResult()
 
 }
 
+void BattleUi::UpdateStart1P()
+{
+}
+
+void BattleUi::UpdateStart2P()
+{
+}
+
 
 void BattleUi::DrawMenu()
 {
@@ -435,6 +444,15 @@ void BattleUi::DrawResult()
 	}
 
 
+}
+
+void BattleUi::DrawStart1P()
+{
+
+}
+
+void BattleUi::DrawStart2P()
+{
 }
 
 void BattleUi::DrawStringCenter(std::string string, MyEngine::Vector2 centerPos, int font, int color, int edgeColor)

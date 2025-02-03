@@ -588,3 +588,15 @@ void CharacterStateNormalAttack::Exit()
 	m_pCharacter->LookTarget();
 	m_pCharacter->SetFrontPos(m_pManager->GetTargetPos(m_pCharacter));
 }
+
+int CharacterStateNormalAttack::GetTimeToAttack()
+{
+	//すでに攻撃を出しているなら-1を返す
+	if (m_isAttacked) return -1;
+
+	//攻撃の情報
+	auto status = m_pCharacter->GetNormalAttackData(m_nowAttackName);
+
+	//攻撃を出すフレームまであと何フレームかを返す
+	return status.attackFrame - m_time;
+}

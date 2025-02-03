@@ -95,6 +95,9 @@ void CharacterStateButtonBashing::Enter()
 		SetCharacterPos(kEnemyInitPos);
 	}
 
+	//移動速度を初期化
+	SetCharacterVelo(MyEngine::Vector3(0, 0, 0));
+
 	//アニメーション変更
 	m_pCharacter->ChangeAnim(Character::AnimKind::kButtonBashingHitBack, false);
 
@@ -110,7 +113,7 @@ void CharacterStateButtonBashing::Enter()
 	//エフェクトを登録
 	m_pManager->EntryEffect(effect);
 	//カメラを揺らす
-	m_pManager->ShakeCamera(kBumpCameraShakeTime,kBumpCameraShakePower);
+	m_pManager->ShakeCamera(kBumpCameraShakeTime, kBumpCameraShakePower);
 }
 
 void CharacterStateButtonBashing::Update()

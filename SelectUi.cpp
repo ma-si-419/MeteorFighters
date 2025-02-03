@@ -16,14 +16,21 @@ namespace
 	constexpr int kMusicNameFontSize = 36;
 	//曲名を表示する文字列の色(黄色)
 	const int kMusicNameColor = GetColor(255, 255, 32);	 
+	//曲名のフェードインの速度
+	constexpr int kMusicNameFadeInSpeed = 13;
+	//曲名の移動速度
+	constexpr int kMusicNameMoveSpeed = 10;
 
 	//音符を表示する座標
-	constexpr int kMusicNotePosX = 1120;
-	constexpr int kMusicNotePosY = 855;
+	constexpr int kMusicNotePosX = 1105;
+	constexpr int kMusicNotePosY = 850;
 	
 	//曲名を表示する座標
-	constexpr int kMusicNamePosX = 1170;
-	constexpr int kMusicNamePosY = 850;
+	constexpr int kMusicNamePosX = 1152;
+	constexpr int kMusicNamePosY = 835;
+
+	//曲名の初期座標
+	constexpr int kMusicNameInitPosX = 1300;
 
 	//カメラの設定
 	constexpr float kCameraNear = 0.1f;
@@ -341,8 +348,23 @@ void SelectUi::Draw()
 
 		DrawStringToHandle(static_cast<int>(pos.x), static_cast<int>(pos.y), kLevelString[prevLevel].c_str(), kLevelColor[prevLevel], m_levelFontHandle);
 
+		//曲名のアルファ値を増やす
+		m_musicNameAlpha += kMusicNameFadeInSpeed;
+
+		//曲名の座標を左にずらす
+		m_musicNamePosX -= kMusicNameMoveSpeed;
+
+		//曲名の座標をクランプ
+		m_musicNamePosX = max(m_musicNamePosX, kMusicNamePosX);
+
+		//ブレンドモードを設定
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, min(m_musicNameAlpha, 255));
+
 		//曲名を表示する
-		DrawStringToHandle(kMusicNamePosX, kMusicNamePosY, m_musicName.c_str(), kMusicNameColor, m_musicNameFontHandle);
+		DrawStringToHandle(m_musicNamePosX, kMusicNamePosY, m_musicName.c_str(), kMusicNameColor, m_musicNameFontHandle);
+
+		//ブレンドモードを元に戻す
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 }
 
@@ -436,6 +458,17 @@ void SelectUi::ChangeSituation(UiSituation situation)
 void SelectUi::SetSkyDomeHandle(int handle)
 {
 	MV1SetTextureGraphHandle(m_skyDomeHandle, 0, handle, FALSE);
+}
+
+void SelectUi::SetMusicName(std::string musicName)
+{
+	m_musicName = musicName;
+
+	//曲名のアルファ値を0にする
+	m_musicNameAlpha = 0;
+
+	//曲名の座標を初期化
+	m_musicNamePosX = kMusicNameInitPosX;
 }
 
 void SelectUi::Update1P()

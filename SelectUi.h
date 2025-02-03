@@ -90,7 +90,7 @@ public:
 	/// 今流している曲の名前を設定する
 	/// </summary>
 	/// <param name="musicName">曲の名前</param>
-	void SetMusicName(std::string musicName) { m_musicName = musicName; }
+	void SetMusicName(std::string musicName);
 
 private:
 
@@ -142,4 +142,10 @@ private:
 
 	//曲の名前
 	std::string m_musicName;
+
+	//曲名のアルファ値
+	int m_musicNameAlpha;
+
+	//曲名の表示座標
+	int m_musicNamePosX;
 };

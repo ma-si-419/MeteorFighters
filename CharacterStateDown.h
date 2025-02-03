@@ -12,4 +12,15 @@ public:
 	virtual void Exit() override;
 
 	void SetFrontHit(bool front);
+
+	/// <summary>
+	/// •œ‹A‚Å‚«‚é‚©‚Ç‚¤‚©‚ðŽæ“¾‚·‚é
+	/// </summary>
+	/// <returns>•œ‹A‚Å‚«‚é‚È‚çtrue</returns>
+	bool IsReturn() { return m_isReturn; }
+private:
+
+	//•œ‹A‚Å‚«‚é‚©‚Ç‚¤‚©
+	bool m_isReturn;
+
 };

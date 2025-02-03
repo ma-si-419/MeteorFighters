@@ -135,3 +135,10 @@ void SceneGame::SetCharacter(int player, int enemy, int enemyLevel)
 
 	m_pGameManager->SetTwoPlayerStatus(enemy, data[enemy], enemyLevel);
 }
+
+void SceneGame::SetMusicName(std::string musicName)
+{
+	auto battleManager = std::dynamic_pointer_cast<BattleManager>(m_pGameManager);
+
+	battleManager->SetMusicName(musicName);
+}

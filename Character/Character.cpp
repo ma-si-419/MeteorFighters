@@ -54,7 +54,7 @@ namespace
 	//必殺技の種類を外部ファイルの文字列から内部のAttackKindに変換する際に使用する
 	const std::map<std::string, Character::AttackKind> kSpecialAttackKindMap =
 	{
-		{"ビーム",Character::AttackKind::kBeam},
+		{"ビーム",Character::AttackKind::kLaser},
 		{"格闘",Character::AttackKind::kRush},
 		{"気弾",Character::AttackKind::kEnergy},
 		{"投げ",Character::AttackKind::kThrow},
@@ -198,7 +198,10 @@ void Character::Init()
 	//敵側の処理
 	if (m_playerNumber == Character::PlayerNumber::kTwoPlayer)
 	{
-		m_pEnemyInput->SetState(m_pState);
+		//エネミーのステートを設定する
+		m_pEnemyInput->SetEnemyState(m_pState);
+		//プレイヤーのステートを設定する
+		m_pEnemyInput->SetPlayerState(m_pBattleManager->GetOnePlayerPointer()->m_pState);
 	}
 
 	//音声大きさの設定
@@ -237,6 +240,12 @@ void Character::Update()
 	//常に更新するもの
 	m_pState->UpdateCommon();
 
+	//EnemyInputにプレイヤーのステートを設定する
+	if (m_playerNumber == Character::PlayerNumber::kTwoPlayer)
+	{
+		m_pEnemyInput->SetPlayerState(m_pBattleManager->GetOnePlayerPointer()->m_pState);
+	}
+
 	//Stateが変更されていたらStateを入れ替える
 	if (m_pState != m_pState->m_pNextState)
 	{
@@ -245,7 +254,7 @@ void Character::Update()
 		//敵側の処理
 		if (m_playerNumber == Character::PlayerNumber::kTwoPlayer)
 		{
-			m_pEnemyInput->SetState(m_pState);
+			m_pEnemyInput->SetEnemyState(m_pState);
 		}
 	}
 
