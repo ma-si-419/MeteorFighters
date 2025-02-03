@@ -243,25 +243,25 @@
     <ClCompile Include="MyEngine\Physics\Physics.cpp">
       <Filter>ソース ファイル\MyEngine\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="SelectManager.cpp">
+    <ClCompile Include="Select\SelectManager.cpp">
       <Filter>ソース ファイル\Select</Filter>
     </ClCompile>
-    <ClCompile Include="BattleUi.cpp">
+    <ClCompile Include="Game\Battle\BattleUi.cpp">
       <Filter>ソース ファイル\Game\Battle</Filter>
     </ClCompile>
-    <ClCompile Include="SelectUi.cpp">
+    <ClCompile Include="Select\SelectUi.cpp">
       <Filter>ソース ファイル\Select</Filter>
     </ClCompile>
-    <ClCompile Include="CharacterStateTeleportation.cpp">
+    <ClCompile Include="Character\State\CharacterStateTeleportation.cpp">
       <Filter>ソース ファイル\Character\State</Filter>
     </ClCompile>
-    <ClCompile Include="CharacterStateDown.cpp">
+    <ClCompile Include="Character\State\CharacterStateDown.cpp">
       <Filter>ソース ファイル\Character\State</Filter>
     </ClCompile>
-    <ClCompile Include="ObjectBase.cpp">
+    <ClCompile Include="Game\ObjectBase.cpp">
       <Filter>ソース ファイル\Game</Filter>
     </ClCompile>
-    <ClCompile Include="Rock.cpp">
+    <ClCompile Include="Game\Rock.cpp">
       <Filter>ソース ファイル\Game</Filter>
     </ClCompile>
   </ItemGroup>
@@ -428,26 +428,26 @@
     <ClInclude Include="MyEngine\Physics\Physics.h">
       <Filter>ヘッダー ファイル\MyEngine\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="SelectManager.h">
+    <ClInclude Include="Select\SelectManager.h">
       <Filter>ヘッダー ファイル\Select</Filter>
     </ClInclude>
-    <ClInclude Include="SelectUi.h">
+    <ClInclude Include="Select\SelectUi.h">
       <Filter>ヘッダー ファイル\Select</Filter>
     </ClInclude>
-    <ClInclude Include="BattleUi.h">
+    <ClInclude Include="Game\Battle\BattleUi.h">
       <Filter>ヘッダー ファイル\Game\Battle</Filter>
     </ClInclude>
-    <ClInclude Include="CharacterStateTeleportation.h">
+    <ClInclude Include="Character\State\CharacterStateTeleportation.h">
       <Filter>ヘッダー ファイル\Character\State</Filter>
     </ClInclude>
-    <ClInclude Include="CharacterStateDown.h">
+    <ClInclude Include="Character\State\CharacterStateDown.h">
       <Filter>ヘッダー ファイル\Character\State</Filter>
     </ClInclude>
-    <ClInclude Include="Rock.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Game\ObjectBase.h">
+      <Filter>ヘッダー ファイル\Game</Filter>
     </ClInclude>
-    <ClInclude Include="ObjectBase.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Game\Rock.h">
+      <Filter>ヘッダー ファイル\Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

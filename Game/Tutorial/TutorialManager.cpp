@@ -100,7 +100,7 @@ namespace
 	};
 
 	//BGMの名前
-	const std::string kBgmName = "Bgm1";
+	const std::string kBgmName = "Bgm0";
 }
 
 TutorialManager::TutorialManager(std::shared_ptr<GameCamera> camera) :
@@ -142,7 +142,7 @@ void TutorialManager::Init()
 
 void TutorialManager::Update()
 {
-	if (SoundManager::GetInstance().IsPlayingSound(kBgmName))
+	if (!SoundManager::GetInstance().IsPlayingSound(kBgmName))
 	{
 		//BGMを再生する
 		SoundManager::GetInstance().PlayLoopSound(kBgmName);
@@ -440,7 +440,15 @@ void TutorialManager::UpdateSuccess()
 			item.second = false;
 		}
 
-		ChangeSituation(TutorialSituation::kStart);
+		//全てのチュートリアルをクリアしていたら
+		if (m_nowTutorial == TutorialKind::kTutorialEnd)
+		{
+			ChangeSituation(TutorialSituation::kStartMenu);
+		}
+		else
+		{
+			ChangeSituation(TutorialSituation::kStart);
+		}
 	}
 
 	//カメラの更新を行う

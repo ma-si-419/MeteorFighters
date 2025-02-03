@@ -64,7 +64,7 @@ MouseMiddleAttack,Game,mouse/middle.m4a,Tutorial
 MouseSpecialAttack,Game,mouse/special.m4a,Tutorial
 MouseStart,Game,mouse/start.m4a,Tutorial
 MouseWinBashing,Game,mouse/winBashing.m4a,Tutorial
-Bgm1,Game,BattleBgm1.mp3,Tutorial
+Bgm0,Game,BattleBgm1.mp3,Tutorial
 EnergyHit,Game,EnergyHit.mp3,Tutorial
 HighHit,Game,High.mp3,Tutorial
 MiddleHit,Game,Middle.mp3,Tutorial

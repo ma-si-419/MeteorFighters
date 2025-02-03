@@ -147,9 +147,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BattleUi.cpp" />
-    <ClCompile Include="CharacterStateTeleportation.cpp" />
-    <ClCompile Include="CharacterStateDown.cpp" />
+    <ClCompile Include="Game\Battle\BattleUi.cpp" />
+    <ClCompile Include="Character\State\CharacterStateTeleportation.cpp" />
+    <ClCompile Include="Character\State\CharacterStateDown.cpp" />
     <ClCompile Include="Game\Attack.cpp" />
     <ClCompile Include="Game\Battle\BattleManager.cpp" />
     <ClCompile Include="Character\Character.cpp" />
@@ -170,10 +170,10 @@
     <ClCompile Include="Character\EnemyInput.cpp" />
     <ClCompile Include="Game\GameCamera.cpp" />
     <ClCompile Include="Game\GameManagerBase.cpp" />
-    <ClCompile Include="ObjectBase.cpp" />
-    <ClCompile Include="Rock.cpp" />
-    <ClCompile Include="SelectManager.cpp" />
-    <ClCompile Include="SelectUi.cpp" />
+    <ClCompile Include="Game\ObjectBase.cpp" />
+    <ClCompile Include="Game\Rock.cpp" />
+    <ClCompile Include="Select\SelectManager.cpp" />
+    <ClCompile Include="Select\SelectUi.cpp" />
     <ClCompile Include="Singleton\GraphManager.cpp" />
     <ClCompile Include="MyEngine\Utility\InputData.cpp" />
     <ClCompile Include="Singleton\LoadManager.cpp" />
@@ -206,9 +206,9 @@
     <ClCompile Include="Game\Tutorial\TutorialUi.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BattleUi.h" />
-    <ClInclude Include="CharacterStateTeleportation.h" />
-    <ClInclude Include="CharacterStateDown.h" />
+    <ClInclude Include="Game\Battle\BattleUi.h" />
+    <ClInclude Include="Character\State\CharacterStateTeleportation.h" />
+    <ClInclude Include="Character\State\CharacterStateDown.h" />
     <ClInclude Include="Game\Attack.h" />
     <ClInclude Include="Game\Battle\BattleManager.h" />
     <ClInclude Include="Character\Character.h" />
@@ -231,10 +231,10 @@
     <ClInclude Include="Game\GameCamera.h" />
     <ClInclude Include="Game\GameManagerBase.h" />
     <ClInclude Include="Game\GameSceneConstant.h" />
-    <ClInclude Include="ObjectBase.h" />
-    <ClInclude Include="Rock.h" />
-    <ClInclude Include="SelectManager.h" />
-    <ClInclude Include="SelectUi.h" />
+    <ClInclude Include="Game\ObjectBase.h" />
+    <ClInclude Include="Game\Rock.h" />
+    <ClInclude Include="Select\SelectManager.h" />
+    <ClInclude Include="Select\SelectUi.h" />
     <ClInclude Include="Singleton\GraphManager.h" />
     <ClInclude Include="MyEngine\Utility\InputData.h" />
     <ClInclude Include="Singleton\LoadManager.h" />

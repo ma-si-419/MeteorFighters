@@ -98,6 +98,9 @@ namespace
 	//上下入力でリピート入力を受け付ける時間
 	constexpr int kRepeatInputTime = 15;
 
+	//プレイメニューの左右入力でリピート入力を受け付ける時間
+	constexpr int kPlayMenuChangeTutorialRepeatInputTime = 20;
+
 	//リピート入力の間隔
 	constexpr int kRepeatInterval = 5;
 
@@ -130,6 +133,7 @@ namespace
 	{
 		"状況をリセットする",
 		"チュートリアルを変更",
+//		"チュートリアルの進め方",
 		"チュートリアルセレクトに戻る",
 		"メニューを閉じる",
 		"チュートリアルを終了する"
@@ -666,9 +670,10 @@ void TutorialUi::DrawPlayMenu()
 		//文字のY座標をずらす
 		pos.y += kPlayMenuStringDistanceY * i;
 
-		//二つ目の文字の座標を横にずらす(別の処理にしたい)
+		//左右に動かせる文字の座標を横にずらす(別の処理にしたい)
 
-		if (i == static_cast<int>(TutorialUi::PlayMenuItem::kChangeTutorial))
+		if (i == static_cast<int>(TutorialUi::PlayMenuItem::kChangeTutorial)/*||
+			i == static_cast<int>(TutorialUi::PlayMenuItem::kRepeat)*/)
 		{
 			pos.x = kMoveMenuStringPosX;
 		}
@@ -1377,12 +1382,40 @@ void TutorialUi::UpdatePlayMenu()
 		if (input->IsTrigger("Right"))
 		{
 			m_selectTutorialNumber++;
+
+			//一番右で右入力した場合
+			if (m_selectTutorialNumber >= static_cast<int>(TutorialManager::TutorialKind::kTutorialNum))
+			{
+				//一番左に移動する
+				m_selectTutorialNumber = 0;
+			}
+
 		}
 
 		//左を押したら
 		if (input->IsTrigger("Left"))
 		{
 			m_selectTutorialNumber--;
+
+			//一番左で左入力した場合
+			if (m_selectTutorialNumber < 0)
+			{
+				//一番右に移動する
+				m_selectTutorialNumber = static_cast<int>(TutorialManager::TutorialKind::kTutorialNum) - 1;
+			}
+		}
+
+		//リピート入力
+		if (m_selectItemMoveTime > kPlayMenuChangeTutorialRepeatInputTime)
+		{
+			if (input->GetPressTime("Right") > kPlayMenuChangeTutorialRepeatInputTime)
+			{
+				m_selectTutorialNumber++;
+			}
+			else if (input->GetPressTime("Left") > kPlayMenuChangeTutorialRepeatInputTime)
+			{
+				m_selectTutorialNumber--;
+			}
 		}
 
 		//クランプ
@@ -1392,6 +1425,9 @@ void TutorialUi::UpdatePlayMenu()
 		//選択している項目が変化していたら
 		if (last != m_selectTutorialNumber)
 		{
+			//変化してから何フレーム立ったかをリセットする
+			m_selectItemMoveTime = 0;
+
 			//サウンドを再生
 			SoundManager::GetInstance().PlayOnceSound("Select");
 		}

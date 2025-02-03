@@ -369,4 +369,6 @@ protected:
 	std::map<std::string, int> m_modelHandles;
 	//HPバーを表示するかどうか
 	bool m_isDrawHpBar;
+	//ボタン連打のエフェクト
+	std::shared_ptr<Effect> m_pButtonBashingEffect;
 };

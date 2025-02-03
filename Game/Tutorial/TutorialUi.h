@@ -13,6 +13,7 @@ public:
 	{
 		kReset,
 		kChangeTutorial,
+		//kRepeat,
 		kSelectMenu,
 		kMenuEnd,
 		kTutorialEnd,

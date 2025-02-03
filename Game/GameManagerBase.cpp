@@ -482,6 +482,19 @@ void GameManagerBase::UpdateButtonBashing()
 		{
 			m_pCamera->ShakeCamera(1, kButtonBashingCameraShakePower);
 		}
+
+		//ボタン連打のエフェクトを登録する
+		if (!m_pButtonBashingEffect)
+		{
+			//ぶつかっているときのエフェクトを再生する
+			m_pButtonBashingEffect = std::make_shared<Effect>(Effect::EffectKind::kShock);
+
+			m_pButtonBashingEffect->SetPos(kButtonBashingCameraTargetPos);
+
+			m_pButtonBashingEffect->SetLoop(10, 15);
+
+			EntryEffect(m_pButtonBashingEffect);
+		}
 	}
 
 	//カメラが目指す座標
@@ -554,6 +567,11 @@ void GameManagerBase::UpdateButtonBashing()
 		//ボタン連打終了のサウンドを再生する
 		SoundManager::GetInstance().PlayOnceSound("WinButtonBashing");
 
+		//エフェクトを削除する
+		m_pEffectManager->Exit(m_pButtonBashingEffect);
+
+		//エフェクトのポインターを初期化する
+		m_pButtonBashingEffect = nullptr;
 	}
 }
 

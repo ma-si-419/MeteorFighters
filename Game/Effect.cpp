@@ -21,7 +21,8 @@ namespace
 		{Effect::EffectKind::kStageHit,"StageHit"},
 		{Effect::EffectKind::kLaserHit,"LaserHit"},
 		{Effect::EffectKind::kStartLaser,"StartLaser"},
-		{Effect::EffectKind::kFalls,"Falls"}
+		{Effect::EffectKind::kFalls,"Falls"},
+		{Effect::EffectKind::kShock,"Shock"}
 	};
 
 	constexpr float kDefaultPlaySpeed = 1.0f;

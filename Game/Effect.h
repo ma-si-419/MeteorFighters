@@ -23,7 +23,8 @@ public:
 		kStageHit,
 		kLaserHit,
 		kStartLaser,
-		kFalls
+		kFalls,
+		kShock
 	};
 
 public:

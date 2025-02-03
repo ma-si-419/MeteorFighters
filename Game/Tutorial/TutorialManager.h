@@ -30,7 +30,8 @@ public:
 		kDownAttack,
 		kGuardUp,
 		kGuardDown,
-		kTutorialNum
+		kTutorialEnd,
+		kTutorialNum = kTutorialEnd
 	};
 
 	enum class TutorialSuccessKind
