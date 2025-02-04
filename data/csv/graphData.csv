@@ -8,6 +8,11 @@ Blue1PChoki,Blue1PChoki,Title
 Blue2PChoki,Blue2PChoki,Title
 Blue1PPar,Blue1PPar,Title
 Blue2PPar,Blue2PPar,Title
+SelectItemBox,SelectItemBox,Menu
+ItemBox,ItemBox,Menu
+Battle,MenuBattleGraph,Menu
+GameEnd,MenuGameEndGraph,Menu
+Tutorial,MenuTutorialGraph,Menu
 HpBar,HpBar,Game
 HpBarNum,HpBarNumBox,Game
 Winner,Winner,Game
@@ -25,8 +30,6 @@ Normal,Normal,Game
 Hard,Hard,Game
 BlueName,BlueName,Game
 MouseName,MouseName,Game
-SelectItemBox,SelectItemBox,Menu
-ItemBox,ItemBox,Menu
 HpBar,HpBar,Tutorial
 HpBarNum,HpBarNumBox,Tutorial
 MpBar,MpBar,Tutorial

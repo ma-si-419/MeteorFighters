@@ -13,7 +13,7 @@
 namespace
 {
 	//BGM‚Ì‰¹—Ê
-	constexpr int kBgmVolume = 150;
+	constexpr int kBgmVolume = 200;
 
 	//string‚©‚çSuccessKind‚É•ÏŠ·‚·‚é‚½‚ß‚Ìmap
 	const std::map<std::string, TutorialManager::TutorialSuccessKind> kSuccessKindMap =

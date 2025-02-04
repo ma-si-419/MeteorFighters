@@ -56,16 +56,50 @@ namespace
 		"ゲームを終了する",
 	};
 
+	//それぞれの項目で表示する画像の名前
+	const std::string kUiGraphName[static_cast<int>(MenuUi::SelectItem::kItemNum)] =
+	{
+		"Battle",
+		"Tutorial",
+		"SelectItemBox",
+		"GameEnd"
+	};
+
 	//フォントの名前
 	const TCHAR* kFontName = "GN-キルゴUかなNB";
 
+	//右側に表示する画像の大きさ
+	constexpr int kRightGraphSize = 680;
+
+	//右側に表示する画像の位置
+	constexpr int kRightGraphPosX = 1150;
+	constexpr int kRightGraphPosY = Game::kWindowHeight / 2;
+
+	//右側に表示する画像がはいってくるときどのくらいずらして表示するか
+	constexpr int kRightGraphMoveRange = 150;
+
+	//右側に表示する画像の移動速度
+	constexpr int kRightGraphMoveSpeed = 10;
+
+	//右側に表示する画像のフェードインアウトの速度
+	constexpr int kRightGraphBlendSpeed = 20;
+
+	//右側の画像を切り替える時間
+	constexpr int kRightGraphChangeTime = 15;
+
+	//右側の画像の切り替える数
+	constexpr int kRightGraphChangeNum = 1;
 }
 
 
 MenuUi::MenuUi() :
 	m_selectItemFontHandle(-1),
 	m_selectItem(SelectItem::kBattle),
-	m_selectItemMoveTime(0)
+	m_selectItemMoveTime(0),
+	m_skyDomeHandle(-1),
+	m_lastSelectItem(SelectItem::kBattle),
+	m_rightGraphSrcNum(0),
+	m_rightGraphChangeTime(0)
 {
 	m_selectItemFontHandle = CreateFontToHandle(kFontName, 64, 0, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
 	m_skyDomeHandle = MV1LoadModel("data/model/Dome.mv1");
@@ -109,15 +143,45 @@ void MenuUi::Init()
 	}
 
 	//選択している項目のボックスの画像を設定する
-	std::string name = "SelectItemBox";
+	{
+		std::string selectItemBox = "SelectItemBox";
 
-	GraphUiStatus status;
+		GraphUiStatus status;
 
-	status.handle = GraphManager::GetInstance().GetHandle("SelectItemBox");
-	status.showPosX = kItemBoxUiPosX;
-	status.showPosY = kItemBoxUiPosY[0];
+		status.handle = GraphManager::GetInstance().GetHandle("SelectItemBox");
+		status.showPosX = kItemBoxUiPosX;
+		status.showPosY = kItemBoxUiPosY[0];
 
-	EntryGraph(name, status);
+		EntryGraph(selectItemBox, status);
+	}
+
+
+	//ひとつ前に選択していた項目の右側に表示していた画像を設定する
+	{
+		std::string name = "LastRightGraph";
+		GraphUiStatus status;
+		status.handle = GraphManager::GetInstance().GetHandle(kUiGraphName[static_cast<int>(m_lastSelectItem)]);
+		status.showPosX = kRightGraphPosX;
+		status.showPosY = kRightGraphPosY;
+		status.graphSizeX = kRightGraphSize;
+		status.graphSizeY = kRightGraphSize;
+		status.srcPosX = 0;
+		status.alpha = 0;
+		EntryGraph(name, status);
+	}
+
+	//右側に表示する画像を設定する
+	{
+		std::string name = "RightGraph";
+		GraphUiStatus status;
+		status.handle = GraphManager::GetInstance().GetHandle(kUiGraphName[static_cast<int>(m_selectItem)]);
+		status.showPosX = kRightGraphPosX;
+		status.showPosY = kRightGraphPosY;
+		status.graphSizeX = kRightGraphSize;
+		status.graphSizeY = kRightGraphSize;
+		status.srcPosX = 0;
+		EntryGraph(name, status);
+	}
 
 	//スカイドームの設定
 	MV1SetPosition(m_skyDomeHandle, VGet(0, 0, 0));
@@ -128,6 +192,68 @@ int MenuUi::Update()
 {
 	//スカイドームを回転させる
 	MV1SetRotationXYZ(m_skyDomeHandle, VGet(0, MV1GetRotationXYZ(m_skyDomeHandle).y + kCameraRotaSpeed, 0));
+
+	//右側の画像を切り替える時間
+	m_rightGraphChangeTime++;
+
+	//右側に表示している画像のアルファ値の設定
+	auto& lastRightGraph = GetGraphRef("LastRightGraph");
+	auto& rightGraph = GetGraphRef("RightGraph");
+
+	//選択している項目の右側に表示していた画像
+	if (lastRightGraph.alpha > 0)
+	{
+		lastRightGraph.alpha -= kRightGraphBlendSpeed;
+		lastRightGraph.alpha = max(lastRightGraph.alpha, 0);
+	}
+
+	//選択している項目の右側に表示する画像
+	if (rightGraph.alpha < 255)
+	{
+		rightGraph.alpha += kRightGraphBlendSpeed;
+		rightGraph.alpha = min(rightGraph.alpha, 255);
+	}
+
+	//前選択していた項目が選択している項目よりも小さい場合
+	if (m_lastSelectItem < m_selectItem)
+	{
+		//右側に表示していた画像を上に動かす
+		lastRightGraph.showPosY -= kRightGraphMoveSpeed;
+				 
+		//右側に表示する画像を上に動かす
+		rightGraph.showPosY -= kRightGraphMoveSpeed;
+		//動かしすぎないように補正
+		rightGraph.showPosY = max(rightGraph.showPosY, kRightGraphPosY);
+	}
+	//前選択していた項目が選択している項目よりも大きい場合
+	else if (m_lastSelectItem > m_selectItem)
+	{
+		//右側に表示していた画像を下に動かす
+		lastRightGraph.showPosY += kRightGraphMoveSpeed;
+		//右側に表示する画像を下に動かす
+		rightGraph.showPosY += kRightGraphMoveSpeed;
+		//動かしすぎないように補正
+		rightGraph.showPosY = min(rightGraph.showPosY, kRightGraphPosY);
+	}
+
+	//右側の画像を切り替える時間になったら
+	if (m_rightGraphChangeTime > kRightGraphChangeTime)
+	{
+		m_rightGraphChangeTime = 0;
+
+		m_rightGraphSrcNum++;
+
+		//一定値を超えたら
+		if (m_rightGraphSrcNum > kRightGraphChangeNum)
+		{
+			m_rightGraphSrcNum = 0;
+		}
+
+		//右側に表示していた画像の切り替え
+		lastRightGraph.srcPosX = lastRightGraph.graphSizeX * m_rightGraphSrcNum;
+		//右側に表示する画像の切り替え
+		rightGraph.srcPosX = rightGraph.graphSizeX * m_rightGraphSrcNum;
+	}
 
 	//選択している選択肢の裏側
 	auto& selectItemBox = GetGraphRef("SelectItemBox");
@@ -184,8 +310,6 @@ int MenuUi::Update()
 		}
 	}
 
-
-
 	//上下入力で選択している項目を変化させる
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
@@ -238,7 +362,7 @@ int MenuUi::Update()
 	//クランプ
 	selectItem = max(selectItem, 0);
 	selectItem = min(selectItem, static_cast<int>(SelectItem::kItemNum) - 1);
-	
+
 	m_selectItem = static_cast<SelectItem>(selectItem);
 
 	//カーソルが動いていたら
@@ -251,6 +375,39 @@ int MenuUi::Update()
 
 		//動いて何フレーム立ったかリセット
 		m_selectItemMoveTime = 0;
+
+		//ひとつ前選択していた項目を記憶する
+		m_lastSelectItem = lastItem;
+
+		//選択していた項目の右側に表示していた画像を設定する
+		{
+			std::string name = "LastRightGraph";
+			auto& lastRightGraph = GetGraphRef(name);
+			lastRightGraph.handle = GraphManager::GetInstance().GetHandle(kUiGraphName[static_cast<int>(m_lastSelectItem)]);
+			lastRightGraph.alpha = 255;
+			lastRightGraph.showPosX = kRightGraphPosX;
+			lastRightGraph.showPosY = kRightGraphPosY;
+		}
+
+		//右側に表示する画像を設定する
+		{
+			std::string name = "RightGraph";
+			auto& rightGraph = GetGraphRef(name);
+			rightGraph.handle = GraphManager::GetInstance().GetHandle(kUiGraphName[static_cast<int>(m_selectItem)]);
+			rightGraph.alpha = 0;
+			rightGraph.showPosX = kRightGraphPosX;
+
+			//下に動かしていた場合
+			if (static_cast<int>(m_selectItem) > static_cast<int>(m_lastSelectItem))
+			{
+				rightGraph.showPosY = kRightGraphPosY + kRightGraphMoveRange;
+			}
+			//上に動かしていた場合
+			else
+			{
+				rightGraph.showPosY = kRightGraphPosY - kRightGraphMoveRange;
+			}
+		}
 
 		//選択音を鳴らす
 		SoundManager::GetInstance().PlayOnceSound("Select");
@@ -280,8 +437,17 @@ void MenuUi::DrawItem()
 		//アルファ値が設定されていたらブレンドモードを変更する
 		if (data.alpha < 255) SetDrawBlendMode(DX_BLENDMODE_ALPHA, data.alpha);
 
-		DrawRotaGraph(data.showPosX, data.showPosY, 1.0, 0.0, data.handle, true);
-
+		//画像のサイズが指定されていたら
+		if (data.graphSizeX != 0 && data.graphSizeY != 0)
+		{
+			//切り取って描画
+			DrawRectRotaGraph(data.showPosX, data.showPosY, data.srcPosX, 0, data.graphSizeX, data.graphSizeY, 1.0, 0.0, data.handle, true);
+		}
+		else
+		{
+			//そのまま描画
+			DrawRotaGraph(data.showPosX, data.showPosY, 1.0, 0.0, data.handle, true);
+		}
 		if (data.alpha < 255) SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 
