@@ -139,6 +139,13 @@ namespace
 		"チュートリアルを終了する"
 	};
 
+	//チュートリアルの進め方で表示する文字列
+	const std::string kPlayMenuTutorialModeStrings[static_cast<int>(TutorialManager::TutorialMode::kModeNum)] =
+	{
+		"自動進行",
+		"リピート"
+	};
+
 	//スタートメニューで表示する文字列
 	const std::string kStartMenuStrings[static_cast<int>(TutorialUi::StartMenuItem::kItemNum)] =
 	{
