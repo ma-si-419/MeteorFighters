@@ -13,7 +13,7 @@ public:
 	{
 		kReset,
 		kChangeTutorial,
-		//kRepeat,
+		kChangeMode,
 		kSelectMenu,
 		kMenuEnd,
 		kTutorialEnd,
@@ -103,6 +103,12 @@ public:
 	void SetNowTutorialNumber(int number) { m_selectTutorialNumber = number; }
 
 	/// <summary>
+	/// 現在選択しているチュートリアルのモードを設定する
+	/// </summary>
+	/// <param name="mode">TutorialManager::TutorialModeをintにキャストして使用</param>
+	void SetNowTutorialMode(int mode) { m_nowTutorialMode = mode; }
+
+	/// <summary>
 	/// クリア演出が終わったかどうかを返す
 	/// </summary>
 	bool IsSuccessEnd() { return m_isSuccessEnd; }
@@ -186,6 +192,9 @@ private:
 
 	//選択しているチュートリアルの番号
 	int m_selectTutorialNumber;
+
+	//今行っているチュートリアルのモード
+	int m_nowTutorialMode;
 
 	//選択しているチュートリアルの左右の矢印の揺れ幅
 	float m_selectTutorialStringArrowPos;

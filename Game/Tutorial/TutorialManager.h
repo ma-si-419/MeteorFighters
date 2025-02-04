@@ -19,7 +19,6 @@ public:
 		kChargeEnergyAttack,
 		kSpecialAttack,
 		kGuard,
-		kJustGuard,
 		kFalls,
 		kReturn,
 		kSuperDash,
@@ -30,6 +29,7 @@ public:
 		kDownAttack,
 		kGuardUp,
 		kGuardDown,
+		kJustGuard,
 		kTutorialEnd,
 		kTutorialNum = kTutorialEnd
 	};
@@ -81,6 +81,15 @@ public:
 		kIsGround,
 		kButton
 	};
+
+	//チュートリアルの進め方
+	enum class TutorialMode
+	{
+		kAuto,
+		kRepeat,
+		kModeNum
+	};
+
 
 private:
 
@@ -179,6 +188,9 @@ private:
 
 	//現在の状況
 	TutorialSituation m_tutorialSituation;
+
+	//現在のチュートリアルの進め方
+	TutorialMode m_tutorialMode;
 
 	//チュートリアルのUI
 	std::shared_ptr<TutorialUi> m_pTutorialUi;

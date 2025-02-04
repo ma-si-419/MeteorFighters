@@ -123,7 +123,7 @@ namespace
 	constexpr int kPlayMenuTutorialNameSideArrowScale = 4;
 
 	//一つ目の高さ
-	constexpr int kPlayMenuStringPosY = 250;
+	constexpr int kPlayMenuStringPosY = 175;
 
 	//メニューの文字を表示する間隔
 	constexpr int kPlayMenuStringDistanceY = 110;
@@ -133,7 +133,7 @@ namespace
 	{
 		"状況をリセットする",
 		"チュートリアルを変更",
-//		"チュートリアルの進め方",
+		"チュートリアルの進め方",
 		"チュートリアルセレクトに戻る",
 		"メニューを閉じる",
 		"チュートリアルを終了する"
@@ -672,8 +672,8 @@ void TutorialUi::DrawPlayMenu()
 
 		//左右に動かせる文字の座標を横にずらす(別の処理にしたい)
 
-		if (i == static_cast<int>(TutorialUi::PlayMenuItem::kChangeTutorial)/*||
-			i == static_cast<int>(TutorialUi::PlayMenuItem::kRepeat)*/)
+		if (i == static_cast<int>(TutorialUi::PlayMenuItem::kChangeTutorial) ||
+			i == static_cast<int>(TutorialUi::PlayMenuItem::kChangeMode))
 		{
 			pos.x = kMoveMenuStringPosX;
 		}
@@ -695,6 +695,14 @@ void TutorialUi::DrawPlayMenu()
 	//左右の矢印
 	MyEngine::Vector2 leftArrowPos = MyEngine::Vector2(selectTutorialPos.x - leftGap - static_cast<float>(kPlayMenuFontSize), selectTutorialPos.y - static_cast<float>(kPlayMenuFontSize / 2));
 	MyEngine::Vector2 rightArrowPos = MyEngine::Vector2(selectTutorialPos.x + rightGap, selectTutorialPos.y - static_cast<float>(kPlayMenuFontSize / 2));
+
+	//左右の矢印を描画
+	DrawStringToHandle(static_cast<int>(leftArrowPos.x), static_cast<int>(leftArrowPos.y), "＜", GetColor(0, 0, 0), m_playMenuFontHandle, GetColor(255, 255, 255));
+	DrawStringToHandle(static_cast<int>(rightArrowPos.x), static_cast<int>(rightArrowPos.y), "＞", GetColor(0, 0, 0), m_playMenuFontHandle, GetColor(255, 255, 255));
+
+	//左右の矢印を一つ下のチュートリアルの進め方の横にも表示する
+	leftArrowPos.y += kPlayMenuStringDistanceY;
+	rightArrowPos.y += kPlayMenuStringDistanceY;
 
 	//左右の矢印を描画
 	DrawStringToHandle(static_cast<int>(leftArrowPos.x), static_cast<int>(leftArrowPos.y), "＜", GetColor(0, 0, 0), m_playMenuFontHandle, GetColor(255, 255, 255));
@@ -1365,7 +1373,7 @@ void TutorialUi::UpdatePlayMenu()
 
 		//サウンドを再生
 		SoundManager::GetInstance().PlayOnceSound("Select");
-		
+
 	}
 	//選択している項目が変化していなければ
 	else
@@ -1374,34 +1382,65 @@ void TutorialUi::UpdatePlayMenu()
 	}
 
 	//左右に動かせる項目であれば
-	if (m_playMenuSelectItem == PlayMenuItem::kChangeTutorial)
+	if (m_playMenuSelectItem == PlayMenuItem::kChangeTutorial ||
+		m_playMenuSelectItem == PlayMenuItem::kChangeMode)
 	{
-		int last = m_selectTutorialNumber;
+		int last = -1;
+		int now = -1;
+
+		//選択している項目
+		if (m_playMenuSelectItem == PlayMenuItem::kChangeTutorial)
+		{
+			last = m_selectTutorialNumber;
+			now = m_selectTutorialNumber;
+		}
+		else if (m_playMenuSelectItem == PlayMenuItem::kChangeMode)
+		{
+			last = m_nowTutorialMode;
+			now = m_nowTutorialMode;
+		}
 
 		//右を押したら
 		if (input->IsTrigger("Right"))
 		{
-			m_selectTutorialNumber++;
+			now++;
 
-			//一番右で右入力した場合
-			if (m_selectTutorialNumber >= static_cast<int>(TutorialManager::TutorialKind::kTutorialNum))
-			{
-				//一番左に移動する
-				m_selectTutorialNumber = 0;
-			}
 
 		}
-
 		//左を押したら
-		if (input->IsTrigger("Left"))
+		else if (input->IsTrigger("Left"))
 		{
-			m_selectTutorialNumber--;
+			now--;
+		}
 
+		if (m_playMenuSelectItem == PlayMenuItem::kChangeTutorial)
+		{
+			//一番右で右入力した場合
+			if (now >= static_cast<int>(TutorialManager::TutorialKind::kTutorialNum))
+			{
+				//一番左に移動する
+				now = 0;
+			}
 			//一番左で左入力した場合
-			if (m_selectTutorialNumber < 0)
+			else if (now < 0)
 			{
 				//一番右に移動する
-				m_selectTutorialNumber = static_cast<int>(TutorialManager::TutorialKind::kTutorialNum) - 1;
+				now = static_cast<int>(TutorialManager::TutorialKind::kTutorialNum) - 1;
+			}
+		}
+		else if (m_playMenuSelectItem == PlayMenuItem::kChangeMode)
+		{
+			//一番右で右入力した場合
+			if (now >= static_cast<int>(TutorialManager::TutorialMode::kModeNum))
+			{
+				//一番左に移動する
+				now = 0;
+			}
+			//一番左で左入力した場合
+			else if (now < 0)
+			{
+				//一番右に移動する
+				now = static_cast<int>(TutorialManager::TutorialMode::kModeNum) - 1;
 			}
 		}
 
@@ -1410,20 +1449,29 @@ void TutorialUi::UpdatePlayMenu()
 		{
 			if (input->GetPressTime("Right") > kPlayMenuChangeTutorialRepeatInputTime)
 			{
-				m_selectTutorialNumber++;
+				now++;
 			}
 			else if (input->GetPressTime("Left") > kPlayMenuChangeTutorialRepeatInputTime)
 			{
-				m_selectTutorialNumber--;
+				now--;
 			}
 		}
 
-		//クランプ
-		m_selectTutorialNumber = max(m_selectTutorialNumber, 0);
-		m_selectTutorialNumber = min(m_selectTutorialNumber, static_cast<int>(TutorialManager::TutorialKind::kTutorialNum) - 1);
-	
+		if (m_playMenuSelectItem == PlayMenuItem::kChangeTutorial)
+		{
+			//クランプ
+			now = max(now, 0);
+			now = min(now, static_cast<int>(TutorialManager::TutorialKind::kTutorialNum) - 1);
+		}
+		else if (m_playMenuSelectItem == PlayMenuItem::kChangeMode)
+		{
+			//クランプ
+			now = max(now, 0);
+			now = min(now, static_cast<int>(TutorialManager::TutorialMode::kModeNum) - 1);
+		}
+
 		//選択している項目が変化していたら
-		if (last != m_selectTutorialNumber)
+		if (last != now)
 		{
 			//変化してから何フレーム立ったかをリセットする
 			m_selectItemMoveTime = 0;
@@ -1431,7 +1479,18 @@ void TutorialUi::UpdatePlayMenu()
 			//サウンドを再生
 			SoundManager::GetInstance().PlayOnceSound("Select");
 		}
+
+		//選択している項目を更新
+		if (m_playMenuSelectItem == PlayMenuItem::kChangeTutorial)
+		{
+			m_selectTutorialNumber = now;
+		}
+		else if (m_playMenuSelectItem == PlayMenuItem::kChangeMode)
+		{
+			m_nowTutorialMode = now;
+		}
 	}
+
 	//左右の矢印を揺らす
 	m_selectTutorialStringArrowPos += kPlayMenuTutorialNameSideArrowSpeed;
 

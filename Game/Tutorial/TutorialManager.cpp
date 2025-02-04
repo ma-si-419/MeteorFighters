@@ -108,7 +108,8 @@ TutorialManager::TutorialManager(std::shared_ptr<GameCamera> camera) :
 	m_nowTutorial(TutorialKind::kMove),
 	m_drawSituationFunc(&TutorialManager::DrawPlayMenu),
 	m_updateSituationFunc(&TutorialManager::UpdatePlayMenu),
-	m_tutorialSituation(TutorialSituation::kPlayMenu)
+	m_tutorialSituation(TutorialSituation::kPlayMenu),
+	m_tutorialMode(TutorialMode::kAuto)
 {
 	m_pTutorialUi = std::make_shared<TutorialUi>();
 
@@ -460,23 +461,27 @@ void TutorialManager::UpdateSelectMenu()
 	//入力情報
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
-	//決定ボタンが押されたら
-	if (input->IsTrigger("A"))
+	//選択できる状況であれば
+	if (m_pTutorialUi->IsSelectSelectMenu())
 	{
-		m_nowTutorial = kTutorialKindMap.at(m_pTutorialUi->GetSelectTutorialName());
+		//決定ボタンが押されたら
+		if (input->IsTrigger("A"))
+		{
+			m_nowTutorial = kTutorialKindMap.at(m_pTutorialUi->GetSelectTutorialName());
 
-		ChangeSituation(TutorialSituation::kStart);
+			ChangeSituation(TutorialSituation::kStart);
 
-		//サウンドを再生する
-		SoundManager::GetInstance().PlayOnceSound("Ok");
+			//サウンドを再生する
+			SoundManager::GetInstance().PlayOnceSound("Ok");
 
-	}
-	//戻るボタンが押されたら
-	else if (input->IsTrigger("B"))
-	{
-		ChangeSituation(TutorialSituation::kStartMenu);
-		//サウンドを再生する
-		SoundManager::GetInstance().PlayOnceSound("Cancel");
+		}
+		//戻るボタンが押されたら
+		else if (input->IsTrigger("B"))
+		{
+			ChangeSituation(TutorialSituation::kStartMenu);
+			//サウンドを再生する
+			SoundManager::GetInstance().PlayOnceSound("Cancel");
+		}
 	}
 
 	//カメラの更新を行う
