@@ -108,8 +108,7 @@ TutorialManager::TutorialManager(std::shared_ptr<GameCamera> camera) :
 	m_nowTutorial(TutorialKind::kMove),
 	m_drawSituationFunc(&TutorialManager::DrawPlayMenu),
 	m_updateSituationFunc(&TutorialManager::UpdatePlayMenu),
-	m_tutorialSituation(TutorialSituation::kPlayMenu),
-	m_tutorialMode(TutorialMode::kAuto)
+	m_tutorialSituation(TutorialSituation::kPlayMenu)
 {
 	m_pTutorialUi = std::make_shared<TutorialUi>();
 
@@ -342,12 +341,23 @@ void TutorialManager::UpdatePlayMenu()
 	if (isEnd)
 	{
 		ChangeSituation(nextSituation);
+
+		for (auto& item : m_successTutorialKinds)
+		{
+			item.second = false;
+		}
 	}
 }
 
 void TutorialManager::UpdateStart()
 {
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
+
+	//クリア判定をリセット
+	for (auto& item : m_successTutorialKinds)
+	{
+		item.second = false;
+	}
 
 	if (input->IsTrigger("A"))
 	{
@@ -380,6 +390,7 @@ void TutorialManager::UpdatePlaying()
 	//成功条件
 	std::vector<TutorialSuccessKind> successTerms;
 
+
 	//外部データから成功条件を取得
 	for (auto& data : m_tutorialPlayData)
 	{
@@ -405,6 +416,7 @@ void TutorialManager::UpdatePlaying()
 		}
 	}
 
+
 	for (auto item : successTerms)
 	{
 		//ここでクリアしているかを確認
@@ -414,6 +426,12 @@ void TutorialManager::UpdatePlaying()
 			isSuccess = false;
 		}
 	}
+
+	if (m_pTutorialUi->GetNowTutorialMode() == static_cast<int>(TutorialManager::TutorialMode::kStop))
+	{
+		isSuccess = false;
+	}
+
 
 	//クリアしたかどうかをUiに送る
 	m_pTutorialUi->SetSuccessTutorial(isSuccess);
@@ -434,7 +452,17 @@ void TutorialManager::UpdateSuccess()
 	//クリア演出が終わっていたら次のメニューに移る
 	if (m_pTutorialUi->IsSuccessEnd())
 	{
-		m_nowTutorial = static_cast<TutorialKind>(static_cast<int>(m_nowTutorial) + 1);
+		//モードによって次に進むかどうかを変える
+		if (m_pTutorialUi->GetNowTutorialMode() == static_cast<int>(TutorialMode::kAuto))
+		{
+			//次のチュートリアルに進む
+			m_nowTutorial = static_cast<TutorialKind>(static_cast<int>(m_nowTutorial) + 1);
+		}
+		else if (m_pTutorialUi->GetNowTutorialMode() == static_cast<int>(TutorialMode::kRepeat))
+		{
+			//同じチュートリアルを繰り返す
+		}
+
 
 		for (auto& item : m_successTutorialKinds)
 		{

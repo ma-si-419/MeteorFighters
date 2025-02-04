@@ -143,7 +143,8 @@ namespace
 	const std::string kPlayMenuTutorialModeStrings[static_cast<int>(TutorialManager::TutorialMode::kModeNum)] =
 	{
 		"自動進行",
-		"リピート"
+		"リピート",
+		"進めない"
 	};
 
 	//スタートメニューで表示する文字列
@@ -239,7 +240,8 @@ TutorialUi::TutorialUi() :
 	m_isSelectStartMenu(false),
 	m_isSelectSelectMenu(false),
 	m_selectMenuIndexX(0),
-	m_selectMenuIndexY(0)
+	m_selectMenuIndexY(0),
+	m_nowTutorialMode(0)
 {
 	LoadCsv load;
 
@@ -691,7 +693,7 @@ void TutorialUi::DrawPlayMenu()
 	}
 
 	//選択しているチュートリアルを表示する
-	MyEngine::Vector2 selectTutorialPos = MyEngine::Vector2(kPlayMenuTutorialNamePosX, kPlayMenuStringPosY + kPlayMenuStringDistanceY);
+	MyEngine::Vector2 selectTutorialPos = MyEngine::Vector2(kPlayMenuTutorialNamePosX, kPlayMenuStringPosY + kPlayMenuStringDistanceY * static_cast<int>(PlayMenuItem::kChangeTutorial));
 	std::string selectTutorialName = m_tutorialPlayData[m_selectTutorialNumber][static_cast<int>(TutorialManager::TutorialPlayDataIndex::kTutorialName)];
 	DrawStringCenter(selectTutorialName, selectTutorialPos, m_playMenuFontHandle, GetColor(0, 0, 0), GetColor(255, 255, 255));
 
@@ -706,8 +708,13 @@ void TutorialUi::DrawPlayMenu()
 	//左右の矢印を描画
 	DrawStringToHandle(static_cast<int>(leftArrowPos.x), static_cast<int>(leftArrowPos.y), "＜", GetColor(0, 0, 0), m_playMenuFontHandle, GetColor(255, 255, 255));
 	DrawStringToHandle(static_cast<int>(rightArrowPos.x), static_cast<int>(rightArrowPos.y), "＞", GetColor(0, 0, 0), m_playMenuFontHandle, GetColor(255, 255, 255));
+	
+	//チュートリアルの進め方を表示する
+	MyEngine::Vector2 tutorialModePos = MyEngine::Vector2(kPlayMenuTutorialNamePosX, kPlayMenuStringPosY + kPlayMenuStringDistanceY * static_cast<int>(PlayMenuItem::kChangeMode));
+	std::string tutorialModeString = kPlayMenuTutorialModeStrings[static_cast<int>(m_nowTutorialMode)];
+	DrawStringCenter(tutorialModeString, tutorialModePos, m_playMenuFontHandle, GetColor(0, 0, 0), GetColor(255, 255, 255));
 
-	//左右の矢印を一つ下のチュートリアルの進め方の横にも表示する
+	//左右の矢印をチュートリアルの進め方の横にも表示する
 	leftArrowPos.y += kPlayMenuStringDistanceY;
 	rightArrowPos.y += kPlayMenuStringDistanceY;
 
@@ -1519,6 +1526,7 @@ void TutorialUi::UpdateStart()
 
 void TutorialUi::UpdatePlaying()
 {
+	//成功していたら
 	if (m_isSuccessTutorial)
 	{
 		InitSuccess();

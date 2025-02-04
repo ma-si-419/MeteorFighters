@@ -103,10 +103,10 @@ public:
 	void SetNowTutorialNumber(int number) { m_selectTutorialNumber = number; }
 
 	/// <summary>
-	/// 現在選択しているチュートリアルのモードを設定する
+	/// 現在選択しているチュートリアルのモードを取得する
 	/// </summary>
-	/// <param name="mode">TutorialManager::TutorialModeをintにキャストして使用</param>
-	void SetNowTutorialMode(int mode) { m_nowTutorialMode = mode; }
+	/// <returns></returns>
+	int GetNowTutorialMode() { return m_nowTutorialMode; }
 
 	/// <summary>
 	/// クリア演出が終わったかどうかを返す
