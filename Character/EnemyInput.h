@@ -232,4 +232,8 @@ private:
 
 	//AIレベル
 	AiLevel m_aiLevel;
+
+	//プレイヤーが操作するか
+	bool m_isPlayerControl;
+
 };

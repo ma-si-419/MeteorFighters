@@ -8,6 +8,7 @@
 #include "Effect.h"
 #include "GameSceneConstant.h"
 #include "TutorialManager.h"
+#include "SoundManager.h"
 
 namespace
 {
@@ -25,10 +26,14 @@ namespace
 
 	//エフェクトのループエンドフレーム
 	constexpr int kEffectEndFrame = 33;
+
+	//サウンドを鳴らす間隔
+	constexpr int kSoundInterval = 10;
 }
 
 CharacterStateCharge::CharacterStateCharge(std::shared_ptr<Character> character) :
-	CharacterStateBase(character)
+	CharacterStateBase(character),
+	m_soundTime(0)
 {
 }
 
@@ -54,6 +59,14 @@ void CharacterStateCharge::Enter()
 
 void CharacterStateCharge::Update()
 {
+	m_soundTime++;
+
+	//サウンドを鳴らす間隔で鳴らす
+	if (m_soundTime > kSoundInterval)
+	{
+		SoundManager::GetInstance().PlayOnceSound("Charge");
+		m_soundTime = 0;
+	}
 
 	auto input = GetCharacterInput();
 

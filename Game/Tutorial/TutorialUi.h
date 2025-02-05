@@ -100,7 +100,7 @@ public:
 	/// 現在選択しているチュートリアル番号を設定する
 	/// </summary>
 	/// <param name="number">現在行っているチュートリアル番号</param>
-	void SetNowTutorialNumber(int number) { m_selectTutorialNumber = number; }
+	void SetTutorialNumber(int number) { m_selectTutorialNumber = number; }
 
 	/// <summary>
 	/// 現在選択しているチュートリアルのモードを取得する

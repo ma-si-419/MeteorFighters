@@ -72,7 +72,7 @@ namespace
 GameManagerBase::GameManagerBase(std::shared_ptr<GameCamera> camera, GameManagerBase::GameKind kind) :
 	m_time(0),
 	m_alpha(0),
-	m_nextScene(Game::Scene::kGame),
+	m_nextScene(Game::Scene::kBattle),
 	m_situation(BattleSituation::kStart1P),
 	m_gameKind(kind),
 	m_buttonBashingTime(0),
@@ -560,9 +560,6 @@ void GameManagerBase::UpdateButtonBashing()
 	{
 		m_isButtonBashing = false;
 		m_pCamera->SetBattleCamera();
-
-		//ボタン連打終了時のサウンドの音量を設定する
-		SoundManager::GetInstance().SetSoundVolume("WinButtonBashing", kWinButtonBashingSoundVolume);
 
 		//ボタン連打終了のサウンドを再生する
 		SoundManager::GetInstance().PlayOnceSound("WinButtonBashing");

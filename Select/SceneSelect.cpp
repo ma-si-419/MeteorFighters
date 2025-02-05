@@ -44,7 +44,7 @@ void SceneSelect::Update()
 	if (!m_sceneManager.IsChangeScene())
 	{
 		//ƒQ[ƒ€ƒV[ƒ“‚Ìê‡
-		if (nextScene == Game::Scene::kGame)
+		if (nextScene == Game::Scene::kBattle)
 		{
 			std::shared_ptr<SceneGame> next = std::make_shared<SceneGame>(m_sceneManager);
 

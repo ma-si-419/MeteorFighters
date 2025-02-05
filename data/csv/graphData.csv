@@ -13,6 +13,15 @@ ItemBox,ItemBox,Menu
 Battle,MenuBattleGraph,Menu
 GameEnd,MenuGameEndGraph,Menu
 Tutorial,MenuTutorialGraph,Menu
+Option,MenuOptionGraph,Menu
+OptionMenu,Menu,Menu
+Thumb,OptionThumb,Menu
+ThumbSelect,OptionSelectThumb,Menu
+Bar,OptionBar,Menu
+MinSound,OptionNoSound,Menu
+MaxSound,OptionMaxSound,Menu
+A,OptionA,Menu
+B,OptionB,Menu
 HpBar,HpBar,Game
 HpBarNum,HpBarNumBox,Game
 Winner,Winner,Game

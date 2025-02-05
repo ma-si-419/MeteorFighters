@@ -38,5 +38,6 @@ private:
 
 	//UŒ‚“ü—Í‚³‚ê‚½‚©‚Ç‚¤‚©
 	bool m_isAttackInput;
+
 };
 

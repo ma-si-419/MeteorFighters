@@ -166,6 +166,7 @@
     <ClCompile Include="Character\State\CharacterStateSpecialAttack.cpp" />
     <ClCompile Include="Character\State\CharacterStateIdle.cpp" />
     <ClCompile Include="Game\Effect.cpp" />
+    <ClCompile Include="MenuManager.cpp" />
     <ClCompile Include="MyEngine\Utility\EffectManager.cpp" />
     <ClCompile Include="Character\EnemyInput.cpp" />
     <ClCompile Include="Game\GameCamera.cpp" />
@@ -225,6 +226,7 @@
     <ClInclude Include="Character\State\CharacterStateRush.h" />
     <ClInclude Include="Character\State\CharacterStateSpecialAttack.h" />
     <ClInclude Include="Game\Effect.h" />
+    <ClInclude Include="MenuManager.h" />
     <ClInclude Include="MyEngine\Utility\EffectManager.h" />
     <ClInclude Include="Character\EnemyInput.h" />
     <ClInclude Include="Game.h" />

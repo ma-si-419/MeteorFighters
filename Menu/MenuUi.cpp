@@ -52,7 +52,7 @@ namespace
 	{
 		"CPUとバトル",
 		"チュートリアル",
-		"タイトルに戻る",
+		"オプション",
 		"ゲームを終了する",
 	};
 
@@ -61,12 +61,21 @@ namespace
 	{
 		"Battle",
 		"Tutorial",
-		"SelectItemBox",
+		"Option",
 		"GameEnd"
 	};
 
 	//フォントの名前
 	const TCHAR* kFontName = "GN-キルゴUかなNB";
+
+	//選択肢のフォントサイズ
+	constexpr int kSelectItemFontSize = 64;
+
+	//オプションのフォントサイズ
+	constexpr int kOptionFontSize = 40;
+
+	//オプションの右下の文字のフォントサイズ
+	constexpr int kOptionButtonStringFontSize = 28;
 
 	//右側に表示する画像の大きさ
 	constexpr int kRightGraphSize = 680;
@@ -89,25 +98,89 @@ namespace
 
 	//右側の画像の切り替える数
 	constexpr int kRightGraphChangeNum = 1;
+
+	//オプションのシークバーの位置
+	constexpr int kOptionBarPosX = Game::kWindowWidth / 2;
+	constexpr int kOptionBarPosY = 230;
+
+	//シークバーの間隔
+	constexpr int kOptionBarInterval = 165;
+
+	//オプションの文字列を表示する座標
+	constexpr int kOptionStringPosX = 360;
+	constexpr int kOptionStringPosY = 135;
+
+	//オプションの文字列
+	const std::string kOptionString[static_cast<int>(SoundManager::OptionSoundKind::kOptionSoundKindNum)] =
+	{
+		"MASTER",
+		"SE",
+		"BGM",
+		"VOICE"
+	};
+
+	//オプションのシークバーの長さ
+	constexpr int kOptionBarLength = 764;
+
+	//シークバーの端の画像をどのくらいずらして表示するか
+	constexpr int kOptionBarMarkShiftLange = 63;
+
+	//オプションのシークバーを動かす速度
+	constexpr float kOptionBarMoveSpeed = 0.01f;
+
+	//シークバーの最大拡大率
+	constexpr float kThumbMaxScale = 1.4f;
+
+	//シークバーの最小拡大率
+	constexpr float kThumbMinScale = 1.3f;
+
+	//シークバーの拡大率の変化速度
+	constexpr float kThumbScaleSpeed = 0.2f;
+
+	//オプションのボタンを表示する座標
+	constexpr int kOptionButtonPosX = 1146;
+	constexpr int kOptionButtonPosY = 782;
+
+	//オプションのボタンの説明を表示する座標
+	constexpr int kOptionButtonStringPosX = 1150;
+	constexpr int kOptionButtonStringPosY = 770;
+
+	//オプションのフェードインの速さ
+	constexpr int kOptionFadeInSpeed = 20;
 }
 
 
 MenuUi::MenuUi() :
 	m_selectItemFontHandle(-1),
-	m_selectItem(SelectItem::kBattle),
+	m_selectItem(SelectItem::kSelect),
 	m_selectItemMoveTime(0),
 	m_skyDomeHandle(-1),
-	m_lastSelectItem(SelectItem::kBattle),
+	m_lastSelectItem(SelectItem::kSelect),
 	m_rightGraphSrcNum(0),
-	m_rightGraphChangeTime(0)
+	m_rightGraphChangeTime(0),
+	m_optionSelectItem(0),
+	m_isMoveSeekBar(false),
+	m_thumbSize(0),
+	m_optionFontHandle(-1),
+	m_optionAlpha(0),
+	m_isEndOption(false)
 {
-	m_selectItemFontHandle = CreateFontToHandle(kFontName, 64, 0, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
+	m_selectItemFontHandle = CreateFontToHandle(kFontName, kSelectItemFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
+	m_optionFontHandle = CreateFontToHandle(kFontName, kOptionFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
+	m_optionButtonFontHandle = CreateFontToHandle(kFontName, kOptionButtonStringFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
+
+
 	m_skyDomeHandle = MV1LoadModel("data/model/Dome.mv1");
+
+	m_updateFunc = &MenuUi::UpdateSelect;
+	m_drawFunc = &MenuUi::DrawNone;
 }
 
 MenuUi::~MenuUi()
 {
 	DeleteFontToHandle(m_selectItemFontHandle);
+	DeleteFontToHandle(m_optionFontHandle);
+	DeleteFontToHandle(m_optionButtonFontHandle);
 }
 
 void MenuUi::Init()
@@ -118,13 +191,12 @@ void MenuUi::Init()
 	//NearFarの設定
 	SetCameraNearFar(kCameraNear, kCameraFar);
 
-
 	//文字列を設定する
 	for (int i = 0; i < static_cast<int>(SelectItem::kItemNum); i++)
 	{
-		m_stringUi[i].showPosX = kStringUiPosX;
-		m_stringUi[i].showPosY = kStringUiPosY[i];
-		m_stringUi[i].showString = kUiString[i];
+		m_selectStringUi[i].showPosX = kStringUiPosX;
+		m_selectStringUi[i].showPosY = kStringUiPosY[i];
+		m_selectStringUi[i].showString = kUiString[i];
 	}
 
 	//選択できる項目のボックスの画像を設定する
@@ -190,6 +262,69 @@ void MenuUi::Init()
 
 int MenuUi::Update()
 {
+	//更新処理
+	UpdateCommon();
+
+	//選択肢の更新
+	int selectItem = (this->*m_updateFunc)();
+
+	return selectItem;
+}
+
+void MenuUi::DrawItem()
+{
+	//画像をすべて表示する
+	for (auto item : m_selectGraphMap)
+	{
+		auto data = item.second;
+
+		//アルファ値が設定されていたらブレンドモードを変更する
+		if (data.alpha < 255) SetDrawBlendMode(DX_BLENDMODE_ALPHA, data.alpha);
+
+		//画像のサイズが指定されていたら
+		if (data.graphSizeX != 0 && data.graphSizeY != 0)
+		{
+			//切り取って描画
+			DrawRectRotaGraph(data.showPosX, data.showPosY, data.srcPosX, 0, data.graphSizeX, data.graphSizeY, 1.0, 0.0, data.handle, true);
+		}
+		else
+		{
+			//そのまま描画
+			DrawRotaGraph(data.showPosX, data.showPosY, 1.0, 0.0, data.handle, true);
+		}
+		if (data.alpha < 255) SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
+
+	//選択肢を表示する
+	for (auto item : m_selectStringUi)
+	{
+		//描画処理
+		DrawStringToHandle(item.showPosX, item.showPosY, item.showString.c_str(), GetColor(255, 255, 255), m_selectItemFontHandle, GetColor(0, 0, 0));
+	}
+
+	//オプションやゲーム終了の画像を表示する
+	(this->*m_drawFunc)();
+}
+
+void MenuUi::DrawModel()
+{
+	MV1DrawModel(m_skyDomeHandle);
+}
+
+void MenuUi::EntryGraph(std::string name, GraphUiStatus status)
+{
+	m_selectGraphMap[name] = status;
+}
+
+MenuUi::GraphUiStatus& MenuUi::GetGraphRef(std::string name)
+{
+	MenuUi::GraphUiStatus& ans = m_selectGraphMap[name];
+
+	return ans;
+}
+
+void MenuUi::UpdateCommon()
+{
 	//スカイドームを回転させる
 	MV1SetRotationXYZ(m_skyDomeHandle, VGet(0, MV1GetRotationXYZ(m_skyDomeHandle).y + kCameraRotaSpeed, 0));
 
@@ -219,7 +354,7 @@ int MenuUi::Update()
 	{
 		//右側に表示していた画像を上に動かす
 		lastRightGraph.showPosY -= kRightGraphMoveSpeed;
-				 
+
 		//右側に表示する画像を上に動かす
 		rightGraph.showPosY -= kRightGraphMoveSpeed;
 		//動かしすぎないように補正
@@ -259,12 +394,12 @@ int MenuUi::Update()
 	auto& selectItemBox = GetGraphRef("SelectItemBox");
 
 	//選択している選択肢を右に動かす
-	if (m_stringUi[static_cast<int>(m_selectItem)].showPosX < kStringUiPosX + kShowUiMoveRange)
+	if (m_selectStringUi[static_cast<int>(m_selectItem)].showPosX < kStringUiPosX + kShowUiMoveRange)
 	{
 		//右に動かす
-		m_stringUi[static_cast<int>(m_selectItem)].showPosX += kShowUiMoveSpeed;
+		m_selectStringUi[static_cast<int>(m_selectItem)].showPosX += kShowUiMoveSpeed;
 		//行きすぎたら戻す
-		m_stringUi[static_cast<int>(m_selectItem)].showPosX = min(m_stringUi[static_cast<int>(m_selectItem)].showPosX, kStringUiPosX + kShowUiMoveRange);
+		m_selectStringUi[static_cast<int>(m_selectItem)].showPosX = min(m_selectStringUi[static_cast<int>(m_selectItem)].showPosX, kStringUiPosX + kShowUiMoveRange);
 
 		//裏側のボックスも一緒に動かす
 
@@ -295,9 +430,9 @@ int MenuUi::Update()
 		if (static_cast<int>(m_selectItem) != i)
 		{
 			//左に動かす
-			m_stringUi[i].showPosX -= kShowUiMoveSpeed;
+			m_selectStringUi[i].showPosX -= kShowUiMoveSpeed;
 			//動かしすぎないように補正
-			m_stringUi[i].showPosX = max(m_stringUi[i].showPosX, kStringUiPosX);
+			m_selectStringUi[i].showPosX = max(m_selectStringUi[i].showPosX, kStringUiPosX);
 
 			//後ろのボックスも一緒に動かす
 			std::string name = "ItemBox";
@@ -309,7 +444,10 @@ int MenuUi::Update()
 			itemBox.showPosX = max(itemBox.showPosX, kItemBoxUiPosX);
 		}
 	}
+}
 
+int MenuUi::UpdateSelect()
+{
 	//上下入力で選択している項目を変化させる
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
@@ -322,7 +460,6 @@ int MenuUi::Update()
 	//トリガー入力
 	if (input->IsTrigger("Up"))
 	{
-
 		//上にカーソルを動かす
 		selectItem--;
 
@@ -364,6 +501,9 @@ int MenuUi::Update()
 	selectItem = min(selectItem, static_cast<int>(SelectItem::kItemNum) - 1);
 
 	m_selectItem = static_cast<SelectItem>(selectItem);
+
+	//選択している選択肢の裏側
+	auto& selectItemBox = GetGraphRef("SelectItemBox");
 
 	//カーソルが動いていたら
 	if (m_selectItem != lastItem)
@@ -417,62 +557,357 @@ int MenuUi::Update()
 		m_selectItemMoveTime++;
 	}
 
+	int ans = -1;
+
+	//決定ボタンを押したら
 	if (input->IsTrigger("A"))
 	{
 		SoundManager::GetInstance().PlayOnceSound("Ok");
 
-		return static_cast<int>(m_selectItem);
-	}
-
-	return -1;
-}
-
-void MenuUi::DrawItem()
-{
-	//画像をすべて表示する
-	for (auto item : m_graphMap)
-	{
-		auto data = item.second;
-
-		//アルファ値が設定されていたらブレンドモードを変更する
-		if (data.alpha < 255) SetDrawBlendMode(DX_BLENDMODE_ALPHA, data.alpha);
-
-		//画像のサイズが指定されていたら
-		if (data.graphSizeX != 0 && data.graphSizeY != 0)
+		//オプションを選択していたら
+		if (m_selectItem == SelectItem::kOption)
 		{
-			//切り取って描画
-			DrawRectRotaGraph(data.showPosX, data.showPosY, data.srcPosX, 0, data.graphSizeX, data.graphSizeY, 1.0, 0.0, data.handle, true);
+			//オプションの更新関数を設定する
+			m_updateFunc = &MenuUi::UpdateOption;
+			//オプションの描画関数を設定する
+			m_drawFunc = &MenuUi::DrawOption;
+
+			//オプションのアルファ値を初期化する
+			m_optionAlpha = 0;
+			//シークバーを動かすかどうかを初期化する
+			m_isMoveSeekBar = false;
+
+			m_isEndOption = false;
+
+			//音声の音量を取得する
+			m_seVolume = SoundManager::GetInstance().GetVolume(SoundManager::OptionSoundKind::kSe);
+			m_bgmVolume = SoundManager::GetInstance().GetVolume(SoundManager::OptionSoundKind::kBgm);
+			m_voiceVolume = SoundManager::GetInstance().GetVolume(SoundManager::OptionSoundKind::kVoice);
+			m_masterVolume = SoundManager::GetInstance().GetVolume(SoundManager::OptionSoundKind::kMaster);
+		}
+		//ゲーム終了を選択していたら
+		else if (m_selectItem == SelectItem::kEndGame)
+		{
+			//ゲーム終了の更新関数を設定する
+			m_updateFunc = &MenuUi::UpdateEndGame;
+			//ゲーム終了の描画関数を設定する
+			m_drawFunc = &MenuUi::DrawEndGame;
 		}
 		else
 		{
-			//そのまま描画
-			DrawRotaGraph(data.showPosX, data.showPosY, 1.0, 0.0, data.handle, true);
+			//選択している項目を返す
+			ans = static_cast<int>(m_selectItem);
 		}
-		if (data.alpha < 255) SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
-
-	//選択肢を表示する
-	for (auto item : m_stringUi)
-	{
-		//描画処理
-		DrawStringToHandle(item.showPosX, item.showPosY, item.showString.c_str(), GetColor(255, 255, 255), m_selectItemFontHandle, GetColor(0, 0, 0));
-	}
-
-}
-
-void MenuUi::DrawModel()
-{
-	MV1DrawModel(m_skyDomeHandle);
-}
-
-void MenuUi::EntryGraph(std::string name, GraphUiStatus status)
-{
-	m_graphMap[name] = status;
-}
-
-MenuUi::GraphUiStatus& MenuUi::GetGraphRef(std::string name)
-{
-	MenuUi::GraphUiStatus& ans = m_graphMap[name];
 
 	return ans;
+
+}
+
+int MenuUi::UpdateOption()
+{
+	auto input = MyEngine::Input::GetInstance().GetInputData(0);
+	auto& soundManager = SoundManager::GetInstance();
+
+	//オプションの更新処理
+
+	//アルファ値をあげていく
+	if (!m_isEndOption)
+	{
+		m_optionAlpha += kOptionFadeInSpeed;
+		if (m_optionAlpha >= 255)
+		{
+			m_optionAlpha = 255;
+		}
+		else
+		{
+			return -1;
+		}
+	}
+	else
+	{
+		m_optionAlpha -= kOptionFadeInSpeed;
+
+		if (m_optionAlpha < 0)
+		{
+			//セレクトモードに戻る
+			m_updateFunc = &MenuUi::UpdateSelect;
+			m_drawFunc = &MenuUi::DrawNone;
+		}
+		return -1;
+	}
+
+	//シークバーを動かすかどうかがfalseの時
+	if (!m_isMoveSeekBar)
+	{
+		//上入力がされていたら
+		if (MyEngine::Input::GetInstance().GetInputData(0)->IsTrigger("Up"))
+		{
+			m_optionSelectItem--;
+
+			//最小値よりも小さくなったら
+			if (m_optionSelectItem < 0)
+			{
+				//最大値に戻す
+				m_optionSelectItem = static_cast<int>(SoundManager::OptionSoundKind::kOptionSoundKindNum) - 1;
+			}
+		}
+		//下入力がされていたら
+		else if (MyEngine::Input::GetInstance().GetInputData(0)->IsTrigger("Down"))
+		{
+			m_optionSelectItem++;
+			//最大値を超えたら
+			if (m_optionSelectItem >= static_cast<int>(SoundManager::OptionSoundKind::kOptionSoundKindNum))
+			{
+				//最小値に戻す
+				m_optionSelectItem = 0;
+			}
+		}
+
+		//Bボタンが押されたら
+		if (input->IsTrigger("B"))
+		{
+			m_isEndOption = true;
+
+			//キャンセルサウンドを鳴らす
+			SoundManager::GetInstance().PlayOnceSound("Cancel");
+		}
+	}
+	//シークバーを動かす時
+	else
+	{
+		//左入力がされていたら
+		if (input->IsPress("Left"))
+		{
+			//選択しているシークバーの音量を下げる
+			if (m_optionSelectItem == static_cast<int>(SoundManager::OptionSoundKind::kSe))
+			{
+				m_seVolume -= kOptionBarMoveSpeed;
+			}
+			else if (m_optionSelectItem == static_cast<int>(SoundManager::OptionSoundKind::kBgm))
+			{
+				m_bgmVolume -= kOptionBarMoveSpeed;
+			}
+			else if (m_optionSelectItem == static_cast<int>(SoundManager::OptionSoundKind::kVoice))
+			{
+				m_voiceVolume -= kOptionBarMoveSpeed;
+			}
+			else if (m_optionSelectItem == static_cast<int>(SoundManager::OptionSoundKind::kMaster))
+			{
+				m_masterVolume -= kOptionBarMoveSpeed;
+			}
+		}
+		//右入力がされていたら
+		else if (input->IsPress("Right"))
+		{
+			//選択しているシークバーの音量を上げる
+			if (m_optionSelectItem == static_cast<int>(SoundManager::OptionSoundKind::kSe))
+			{
+				m_seVolume += kOptionBarMoveSpeed;
+			}
+			else if (m_optionSelectItem == static_cast<int>(SoundManager::OptionSoundKind::kBgm))
+			{
+				m_bgmVolume += kOptionBarMoveSpeed;
+			}
+			else if (m_optionSelectItem == static_cast<int>(SoundManager::OptionSoundKind::kVoice))
+			{
+				m_voiceVolume += kOptionBarMoveSpeed;
+			}
+			else if (m_optionSelectItem == static_cast<int>(SoundManager::OptionSoundKind::kMaster))
+			{
+				m_masterVolume += kOptionBarMoveSpeed;
+			}
+		}
+
+		//音量のクランプ
+		m_seVolume = fmax(m_seVolume, 0.0f);
+		m_seVolume = fmin(m_seVolume, 1.0f);
+
+		m_bgmVolume = fmax(m_bgmVolume, 0.0f);
+		m_bgmVolume = fmin(m_bgmVolume, 1.0f);
+
+		m_voiceVolume = fmax(m_voiceVolume, 0.0f);
+		m_voiceVolume = fmin(m_voiceVolume, 1.0f);
+
+		m_masterVolume = fmax(m_masterVolume, 0.0f);
+		m_masterVolume = fmin(m_masterVolume, 1.0f);
+
+
+		//SE音量が変更されているかチェック
+		if (soundManager.GetVolume(SoundManager::OptionSoundKind::kSe) != m_seVolume)
+		{
+			//音量を変更する
+			soundManager.SetVolume(SoundManager::OptionSoundKind::kSe, m_seVolume);
+		}
+
+		//BGM音量が変更されているかチェック
+		if (soundManager.GetVolume(SoundManager::OptionSoundKind::kBgm) != m_bgmVolume)
+		{
+			//音量を変更する
+			soundManager.SetVolume(SoundManager::OptionSoundKind::kBgm, m_bgmVolume);
+		}
+
+		//VOICE音量が変更されているかチェック
+		if (soundManager.GetVolume(SoundManager::OptionSoundKind::kVoice) != m_voiceVolume)
+		{
+			//音量を変更する
+			soundManager.SetVolume(SoundManager::OptionSoundKind::kVoice, m_voiceVolume);
+		}
+
+		//MASTER音量が変更されているかチェック
+		if (soundManager.GetVolume(SoundManager::OptionSoundKind::kMaster) != m_masterVolume)
+		{
+			//音量を変更する
+			soundManager.SetVolume(SoundManager::OptionSoundKind::kMaster, m_masterVolume);
+		}
+
+		//Bボタンが押されたら
+		if (MyEngine::Input::GetInstance().GetInputData(0)->IsTrigger("B"))
+		{
+			//シークバーを動かすかどうかをfalseにする
+			m_isMoveSeekBar = false;
+
+			//キャンセルサウンドを鳴らす
+			SoundManager::GetInstance().PlayOnceSound("Cancel");
+		}
+	}
+
+	//Aボタンが押されたら
+	if (MyEngine::Input::GetInstance().GetInputData(0)->IsTrigger("A"))
+	{
+		m_isMoveSeekBar = true;
+
+		//決定サウンドを鳴らす
+		SoundManager::GetInstance().PlayOnceSound("Ok");
+	}
+
+
+
+	//基本的に-1を返す
+	return -1;
+}
+
+int MenuUi::UpdateEndGame()
+{
+	//ゲームを終了する
+	return static_cast<int>(SelectItem::kEndGame);
+}
+
+void MenuUi::DrawOption()
+{
+	//オプションの描画処理
+	int optionMenu = GraphManager::GetInstance().GetHandle("OptionMenu");
+
+	int bar = GraphManager::GetInstance().GetHandle("Bar");
+
+	int thumb = GraphManager::GetInstance().GetHandle("Thumb");
+
+	int thumbSelect = GraphManager::GetInstance().GetHandle("ThumbSelect");
+
+	int minSound = GraphManager::GetInstance().GetHandle("MinSound");
+
+	int maxSound = GraphManager::GetInstance().GetHandle("MaxSound");
+
+	//つまみのサイズを設定する
+	m_thumbSize += kThumbScaleSpeed;
+	float thumbScale = kThumbMinScale + (kThumbMaxScale - kThumbMinScale) * sin(m_thumbSize);
+
+	//ブレンドモードの設定
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_optionAlpha);
+
+	//オプションの画像を描画する
+	DrawRotaGraph(Game::kWindowWidth / 2, Game::kWindowHeight / 2, 1.0, 0.0, optionMenu, true);
+
+	//シークバーを調整できる数分表示する
+	for (int i = 0; i < static_cast<int>(SoundManager::OptionSoundKind::kOptionSoundKindNum); i++)
+	{
+		//シークバーの位置を設定する
+		int posX = kOptionBarPosX;
+		int posY = kOptionBarPosY + kOptionBarInterval * i;
+
+		//シークバーを描画する
+		DrawRotaGraph(posX, posY, 1.0, 0.0, bar, true);
+
+		//シークバーの端の画像を描画する
+		DrawRotaGraph(posX - kOptionBarLength / 2 - kOptionBarMarkShiftLange, posY, 1.0, 0.0, minSound, true);
+
+		//シークバーの端の画像を描画する
+		DrawRotaGraph(posX + kOptionBarLength / 2 + kOptionBarMarkShiftLange, posY, 1.0, 0.0, maxSound, true);
+
+		//つまみの位置を設定する
+		posX -= kOptionBarLength / 2;
+
+		if (i == static_cast<int>(SoundManager::OptionSoundKind::kSe))
+		{
+			posX += kOptionBarLength * m_seVolume;
+		}
+		else if (i == static_cast<int>(SoundManager::OptionSoundKind::kBgm))
+		{
+			posX += kOptionBarLength * m_bgmVolume;
+		}
+		else if (i == static_cast<int>(SoundManager::OptionSoundKind::kVoice))
+		{
+			posX += kOptionBarLength * m_voiceVolume;
+		}
+		else if (i == static_cast<int>(SoundManager::OptionSoundKind::kMaster))
+		{
+			posX += kOptionBarLength * m_masterVolume;
+		}
+
+		if (i == m_optionSelectItem)
+		{
+			if (m_isMoveSeekBar)
+			{
+				//つまみの位置を描画する
+				DrawRotaGraph(posX, posY, thumbScale, 0.0, thumb, true);
+			}
+			else
+			{
+
+				//つまみの位置を描画する
+				DrawRotaGraph(posX, posY, 1.0, 0.0, thumb, true);
+
+				DrawRotaGraph(posX, posY, thumbScale, 0.0, thumbSelect, true);
+			}
+		}
+		else
+		{
+			//つまみの位置を描画する
+			DrawRotaGraph(posX, posY, 1.0, 0.0, thumb, true);
+		}
+	}
+
+	//オプションの文字列を表示する
+	for (int i = 0; i < static_cast<int>(SoundManager::OptionSoundKind::kOptionSoundKindNum); i++)
+	{
+		DrawStringToHandle(kOptionStringPosX, kOptionStringPosY + kOptionBarInterval * i, kOptionString[i].c_str(), GetColor(255, 255, 255), m_optionFontHandle, GetColor(0, 0, 0));
+	}
+
+
+	if (m_isMoveSeekBar)
+	{
+		//オプションのボタンを表示する
+		int button = GraphManager::GetInstance().GetHandle("B");
+		DrawRotaGraph(kOptionButtonPosX, kOptionButtonPosY, 1.0, 0.0, button, true);
+
+		DrawStringToHandle(kOptionButtonStringPosX, kOptionButtonStringPosY, " :戻る", GetColor(255, 255, 255), m_optionButtonFontHandle, GetColor(0, 0, 0));
+
+	}
+	else
+	{
+		//オプションのボタンを表示する
+		int button = GraphManager::GetInstance().GetHandle("A");
+		DrawRotaGraph(kOptionButtonPosX, kOptionButtonPosY, 1.0, 0.0, button, true);
+
+		DrawStringToHandle(kOptionButtonStringPosX, kOptionButtonStringPosY, " :決定", GetColor(255, 255, 255), m_optionButtonFontHandle, GetColor(0, 0, 0));
+	}
+
+	//ブレンドモードを戻す
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+}
+
+void MenuUi::DrawEndGame()
+{
+
 }

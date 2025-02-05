@@ -88,9 +88,6 @@ void BattleManager::Init()
 	//BGMを再生する
 	SoundManager::GetInstance().PlayLoopSound(m_bgmName);
 
-	//BGMの音量を設定する
-	SoundManager::GetInstance().SetSoundVolume(m_bgmName, kBgmVolume);
-
 #ifdef _DEBUG
 	//	m_situation = Situation::kBattle;
 	//	m_updateSituationFunc = &BattleManager::UpdateBattle;
@@ -355,9 +352,6 @@ void BattleManager::UpdateBattle()
 			m_pCamera->SetFrontPos(frontPos);
 
 			m_pCamera->SetPoseCamera();
-
-			//ノックアウト時のサウンドの音量を設定
-			SoundManager::GetInstance().SetSoundVolume("KnockOut", kKnockOutVolume);
 
 			//ノックアウト時のサウンドを再生
 			SoundManager::GetInstance().PlayOnceSound("KnockOut");

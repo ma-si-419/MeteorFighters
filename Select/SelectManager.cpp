@@ -68,10 +68,6 @@ void SelectManager::Init()
 	//BGMの再生
 	SoundManager::GetInstance().PlayLoopSound("Bgm0");
 
-	//BGMの音量を設定
-	SoundManager::GetInstance().SetSoundVolume("Bgm0", kBgmVolume);
-
-
 	//UIにBGMの名前を渡す
 	m_pUi->SetMusicName(kBgmName[m_bgmNumber]);
 }
@@ -150,9 +146,6 @@ void SelectManager::Update()
 
 		//BGMを再生
 		SoundManager::GetInstance().PlayLoopSound("Bgm" + std::to_string(m_bgmNumber));
-
-		//BGMの音量を設定
-		SoundManager::GetInstance().SetSoundVolume("Bgm" + std::to_string(m_bgmNumber), kBgmVolume);
 
 		//UIにBGMの名前を渡す
 		m_pUi->SetMusicName(kBgmName[m_bgmNumber]);
@@ -313,7 +306,7 @@ void SelectManager::SelectTwoPlayer()
 	{
 		SoundManager::GetInstance().PlayOnceSound("CharacterConfirm");
 
-		m_nextScene = static_cast<int>(Game::Scene::kGame);
+		m_nextScene = static_cast<int>(Game::Scene::kBattle);
 	}
 	//Bボタンを押したら1プレイヤーのキャラクター選択画面に戻る
 	else if (input->IsTrigger("B"))

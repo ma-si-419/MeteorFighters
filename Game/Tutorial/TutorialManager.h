@@ -91,7 +91,6 @@ public:
 		kModeNum
 	};
 
-
 private:
 
 	enum class TutorialSituation

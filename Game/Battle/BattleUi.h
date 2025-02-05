@@ -134,4 +134,7 @@ private:
 	//選択している項目の後ろの画像の大きさ
 	double m_selectItemBoxScale;
 
+	//サウンドを鳴らしたかどうか
+	bool m_isPlaySound;
+
 };

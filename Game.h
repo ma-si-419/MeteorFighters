@@ -11,7 +11,8 @@ namespace Game
 		kTitle,
 		kMenu,
 		kSelect,
-		kGame,
-		kTutorial
+		kBattle,
+		kTutorial,
+		kEnd
 	};
 }

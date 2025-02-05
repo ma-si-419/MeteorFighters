@@ -115,7 +115,8 @@ BattleUi::BattleUi() :
 	m_menuFontHandle(-1),
 	m_selectItemBoxScale(kSelectItemBoxMaxScale),
 	m_menuAlpha(0),
-	m_isResultMenuDisplay(false)
+	m_isResultMenuDisplay(false),
+	m_isPlaySound(false)
 {
 	//最初は何もしないように設定しておく
 	m_updateFunc = &BattleUi::None;
@@ -268,6 +269,25 @@ void BattleUi::UpdateMenu()
 
 void BattleUi::UpdateResult()
 {
+	//一定時間たったら
+	if (m_resultTime > kResultDisplayStartTime)
+	{
+		//サウンドを鳴らす
+		if (!m_isPlaySound)
+		{
+			if (m_isWin)
+			{
+				SoundManager::GetInstance().PlayOnceSound("Win");
+			}
+			else
+			{
+				SoundManager::GetInstance().PlayOnceSound("Lose");
+			}
+			m_isPlaySound = true;
+		}
+
+	}
+
 	//リザルトのロゴの拡縮が終了したら操作可能にする
 	if (m_resultLogoScale != kResultLogoFinalScale) return;
 

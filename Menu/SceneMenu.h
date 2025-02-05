@@ -2,7 +2,7 @@
 #include "SceneBase.h"
 #include <memory>
 
-class MenuUi;
+class MenuManager;
 class SceneMenu : public SceneBase
 {
 public:
@@ -22,8 +22,5 @@ public:
 
 private:
 
-	std::shared_ptr<MenuUi> m_pMenuUi;
-
-	int m_bgmPlayHandle;
-
+	std::shared_ptr<MenuManager> m_pMenuManager;
 };

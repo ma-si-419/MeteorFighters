@@ -146,9 +146,6 @@ void TutorialManager::Update()
 	{
 		//BGMを再生する
 		SoundManager::GetInstance().PlayLoopSound(kBgmName);
-
-		//BGMの音量を設定する
-		SoundManager::GetInstance().SetSoundVolume(kBgmName, kBgmVolume);
 	}
 
 	(this->*m_updateSituationFunc)();
@@ -224,6 +221,10 @@ void TutorialManager::UpdateStartMenu()
 			SoundManager::GetInstance().PlayOnceSound("Ok");
 
 			ChangeSituation(TutorialSituation::kStart);
+
+			m_nowTutorial = TutorialKind::kMove;
+
+			m_pTutorialUi->SetTutorialNumber(static_cast<int>(m_nowTutorial));
 
 			//体力バーを表示する
 			m_isDrawHpBar = true;
@@ -440,6 +441,12 @@ void TutorialManager::UpdatePlaying()
 	if (isSuccess)
 	{
 		ChangeSituation(TutorialSituation::kSuccess);
+
+		//ランダムでサウンドを再生
+		int rand = GetRand(1);
+
+		SoundManager::GetInstance().PlayOnceSound("Success" + std::to_string(rand));
+
 	}
 
 	//カメラの更新を行う
@@ -558,7 +565,7 @@ void TutorialManager::ChangeSituation(TutorialSituation next)
 		for (auto& player : m_pCharacters) player->ChangeSituationUpdate(static_cast<int>(BattleSituation::kMenu));
 
 		//初期化を行う
-		m_pTutorialUi->SetNowTutorialNumber(static_cast<int>(m_nowTutorial));
+		m_pTutorialUi->SetTutorialNumber(static_cast<int>(m_nowTutorial));
 		m_pTutorialUi->InitPlayMenu();
 		//更新処理の変更
 		m_updateSituationFunc = &TutorialManager::UpdatePlayMenu;
@@ -627,7 +634,7 @@ void TutorialManager::ChangeSituation(TutorialSituation next)
 
 		//初期化を行う
 		m_pTutorialUi->InitPlaying(static_cast<int>(m_nowTutorial));
-		m_pTutorialUi->SetNowTutorialNumber(static_cast<int>(m_nowTutorial));
+		m_pTutorialUi->SetTutorialNumber(static_cast<int>(m_nowTutorial));
 		//更新処理の変更
 		m_updateSituationFunc = &TutorialManager::UpdatePlaying;
 		//描画処理の変更

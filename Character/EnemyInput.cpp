@@ -6,6 +6,7 @@
 #include "CharacterStateDown.h"
 #include "LoadCsv.h"
 #include "GameSceneConstant.h"
+#include "Input.h"
 
 namespace
 {
@@ -92,7 +93,8 @@ EnemyInput::EnemyInput(std::shared_ptr<MyEngine::InputData> inputData) :
 	m_guardTime(0),
 	m_superDashTime(0),
 	m_pManager(nullptr),
-	m_tutorialAction(Action::kNone)
+	m_tutorialAction(Action::kNone),
+	m_isPlayerControl(false)
 {
 	m_pInputData = inputData;
 	m_moveFunc = &EnemyInput::None;
@@ -159,6 +161,15 @@ EnemyInput::~EnemyInput()
 
 void EnemyInput::Update()
 {
+	//もしコントローラー2でPauseボタンが押されたら
+	if (MyEngine::Input::GetInstance().GetInputData(1)->IsTrigger("Pause"))
+	{
+		//プレイヤーが操作できるようにする
+		m_isPlayerControl = !m_isPlayerControl;
+	}
+
+	if (m_isPlayerControl) return;
+
 	auto player = m_pManager->GetOnePlayerPointer();
 	auto enemy = m_pManager->GetTwoPlayerPointer();
 

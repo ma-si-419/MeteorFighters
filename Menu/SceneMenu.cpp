@@ -6,12 +6,13 @@
 #include "Input.h"
 #include "SoundManager.h"
 #include "GraphManager.h"
-#include "MenuUi.h"
+#include "MenuManager.h"
+#include "Game.h"
 
 SceneMenu::SceneMenu(SceneManager& sceneManager) :
 	SceneBase(sceneManager)
 {
-	m_pMenuUi = std::make_shared<MenuUi>();
+	m_pMenuManager = std::make_shared<MenuManager>();
 }
 
 SceneMenu::~SceneMenu()
@@ -22,29 +23,36 @@ void SceneMenu::Init()
 {
 	GraphManager::GetInstance().LoadSceneGraph("Menu");
 	SoundManager::GetInstance().LoadSceneSound("Menu");
-	m_pMenuUi->Init();
+	m_pMenuManager->Init();
 
 	//Bgmを再生
-	m_bgmPlayHandle = SoundManager::GetInstance().PlayLoopSound("Bgm");
+	SoundManager::GetInstance().PlayLoopSound("Bgm");
 }
 
 void SceneMenu::Update()
 {
-	int selectItem = m_pMenuUi->Update();
+	m_pMenuManager->Update();
 
-	if (selectItem == static_cast<int>(MenuUi::SelectItem::kBattle))
+	//シーン遷移中なら何もしない
+	if (m_sceneManager.IsChangeScene()) return;
+
+	//次のシーン
+	if (m_pMenuManager->GetNextScene() == static_cast<int>(Game::Scene::kSelect))
 	{
-		m_sceneManager.ChangeScene(std::make_shared<SceneSelect>(m_sceneManager));
+		std::shared_ptr<SceneSelect> next = std::make_shared<SceneSelect>(m_sceneManager);
+		m_sceneManager.ChangeScene(next);
 	}
-	else if (selectItem == static_cast<int>(MenuUi::SelectItem::kTutorial))
+	else if (m_pMenuManager->GetNextScene() == static_cast<int>(Game::Scene::kTitle))
 	{
-		m_sceneManager.ChangeScene(std::make_shared<SceneTutorial>(m_sceneManager));
+		std::shared_ptr<SceneTitle> next = std::make_shared<SceneTitle>(m_sceneManager);
+		m_sceneManager.ChangeScene(next);
 	}
-	else if (selectItem == static_cast<int>(MenuUi::SelectItem::kTitle))
+	else if (m_pMenuManager->GetNextScene() == static_cast<int>(Game::Scene::kTutorial))
 	{
-		m_sceneManager.ChangeScene(std::make_shared<SceneTitle>(m_sceneManager));
+		std::shared_ptr<SceneTutorial> next = std::make_shared<SceneTutorial>(m_sceneManager);
+		m_sceneManager.ChangeScene(next);
 	}
-	else if(selectItem == static_cast<int>(MenuUi::SelectItem::kEndGame))
+	else if (m_pMenuManager->GetNextScene() == static_cast<int>(Game::Scene::kEnd))
 	{
 		m_sceneManager.GameEnd();
 		return;
@@ -57,15 +65,7 @@ void SceneMenu::UpdateAsyncLoad()
 
 void SceneMenu::Draw()
 {
-#ifdef _DEBUG
-
-	DrawString(0, 0, "SceneMenu", GetColor(255,0,0));
-
-#endif // _DEBUG
-
-	m_pMenuUi->DrawModel();
-
-	m_pMenuUi->DrawItem();
+	m_pMenuManager->Draw();
 }
 
 void SceneMenu::End()

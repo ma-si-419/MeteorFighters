@@ -203,13 +203,6 @@ void Character::Init()
 		//プレイヤーのステートを設定する
 		m_pEnemyInput->SetPlayerState(m_pBattleManager->GetOnePlayerPointer()->m_pState);
 	}
-
-	//音声大きさの設定
-	for (auto item : kVoiceKindMap)
-	{
-		SoundManager::GetInstance().SetSoundVolume(item.second.c_str(), kVoiceVolume);
-	}
-
 }
 
 void Character::SetEnemyInput(int level)

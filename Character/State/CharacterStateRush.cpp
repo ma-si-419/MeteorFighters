@@ -11,6 +11,7 @@
 #include "GameManagerBase.h"
 #include "TutorialManager.h"
 #include <cmath>
+#include "SoundManager.h"
 
 namespace
 {
@@ -56,7 +57,10 @@ namespace
 	constexpr int kRushTime = 20;
 
 	//移動中に真反対を入力されたと判断するベクトルの差の大きさ
-	constexpr float kReverseVecScale = 1.999f;
+	constexpr float kReverseVecScale = 1.999f; 
+
+	//音声を再生する間隔
+	constexpr int kSoundInterval = 60;
 }
 
 CharacterStateRush::CharacterStateRush(std::shared_ptr<Character> character) :
@@ -102,11 +106,20 @@ void CharacterStateRush::Enter()
 
 	//スーパーダッシュのチュートリアルをクリアする
 	SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kSuperDash));
+
+	//スーパーダッシュ開始のサウンドを再生する
+	SoundManager::GetInstance().PlayOnceSound("StartSuperDash");
 }
 
 void CharacterStateRush::Update()
 {
 	m_time++;
+
+	//サウンドを一定間隔で再生する
+	if (static_cast<int>(m_time) % kSoundInterval == 0)
+	{
+		SoundManager::GetInstance().PlayOnceSound("OnSuperDash");
+	}
 
 	//通常時で気力が足りなければ
 	if (!m_pCharacter->SubMp(kRushCost) && !m_isRushEnemy)
@@ -225,6 +238,9 @@ void CharacterStateRush::Update()
 				//気力が足りた場合のみ
 				if (m_pCharacter->SubMp(kEnemyRushCost))
 				{
+					//サウンドを再生する
+					SoundManager::GetInstance().PlayOnceSound("StartRocketDash");
+
 					//敵の近くまで向かう突撃状態になる
 					m_isRushEnemy = true;
 					m_rushTargetPos = m_pManager->GetTargetBackPos(GameSceneConstant::kEnemyBackPosDistance, m_pCharacter);
@@ -528,4 +544,7 @@ void CharacterStateRush::Update()
 void CharacterStateRush::Exit()
 {
 	m_pManager->ExitEffect(m_pEffect);
+
+	//サウンドを止める
+	SoundManager::GetInstance().StopSound("OnSuperDash");
 }

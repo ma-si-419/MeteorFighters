@@ -338,6 +338,9 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 	//ガード状態
 	if (hitReaction == Character::HitReactionKind::kGuard)
 	{
+		//サウンドを再生する
+		SoundManager::GetInstance().PlayOnceSound("Guard");
+
 		//動けない時間を設定する
 		SetStopTime(kDownTimeMap.at(hitReaction));
 
