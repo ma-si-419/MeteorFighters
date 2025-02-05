@@ -55,7 +55,7 @@ namespace
 	constexpr float kResultCameraMoveSpeed = 1.0f;
 
 	//Bgm‚Ì‰¹—Ê
-	constexpr int kBgmVolume = 200;
+	constexpr int kBgmVolume = 220;
 
 	//KnockOut‚Ì‰¹—Ê
 	constexpr int kKnockOutVolume = 255;

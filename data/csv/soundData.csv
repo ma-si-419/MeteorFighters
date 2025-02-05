@@ -12,6 +12,7 @@ Bgm0,Game,BattleBgm1.mp3,Select
 Bgm1,Game,BattleBgm2.mp3,Select
 Bgm2,Game,BattleBgm3.mp3,Select
 CharacterConfirm,Select,CharacterConfirm.mp3,Select
+LevelChange,Select,LevelChange.mp3,Select
 MusicChange,Select,MusicChange.mp3,Select
 BlueDodge1,Game,blue/dodge1.m4a,Game
 BlueDodge2,Game,blue/dodge2.m4a,Game

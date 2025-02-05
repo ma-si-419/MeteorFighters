@@ -15,6 +15,9 @@ namespace
 
 
 	const int kRedColor = GetColor(255, 0, 0);
+
+	//BGM‚Ì‰¹—Ê
+	constexpr int kBgmVolume = 255;
 }
 
 SceneTitle::SceneTitle(SceneManager& sceneManager) :
@@ -37,6 +40,9 @@ void SceneTitle::Init()
 
 	//BGM‚ğÄ¶
 	SoundManager::GetInstance().PlayLoopSound("Bgm");
+
+	//BGM‚Ì‰¹—Ê‚ğİ’è
+	SoundManager::GetInstance().SetSoundVolume("Bgm", kBgmVolume);
 }
 
 void SceneTitle::Update()

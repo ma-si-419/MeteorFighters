@@ -55,7 +55,7 @@ namespace
 
 	//メニューの文字を表示する座標
 	constexpr int kPlayMenuStringPosX = Game::kWindowWidth / 2;
-	
+
 	//メニューの文字
 	const std::string kMenuString[static_cast<int>(BattleUi::MenuItem::kItemNum)] =
 	{
@@ -80,7 +80,7 @@ namespace
 		"キャラクターを選びなおす",
 		"メニューに戻る"
 	};
-	
+
 	//リザルトの文字を表示する座標
 	constexpr int kResultStringPosY[static_cast<int>(BattleUi::ResultItem::kItemNum)] =
 	{
@@ -209,11 +209,22 @@ void BattleUi::UpdateMenu()
 	{
 		m_selectItem++;
 
+		//一番下ならば一番上に戻す
+		if (m_selectItem > static_cast<int>(MenuItem::kItemEnd))
+		{
+			m_selectItem = 0;
+		}
+
 	}
 	else if (input->IsTrigger("Up"))
 	{
 		m_selectItem--;
 
+		//一番上ならば一番下に戻す
+		if (m_selectItem < 0)
+		{
+			m_selectItem = static_cast<int>(MenuItem::kItemEnd);
+		}
 	}
 
 	//リピート入力
@@ -284,11 +295,22 @@ void BattleUi::UpdateResult()
 	{
 		m_selectItem++;
 
+		//一番下ならば一番上に戻す
+		if (m_selectItem > static_cast<int>(ResultItem::kItemEnd))
+		{
+			m_selectItem = 0;
+
+		}
 	}
 	else if (input->IsTrigger("Up"))
 	{
 		m_selectItem--;
 
+		//一番上ならば一番下に戻す
+		if (m_selectItem < 0)
+		{
+			m_selectItem = static_cast<int>(ResultItem::kItemEnd);
+		}
 	}
 
 	//リピート入力
@@ -419,15 +441,15 @@ void BattleUi::DrawResult()
 		m_resultMenuAlpha += kMenuFadeinSpeed;
 
 		//画面全体を暗くする
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA,min(m_resultMenuAlpha,kMenuBackBoxMaxAlpha));
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, min(m_resultMenuAlpha, kMenuBackBoxMaxAlpha));
 
-		DrawBox(0,0,Game::kWindowWidth,Game::kWindowHeight,GetColor(0,0,0),true);
+		DrawBox(0, 0, Game::kWindowWidth, Game::kWindowHeight, GetColor(0, 0, 0), true);
 
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA,m_resultMenuAlpha);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_resultMenuAlpha);
 
 		//メニューを表示する
-		DrawRotaGraph(kMenuPosX,kMenuPosY,1.0,0.0,graphManager.GetHandle("Menu"),true);
-		
+		DrawRotaGraph(kMenuPosX, kMenuPosY, 1.0, 0.0, graphManager.GetHandle("Menu"), true);
+
 		//選択している項目を示すボックスを表示
 		DrawRotaGraph(kPlayMenuStringPosX, kResultStringPosY[m_selectItem], m_selectItemBoxScale, 0.0, graphManager.GetHandle("SelectItem"), true);
 

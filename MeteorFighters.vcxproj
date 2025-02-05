@@ -133,7 +133,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Character;$(ProjectDir)Character/State;data/addFile;$(ProjectDir)Menu;$(ProjectDir)Title;$(ProjectDir)Select;$(ProjectDir)Game;$(ProjectDir)Game/Battle;$(ProjectDir)Game/Tutorial;$(ProjectDir)Singleton</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Character;$(ProjectDir)Character/State;data/addFile;$(ProjectDir)Menu;$(ProjectDir)Title;$(ProjectDir)Select;$(ProjectDir)Game;$(ProjectDir)Game/Battle;$(ProjectDir)Game/Tutorial;$(ProjectDir)Singleton</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4099;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -142,7 +142,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(DXLIB_DIR);$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Character;$(ProjectDir)Character/State;data/addFile;$(ProjectDir)Menu;$(ProjectDir)Title;$(ProjectDir)Select;$(ProjectDir)Game;$(ProjectDir)Game/Battle;$(ProjectDir)Game/Tutorial;$(ProjectDir)Singleton</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir);$(ProjectDir)MyEngine;$(ProjectDir)MyEngine/Utility;$(ProjectDir)MyEngine/Physics;$(ProjectDir)Scene;$(ProjectDir)Character;$(ProjectDir)Character/State;data/addFile;$(ProjectDir)Menu;$(ProjectDir)Title;$(ProjectDir)Select;$(ProjectDir)Game;$(ProjectDir)Game/Battle;$(ProjectDir)Game/Tutorial;$(ProjectDir)Singleton</AdditionalLibraryDirectories>
       <AdditionalOptions>/ignore:4099</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>

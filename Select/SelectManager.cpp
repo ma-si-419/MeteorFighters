@@ -39,6 +39,8 @@ namespace
 		"デカヘッドは止まらない"
 	};
 
+	//BGMの音量
+	constexpr int kBgmVolume = 220;
 }
 
 SelectManager::SelectManager() :
@@ -65,6 +67,10 @@ void SelectManager::Init()
 
 	//BGMの再生
 	SoundManager::GetInstance().PlayLoopSound("Bgm0");
+
+	//BGMの音量を設定
+	SoundManager::GetInstance().SetSoundVolume("Bgm0", kBgmVolume);
+
 
 	//UIにBGMの名前を渡す
 	m_pUi->SetMusicName(kBgmName[m_bgmNumber]);
@@ -118,6 +124,10 @@ void SelectManager::Update()
 	{
 		//スカイドームのハンドルを変更する
 		m_pUi->SetSkyDomeHandle(GraphManager::GetInstance().GetHandle(kSkyDomeTextureHandleName[m_enemyLevel]));
+	
+		//レベルを切り替えた時の音を再生する
+		SoundManager::GetInstance().PlayOnceSound("LevelChange");
+			
 	}
 
 	//YボタンでBGMを変更する
@@ -140,6 +150,9 @@ void SelectManager::Update()
 
 		//BGMを再生
 		SoundManager::GetInstance().PlayLoopSound("Bgm" + std::to_string(m_bgmNumber));
+
+		//BGMの音量を設定
+		SoundManager::GetInstance().SetSoundVolume("Bgm" + std::to_string(m_bgmNumber), kBgmVolume);
 
 		//UIにBGMの名前を渡す
 		m_pUi->SetMusicName(kBgmName[m_bgmNumber]);
@@ -202,14 +215,27 @@ void SelectManager::SelectOnePlayer()
 	{
 		m_playerNumber++;
 
-		m_playerNumber = min(m_playerNumber, static_cast<int>(CharacterNumber::kCharacterNum) - 1);
+		//最大値を超えたら
+		if (m_playerNumber >= static_cast<int>(CharacterNumber::kCharacterNum))
+		{
+			//最小値に戻す
+			m_playerNumber = 0;
+		}
 	}
 	else if (input->IsTrigger("Left"))
 	{
 		m_playerNumber--;
 
-		m_playerNumber = max(m_playerNumber, 0);
+		//最小値よりも小さくなったら
+		if (m_playerNumber < 0)
+		{
+			//最大値に戻す
+			m_playerNumber = static_cast<int>(CharacterNumber::kCharacterNum) - 1;
+		}
 	}
+
+		m_playerNumber = max(m_playerNumber, 0);
+		m_playerNumber = min(m_playerNumber, static_cast<int>(CharacterNumber::kCharacterNum) - 1);
 
 	//キャラクターが変わったら
 	if (lastPlayerNumber!= m_playerNumber)
@@ -250,14 +276,29 @@ void SelectManager::SelectTwoPlayer()
 	{
 		m_enemyNumber++;
 
-		m_enemyNumber = min(m_enemyNumber, static_cast<int>(CharacterNumber::kCharacterNum) - 1);
+		//最大値を超えたら
+		if (m_enemyNumber >= static_cast<int>(CharacterNumber::kCharacterNum))
+		{
+			//最小値に戻す
+			m_enemyNumber = 0;
+		}
+
 	}
 	else if (input->IsTrigger("Left"))
 	{
 		m_enemyNumber--;
 
-		m_enemyNumber = max(m_enemyNumber, 0);
+		//最小値よりも小さくなったら
+		if (m_enemyNumber < 0)
+		{
+			//最大値に戻す
+			m_enemyNumber = static_cast<int>(CharacterNumber::kCharacterNum) - 1;
+		}
+
 	}
+
+		m_enemyNumber = max(m_enemyNumber, 0);
+		m_enemyNumber = min(m_enemyNumber, static_cast<int>(CharacterNumber::kCharacterNum) - 1);
 
 	//キャラクターが変わったら
 	if (lastEnemyNumber != m_enemyNumber)
