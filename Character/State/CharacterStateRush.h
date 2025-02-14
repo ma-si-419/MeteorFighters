@@ -3,7 +3,7 @@
 #include "LocalPos.h"
 
 class Effect;
-class CharacterStateRush : public CharacterStateBase,public std::enable_shared_from_this<CharacterStateRush>
+class CharacterStateRush : public CharacterStateBase, public std::enable_shared_from_this<CharacterStateRush>
 {
 public:
 	CharacterStateRush(std::shared_ptr<Character> character);
@@ -15,6 +15,8 @@ public:
 	virtual void Update() override;
 
 	virtual void Exit() override;
+
+	void StartButtonBashing() { m_isButtonBashing = true; }
 
 private:
 
@@ -39,5 +41,7 @@ private:
 	//攻撃入力されたかどうか
 	bool m_isAttackInput;
 
-};
+	//ボタン連打対決に移行するかどうか
+	bool m_isButtonBashing;
 
+};

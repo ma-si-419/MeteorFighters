@@ -2,6 +2,7 @@
 #include "CharacterStateHitAttack.h"
 #include "CharacterStateGuard.h"
 #include "CharacterStateButtonBashing.h"
+#include "CharacterStateRush.h"
 #include "CharacterStateTeleportation.h"
 #include "Character.h"
 #include "GameManagerBase.h"
@@ -104,6 +105,22 @@ void CharacterStateBase::OnCollide(std::shared_ptr<Collidable> collider)
 
 			CharacterStateBase::HitAttack(attack);
 		}
+
+		//2Pに当たった時
+		if (collider->GetTag() == ObjectTag::kTwoPlayer)
+		{
+			//自身のStateがドラゴンダッシュ中で相手もドラゴンダッシュであれば
+			if (m_kind == CharacterStateKind::kRush &&
+				static_cast<CharacterStateKind>(m_pManager->GetTargetState(m_pCharacter)) == CharacterStateKind::kRush)
+			{
+				//ボタンバッシング状態に遷移する
+				auto state = std::dynamic_pointer_cast<CharacterStateRush>(m_pCharacter->m_pState);
+
+				state->StartButtonBashing();
+			}
+		}
+
+
 	}
 	//2P側の処理
 	else if (m_pCharacter->GetTag() == ObjectTag::kTwoPlayer)
@@ -116,6 +133,20 @@ void CharacterStateBase::OnCollide(std::shared_ptr<Collidable> collider)
 			auto status = attack->GetStatus();
 
 			CharacterStateBase::HitAttack(attack);
+		}
+
+		//1Pに当たった時
+		if (collider->GetTag() == ObjectTag::kOnePlayer)
+		{
+			//自身のStateがドラゴンダッシュ中で相手もドラゴンダッシュであれば
+			if (m_kind == CharacterStateKind::kRush &&
+				static_cast<CharacterStateKind>(m_pManager->GetTargetState(m_pCharacter)) == CharacterStateKind::kRush)
+			{
+				//ボタンバッシング状態に遷移する
+				auto state = std::dynamic_pointer_cast<CharacterStateRush>(m_pCharacter->m_pState);
+
+				state->StartButtonBashing();
+			}
 		}
 	}
 }

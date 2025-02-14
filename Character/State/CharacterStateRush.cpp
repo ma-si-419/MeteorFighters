@@ -68,7 +68,8 @@ CharacterStateRush::CharacterStateRush(std::shared_ptr<Character> character) :
 	m_isRushEnemy(false),
 	m_isEndRush(false),
 	m_rushEndTime(0),
-	m_isAttackInput(false)
+	m_isAttackInput(false),
+	m_isButtonBashing(false)
 {
 }
 
@@ -391,6 +392,14 @@ void CharacterStateRush::Update()
 
 	MyEngine::Vector3 velo = m_moveDir * speed;
 
+	//ボタン連打対決に移行するフラグが立っていれば
+	if (m_isButtonBashing)
+	{
+		//ボタン連打対決に移行する
+		auto next = std::make_shared<CharacterStateButtonBashing>(m_pCharacter);
+		ChangeState(next);
+		return;
+	}
 
 	//敵の背後に向かうフラグが立っていれば
 	if (m_isRushEnemy)
@@ -495,7 +504,7 @@ void CharacterStateRush::Update()
 		//キャラクターの半径二体分よりも距離が近ければ
 		if (lange < GameSceneConstant::kCharacterRadius * 2)
 		{
-			m_isEndRush = true;
+			//m_isEndRush = true;
 		}
 
 		//攻撃入力がされたらすぐに攻撃に移る
