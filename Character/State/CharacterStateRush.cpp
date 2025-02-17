@@ -36,13 +36,16 @@ namespace
 	constexpr float kRushCost = 50.0f;
 
 	//アイドルに戻るときのアニメーションブレンドの速さ
-	constexpr float kEndAnimBlendSpeed = 0.08f;
+	constexpr float kEndAnimBlendSpeed = 0.11f;
 
 	//アイドルに戻るときのアニメーションの再生速度
-	constexpr float kEndAnimPlaySpeed = 0.6f;
+	constexpr float kEndAnimPlaySpeed = 0.5f;
 
 	//アイドルに戻るときの硬直時間
-	constexpr int kEndLandingTime = 20;
+	constexpr int kEndLandingTime = 6;
+
+	//止まった時のエフェクトの再生時間
+	constexpr int kStopEffectTime = 20;
 
 	//アイドルに戻るときにカメラを揺らす時間
 	constexpr int kCameraShakeTime = 3;
@@ -105,6 +108,9 @@ void CharacterStateRush::Enter()
 	m_kind = CharacterStateKind::kRush;
 	m_pCharacter->ChangeAnim(Character::AnimKind::kRushStart, true);
 
+	//スーパーアーマー状態にする
+	m_guardKind = CharacterGuardKind::kSuperArmor;
+
 	//スーパーダッシュのチュートリアルをクリアする
 	SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kSuperDash));
 
@@ -155,9 +161,10 @@ void CharacterStateRush::Update()
 			//エフェクトを変更する
 			m_pManager->ExitEffect(m_pEffect);
 
-			m_pEffect = std::make_shared<Effect>(Effect::EffectKind::kDashEnd);
+			//ダッシュ終了のエフェクトを作成する
+			auto effect = std::make_shared<Effect>(Effect::EffectKind::kDashEnd);
 
-			m_pEffect->SetPos(m_pCharacter->GetFrontPos());
+			effect->SetPos(m_pCharacter->GetFrontPos());
 
 			//回転を設定する
 			MyEngine::Vector3 rotation;
@@ -185,9 +192,13 @@ void CharacterStateRush::Update()
 				rotation.y = std::atan2f(vX, vZ);
 			}
 
-			m_pEffect->SetRotation(rotation);
+			effect->SetRotation(rotation);
 
-			m_pManager->EntryEffect(m_pEffect);
+			//エフェクトの生存時間を設定する
+			effect->SetLifeTime(kStopEffectTime);
+
+			//エフェクトを登録する
+			m_pManager->EntryEffect(effect);
 
 		}
 		//攻撃入力がされていたら攻撃状態に移行する
@@ -474,6 +485,7 @@ void CharacterStateRush::Update()
 				//カメラを高速移動させる
 				m_pCharacter->StartFastCameraMove();
 			}
+
 			//さらに近くまで近づいたら
 			if (toTarget.Length() < GameSceneConstant::kEndRushDistance)
 			{
@@ -552,8 +564,20 @@ void CharacterStateRush::Update()
 }
 void CharacterStateRush::Exit()
 {
-	m_pManager->ExitEffect(m_pEffect);
+	//エフェクトが再生されていたら
+	if (m_pEffect)
+	{
+		//エフェクトを消す
+		m_pManager->ExitEffect(m_pEffect);
+	}
 
 	//サウンドを止める
 	SoundManager::GetInstance().StopSound("OnSuperDash");
+
+	//スーパーアーマー状態を解除する
+	m_guardKind = CharacterGuardKind::kNone;
+
+	//ダッシュ中に攻撃を食らった時のためにカメラの補正をここでも解除しておく
+	m_pManager->StartCameraCorrection();
+
 }

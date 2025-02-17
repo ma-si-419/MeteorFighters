@@ -114,7 +114,7 @@ namespace
 	constexpr int kPlayMenuTutorialNamePosX = 1005;
 
 	//チュートリアルの左右の矢印とチュートリアルの名前の距離
-	constexpr float kPlayMenuTutorialNameSideArrowDistance = 132.0f;
+	constexpr float kPlayMenuTutorialNameSideArrowDistance = 140.0f;
 
 	//チュートリアルの左右の矢印を揺らす速さ
 	constexpr float kPlayMenuTutorialNameSideArrowSpeed = 0.2f;

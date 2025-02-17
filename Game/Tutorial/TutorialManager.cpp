@@ -377,7 +377,7 @@ void TutorialManager::UpdatePlaying()
 {
 	auto input = MyEngine::Input::GetInstance().GetInputData(0);
 
-	if (input->IsTrigger("Pause"))
+	if (input->IsTrigger("Pause") && !m_isButtonBashing)
 	{
 		//ƒTƒEƒ“ƒh‚ğÄ¶
 		SoundManager::GetInstance().PlayOnceSound("Ok");

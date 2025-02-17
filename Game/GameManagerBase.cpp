@@ -1,5 +1,6 @@
 #include "GameManagerBase.h"
 #include "Attack.h"
+#include "EnemyInput.h"
 #include "LoadCsv.h"
 #include "LocalPos.h"
 #include "Stage.h"
@@ -66,6 +67,14 @@ namespace
 
 	//ボタン連打終了時のサウンドの音量
 	constexpr int kWinButtonBashingSoundVolume = 255;
+
+	//ボタン連打で勝利できる回数(難易度によって変更する)
+	const int kWinButtonBashingNum[static_cast<int>(EnemyInput::AiLevel::kLevelNum)] =
+	{
+		5,
+		10,
+		15
+	};
 
 }
 
@@ -331,10 +340,13 @@ std::string GameManagerBase::GetSkyDomePath()
 
 Character::PlayerNumber GameManagerBase::GetButtonBashWinner()
 {
-	int one = m_buttonBashNum[static_cast<int>(Character::PlayerNumber::kOnePlayer)];
-	int two = m_buttonBashNum[static_cast<int>(Character::PlayerNumber::kTwoPlayer)];
+	//プレイヤーのボタン連打回数
+	int player = m_buttonBashNum[static_cast<int>(Character::PlayerNumber::kOnePlayer)];
+	
+	//エネミーは難易度によって連打した回数を変える
+	int enemy = kWinButtonBashingNum[m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetEnemyInput()->GetAiLevel()];
 
-	if (one >= two)
+	if (player >= enemy)
 	{
 		return Character::PlayerNumber::kOnePlayer;
 	}
@@ -505,7 +517,6 @@ void GameManagerBase::UpdateButtonBashing()
 
 	//現在のカメラの座標と目的地までのベクトル
 	MyEngine::Vector3 cameraToGoalVec = cameraGoalPos - m_buttonBashingCameraPos;
-
 
 	//カメラを回す時にtrueにする
 	bool isRota = false;

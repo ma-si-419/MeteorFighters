@@ -96,7 +96,6 @@ void BattleManager::Init()
 
 void BattleManager::Update()
 {
-	
 
 	//ó‹µ‚É‚æ‚Á‚Ä•Ï‚í‚éUpdate
 	(this->*m_updateSituationFunc)();

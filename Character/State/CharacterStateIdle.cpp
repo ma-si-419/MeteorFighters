@@ -78,10 +78,17 @@ void CharacterStateIdle::Update()
 	MyEngine::Vector3 velo;
 
 	//アニメーションが終わる時間になっていれば
-	if (m_time > m_endAnimTime)
+	if (m_isPlayEndAnim)
 	{
-		m_isPlayEndAnim = false;
 
+		//前のStateのアニメーションが終了していたら
+		if (m_pCharacter->IsEndAnim())
+		{
+			m_isPlayEndAnim = false;
+		}
+	}
+	else
+	{
 		//地上にいる場合
 		if (m_pCharacter->IsGround())
 		{
@@ -110,15 +117,15 @@ void CharacterStateIdle::Update()
 			m_swayCount += kSwaySpeed;
 
 			//sin波で揺らす
-			MyEngine::Vector3 shiftVec = MyEngine::Vector3(0.0f,sinf(m_swayCount) * kSwayWidth,0.0f);
+			MyEngine::Vector3 shiftVec = MyEngine::Vector3(0.0f, sinf(m_swayCount) * kSwayWidth, 0.0f);
 
 			//座標を設定
 			m_pCharacter->SetDrawShiftVec(shiftVec);
 		}
 	}
 
-	//前のフレームの終了アニメーションが再生されていたら下の条件分岐を通らない
-	if (m_isPlayEndAnim) return;
+	//前のStateの後隙が終わっていなければ
+	if (m_time < m_endAnimTime) return;
 
 	//一度ボタンが離されたかどうか
 	if (!input->IsPress("X"))

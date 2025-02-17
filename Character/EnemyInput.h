@@ -100,6 +100,12 @@ public:
 	void SetAiLevel(AiLevel level);
 
 	/// <summary>
+	/// 難易度を取得する
+	/// </summary>
+	/// <returns>AIの難易度を取得する</returns>
+	AiLevel GetAiLevel() { return m_aiLevel; }
+
+	/// <summary>
 	/// 現在の状況みて行う行動を取得する
 	/// </summary>
 	/// <returns>何も行う行動がなかったらkNoneを返す</returns>
