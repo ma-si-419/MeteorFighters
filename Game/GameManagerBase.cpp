@@ -344,7 +344,7 @@ Character::PlayerNumber GameManagerBase::GetButtonBashWinner()
 	int player = m_buttonBashNum[static_cast<int>(Character::PlayerNumber::kOnePlayer)];
 	
 	//エネミーは難易度によって連打した回数を変える
-	int enemy = kWinButtonBashingNum[m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetEnemyInput()->GetAiLevel()];
+	int enemy = kWinButtonBashingNum[static_cast<int>(m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetEnemyInput()->GetAiLevel())];
 
 	if (player >= enemy)
 	{
