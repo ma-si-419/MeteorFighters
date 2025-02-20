@@ -114,6 +114,7 @@ void CharacterStateCharge::Update()
 			return;
 		}
 
+		//ˆÚ“®•ûŒü‚ð‘O•ûŒü‚É‚·‚é
 		moveDir = MyEngine::Vector3(0, 0, 1);
 
 		next->SetMoveDir(moveDir);
@@ -155,12 +156,6 @@ void CharacterStateCharge::Update()
 	{
 		SuccessTutorial(static_cast<int>(TutorialManager::TutorialSuccessKind::kEnergyCharge));
 	}
-
-#ifdef _DEBUG
-
-	DrawString(0, 16, "PlayerState:Charge", GetColor(255, 255, 255));
-
-#endif // _DEBUG
 }
 
 void CharacterStateCharge::Exit()

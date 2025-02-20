@@ -64,6 +64,15 @@ namespace
 
 	//音声を再生する間隔
 	constexpr int kSoundInterval = 60;
+
+	//エフェクトのループ開始時間
+	constexpr int kEffectLoopStartTime = 30;
+
+	//エフェクトのループ終了時間
+	constexpr int kEffectLoopEndTime = 32;
+
+	//攻撃を出す距離
+	constexpr float kAttackDistance = 3.0f;
 }
 
 CharacterStateRush::CharacterStateRush(std::shared_ptr<Character> character) :
@@ -355,7 +364,7 @@ void CharacterStateRush::Update()
 			//エフェクトを再生する
 			m_pEffect = std::make_shared<Effect>(Effect::EffectKind::kDash);
 			m_pEffect->SetPos(m_pCharacter->GetPos());
-			m_pEffect->SetLoop(30, 32);
+			m_pEffect->SetLoop(kEffectLoopStartTime, kEffectLoopEndTime);
 			m_pManager->EntryEffect(m_pEffect);
 		}
 	}
@@ -374,6 +383,7 @@ void CharacterStateRush::Update()
 	//少しずつスティックを傾けている方向に移動方向を変更する
 	if (m_moveDir.SqLength() > 0.1f && m_moveTarget.SqLength() > 0.1f)
 	{
+		//kEasingSpeedの割合で移動方向を変更していく
 		m_moveDir = m_moveDir * (1.0f - kEasingSpeed) + m_moveTarget * kEasingSpeed;
 
 		MyEngine::Vector3 checkVecA = m_moveDir;
@@ -513,19 +523,13 @@ void CharacterStateRush::Update()
 
 		float lange = (m_pManager->GetTargetPos(m_pCharacter) - nextPos).Length();
 
-		//キャラクターの半径二体分よりも距離が近ければ
-		if (lange < GameSceneConstant::kCharacterRadius * 2)
-		{
-			//m_isEndRush = true;
-		}
-
 		//攻撃入力がされたらすぐに攻撃に移る
 		if (input->IsTrigger("X"))
 		{
 			auto next = std::make_shared<CharacterStateNormalAttack>(m_pCharacter);
 
 			next->SetAttack("X", "MiddleCharge");
-			next->SetAttackVelo(m_moveDir * 3.0f);
+			next->SetAttackVelo(m_moveDir * kAttackDistance);
 
 			//移動方向を見る
 			m_pCharacter->SetFrontPos(m_moveDir + m_pCharacter->GetPos());

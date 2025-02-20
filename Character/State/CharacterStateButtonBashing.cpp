@@ -67,6 +67,9 @@ namespace
 
 	//効果音を再生する間隔
 	constexpr int kSoundPlayInterval = 7;
+
+	//終了後の硬直時間
+	constexpr int kEndStopTime = 30;
 }
 
 CharacterStateButtonBashing::CharacterStateButtonBashing(std::shared_ptr<Character> character) :
@@ -337,7 +340,7 @@ void CharacterStateButtonBashing::Update()
 			//アイドル状態に戻る
 			auto next = std::make_shared<CharacterStateIdle>(m_pCharacter);
 
-			next->SetEndAnim(static_cast<int>(Character::AnimKind::kOnButtonBashing), 30);
+			next->SetEndAnim(static_cast<int>(Character::AnimKind::kOnButtonBashing), kEndStopTime);
 
 			ChangeState(next);
 		}

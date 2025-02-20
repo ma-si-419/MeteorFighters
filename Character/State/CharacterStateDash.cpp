@@ -21,6 +21,9 @@ namespace
 	constexpr float kAnimationBlendSpeed = 0.12f;
 
 	constexpr float kAnimPlaySpeed = 1.5f;
+
+	//傾いていると判断する大きさ
+	constexpr float kTiltSize = 0.5f;
 }
 
 CharacterStateDash::CharacterStateDash(std::shared_ptr<Character> character) :
@@ -63,24 +66,32 @@ void CharacterStateDash::Enter()
 	{
 		//向きによってアニメーションを変える
 		//回避の場合は移動方向を前後左右の四通りに限定する(斜めをなくす)
-		if (m_moveDir.z >= 0.5f)
+		if (m_moveDir.z >= kTiltSize)
 		{
 			m_pCharacter->ChangeAnim(Character::AnimKind::kDodgeFront, false, kAnimationBlendSpeed);
+			
+			//前方向にする
 			m_moveDir = MyEngine::Vector3(0.0f, 0.0f, 1.0f);
 		}
-		else if (m_moveDir.z < -0.5f)
+		else if (m_moveDir.z < -kTiltSize)
 		{
 			m_pCharacter->ChangeAnim(Character::AnimKind::kDodgeBack, false, kAnimationBlendSpeed);
+
+			//後ろ方向にする
 			m_moveDir = MyEngine::Vector3(0.0f, 0.0f, -1.0f);
 		}
-		else if (m_moveDir.x >= 0.5f)
+		else if (m_moveDir.x >= kTiltSize)
 		{
 			m_pCharacter->ChangeAnim(Character::AnimKind::kDodgeRight, false, kAnimationBlendSpeed);
+
+			//右方向にする
 			m_moveDir = MyEngine::Vector3(1.0f, 0.0f, 0.0f);
 		}
 		else
 		{
 			m_pCharacter->ChangeAnim(Character::AnimKind::kDodgeLeft, false, kAnimationBlendSpeed);
+
+			//左方向にする
 			m_moveDir = MyEngine::Vector3(-1.0f, 0.0f, 0.0f);
 		}
 

@@ -60,7 +60,7 @@ void CharacterStateDown::Update()
 		std::shared_ptr<CharacterStateDash> next = std::make_shared<CharacterStateDash>(m_pCharacter);
 		//‰ñ”ğ‚É‚È‚é‚æ‚¤‚Éİ’è
 		next->SetDodge();
-		//ˆÚ“®•ûŒü‚ğİ’è
+		//ˆÚ“®•ûŒü‚ğİ’è(Œã‚ë•ûŒü)
 		next->SetMoveDir(MyEngine::Vector3(0.0f, 0.0f, -1.0f));
 		//ƒ_ƒbƒVƒ…ó‘Ô‚É‘JˆÚ
 		ChangeState(next);
