@@ -374,7 +374,7 @@ void CharacterStateButtonBashing::Update()
 			//ó‚¯‚éUŒ‚
 			auto attack = std::make_shared<Attack>(tag, kTargetPos);
 
-			attack->Init(status, m_pManager->GetEffectManagerPointer());
+			attack->Init(status, m_pManager);
 
 			m_pManager->AddAttack(attack);
 		}

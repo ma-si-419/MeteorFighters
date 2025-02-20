@@ -21,7 +21,7 @@ namespace
 		{Character::HitReactionKind::kWeakUpBurst,1.2f},
 		{Character::HitReactionKind::kUpBurst,2.0f},
 		{Character::HitReactionKind::kFarBurst,2.0f},
-		{Character::HitReactionKind::kDownBurst,2.0f},
+		{Character::HitReactionKind::kDownBurst,3.3f},
 		{Character::HitReactionKind::kWeakBurst,1.8f},
 		{Character::HitReactionKind::kMiddleStan,0.1f},
 		{Character::HitReactionKind::kBottomStan,0.1f}
@@ -102,10 +102,10 @@ namespace
 	constexpr int kFallsEffectLifeTime = 30;
 
 	//ステージにぶつかった時のカメラを揺らす時間
-	constexpr int kStageBumpShakeCameraTime = 13;
+	constexpr int kStageBumpShakeCameraTime = 20;
 
 	//ステージにぶつかった時のカメラを揺らす大きさ
-	constexpr int kStageBumpShakeCameraPower = 10;
+	constexpr int kStageBumpShakeCameraPower = 20;
 
 	//ステージにぶつかった時受けるダメージ
 	constexpr int kStageBumpDamage = 2000;

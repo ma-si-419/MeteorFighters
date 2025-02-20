@@ -612,8 +612,10 @@ std::shared_ptr<Attack> Character::CreateAttack(AttackData attackData)
 	//攻撃のポインタ作成
 	ans = std::make_shared<Attack>(tag, attackPos);
 
+	//攻撃のステータス
 	Attack::AttackStatus status;
 
+	//攻撃のステータスを設定
 	status.targetPos = targetPos;
 	status.damage = attackData.damage;
 	status.speed = attackData.speed;
@@ -625,7 +627,8 @@ std::shared_ptr<Attack> Character::CreateAttack(AttackData attackData)
 	status.attackName = attackData.attackName;
 	status.hitSoundName = attackData.hitSoundName;
 
-	ans->Init(status, m_pBattleManager->GetEffectManagerPointer());
+	//攻撃の初期化
+	ans->Init(status, m_pBattleManager);
 
 	m_pBattleManager->AddAttack(ans);
 

@@ -67,17 +67,29 @@ namespace
 		{Character::HitReactionKind::kBottomStan,60}
 	};
 
+	//•KE‹Z‚ğó‚¯‚½‚ÌƒJƒƒ‰‚ğ—h‚ç‚·‘å‚«‚³
+	constexpr int kSpecialShakeCameraPower = 15;
+
+	//•KE‹Z‚ğó‚¯‚½‚ÌƒJƒƒ‰‚ğ—h‚ç‚·ŠÔ
+	constexpr int kSpecialShakeCameraTime = 20;
+
+	//ƒGƒlƒ‹ƒM[UŒ‚‚ğ“–‚Ä‚½‚ÌƒJƒƒ‰‚ğ—h‚ç‚·ŠÔ
+	constexpr int kEnergyShakeCameraTime = 3;
+
+	//ƒGƒlƒ‹ƒM[UŒ‚‚ğ“–‚Ä‚½‚ÌƒJƒƒ‰‚ğ—h‚ç‚·‘å‚«‚³
+	constexpr int kEnergyShakeCameraPower = 3;
+
 	//‚«”ò‚Î‚·UŒ‚‚ğ“–‚Ä‚½‚ÌƒJƒƒ‰‚ğ—h‚ç‚·ŠÔ
 	constexpr int kHighShakeCameraTime = 10;
 
 	//‚«”ò‚Î‚·UŒ‚‚ğ“–‚Ä‚½‚ÌƒJƒƒ‰‚ğ—h‚ç‚·‘å‚«‚³
-	constexpr int kHighShakeCameraPower = 10;
+	constexpr int kHighShakeCameraPower = 15;
 
 	//’†‚­‚ç‚¢‚ÌUŒ‚‚ğ“–‚Ä‚½‚ÌƒJƒƒ‰‚ğ—h‚ç‚·ŠÔ
-	constexpr int kMiddleShakeCameraTime = 5;
+	constexpr int kMiddleShakeCameraTime = 7;
 
 	//’†‚­‚ç‚¢‚ÌUŒ‚‚ğ“–‚Ä‚½‚ÌƒJƒƒ‰‚ğ—h‚ç‚·‘å‚«‚³
-	constexpr int kMiddleShakeCameraPower = 5;
+	constexpr int kMiddleShakeCameraPower = 10;
 }
 
 CharacterStateBase::CharacterStateBase(std::shared_ptr<Character> character) :
@@ -336,8 +348,20 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 	//ƒ_ƒ[ƒW‚ğó‚¯‚éÛ‚ÉƒqƒbƒgƒTƒEƒ“ƒh‚ğ–Â‚ç‚·
 	SoundManager::GetInstance().PlayOnceSound(status.hitSoundName);
 
+	//•KE‹Z‚Å‚ ‚ê‚Î
+	if (status.attackKind == Character::AttackKind::kLaser)
+	{
+		//ƒJƒƒ‰‚ğ—h‚ç‚·
+		m_pManager->ShakeCamera(kSpecialShakeCameraTime, kSpecialShakeCameraPower);
+	}
+	//ƒGƒlƒ‹ƒM[UŒ‚‚Å‚ ‚ê‚Î
+	else if (status.attackKind == Character::AttackKind::kEnergy)
+	{
+		//ƒJƒƒ‰‚ğ—h‚ç‚·
+		m_pManager->ShakeCamera(kEnergyShakeCameraTime, kEnergyShakeCameraPower);
+	}
 	//“G‚ğ‚«”ò‚Î‚·UŒ‚‚Å‚ ‚ê‚Î
-	if (hitReaction == Character::HitReactionKind::kUpBurst ||
+	else if (hitReaction == Character::HitReactionKind::kUpBurst ||
 		hitReaction == Character::HitReactionKind::kDownBurst ||
 		hitReaction == Character::HitReactionKind::kFarBurst)
 	{

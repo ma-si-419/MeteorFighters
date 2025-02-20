@@ -1,8 +1,8 @@
 #pragma once
 #include "Collidable.h"
 #include "Character.h"
+class GameManagerBase;
 class Effect;
-class EffectManager;
 class Attack : public Collidable
 {
 public:
@@ -32,7 +32,7 @@ public:
 	/// <summary>
 	/// 攻撃のステータスの設定
 	/// </summary>
-	void Init(AttackStatus status,std::shared_ptr<EffectManager> manager);
+	void Init(AttackStatus status,std::shared_ptr<GameManagerBase> manager);
 
 	/// <summary>
 	/// 攻撃の更新(座標の更新など)
@@ -133,6 +133,6 @@ private:
 	//エフェクト
 	std::shared_ptr<Effect> m_pEffect;
 
-	//エフェクトマネージャーを持っておく
-	std::shared_ptr<EffectManager> m_pEffectManager;
+	//ゲームマネージャーを持っておく
+	std::shared_ptr<GameManagerBase> m_pGameManager;
 };

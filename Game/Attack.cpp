@@ -3,6 +3,7 @@
 #include "CapsuleColliderData.h"
 #include "Effect.h"
 #include "EffectManager.h"
+#include "GameManagerBase.h"
 #include <cmath>
 
 namespace
@@ -13,6 +14,19 @@ namespace
 
 	constexpr int kHitEffectTime = 50;
 
+	//攻撃と攻撃がぶつかった際にカメラを揺らす大きさ
+	constexpr int kAttackBumpShakePower = 5;
+
+	//強い攻撃と強い攻撃がぶつかった際にカメラを揺らす大きさ
+	constexpr int kStrongAttackBumpShakePower = 15;
+
+	//攻撃と攻撃がぶつかった際にカメラを揺らす時間
+	constexpr int kAttackBumpShakeTime = 5;
+
+	//強い攻撃と強い攻撃がぶつかった際にカメラを揺らす時間
+	constexpr int kStrongAttackBumpShakeTime = 50;
+
+	
 	//格闘攻撃を受けた時に出すエフェクト
 	const std::map<Character::AttackHitKind, Effect::EffectKind> kPhysicalAttackHitEffectMap =
 	{
@@ -50,7 +64,7 @@ Attack::~Attack()
 {
 }
 
-void Attack::Init(AttackStatus status, std::shared_ptr<EffectManager> manager)
+void Attack::Init(AttackStatus status, std::shared_ptr<GameManagerBase> manager)
 {
 	m_status = status;
 	Collidable::Init();
@@ -59,13 +73,14 @@ void Attack::Init(AttackStatus status, std::shared_ptr<EffectManager> manager)
 	col->m_lange = (m_status.targetPos - m_rigidbody.GetPos()).Normalize() * kAttackLange;
 	col->m_endPos = m_rigidbody.GetPos() + col->m_lange;
 
-	m_pEffectManager = manager;
+	m_pGameManager = manager;
+
 	//エフェクトが設定されていたら
 	if (status.effectName != "None")
 	{
 		m_pEffect = std::make_shared<Effect>(status.effectName);
 
-		manager->Entry(m_pEffect, m_rigidbody.GetPos());
+		manager->GetEffectManagerPointer()->Entry(m_pEffect, m_rigidbody.GetPos());
 	}
 
 	m_dir = (m_status.targetPos - m_rigidbody.GetPos()).Normalize();
@@ -116,13 +131,13 @@ void Attack::Final()
 	if (m_pEffect)
 	{
 		//自身の攻撃エフェクトの再生をやめる
-		m_pEffectManager->Exit(m_pEffect);
+		m_pGameManager->GetEffectManagerPointer()->Exit(m_pEffect);
 	}
 }
 
 void Attack::StopEffect()
 {
-	m_pEffectManager->Exit(m_pEffect);
+	m_pGameManager->GetEffectManagerPointer()->Exit(m_pEffect);
 }
 
 void Attack::SetEffectLifeTime(int time)
@@ -167,6 +182,17 @@ void Attack::OnCollide(std::shared_ptr<Collidable> collider)
 					//この攻撃を消す
 					m_isExist = false;
 
+					if (m_status.attackKind == Character::AttackKind::kLaser)
+					{
+						//カメラを揺らす
+						m_pGameManager->ShakeCamera(kStrongAttackBumpShakeTime, kStrongAttackBumpShakePower);
+					}
+					else if (m_status.attackKind == Character::AttackKind::kEnergy)
+					{
+						//カメラを揺らす
+						m_pGameManager->ShakeCamera(kAttackBumpShakeTime, kAttackBumpShakePower);
+					}
+
 					//ヒットエフェクトを再生する
 					auto effect = std::make_shared<Effect>(static_cast<Effect::EffectKind>(GetHitEffeckKind()));
 
@@ -177,7 +203,7 @@ void Attack::OnCollide(std::shared_ptr<Collidable> collider)
 					effect->SetLifeTime(kHitEffectTime);
 
 					//エフェクトを登録
-					m_pEffectManager->Entry(effect, m_rigidbody.GetPos());
+					m_pGameManager->GetEffectManagerPointer()->Entry(effect, m_rigidbody.GetPos());
 				}
 			}
 		}
@@ -196,6 +222,17 @@ void Attack::OnCollide(std::shared_ptr<Collidable> collider)
 					//この攻撃を消す
 					m_isExist = false;
 
+					if (m_status.attackKind == Character::AttackKind::kLaser)
+					{
+						//カメラを揺らす
+						m_pGameManager->ShakeCamera(kStrongAttackBumpShakeTime, kStrongAttackBumpShakePower);
+					}
+					else if (m_status.attackKind == Character::AttackKind::kEnergy)
+					{
+						//カメラを揺らす
+						m_pGameManager->ShakeCamera(kAttackBumpShakeTime, kAttackBumpShakePower);
+					}
+
 					//ヒットエフェクトを再生する
 					auto effect = std::make_shared<Effect>(static_cast<Effect::EffectKind>(GetHitEffeckKind()));
 
@@ -206,7 +243,7 @@ void Attack::OnCollide(std::shared_ptr<Collidable> collider)
 					effect->SetLifeTime(kHitEffectTime);
 
 					//エフェクトを登録
-					m_pEffectManager->Entry(effect, m_rigidbody.GetPos());
+					m_pGameManager->GetEffectManagerPointer()->Entry(effect, m_rigidbody.GetPos());
 				}
 			}
 		}
