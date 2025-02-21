@@ -31,7 +31,7 @@ namespace GameSceneConstant
 	//残像を作成する感覚
 	constexpr int kAfterImageCreateTime = 6;
 	//残像を消す速さ
-	constexpr float kAfterImageDeleteSpeed = kAfterImageInitOpacityRate / 10;
+	constexpr float kAfterImageDeleteSpeed = kAfterImageInitOpacityRate / 15;
 	//突撃しているときの移動速度倍率
 	constexpr float kRushMoveSpeedRate = 3.0f;
 	//突撃するとき移動ベクトルの向きの変えやすさ

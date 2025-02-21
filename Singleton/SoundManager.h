@@ -76,14 +76,37 @@ public:
 	/// <param name="">シーンの名前</param>
 	void LoadSceneSound(std::string sceneName);
 
+	/// <summary>
+	/// サウンドを一度だけ再生する
+	/// </summary>
+	/// <param name="soundName">サウンドの名前</param>
+	/// <returns>サウンドのプレイハンドル</returns>
 	int PlayOnceSound(std::string soundName);
 
+	/// <summary>
+	/// サウンドをループ再生する
+	/// </summary>
+	/// <param name="soundName">サウンドの名前</param>
+	/// <returns>サウンドのプレイハンドル</returns>
 	int PlayLoopSound(std::string soundName);
 
+	/// <summary>
+	/// サウンドを停止する
+	/// </summary>
+	/// <param name="soundName">サウンドの名前</param>
 	void StopSound(std::string soundName);
 
+	/// <summary>
+	/// ループ再生している音声を停止する
+	/// </summary>
+	/// <param name="soundName">サウンドの名前</param>
 	void StopLoopSound(std::string soundName);
 
+	/// <summary>
+	/// 音声が再生中かどうかを取得する
+	/// </summary>
+	/// <param name="soundName">サウンドの名前</param>
+	/// <returns>再生しているならばtrue</returns>
 	bool IsPlayingSound(std::string soundName);
 
 	/// <summary>

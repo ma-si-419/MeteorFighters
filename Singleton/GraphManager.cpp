@@ -77,9 +77,10 @@ void GraphManager::Init()
 
 void GraphManager::LoadSceneGraph(std::string sceneName)
 {
-	//画像ハンドルを削除する
+	//前のシーンで使用していた画像ハンドルを削除する
 	if (m_sceneGraphHandle.size() > 0)
 	{
+		//シーンの画像ハンドルを削除する
 		for (auto& item : m_sceneGraphHandle)
 		{
 			DeleteGraph(item.second);

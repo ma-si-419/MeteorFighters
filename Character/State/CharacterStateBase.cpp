@@ -37,6 +37,12 @@ namespace
 	//ヒットエフェクトを残す時間
 	constexpr int kHitEffectLifeTime = 180;
 
+	//ガードエフェクトとキャラクターの距離
+	constexpr float kGuardEffectDistance = 5.7f;
+	
+	//ガードエフェクトの高さ
+	constexpr float kGuardEffectHeight = 2.5f;
+
 	//ガードできる可能性がある状態
 	const std::vector<Character::HitReactionKind> kCanGuardHitReactionKind =
 	{
@@ -266,11 +272,27 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 	//エフェクトが設定されていれば
 	if (effectKind != Effect::EffectKind::kNone)
 	{
+		//エフェクトを生成する
 		std::shared_ptr<Effect> hitEffect = std::make_shared<Effect>(effectKind);
+		
+		//エフェクトの寿命を設定する
 		hitEffect->SetLifeTime(kHitEffectLifeTime);
-		hitEffect->SetPos(m_pCharacter->GetPos());
-		m_pCharacter->m_pBattleManager->GetEffectManagerPointer()->Entry(hitEffect, m_pCharacter->GetPos());
 
+		//エフェクトの位置
+		MyEngine::Vector3 pos = m_pCharacter->GetPos();
+
+		//ガードエフェクトであればキャラクターの前方に表示する
+		if (effectKind == Effect::EffectKind::kGuardHit)
+		{
+			pos += (m_pCharacter->GetFrontPos() - m_pCharacter->GetPos()).Normalize() * kGuardEffectDistance;
+			pos.y += kGuardEffectHeight;
+		}
+
+		//エフェクトの位置を設定する
+		hitEffect->SetPos(pos);
+		m_pCharacter->m_pBattleManager->GetEffectManagerPointer()->Entry(hitEffect, pos);
+
+		//エフェクトの向きを設定する
 		MyEngine::Vector3 rotation;
 
 		float vX = attack->GetPos().x - m_pCharacter->GetPos().x;

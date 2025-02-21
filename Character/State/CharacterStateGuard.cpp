@@ -28,8 +28,11 @@ void CharacterStateGuard::Enter()
 	m_pCharacter->ChangeAnim(Character::AnimKind::kGuardMiddle, true, kBlendSpeed);
 	m_guardKind = CharacterGuardKind::kMiddleGuard;
 
-	//“G‚Ì•ûŒü‚ðŒü‚­
-	m_pCharacter->LookTarget();
+	//“G‚ªŽ©g‚Ì‘O‘¤‚É‚¢‚ê‚Î“G‚Ì•ûŒü‚ðŒü‚­
+	if (m_pCharacter->IsFrontTarget())
+	{
+		m_pCharacter->LookTarget();
+	}
 }
 
 void CharacterStateGuard::Update()

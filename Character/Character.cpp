@@ -39,6 +39,9 @@ namespace
 	//ボイスの大きさ(255がMAX)
 	constexpr int kVoiceVolume = 40;
 
+	//ノックアウト時の時間の進む速度
+	constexpr float kKnockOutTimeSpeed = 0.1f;
+
 	//攻撃の種類を外部ファイルの文字列から内部のAttackHitKindに変換する際に使用する
 	const std::map<std::string, Character::AttackHitKind> kAttackHitKindMap =
 	{
@@ -996,9 +999,9 @@ void Character::UpdateKnockOut()
 	}
 
 	//移動を遅くする
-	m_rigidbody.SetVelo(m_knockOutVelo * 0.1f);
+	m_rigidbody.SetVelo(m_knockOutVelo * kKnockOutTimeSpeed);
 	//アニメーションもゆっくり再生する
-	SetAnimPlaySpeed(0.1f);
+	SetAnimPlaySpeed(kKnockOutTimeSpeed);
 
 	//残像の更新を行う
 	UpdateAfterImage();
