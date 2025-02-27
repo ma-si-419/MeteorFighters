@@ -11,7 +11,7 @@ public:
 	~SceneManager();
 
 	//‰Šú‰»ˆ—
-	void Init();
+	void Init(std::shared_ptr<SceneBase> scene);
 	//XVˆ—
 	void Update();
 	//•`‰æˆ—

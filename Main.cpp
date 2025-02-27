@@ -1,5 +1,7 @@
 #include "DxLib.h"
 #include "SceneManager.h"
+#include "SceneTitle.h"
+#include "SceneDebug.h"
 #include "GraphManager.h"
 #include "SoundManager.h"
 #include "LoadManager.h"
@@ -68,7 +70,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	MyEngine::Input::GetInstance().Init();
 	SceneManager sceneManager;
 
-	sceneManager.Init();
+	std::shared_ptr<SceneBase> startScene;
+
+	//タイトルシーン
+	startScene = std::make_shared<SceneTitle>(sceneManager);
+
+#ifdef _DEBUG
+
+	//デバッグシーン
+	startScene = std::make_shared<SceneDebug>(sceneManager);
+
+#endif // _DEBUG
+
+	sceneManager.Init(startScene);
 
 #ifdef _DEBUG
 

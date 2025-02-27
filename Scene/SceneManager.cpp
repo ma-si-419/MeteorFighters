@@ -23,9 +23,9 @@ SceneManager::~SceneManager()
 {
 }
 
-void SceneManager::Init()
+void SceneManager::Init(std::shared_ptr<SceneBase> scene)
 {
-	m_pScene = std::make_shared<SceneTitle>(*this);
+	m_pScene = scene;
 	m_pScene->Init();
 }
 
