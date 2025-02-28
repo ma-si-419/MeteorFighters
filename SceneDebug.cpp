@@ -44,15 +44,31 @@ namespace
 	//フォントのサイズ
 	constexpr int kFontSize = 48;
 
+	//フォントの名前
+	const std::string kFontName = "GN-キルゴUかなNB";
+
+	//ダメージを表示する座標
+	constexpr int kDamagePosX = Game::kWindowWidth - 250;
+	constexpr int kDamagePosY = Game::kWindowHeight / 2 + 70;
+
+	//ダメージの初期座標
+	constexpr int kDamageInitPosX = Game::kWindowWidth + 300;
+
 	//コンボを表示する座標
 	constexpr int kComboPosX[2] = { 200,Game::kWindowWidth - 200 };
-	constexpr int kComboPosY = Game::kWindowHeight / 2;
+	constexpr int kComboPosY = Game::kWindowHeight / 2 - 50;
 
 	//コンボの初期座標
 	constexpr int kComboInitPosX[2] = { -200,Game::kWindowWidth + 200 };
 
+	//コンボの数字以外のUIを表示する座標(コンボの座標の相対座標)
+	const MyEngine::Vector2 kComboUIShiftVec = MyEngine::Vector2(50, 40);
+
 	//コンボが入ってくるときの速度
-	constexpr int kComboMoveSpeed = 60;
+	constexpr int kComboMoveSpeed = 75;
+
+	//数字を表示する間隔
+	constexpr float kNumberInterval = 65.0f;
 
 	//コンボの表示時間
 	constexpr int kComboTime = 60;
@@ -60,6 +76,8 @@ namespace
 	//コンボを消していく速度
 	constexpr int kComboFadeSpeed = 35;
 
+	//表示するダメージを増やしていく時間
+	constexpr int kShowDamageAddTime = 20;
 }
 
 SceneDebug::SceneDebug(SceneManager& sceneManager) :
@@ -69,9 +87,16 @@ SceneDebug::SceneDebug(SceneManager& sceneManager) :
 	m_combo(0),
 	m_comboTime(0),
 	m_numberGraphHandle(),
-	m_comboPosX(),
-	m_comboScale()
+	m_comboPos(),
+	m_comboScale(),
+	m_comboAlpha(0),
+	m_damage(0),
+	m_showDamage(0),
+	m_showDamageAddTime(0),
+	m_showDamageAddNum(0)
 {
+	//ダメージを表示する際のフォントのハンドルを取得
+	m_damageFontHandle = CreateFontToHandle(kFontName.c_str(), kFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, 0, 2);
 }
 
 SceneDebug::~SceneDebug()
@@ -86,11 +111,13 @@ void SceneDebug::Init()
 		m_numberGraphHandle[i] = LoadGraph(("data/image/" + std::to_string(i) + ".png").c_str());
 	}
 
+	//コンボのUIの読み込み
+	m_comboGraphHandle = LoadGraph("data/image/combo.png");
+
 	//コンボの初期化
 	m_combo = 0;
 	m_comboTime = 0;
-	m_comboPosX[0] = kComboInitPosX[0];
-	m_comboPosX[1] = kComboInitPosX[1];
+	m_comboPos = MyEngine::Vector2(kComboInitPosX[0], kComboPosY);
 	m_comboScale[0] = 1.0;
 	m_comboScale[1] = 1.0;
 }
@@ -154,6 +181,15 @@ void SceneDebug::Update()
 		//選択している項目を更新
 		m_selectScene = lastSelectScene;
 
+		//ダメージを増やす
+		m_damage += GetRand(1000);
+
+		//表示するダメージを増やす時間を初期化
+		m_showDamageAddTime = 0;
+
+		//1フレームで増やすダメージを計算
+		m_showDamageAddNum = (m_damage - m_showDamage) / kShowDamageAddTime;
+
 		//コンボ数を増やす
 		m_combo++;
 
@@ -185,8 +221,21 @@ void SceneDebug::Update()
 		{
 			//コンボを初期化
 			m_combo = 0;
-			m_comboPosX[0] = kComboInitPosX[0];
+			m_comboPos.x = kComboInitPosX[1];
 		}
+	}
+
+	//表示するダメージを増やす時間が一定時間を超えたら
+	if (m_showDamageAddTime > kShowDamageAddTime)
+	{
+		//ダメージと表示しているダメージ量を一致させる
+		m_showDamage = m_damage;
+	}
+	else
+	{
+		//表示しているダメージを増やす
+		m_showDamage += m_showDamageAddNum;
+		m_showDamageAddTime++;
 	}
 
 	//コンボの拡大率をあげてく
@@ -198,15 +247,26 @@ void SceneDebug::Update()
 	if (m_combo > 0)
 	{
 		//コンボの座標を移動
-		m_comboPosX[1] -= kComboMoveSpeed;
+		m_comboPos.x -= kComboMoveSpeed;
+		//ダメージの座標を移動
+		m_damagePosX -= kComboMoveSpeed;
 	}
 	else
 	{
-		m_comboPosX[1] = kComboInitPosX[1];
+		m_comboPos.x = kComboInitPosX[1];
+		m_damagePosX = kDamageInitPosX;
+
+		m_damage = 0;
+		m_showDamage = 0;
+		m_showDamageAddTime = 0;
+		m_showDamageAddNum = 0;
 	}
 
 	//コンボの座標をクランプ
-	m_comboPosX[1] = max(m_comboPosX[1], kComboPosX[1]);
+	m_comboPos.x = max(m_comboPos.x, kComboPosX[1]);
+
+	//ダメージの座標をクランプ
+	m_damagePosX = max(m_damagePosX, kDamagePosX);
 
 	//決定ボタンが押されたら
 	if (input->IsTrigger("A") && !m_sceneManager.IsChangeScene())
@@ -223,6 +283,10 @@ void SceneDebug::Update()
 
 void SceneDebug::Draw()
 {
+
+	//背景を水色に
+	DrawBox(0, 0, Game::kWindowWidth, Game::kWindowHeight, GetColor(0, 192, 192), true);
+
 	//基本的に白で描画
 	int color[static_cast<int>(Game::Scene::kEnd)] =
 	{
@@ -242,21 +306,39 @@ void SceneDebug::Draw()
 		DrawString(100, 100 + i * 50, kSceneName[i].c_str(), color[i]);
 	}
 
-	//コンボを描画
+	//コンボUIを描画
 
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA,m_comboAlpha);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_comboAlpha);
 
+
+	//ダメージを表示
+	DrawFormatStringToHandle(m_damagePosX, kDamagePosY, GetColor(255, 255, 255), m_damageFontHandle, "%d", m_showDamage);
+
+	//コンボ数によって処理を派生
 	if (m_combo < 10)
 	{
-		DrawRotaGraph(m_comboPosX[1], kComboPosY, m_comboScale[1], 0.0, m_numberGraphHandle[m_combo], true);
+		DrawRotaGraph(m_comboPos.x, m_comboPos.y, m_comboScale[1], 0.0, m_numberGraphHandle[m_combo], true);
+
+		MyEngine::Vector2 pos = m_comboPos + kComboUIShiftVec;
+
+		//コンボのUIを描画
+		DrawRotaGraph(pos.x, pos.y, 1.0, 0.0, m_comboGraphHandle, true);
 	}
 	else
 	{
 		int ten = m_combo / 10;
 		int one = m_combo % 10;
 
-		DrawRotaGraph(m_comboPosX[1] - 60, kComboPosY, m_comboScale[1], 0.0, m_numberGraphHandle[ten], true);
-		DrawRotaGraph(m_comboPosX[1], kComboPosY, m_comboScale[1], 0.0, m_numberGraphHandle[one], true);
+		//十の位
+		DrawRotaGraph(m_comboPos.x - kNumberInterval, kComboPosY, m_comboScale[1], 0.0, m_numberGraphHandle[ten], true);
+
+		//一の位
+		DrawRotaGraph(m_comboPos.x, kComboPosY, m_comboScale[1], 0.0, m_numberGraphHandle[one], true);
+
+		MyEngine::Vector2 pos = m_comboPos + kComboUIShiftVec;
+
+		//コンボのUIを描画
+		DrawRotaGraph(pos.x, pos.y, 1.0, 0.0, m_comboGraphHandle, true);
 	}
 
 	//ブレンドモードを元に戻す
@@ -306,4 +388,38 @@ std::shared_ptr<SceneBase> SceneDebug::CreateScene(int sceneNum)
 
 	//デフォルトはタイトルシーン
 	return std::make_shared<SceneTitle>(m_sceneManager);
+}
+
+void SceneDebug::DrawDamage(int damage)
+{
+	//桁数を取得
+	int digit = 1;
+
+	while(true)
+	{
+		int num = 1;
+
+		for (int i = 0; i < digit; i++)
+		{
+			num *= 10;
+		}
+
+		if (damage <= num)
+		{
+			break;
+		}
+
+		digit++;
+	}
+
+	int digit = 1;
+	while(damage > 0)
+	{
+		damage /= 10;
+		digit++;
+	}
+	return digit;
+	
+
+
 }
