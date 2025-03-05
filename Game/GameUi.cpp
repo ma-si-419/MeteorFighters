@@ -129,6 +129,41 @@ namespace
 
 	//連打するボタンを切り替える時間
 	constexpr int kBashButtonChangeTime = 10;
+
+	//ダメージを表示する座標
+	constexpr int kDamagePosX = Game::kWindowWidth - 90;
+	constexpr int kDamagePosY = Game::kWindowHeight / 2 + 70;
+
+	//ダメージの初期座標
+	constexpr int kDamageInitPosX = Game::kWindowWidth + 300;
+
+	//コンボを表示する座標
+	constexpr int kComboPosX[2] = { 200,Game::kWindowWidth - 200 };
+	constexpr int kComboPosY = Game::kWindowHeight / 2 - 50;
+
+	//コンボの初期座標
+	constexpr int kComboInitPosX[2] = { -200,Game::kWindowWidth + 200 };
+
+	//コンボの数字以外のUIを表示する座標(コンボの座標の相対座標)
+	const MyEngine::Vector2 kComboUIShiftVec = MyEngine::Vector2(50, 40);
+
+	//コンボが入ってくるときの速度
+	constexpr int kComboMoveSpeed = 75;
+
+	//数字を表示する間隔
+	constexpr float kNumberInterval = 65.0f;
+
+	//ダメージの数字の間隔
+	constexpr float kDamageNumberInterval = 43.0f;
+
+	//コンボの表示時間
+	constexpr int kComboTime = 60;
+
+	//コンボを消していく速度
+	constexpr int kComboFadeSpeed = 35;
+
+	//表示するダメージを増やしていく時間
+	constexpr int kShowDamageAddTime = 20;
 }
 
 GameUi::GameUi() :
@@ -675,6 +710,11 @@ void GameUi::DrawMpBar(float mp, bool isLeft)
 
 }
 
+void GameUi::DrawCombo(int combo)
+{	
+
+}
+
 void GameUi::DrawFade(int color, int alpha)
 {
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
@@ -699,9 +739,20 @@ void GameUi::DrawBashButton(std::string button)
 	}
 
 	//ボタンの後ろの背景を表示する
-	DrawRotaGraph(kBashButtonPosX, kBashButtonPosY,1.0,0.0,graphManager.GetHandle("BashBack"),true);
+	DrawRotaGraph(kBashButtonPosX, kBashButtonPosY, 1.0, 0.0, graphManager.GetHandle("BashBack"), true);
 
 	//ボタンを描画する
-	DrawRectRotaGraph(kBashButtonPosX, kBashButtonPosY,cutPos,0,kBashButtonGraphWidth,kBashButtonGraphHeight,
-	1.0,0.0,buttonHandle,true);
+	DrawRectRotaGraph(kBashButtonPosX, kBashButtonPosY, cutPos, 0, kBashButtonGraphWidth, kBashButtonGraphHeight,
+		1.0, 0.0, buttonHandle, true);
+}
+
+int GameUi::GetDigit(int num)
+{
+	int digit = 0;
+	while (num > 0)
+	{
+		num /= 10;
+		digit++;
+	}
+	return digit;
 }

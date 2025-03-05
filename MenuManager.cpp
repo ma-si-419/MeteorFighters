@@ -19,7 +19,8 @@ void MenuManager::Init()
 
 void MenuManager::Update()
 {
-	int selectItem = m_pMenuUi->Update();
+
+	int selectItem = m_pMenuUi->Update(); 
 
 	if (selectItem == static_cast<int>(MenuUi::SelectItem::kSelect))
 	{

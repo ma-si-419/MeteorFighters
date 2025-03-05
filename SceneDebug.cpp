@@ -48,7 +48,7 @@ namespace
 	const std::string kFontName = "GN-キルゴUかなNB";
 
 	//ダメージを表示する座標
-	constexpr int kDamagePosX = Game::kWindowWidth - 250;
+	constexpr int kDamagePosX = Game::kWindowWidth - 90;
 	constexpr int kDamagePosY = Game::kWindowHeight / 2 + 70;
 
 	//ダメージの初期座標
@@ -69,6 +69,9 @@ namespace
 
 	//数字を表示する間隔
 	constexpr float kNumberInterval = 65.0f;
+
+	//ダメージの数字の間隔
+	constexpr float kDamageNumberInterval = 43.0f;
 
 	//コンボの表示時間
 	constexpr int kComboTime = 60;
@@ -312,7 +315,7 @@ void SceneDebug::Draw()
 
 
 	//ダメージを表示
-	DrawFormatStringToHandle(m_damagePosX, kDamagePosY, GetColor(255, 255, 255), m_damageFontHandle, "%d", m_showDamage);
+	DrawDamage(m_showDamage);
 
 	//コンボ数によって処理を派生
 	if (m_combo < 10)
@@ -392,34 +395,24 @@ std::shared_ptr<SceneBase> SceneDebug::CreateScene(int sceneNum)
 
 void SceneDebug::DrawDamage(int damage)
 {
-	//桁数を取得
-	int digit = 1;
-
-	while(true)
+	//桁数を取得	
+	int digit = 0;
+	int mathDamage = damage;
+	while(mathDamage > 0)
 	{
-		int num = 1;
-
-		for (int i = 0; i < digit; i++)
-		{
-			num *= 10;
-		}
-
-		if (damage <= num)
-		{
-			break;
-		}
-
+		mathDamage /= 10;
 		digit++;
 	}
-
-	int digit = 1;
-	while(damage > 0)
-	{
-		damage /= 10;
-		digit++;
-	}
-	return digit;
 	
 
-
+	//桁数分繰り返す
+	for (int i = 0; i < digit; i++)
+	{
+		//1の位を取得
+		int num = damage % 10;
+		//数字を右揃えで表示
+		DrawFormatStringToHandle(m_damagePosX - i * kDamageNumberInterval, kDamagePosY,GetColor(255, 255, 255),m_damageFontHandle,"%d",num);
+		//10で割る
+		damage /= 10;
+	}
 }

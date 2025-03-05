@@ -28,6 +28,12 @@ public:
 	void DrawMpBar(float mp, bool isLeft);
 
 	/// <summary>
+	/// コンボを描画する
+	/// </summary>
+	/// <param name="combo">コンボ数</param>
+	void DrawCombo(int combo);
+
+	/// <summary>
 	/// 画面全体のフェードを表示する
 	/// </summary>
 	/// <param name="color">色</param>
@@ -40,6 +46,11 @@ public:
 	/// <param name="button">連打するボタンの名前</param>
 	void DrawBashButton(std::string button);
 private:
+
+	int GetDigit(int num);
+
+private:
+
 
 	//1Pと2Pの二つのHpバーがあるので二つ持っておく
 	MyEngine::Vector2 m_shakePos[2];
@@ -61,4 +72,16 @@ private:
 
 	//連打するボタンを切り替える時間
 	int m_bashButtonChangeTime;
+
+	//コンボ数が切り替わってからの時間
+	int m_comboTime;
+
+	//コンボのUIのX座標
+	MyEngine::Vector2 m_comboPos;
+
+	//コンボの数字の拡大率
+	double m_comboScale[2];
+
+	//コンボのアルファ値
+	int m_comboAlpha;
 };
