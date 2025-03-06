@@ -23,7 +23,6 @@ public:
 
 private:
 
-
 	/// <summary>
 	/// w’è‚µ‚½ƒV[ƒ“‚ğì¬‚·‚é
 	/// </summary>
@@ -78,7 +77,7 @@ private:
 
 	int m_numberGraphHandle[10];
 
-	int m_comboGraphHandle;
+	int m_comboBarGraphHandle;
 
 	int m_selectScene;
 

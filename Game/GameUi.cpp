@@ -138,8 +138,8 @@ namespace
 	constexpr int kDamageInitPosX = Game::kWindowWidth + 300;
 
 	//コンボを表示する座標
-	constexpr int kComboPosX[2] = { 200,Game::kWindowWidth - 200 };
-	constexpr int kComboPosY = Game::kWindowHeight / 2 - 50;
+	constexpr int kComboBarPosX[2] = { 200,Game::kWindowWidth - 200 };
+	constexpr int kComboBarPosY = Game::kWindowHeight / 2 - 50;
 
 	//コンボの初期座標
 	constexpr int kComboInitPosX[2] = { -200,Game::kWindowWidth + 200 };

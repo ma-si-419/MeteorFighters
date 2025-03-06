@@ -54,9 +54,18 @@ namespace
 	//ダメージの初期座標
 	constexpr int kDamageInitPosX = Game::kWindowWidth + 300;
 
-	//コンボを表示する座標
-	constexpr int kComboPosX[2] = { 200,Game::kWindowWidth - 200 };
-	constexpr int kComboPosY = Game::kWindowHeight / 2 - 50;
+
+
+	//コンボバーを表示する座標
+	constexpr int kComboBarPosX[2] = { 200,Game::kWindowWidth - 200 };
+	constexpr int kComboBarPosY = Game::kWindowHeight / 2;
+	
+	//コンボ数を表示する座標
+	constexpr int kComboNumberPosY = kComboBarPosY - 24;
+
+	//コンボの文字を表示する座標
+	constexpr int kComboPosX[2] = { kComboBarPosX[0] - 50,kComboBarPosX[1] + 50};
+	constexpr int kComboPosY = kComboBarPosY - 40;
 
 	//コンボの初期座標
 	constexpr int kComboInitPosX[2] = { -200,Game::kWindowWidth + 200 };
@@ -115,12 +124,12 @@ void SceneDebug::Init()
 	}
 
 	//コンボのUIの読み込み
-	m_comboGraphHandle = LoadGraph("data/image/combo.png");
+	m_comboBarGraphHandle = LoadGraph("data/image/ComboBar.png");
 
 	//コンボの初期化
 	m_combo = 0;
 	m_comboTime = 0;
-	m_comboPos = MyEngine::Vector2(kComboInitPosX[0], kComboPosY);
+	m_comboPos = MyEngine::Vector2(kComboInitPosX[0], kComboBarPosY);
 	m_comboScale[0] = 1.0;
 	m_comboScale[1] = 1.0;
 }
@@ -266,7 +275,7 @@ void SceneDebug::Update()
 	}
 
 	//コンボの座標をクランプ
-	m_comboPos.x = max(m_comboPos.x, kComboPosX[1]);
+	m_comboPos.x = max(m_comboPos.x, kComboBarPosX[1]);
 
 	//ダメージの座標をクランプ
 	m_damagePosX = max(m_damagePosX, kDamagePosX);
@@ -320,12 +329,12 @@ void SceneDebug::Draw()
 	//コンボ数によって処理を派生
 	if (m_combo < 10)
 	{
-		DrawRotaGraph(m_comboPos.x, m_comboPos.y, m_comboScale[1], 0.0, m_numberGraphHandle[m_combo], true);
+		DrawRotaGraph(m_comboPos.x, kComboNumberPosY, m_comboScale[1], 0.0, m_numberGraphHandle[m_combo], true);
 
 		MyEngine::Vector2 pos = m_comboPos + kComboUIShiftVec;
 
 		//コンボのUIを描画
-		DrawRotaGraph(pos.x, pos.y, 1.0, 0.0, m_comboGraphHandle, true);
+		DrawRotaGraph(pos.x, pos.y, 1.0, 0.0, m_comboBarGraphHandle, true);
 	}
 	else
 	{
@@ -333,15 +342,15 @@ void SceneDebug::Draw()
 		int one = m_combo % 10;
 
 		//十の位
-		DrawRotaGraph(m_comboPos.x - kNumberInterval, kComboPosY, m_comboScale[1], 0.0, m_numberGraphHandle[ten], true);
+		DrawRotaGraph(m_comboPos.x - kNumberInterval, kComboNumberPosY, m_comboScale[1], 0.0, m_numberGraphHandle[ten], true);
 
 		//一の位
-		DrawRotaGraph(m_comboPos.x, kComboPosY, m_comboScale[1], 0.0, m_numberGraphHandle[one], true);
+		DrawRotaGraph(m_comboPos.x, kComboNumberPosY, m_comboScale[1], 0.0, m_numberGraphHandle[one], true);
 
 		MyEngine::Vector2 pos = m_comboPos + kComboUIShiftVec;
 
 		//コンボのUIを描画
-		DrawRotaGraph(pos.x, pos.y, 1.0, 0.0, m_comboGraphHandle, true);
+		DrawRotaGraph(pos.x, pos.y, 1.0, 0.0, m_comboBarGraphHandle, true);
 	}
 
 	//ブレンドモードを元に戻す
@@ -404,7 +413,6 @@ void SceneDebug::DrawDamage(int damage)
 		digit++;
 	}
 	
-
 	//桁数分繰り返す
 	for (int i = 0; i < digit; i++)
 	{
