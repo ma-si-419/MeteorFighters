@@ -138,8 +138,8 @@ namespace
 	constexpr int kDamageInitPosX = Game::kWindowWidth + 300;
 
 	//コンボを表示する座標
-	constexpr int kComboBarPosX[2] = { 200,Game::kWindowWidth - 200 };
-	constexpr int kComboBarPosY = Game::kWindowHeight / 2 - 50;
+	constexpr int kComboPosX[2] = { 200,Game::kWindowWidth - 200 };
+	constexpr int kComboPosY = Game::kWindowHeight / 2 - 50;
 
 	//コンボの初期座標
 	constexpr int kComboInitPosX[2] = { -200,Game::kWindowWidth + 200 };
@@ -148,7 +148,7 @@ namespace
 	const MyEngine::Vector2 kComboUIShiftVec = MyEngine::Vector2(50, 40);
 
 	//コンボが入ってくるときの速度
-	constexpr int kComboMoveSpeed = 75;
+	constexpr int kComboMoveSpeed[2] = { 75,-75 };
 
 	//数字を表示する間隔
 	constexpr float kNumberInterval = 65.0f;
@@ -156,8 +156,26 @@ namespace
 	//ダメージの数字の間隔
 	constexpr float kDamageNumberInterval = 43.0f;
 
+	//コンボの描画を始めるコンボ数
+	constexpr int kComboStartNum = 2;
+
 	//コンボの表示時間
 	constexpr int kComboTime = 60;
+
+	//コンボを消していく速度
+	constexpr int kComboFadeSpeed = 35;
+
+	//表示するダメージを増やしていく時間
+	constexpr int kShowDamageAddTime = 20;
+
+	//コンボ数が更新されたときのコンボ数の拡大率
+	constexpr double kComboNumInitScale = 0.55;
+
+	//コンボ数の拡大率の増加速度
+	constexpr double kComboNumScaleSpeed = 0.12;
+
+	//コンボ数の拡大率の最大値
+	constexpr double kComboNumMaxScale = 1.0;
 
 	//コンボを消していく速度
 	constexpr int kComboFadeSpeed = 35;
@@ -710,9 +728,120 @@ void GameUi::DrawMpBar(float mp, bool isLeft)
 
 }
 
-void GameUi::DrawCombo(int combo)
-{	
+void GameUi::UpdateComboUI()
+{
+	//コンボ数の表示
+	for (int i = 0; i < 2; i++)
+	{
+		//コンボ数が規定数より大きいなら
+		if (m_comboNum[i] > kComboStartNum)
+		{
+			//コンボ数の表示時間を減らす
+			m_comboTime[i]--;
+			//コンボ数の拡大率をあげる
+			m_comboScale[i] += kComboNumScaleSpeed;
+			//コンボの座標をずらす
+			m_comboPosX[i] += kComboMoveSpeed[i];
 
+			//座標を右にずらしていたら
+			if (kComboMoveSpeed[i] > 0)
+			{
+				//コンボの座標をクランプ
+				m_comboPosX[i] = min(m_comboPosX[i], kComboPosX[i]);
+			}
+			//座標を左にずらしていたら
+			else
+			{
+				//コンボの座標をクランプ
+				m_comboPosX[i] = max(m_comboPosX[i], kComboPosX[i]);
+			}
+
+			//コンボの表示時間が無くなれば
+			if (m_comboTime[i] < 0)
+			{
+				//アルファ値を減らす
+				m_comboAlpha[i] -= kComboFadeSpeed;
+			}
+		}
+
+		//もしアルファ値が0以下なら
+		if (m_comboAlpha[i] <= 0)
+		{
+			//コンボ数を0にする
+			m_comboNum[i] = 0;
+			//コンボの表示時間を0にする
+			m_comboTime[i] = 0;
+			//コンボ数の拡大率を初期化する
+			m_comboScale[i] = kComboNumInitScale;
+			//コンボのアルファ値を初期化する
+			m_comboAlpha[i] = 0;
+			//コンボの座標を初期化する
+			m_comboPosX[i] = kComboInitPosX[i];
+		}
+	}
+}
+
+void GameUi::DrawCombo()
+{
+	//コンボ数の表示
+	for (int i = 0; i < 2; i++)
+	{
+		//コンボ数が規定数より大きいなら
+		if (m_comboNum[i] > kComboStartNum)
+		{
+			
+		}
+	}
+}
+
+void GameUi::SetComboNum(int combo, bool isLeft)
+{
+	if (isLeft)
+	{
+		//コンボ数を設定する
+		m_comboNum[0] = combo;
+
+		//コンボの表示時間を設定する
+		m_comboTime[0] = kComboTime;
+
+		//コンボ数の拡大率を設定する
+		m_comboScale[0] = kComboNumInitScale;
+
+		//コンボのアルファ値を設定する
+		m_comboAlpha[0] = 255;
+
+		//もしコンボ数が1ならば
+		if (combo == 1)
+		{
+			//コンボの座標を初期化する
+			m_comboPosX[0] = kComboInitPosX[0];
+		}
+	}
+	else
+	{
+		//コンボ数を設定する
+		m_comboNum[1] = combo;
+
+		//コンボの表示時間を設定する
+		m_comboTime[1] = kComboTime;
+
+		//コンボ数の拡大率を設定する
+		m_comboScale[1] = kComboNumInitScale;
+
+		//コンボのアルファ値を設定する
+		m_comboAlpha[1] = 255;
+
+		//もしコンボ数が1ならば
+		if (combo == 1)
+		{
+			//コンボの座標を初期化する
+			m_comboPosX[1] = kComboInitPosX[1];
+		}
+	}
+}
+
+void GameUi::SetDamage(int damage, bool isLeft)
+{
 }
 
 void GameUi::DrawFade(int color, int alpha)
@@ -755,4 +884,16 @@ int GameUi::GetDigit(int num)
 		digit++;
 	}
 	return digit;
+}
+
+void GameUi::DrawNumber(int number, int posX, int posY, int interval, int fontHandle, int color)
+{
+	int digit = GetDigit(number);
+	int num = number;
+	for (int i = 0; i < digit; i++)
+	{
+		int digitNum = num % 10;
+		DrawFormatStringToHandle(posX - (interval * i), posY, color, fontHandle, "%d", digitNum);
+		num /= 10;
+	}
 }

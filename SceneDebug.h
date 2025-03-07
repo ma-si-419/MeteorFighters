@@ -79,6 +79,8 @@ private:
 
 	int m_comboBarGraphHandle;
 
+	int m_hitGraphHandle;
+
 	int m_selectScene;
 
 	int m_selectSceneMoveTime;
