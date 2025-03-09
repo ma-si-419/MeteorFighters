@@ -137,15 +137,16 @@ namespace
 	//ダメージの初期座標
 	constexpr int kDamageInitPosX = Game::kWindowWidth + 300;
 
-	//コンボを表示する座標
-	constexpr int kComboPosX[2] = { 200,Game::kWindowWidth - 200 };
-	constexpr int kComboPosY = Game::kWindowHeight / 2 - 50;
+	//コンボのUIを表示する座標
+	constexpr int kComboUIPosX[2] = { 200,Game::kWindowWidth - 200 };
+	constexpr int kComboUIPosY = Game::kWindowHeight / 2 - 50;
+
+	//コンボ数を表示する座標
+	constexpr int kComboNumberShiftX = -10;
+	constexpr int kComboNumberShiftY = -24;
 
 	//コンボの初期座標
 	constexpr int kComboInitPosX[2] = { -200,Game::kWindowWidth + 200 };
-
-	//コンボの数字以外のUIを表示する座標(コンボの座標の相対座標)
-	const MyEngine::Vector2 kComboUIShiftVec = MyEngine::Vector2(50, 40);
 
 	//コンボが入ってくるときの速度
 	constexpr int kComboMoveSpeed[2] = { 75,-75 };
@@ -155,6 +156,9 @@ namespace
 
 	//ダメージの数字の間隔
 	constexpr float kDamageNumberInterval = 43.0f;
+
+	//コンボの数字を表示する間隔
+	constexpr float kComboNumberInterval = 65.0f;
 
 	//コンボの描画を始めるコンボ数
 	constexpr int kComboStartNum = 2;
@@ -176,12 +180,6 @@ namespace
 
 	//コンボ数の拡大率の最大値
 	constexpr double kComboNumMaxScale = 1.0;
-
-	//コンボを消していく速度
-	constexpr int kComboFadeSpeed = 35;
-
-	//表示するダメージを増やしていく時間
-	constexpr int kShowDamageAddTime = 20;
 }
 
 GameUi::GameUi() :
@@ -740,20 +738,24 @@ void GameUi::UpdateComboUI()
 			m_comboTime[i]--;
 			//コンボ数の拡大率をあげる
 			m_comboScale[i] += kComboNumScaleSpeed;
-			//コンボの座標をずらす
+
+			//拡大率をクランプ
+			m_comboScale[i] = min(m_comboScale[i], kComboNumMaxScale);
+
+			//コンボの座標を動かす
 			m_comboPosX[i] += kComboMoveSpeed[i];
 
 			//座標を右にずらしていたら
 			if (kComboMoveSpeed[i] > 0)
 			{
 				//コンボの座標をクランプ
-				m_comboPosX[i] = min(m_comboPosX[i], kComboPosX[i]);
+				m_comboPosX[i] = min(m_comboPosX[i], kComboUIPosX[i]);
 			}
 			//座標を左にずらしていたら
 			else
 			{
 				//コンボの座標をクランプ
-				m_comboPosX[i] = max(m_comboPosX[i], kComboPosX[i]);
+				m_comboPosX[i] = max(m_comboPosX[i], kComboUIPosX[i]);
 			}
 
 			//コンボの表示時間が無くなれば
@@ -789,7 +791,45 @@ void GameUi::DrawCombo()
 		//コンボ数が規定数より大きいなら
 		if (m_comboNum[i] > kComboStartNum)
 		{
+			//コンボ数を表示する
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_comboAlpha[i]);
 			
+			//桁数を取得する
+			int digit = GetDigit(m_comboNum[i]);
+
+			//コンボ数
+			int combo = m_comboNum[i];
+
+			//コンボ数の間隔
+			int interval = kComboNumberInterval;
+
+			if (interval == 0)
+			{
+				interval *= -1;
+			}
+
+
+			for (int j = 0; j < digit; j++)
+			{
+				//一桁目の数字
+				int num = combo % 10;
+
+				//数字の画像ハンドル
+				int numberHandle = GraphManager::GetInstance().GetHandle("Number" + std::to_string(num));
+
+				//コンボ数を表示する
+				DrawRotaGraph(m_comboPosX[i] + kComboNumberShiftX - interval * j, kComboUIPosY + kComboNumberShiftY, m_comboScale[i], 0.0, numberHandle, true);
+			
+				float scale = m_comboScale[i];
+
+				//拡大率をでバック表示
+				printfDx("scale:%f\n", scale);
+
+				//次の桁へ
+				combo /= 10;
+			}
+
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 		}
 	}
 }

@@ -14,6 +14,7 @@
 #include "ObjectBase.h"
 #include <cmath>
 #include "SoundManager.h"
+#include "Input.h"
 
 namespace
 {
@@ -342,7 +343,7 @@ Character::PlayerNumber GameManagerBase::GetButtonBashWinner()
 {
 	//プレイヤーのボタン連打回数
 	int player = m_buttonBashNum[static_cast<int>(Character::PlayerNumber::kOnePlayer)];
-	
+
 	//エネミーは難易度によって連打した回数を変える
 	int enemy = kWinButtonBashingNum[static_cast<int>(m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetEnemyInput()->GetAiLevel())];
 
@@ -438,6 +439,25 @@ void GameManagerBase::UpdateCommon()
 	}
 	//エフェクトの更新
 	m_pEffectManager->Update();
+
+
+
+	auto input = MyEngine::Input::GetInstance().GetInputData(0);
+
+	//コンボの更新
+	if (input->GetPressTime("RB") > 2)
+	{
+
+		m_pGameUi->SetComboNum(input->GetPressTime("RB"), true);
+	}
+
+	if (input->GetPressTime("LB") > 2)
+	{
+		m_pGameUi->SetComboNum(input->GetPressTime("LB"), false);
+	}
+
+	m_pGameUi->UpdateComboUI();
+
 }
 
 void GameManagerBase::DrawCommon()
@@ -460,6 +480,10 @@ void GameManagerBase::DrawCommon()
 
 	//エフェクトの描画
 	m_pEffectManager->Draw();
+
+
+	//コンボの描画
+	m_pGameUi->DrawCombo();
 
 	//体力を描画するかどうか
 	if (m_isDrawHpBar)

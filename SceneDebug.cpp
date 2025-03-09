@@ -55,8 +55,8 @@ namespace
 	constexpr int kDamageInitPosX = Game::kWindowWidth + 300;
 
 	//コンボバーを表示する座標
-	constexpr int kComboPosX[2] = { 220,Game::kWindowWidth - 220 };
-	constexpr int kComboPosY = Game::kWindowHeight / 2;
+	constexpr int kComboUIPosX[2] = { 220,Game::kWindowWidth - 220 };
+	constexpr int kComboUIPosY = Game::kWindowHeight / 2;
 
 	//コンボ数を表示する座標
 	constexpr int kComboNumberShiftX = -10;
@@ -129,7 +129,7 @@ void SceneDebug::Init()
 	//コンボの初期化
 	m_combo = 0;
 	m_comboTime = 0;
-	m_comboPos = MyEngine::Vector2(kComboInitPosX[0], kComboPosY);
+	m_comboPos = MyEngine::Vector2(kComboInitPosX[0], kComboUIPosY);
 	m_comboScale[0] = 1.0;
 	m_comboScale[1] = 1.0;
 }
@@ -275,7 +275,7 @@ void SceneDebug::Update()
 	}
 
 	//コンボの座標をクランプ
-	m_comboPos.x = max(m_comboPos.x, kComboPosX[1]);
+	m_comboPos.x = max(m_comboPos.x, kComboUIPosX[1]);
 
 	//ダメージの座標をクランプ
 	m_damagePosX = max(m_damagePosX, kDamagePosX);
