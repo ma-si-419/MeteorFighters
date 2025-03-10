@@ -49,6 +49,8 @@ Number6,6,Game
 Number7,7,Game
 Number8,8,Game
 Number9,9,Game
+ComboHits,ComboHits,Game
+ComboBar,ComboBar,Game
 HpBar,HpBar,Tutorial
 HpBarNum,HpBarNumBox,Tutorial
 MpBar,MpBar,Tutorial
@@ -92,6 +94,8 @@ Number6,6,Tutorial
 Number7,7,Tutorial
 Number8,8,Tutorial
 Number9,9,Tutorial
+ComboHits,ComboHits,Tutorial
+ComboBar,ComboBar,Tutorial
 Character0,SelectCharacter0,Select
 Character1,SelectCharacter1,Select
 Random,SelectRandom,Select

@@ -465,6 +465,7 @@ void CharacterStateBase::HitAttack(std::shared_ptr<Attack> attack)
 	}
 
 	//ここまで来たら攻撃を受けているので
+	m_pCharacter->HitAttack(damage);	
 
 	//特定の攻撃を行っていたらチュートリアルをクリアさせる
 	if (status.attackName == "Low1")

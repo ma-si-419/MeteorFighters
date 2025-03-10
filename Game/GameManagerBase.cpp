@@ -441,23 +441,24 @@ void GameManagerBase::UpdateCommon()
 	m_pEffectManager->Update();
 
 
+	//ダメージの設定
+	int onePlayerDamage = m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetDamage();
+	int twoPlayerDamage = m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetDamage();
 
-	auto input = MyEngine::Input::GetInstance().GetInputData(0);
+	m_pGameUi->SetDamage(twoPlayerDamage, true);
+	m_pGameUi->SetDamage(onePlayerDamage,false);
 
+	//コンボの設定
+	int onePlayerCombo = m_pCharacters[static_cast<int>(Character::PlayerNumber::kOnePlayer)]->GetCombo();
+	int twoPlayerCombo = m_pCharacters[static_cast<int>(Character::PlayerNumber::kTwoPlayer)]->GetCombo();
+
+	m_pGameUi->SetCombo(twoPlayerCombo, true);
+	m_pGameUi->SetCombo(onePlayerCombo, false);
+	
 	//コンボの更新
-	if (input->GetPressTime("RB") > 2)
-	{
-
-		m_pGameUi->SetComboNum(input->GetPressTime("RB"), true);
-	}
-
-	if (input->GetPressTime("LB") > 2)
-	{
-		m_pGameUi->SetComboNum(input->GetPressTime("LB"), false);
-	}
-
 	m_pGameUi->UpdateComboUI();
-
+	//ダメージの更新
+	m_pGameUi->UpdateDamageUI();
 }
 
 void GameManagerBase::DrawCommon()
@@ -484,6 +485,9 @@ void GameManagerBase::DrawCommon()
 
 	//コンボの描画
 	m_pGameUi->DrawCombo();
+
+	//ダメージの描画
+	m_pGameUi->DrawDamage();
 
 	//体力を描画するかどうか
 	if (m_isDrawHpBar)

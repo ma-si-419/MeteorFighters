@@ -275,6 +275,9 @@ void CharacterStateHitAttack::Update()
 
 				//ステージにぶつかった時にダメージを受ける
 				m_pCharacter->SubHp(kStageBumpDamage);
+
+				//受けたダメージをキャラクターに渡す
+				m_pCharacter->HitAttack(kStageBumpDamage);
 			}
 
 
@@ -330,6 +333,10 @@ void CharacterStateHitAttack::Update()
 
 				//ステージにぶつかった時にダメージを受ける
 				m_pCharacter->SubHp(kStageBumpDamage);
+
+				//受けたダメージをキャラクターに渡す
+				m_pCharacter->HitAttack(kStageBumpDamage);
+				
 			}
 
 			return;

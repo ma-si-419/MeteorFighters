@@ -42,7 +42,7 @@ namespace
 	};
 
 	//フォントのサイズ
-	constexpr int kFontSize = 48;
+	constexpr int kDamageFontSize = 48;
 
 	//フォントの名前
 	const std::string kFontName = "GN-キルゴUかなNB";
@@ -73,7 +73,7 @@ namespace
 	const MyEngine::Vector2 kComboUIShiftVec = MyEngine::Vector2(50, 40);
 
 	//コンボが入ってくるときの速度
-	constexpr int kComboMoveSpeed = 75;
+	constexpr int kComboUIMoveSpeed = 75;
 
 	//数字を表示する間隔
 	constexpr float kNumberInterval = 65.0f;
@@ -82,10 +82,10 @@ namespace
 	constexpr float kDamageNumberInterval = 43.0f;
 
 	//コンボの表示時間
-	constexpr int kComboTime = 60;
+	constexpr int kComboUIShowTime = 60;
 
 	//コンボを消していく速度
-	constexpr int kComboFadeSpeed = 35;
+	constexpr int kComboUIFadeSpeed = 35;
 
 	//表示するダメージを増やしていく時間
 	constexpr int kShowDamageAddTime = 20;
@@ -107,7 +107,7 @@ SceneDebug::SceneDebug(SceneManager& sceneManager) :
 	m_showDamageAddNum(0)
 {
 	//ダメージを表示する際のフォントのハンドルを取得
-	m_damageFontHandle = CreateFontToHandle(kFontName.c_str(), kFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, 0, 2);
+	m_damageFontHandle = CreateFontToHandle(kFontName.c_str(), kDamageFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, 0, 2);
 }
 
 SceneDebug::~SceneDebug()
@@ -224,10 +224,10 @@ void SceneDebug::Update()
 	}
 
 	//コンボの時間が一定時間を超えたら
-	if (m_comboTime > kComboTime)
+	if (m_comboTime > kComboUIShowTime)
 	{
 		//コンボのアルファ値を下げる
-		m_comboAlpha -= kComboFadeSpeed;
+		m_comboAlpha -= kComboUIFadeSpeed;
 		//コンボのアルファ値が0以下になったら
 		if (m_comboAlpha <= 0)
 		{
@@ -259,9 +259,9 @@ void SceneDebug::Update()
 	if (m_combo > 0)
 	{
 		//コンボの座標を移動
-		m_comboPos.x -= kComboMoveSpeed;
+		m_comboPos.x -= kComboUIMoveSpeed;
 		//ダメージの座標を移動
-		m_damagePosX -= kComboMoveSpeed;
+		m_damagePosX -= kComboUIMoveSpeed;
 	}
 	else
 	{

@@ -8,6 +8,12 @@
 
 namespace
 {
+	//フォントの名前
+	const TCHAR* kFontName = "GN-キルゴUかなNB";
+
+	//ダメージを表示する際のフォントのサイズ
+	constexpr int kDamageFontSize = 48;
+
 	//一本のHPバーの体力量
 	constexpr int kMaxHp = 10000;
 
@@ -131,31 +137,38 @@ namespace
 	constexpr int kBashButtonChangeTime = 10;
 
 	//ダメージを表示する座標
-	constexpr int kDamagePosX = Game::kWindowWidth - 90;
-	constexpr int kDamagePosY = Game::kWindowHeight / 2 + 70;
+	constexpr int kDamagePosX[2] = { 270,Game::kWindowWidth - 330 };
+	constexpr int kDamagePosY = Game::kWindowHeight / 2 + 50;
 
 	//ダメージの初期座標
-	constexpr int kDamageInitPosX = Game::kWindowWidth + 300;
+	constexpr int kDamageInitPosX[2] = { -300, Game::kWindowWidth + 300 };
 
 	//コンボのUIを表示する座標
 	constexpr int kComboUIPosX[2] = { 200,Game::kWindowWidth - 200 };
-	constexpr int kComboUIPosY = Game::kWindowHeight / 2 - 50;
+	constexpr int kComboUIPosY = Game::kWindowHeight / 2;
 
 	//コンボ数を表示する座標
-	constexpr int kComboNumberShiftX = -10;
-	constexpr int kComboNumberShiftY = -24;
+	constexpr int kComboNumberShiftX = -15;
+	constexpr int kComboNumberShiftY = -64;
+
+	//コンボのHitsを表示する座標
+	constexpr int kComboHitsShiftX = 98;
+	constexpr int kComboHitsShiftY = -48;
 
 	//コンボの初期座標
 	constexpr int kComboInitPosX[2] = { -200,Game::kWindowWidth + 200 };
 
 	//コンボが入ってくるときの速度
-	constexpr int kComboMoveSpeed[2] = { 75,-75 };
+	constexpr int kComboUIMoveSpeed[2] = { 75,-75 };
 
 	//数字を表示する間隔
 	constexpr float kNumberInterval = 65.0f;
 
 	//ダメージの数字の間隔
 	constexpr float kDamageNumberInterval = 43.0f;
+
+	//ダメージのUIの色
+	const int kDamageColor = GetColor(255, 255, 255);
 
 	//コンボの数字を表示する間隔
 	constexpr float kComboNumberInterval = 65.0f;
@@ -164,10 +177,10 @@ namespace
 	constexpr int kComboStartNum = 2;
 
 	//コンボの表示時間
-	constexpr int kComboTime = 60;
+	constexpr int kComboUIShowTime = 100;
 
 	//コンボを消していく速度
-	constexpr int kComboFadeSpeed = 35;
+	constexpr int kComboUIFadeSpeed = 35;
 
 	//表示するダメージを増やしていく時間
 	constexpr int kShowDamageAddTime = 20;
@@ -188,8 +201,24 @@ GameUi::GameUi() :
 	m_onHitDamageHp(),
 	m_hitDamageTime(),
 	m_onSubMp(),
-	m_bashButtonChangeTime(0)
+	m_bashButtonChangeTime(0),
+	m_comboNum(),
+	m_comboTime(),
+	m_comboPosX(),
+	m_comboScale(),
+	m_comboAlpha(),
+	m_damage(),
+	m_showDamage(),
+	m_showDamageAddNum(),
+	m_damagePosX(),
+	m_damageAlpha()
 {
+	m_damageFontHandle = CreateFontToHandle(kFontName, kDamageFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, 0, 2);
+}
+
+GameUi::~GameUi()
+{
+	DeleteFontToHandle(m_damageFontHandle);
 }
 
 void GameUi::RetryInit()
@@ -728,11 +757,11 @@ void GameUi::DrawMpBar(float mp, bool isLeft)
 
 void GameUi::UpdateComboUI()
 {
-	//コンボ数の表示
+	//コンボとダメージの表示を更新する
 	for (int i = 0; i < 2; i++)
 	{
 		//コンボ数が規定数より大きいなら
-		if (m_comboNum[i] > kComboStartNum)
+		if (m_comboNum[i] >= kComboStartNum)
 		{
 			//コンボ数の表示時間を減らす
 			m_comboTime[i]--;
@@ -743,10 +772,10 @@ void GameUi::UpdateComboUI()
 			m_comboScale[i] = min(m_comboScale[i], kComboNumMaxScale);
 
 			//コンボの座標を動かす
-			m_comboPosX[i] += kComboMoveSpeed[i];
+			m_comboPosX[i] += kComboUIMoveSpeed[i];
 
 			//座標を右にずらしていたら
-			if (kComboMoveSpeed[i] > 0)
+			if (kComboUIMoveSpeed[i] > 0)
 			{
 				//コンボの座標をクランプ
 				m_comboPosX[i] = min(m_comboPosX[i], kComboUIPosX[i]);
@@ -762,7 +791,7 @@ void GameUi::UpdateComboUI()
 			if (m_comboTime[i] < 0)
 			{
 				//アルファ値を減らす
-				m_comboAlpha[i] -= kComboFadeSpeed;
+				m_comboAlpha[i] -= kComboUIFadeSpeed;
 			}
 		}
 
@@ -783,19 +812,80 @@ void GameUi::UpdateComboUI()
 	}
 }
 
+void GameUi::UpdateDamageUI()
+{
+	//ダメージの表示を更新する
+	for (int i = 0; i < 2; i++)
+	{
+		//表示ダメージを増やしていく
+		m_showDamage[i] += m_showDamageAddNum[i];
+
+		//表示ダメージをクランプ
+		m_showDamage[i] = min(m_showDamage[i], m_damage[i]);
+
+		//ダメージがあれば
+		if (m_showDamage[i] > 0)
+		{
+			//ダメージの表示時間を減らす
+			m_damageShowTime[i]--;
+
+			//ダメージの座標を動かす
+			m_damagePosX[i] += kComboUIMoveSpeed[i];
+
+			//座標を右にずらしていたら
+			if (kComboUIMoveSpeed[i] > 0)
+			{
+				//ダメージの座標をクランプ
+				m_damagePosX[i] = min(m_damagePosX[i], kDamagePosX[i]);
+			}
+			//座標を左にずらしていたら
+			else
+			{
+				//ダメージの座標をクランプ
+				m_damagePosX[i] = max(m_damagePosX[i], kDamagePosX[i]);
+			}
+
+			//ダメージの表示時間が無くなれば
+			if (m_damageShowTime[i] < 0)
+			{
+				//アルファ値を減らす
+				m_damageAlpha[i] -= kComboUIFadeSpeed;
+			}
+		}
+
+		//もしアルファ値が0以下なら
+		if (m_damageAlpha[i] <= 0)
+		{
+			//ダメージを0にする
+			m_showDamage[i] = 0;
+			//ダメージの表示時間を0にする
+			m_damageShowTime[i] = 0;
+			//ダメージのアルファ値を初期化する
+			m_damageAlpha[i] = 0;
+			//総ダメージ量を0にする
+			m_damage[i] = 0;
+			//ダメージの座標を初期化する
+			m_damagePosX[i] = kDamageInitPosX[i];
+			//増加ダメージ量を0にする
+			m_showDamageAddNum[i] = 0;
+		}
+
+	}
+}
+
 void GameUi::DrawCombo()
 {
 	//コンボ数の表示
 	for (int i = 0; i < 2; i++)
 	{
 		//コンボ数が規定数より大きいなら
-		if (m_comboNum[i] > kComboStartNum)
+		if (m_comboNum[i] >= kComboStartNum)
 		{
 			//コンボ数を表示する
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_comboAlpha[i]);
-			
+
 			//桁数を取得する
-			int digit = GetDigit(m_comboNum[i]);
+			int comboDigit = GetDigit(m_comboNum[i]);
 
 			//コンボ数
 			int combo = m_comboNum[i];
@@ -803,13 +893,25 @@ void GameUi::DrawCombo()
 			//コンボ数の間隔
 			int interval = kComboNumberInterval;
 
-			if (interval == 0)
+			int hitsShiftX = kComboHitsShiftX;
+			int numberShiftX = kComboNumberShiftX;
+
+			//右側の表示の際
+			if (i == 1)
 			{
-				interval *= -1;
+				//ずらす方向を変更する
+				hitsShiftX *= -1;
+				numberShiftX *= -1;
 			}
 
+			//コンボバーの表示(左右で画像を反転させる)
+			DrawRotaGraph(m_comboPosX[i], kComboUIPosY, 1.0, 0.0, GraphManager::GetInstance().GetHandle("ComboBar"), true, static_cast<bool>(i));
 
-			for (int j = 0; j < digit; j++)
+			//コンボHitsの表示
+			DrawRotaGraph(m_comboPosX[i] + hitsShiftX, kComboUIPosY + kComboHitsShiftY, 1.0, 0.0, GraphManager::GetInstance().GetHandle("ComboHits"), true);
+
+			//コンボ数の表示
+			for (int j = 0; j < comboDigit; j++)
 			{
 				//一桁目の数字
 				int num = combo % 10;
@@ -818,31 +920,51 @@ void GameUi::DrawCombo()
 				int numberHandle = GraphManager::GetInstance().GetHandle("Number" + std::to_string(num));
 
 				//コンボ数を表示する
-				DrawRotaGraph(m_comboPosX[i] + kComboNumberShiftX - interval * j, kComboUIPosY + kComboNumberShiftY, m_comboScale[i], 0.0, numberHandle, true);
-			
-				float scale = m_comboScale[i];
-
-				//拡大率をでバック表示
-				printfDx("scale:%f\n", scale);
+				DrawRotaGraph(m_comboPosX[i] + numberShiftX - interval * j, kComboUIPosY + kComboNumberShiftY, m_comboScale[i], 0.0, numberHandle, true);
 
 				//次の桁へ
 				combo /= 10;
 			}
 
+			//ブレンドモードを元に戻す
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 		}
 	}
 }
 
-void GameUi::SetComboNum(int combo, bool isLeft)
+void GameUi::DrawDamage()
 {
+	//敵とプレイヤーの分2回描画する
+	for (int i = 0; i < 2; i++)
+	{
+		//ダメージがあれば
+		if (m_showDamage[i] > 0)
+		{
+			//ダメージを表示する
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_damageAlpha[i]);
+			//ダメージの数字を表示する
+			DrawNumber(m_showDamage[i], m_damagePosX[i], kDamagePosY, kDamageNumberInterval, m_damageFontHandle, kDamageColor,static_cast<bool>(i));
+			//ブレンドモードを元に戻す
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+		}
+	}
+}
+
+void GameUi::SetCombo(int combo, bool isLeft)
+{
+	//コンボ数が0ならば
+	if (combo == 0) return;
+
 	if (isLeft)
 	{
+		//コンボ数が同じなら
+		if (m_comboNum[0] == combo) return;
+
 		//コンボ数を設定する
 		m_comboNum[0] = combo;
 
 		//コンボの表示時間を設定する
-		m_comboTime[0] = kComboTime;
+		m_comboTime[0] = kComboUIShowTime;
 
 		//コンボ数の拡大率を設定する
 		m_comboScale[0] = kComboNumInitScale;
@@ -859,11 +981,14 @@ void GameUi::SetComboNum(int combo, bool isLeft)
 	}
 	else
 	{
+		//コンボ数が同じなら
+		if (m_comboNum[1] == combo) return;
+
 		//コンボ数を設定する
 		m_comboNum[1] = combo;
 
 		//コンボの表示時間を設定する
-		m_comboTime[1] = kComboTime;
+		m_comboTime[1] = kComboUIShowTime;
 
 		//コンボ数の拡大率を設定する
 		m_comboScale[1] = kComboNumInitScale;
@@ -882,6 +1007,48 @@ void GameUi::SetComboNum(int combo, bool isLeft)
 
 void GameUi::SetDamage(int damage, bool isLeft)
 {
+	//ダメージが0ならば
+	if (damage == 0) return;
+
+	if (isLeft)
+	{
+		//もしダメージが同じならば
+		if (m_damage[0] == damage) return;
+
+		if (m_showDamage[0] == 0)
+		{
+			//ダメージの座標を設定する
+			m_damagePosX[0] = kDamageInitPosX[0];
+		}
+		//総ダメージを設定する
+		m_damage[0] = damage;
+		//ダメージのアルファ値を設定する
+		m_damageAlpha[0] = 255;
+		//1フレームで増加するダメージの量を設定する
+		m_showDamageAddNum[0] = (m_damage[0] - m_showDamage[0]) / kShowDamageAddTime;
+		//表示時間を設定する
+		m_damageShowTime[0] = kComboUIShowTime;
+	}
+	else
+	{
+		//もしダメージが同じならば
+		if (m_damage[1] == damage) return;
+
+		if (m_showDamage[1] == 0)
+		{
+			//ダメージの座標を設定する
+			m_damagePosX[1] = kDamageInitPosX[0];
+		}
+		//総ダメージを設定する
+		m_damage[1] = damage;
+		//ダメージのアルファ値を設定する
+		m_damageAlpha[1] = 255;
+		//1フレームで増加するダメージの量を設定する
+		m_showDamageAddNum[1] = (m_damage[1] - m_showDamage[1]) / kShowDamageAddTime;
+		//表示時間を設定する
+		m_damageShowTime[1] = kComboUIShowTime;
+
+	}
 }
 
 void GameUi::DrawFade(int color, int alpha)
@@ -926,14 +1093,29 @@ int GameUi::GetDigit(int num)
 	return digit;
 }
 
-void GameUi::DrawNumber(int number, int posX, int posY, int interval, int fontHandle, int color)
+void GameUi::DrawNumber(int number, int posX, int posY, int interval, int fontHandle, int color, bool isLeft)
 {
 	int digit = GetDigit(number);
 	int num = number;
-	for (int i = 0; i < digit; i++)
+
+	//左揃え
+	if (isLeft)
 	{
-		int digitNum = num % 10;
-		DrawFormatStringToHandle(posX - (interval * i), posY, color, fontHandle, "%d", digitNum);
-		num /= 10;
+		for (int i = 0; i < digit; i++)
+		{
+			int digitNum = num % 10;
+			DrawFormatStringToHandle(posX - (i - digit) * interval, posY, color, fontHandle, "%d", digitNum);
+			num /= 10;
+		}
+	}
+	//右揃え
+	else
+	{
+		for (int i = 0; i < digit; i++)
+		{
+			int digitNum = num % 10;
+			DrawFormatStringToHandle(posX - interval * i, posY, color, fontHandle, "%d", digitNum);
+			num /= 10;
+		}
 	}
 }

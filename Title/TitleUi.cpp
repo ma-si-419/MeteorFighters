@@ -11,7 +11,7 @@ namespace
 	const TCHAR* kFontName = "GN-キルゴUかなNB";
 
 	//文字の大きさ
-	constexpr int kFontSize = 50;
+	constexpr int kDamageFontSize = 50;
 
 	//文字の色(グレー)
 	const unsigned int kFontColor = GetColor(192, 192, 192);
@@ -156,7 +156,7 @@ TitleUi::TitleUi() :
 	m_fontHandle(-1)
 {
 	//フォントのハンドルの取得
-	m_fontHandle = CreateFontToHandle(kFontName, kFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
+	m_fontHandle = CreateFontToHandle(kFontName, kDamageFontSize, 0, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 3);
 }
 
 TitleUi::~TitleUi()

@@ -36,8 +36,8 @@ namespace
 	//敵が正面にいないときのターゲット座標までの距離
 	constexpr float kTargetDistance = 30.0f;
 
-	//ボイスの大きさ(255がMAX)
-	constexpr int kVoiceVolume = 40;
+	//コンボが途切れる時間
+	constexpr int kComboTime = 100;
 
 	//ノックアウト時の時間の進む速度
 	constexpr float kKnockOutTimeSpeed = 0.1f;
@@ -117,7 +117,19 @@ Character::Character(ObjectTag tag, CharacterKind kind) :
 	m_isEndAnim(false),
 	m_modelPath("empty"),
 	m_nowHitReaction(Character::HitReactionKind::kNone),
-	m_isDrawCharacter(true)
+	m_isDrawCharacter(true),
+	m_voiceHandle(-1),
+	m_knockOutVelo(0, 0, 0),
+	m_pBattleManager(nullptr),
+	m_pState(nullptr),
+	m_pScene(nullptr),
+	m_drawShiftVec(0, 0, 0),
+	m_playAnimKind(AnimKind::kIdle),
+	m_nowHp(0),
+	m_nowMp(0),
+	m_damage(0),
+	m_combo(0),
+	m_lastDamageTime(0)
 {
 	auto sphereData = std::dynamic_pointer_cast<SphereColliderData>(m_pColData);
 
@@ -254,6 +266,17 @@ void Character::Update()
 		}
 	}
 
+	m_lastDamageTime++;
+
+	//ダメージを受けてからの時間が一定時間経過したら
+	if (m_lastDamageTime > kComboTime)
+	{
+		//ダメージを受けていない状態にする
+		m_lastDamageTime = 0;
+		m_damage = 0;
+		m_combo = 0;
+	}
+
 	//状況によって変化するアップデート
 	(this->*m_updateSituationFunc)();
 
@@ -379,6 +402,13 @@ MyEngine::Vector3 Character::GetPos()
 MyEngine::Vector3 Character::GetVelo()
 {
 	return m_rigidbody.GetVelo();
+}
+
+void Character::HitAttack(int damage)
+{
+	m_damage += damage;
+	m_combo++;
+	m_lastDamageTime = 0;
 }
 
 bool Character::SubMp(float subMp)

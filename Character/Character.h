@@ -343,6 +343,24 @@ public:
 	float GetMp() { return m_nowMp; }
 
 	/// <summary>
+	/// 攻撃を受けた時に呼ぶ関数
+	/// </summary>
+	/// <param name="damage">受けたダメージ量</param>
+	void HitAttack(int damage);
+
+	/// <summary>
+	/// 受けたダメージを取得する
+	/// </summary>
+	/// <returns>受けたダメージ</returns>
+	int GetDamage() { return m_damage; }
+
+	/// <summary>
+	/// 受けたコンボ数を取得する
+	/// </summary>
+	/// <returns>受けたコンボ数</returns>
+	int GetCombo() { return m_combo; }
+
+	/// <summary>
 	/// 体力を減らす
 	/// </summary>
 	/// <param name="subHp">減少量</param>
@@ -754,6 +772,12 @@ private:
 	bool m_isDrawCharacter;
 	//話している声のプレイハンドル
 	int m_voiceHandle;
+	//受けたダメージ量を保存する
+	int m_damage;
+	//受けたコンボ量を保存する
+	int m_combo;
+	//前ダメージを受けてからの時間を保存する
+	int m_lastDamageTime;
 
 	friend CharacterStateBase;
 };

@@ -8,6 +8,8 @@ public:
 
 	GameUi();
 
+	~GameUi();
+
 	/// <summary>
 	/// リトライする際の初期化を行う
 	/// </summary>
@@ -33,16 +35,26 @@ public:
 	void UpdateComboUI();
 
 	/// <summary>
+	/// ダメージの更新を行う
+	/// </summary>
+	void UpdateDamageUI();
+
+	/// <summary>
 	/// コンボ数を描画する
 	/// </summary>
 	void DrawCombo();
+
+	/// <summary>
+	/// ダメージ数を描画する
+	/// </summary>
+	void DrawDamage();
 
 	/// <summary>
 	/// コンボ数を設定する
 	/// </summary>
 	/// <param name="combo">コンボ数</param>
 	/// <param name="isLeft">1P側ならtrue</param>
-	void SetComboNum(int combo, bool isLeft);
+	void SetCombo(int combo, bool isLeft);
 
 	/// <summary>
 	/// ダメージを設定する
@@ -81,10 +93,15 @@ private:
 	/// <param name="interval">描画する間隔</param>
 	/// <param name="fontHandle">フォントハンドル</param>
 	/// <param name="color">色</param>
-	void DrawNumber(int number, int posX, int posY, int interval, int fontHandle, int color);
+	/// <param name="isLeft">左ぞろえならtrue</param>
+	void DrawNumber(int number, int posX, int posY, int interval, int fontHandle, int color, bool isLeft);
+
+
 
 private:
 
+	//ダメージを表示するときのフォントハンドル
+	int m_damageFontHandle;
 
 	//1Pと2Pの二つのHpバーがあるので二つ持っておく
 	MyEngine::Vector2 m_shakePos[2];
@@ -122,6 +139,9 @@ private:
 	//コンボのアルファ値
 	int m_comboAlpha[2];
 
+	//総ダメージ量
+	int m_damage[2];
+
 	//表示しているダメージ
 	int m_showDamage[2];
 
@@ -130,4 +150,10 @@ private:
 
 	//ダメージを表示する座標
 	int m_damagePosX[2];
+
+	//ダメージのアルファ値
+	int m_damageAlpha[2];
+
+	//ダメージの表示時間
+	int m_damageShowTime[2];
 };
