@@ -148,11 +148,11 @@ namespace
 	constexpr int kComboUIPosY = Game::kWindowHeight / 2;
 
 	//コンボ数を表示する座標
-	constexpr int kComboNumberShiftX = -15;
+	constexpr int kComboNumberShiftX[2] = {-15 ,-108};
 	constexpr int kComboNumberShiftY = -64;
 
 	//コンボのHitsを表示する座標
-	constexpr int kComboHitsShiftX = 98;
+	constexpr int kComboHitsShiftX[2] = { 98, -0};
 	constexpr int kComboHitsShiftY = -48;
 
 	//コンボの初期座標
@@ -893,22 +893,11 @@ void GameUi::DrawCombo()
 			//コンボ数の間隔
 			int interval = kComboNumberInterval;
 
-			int hitsShiftX = kComboHitsShiftX;
-			int numberShiftX = kComboNumberShiftX;
-
-			//右側の表示の際
-			if (i == 1)
-			{
-				//ずらす方向を変更する
-				hitsShiftX *= -1;
-				numberShiftX *= -1;
-			}
-
 			//コンボバーの表示(左右で画像を反転させる)
 			DrawRotaGraph(m_comboPosX[i], kComboUIPosY, 1.0, 0.0, GraphManager::GetInstance().GetHandle("ComboBar"), true, static_cast<bool>(i));
 
 			//コンボHitsの表示
-			DrawRotaGraph(m_comboPosX[i] + hitsShiftX, kComboUIPosY + kComboHitsShiftY, 1.0, 0.0, GraphManager::GetInstance().GetHandle("ComboHits"), true);
+			DrawRotaGraph(m_comboPosX[i] + kComboHitsShiftX[i], kComboUIPosY + kComboHitsShiftY, 1.0, 0.0, GraphManager::GetInstance().GetHandle("ComboHits"), true);
 
 			//コンボ数の表示
 			for (int j = 0; j < comboDigit; j++)
@@ -920,7 +909,7 @@ void GameUi::DrawCombo()
 				int numberHandle = GraphManager::GetInstance().GetHandle("Number" + std::to_string(num));
 
 				//コンボ数を表示する
-				DrawRotaGraph(m_comboPosX[i] + numberShiftX - interval * j, kComboUIPosY + kComboNumberShiftY, m_comboScale[i], 0.0, numberHandle, true);
+				DrawRotaGraph(m_comboPosX[i] + kComboNumberShiftX[i] - interval * j, kComboUIPosY + kComboNumberShiftY, m_comboScale[i], 0.0, numberHandle, true);
 
 				//次の桁へ
 				combo /= 10;
@@ -943,7 +932,7 @@ void GameUi::DrawDamage()
 			//ダメージを表示する
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_damageAlpha[i]);
 			//ダメージの数字を表示する
-			DrawNumber(m_showDamage[i], m_damagePosX[i], kDamagePosY, kDamageNumberInterval, m_damageFontHandle, kDamageColor,static_cast<bool>(i));
+			DrawNumber(m_showDamage[i], m_damagePosX[i], kDamagePosY, kDamageNumberInterval, m_damageFontHandle, kDamageColor, static_cast<bool>(i));
 			//ブレンドモードを元に戻す
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 		}
