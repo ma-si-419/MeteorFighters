@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{22a1bb1d-534b-4323-a825-0fe9f3f56ba8}</ProjectGuid>
-    <RootNamespace>NoteState</RootNamespace>
+    <ProjectGuid>{b2f66256-ebe3-43b5-8e93-ba91f0a7edd4}</ProjectGuid>
+    <RootNamespace>DxState</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -102,10 +102,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(DXLIB_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(DXLIB_DIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -118,12 +120,26 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Character.cpp" />
+    <ClCompile Include="CharacterStateMove.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="CharacterStateAttack.cpp" />
+    <ClCompile Include="CharacterStateBase.cpp" />
+    <ClCompile Include="CharacterStateDefense.cpp" />
+    <ClCompile Include="CharacterStateIdle.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Character.h" />
+    <ClInclude Include="CharacterStateAttack.h" />
+    <ClInclude Include="CharacterStateBase.h" />
+    <ClInclude Include="CharacterStateDefense.h" />
+    <ClInclude Include="CharacterStateIdle.h" />
+    <ClInclude Include="CharacterStateMove.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
